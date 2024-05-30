@@ -23,33 +23,6 @@ const LoginPage = () => {
 
 	const { wallets } = useWallets()
 
-	const handleBackendLogin = async () => {
-		console.log('handleBackendLogin')
-		let result = await fetchNonce({ address: user?.wallet?.address! })
-		console.log('nonce', result)
-
-		const message = 'Sign message'
-
-		let signedMessage = ''
-		try {
-			signedMessage = await signMessage(message)
-		} catch (e: any) {
-			console.log('User did not sign transaction')
-		}
-
-		let tokenResult = await fetchToken({
-			address: user?.wallet?.address!,
-			message,
-			signedMessage,
-			nonce: result.nonce,
-		})
-		console.log('tokenResult', tokenResult)
-		setTokenCookie(tokenResult.token)
-		console.log('cookie', getTokenCookie())
-	}
-
-	const showBackend = ready && authenticated
-
 	const signOut = async () => {
 		await logout()
 	}
@@ -62,7 +35,7 @@ const LoginPage = () => {
 
 		if (ready && authenticated && wallets?.length > 0) {
 			// Replace this code with however you'd like to handle an authenticated user
-			router.push('/authenticate')
+			router.push('/')
 			// console.log('ready and authenticated')
 		}
 	}, [ready, authenticated, wallets, router])
