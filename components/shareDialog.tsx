@@ -39,6 +39,7 @@ interface shareDialogProps {
 const ShareDialog = (props: shareDialogProps) => {
 	const [open, setOpen] = React.useState(false)
 	const isDesktop = useMediaQuery('(min-width: 768px)')
+	const poolId = router.query.poolId
 
 	if (isDesktop) {
 		return (
