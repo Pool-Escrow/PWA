@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@privy-io/react-auth": "^1.55.2",
+		"@privy-io/server-auth": "^1.7.3",
 		"@privy-io/wagmi-connector": "^0.1.12",
 		"@radix-ui/react-alert-dialog": "^1.0.5",
 		"@radix-ui/react-dialog": "^1.0.5",

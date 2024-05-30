@@ -72,7 +72,6 @@ import {
 	handleUnregisterServer,
 } from '@/lib/api/clientAPI'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCookie } from '@/hooks/cookie'
 import { Button } from '@/components/ui/button'
 
 import LoadingAnimation from '@/components/loadingAnimation'
@@ -112,6 +111,7 @@ const PoolPage = () => {
 		sendTransaction,
 		logout,
 		login,
+		getAccessToken,
 	} = usePrivy()
 
 	const { wallets } = useWallets()
@@ -130,8 +130,7 @@ const PoolPage = () => {
 
 	const [pageUrl, setPageUrl] = useState('')
 	const [timeLeft, setTimeLeft] = useState<number>()
-
-	const { currentJwt } = useCookie()
+	const [currentJwt, setCurrentJwt] = useState<string | null>()
 
 	const calculateTimeLeft = (startTime: string) => {
 		const currentTimestamp: Date = new Date()
@@ -217,6 +216,11 @@ const PoolPage = () => {
 		queryFn: fetchUserDisplayForAddress,
 		enabled: !_.isEmpty(poolSCAdmin?.[0]?.toString()),
 	})
+
+	const retrieveAccessToken = async () => {
+		const token = await getAccessToken()
+		setCurrentJwt(token)
+	}
 
 	useEffect(() => {
 		// Update the document title using the browser API

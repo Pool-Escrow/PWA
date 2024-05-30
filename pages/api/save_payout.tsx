@@ -2,6 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { JwtPayload, decode } from 'jsonwebtoken'
+import { getUser, verifyToken } from '@/lib/server'
+import { WalletWithMetadata } from '@privy-io/react-auth'
 
 export default async function handler(
 	req: NextApiRequest,
@@ -27,9 +29,14 @@ export default async function handler(
 	)
 
 	let jwtAddress: string = '0x'
+
 	try {
-		const jwtObj = decode(jwtString, { json: true })
-		jwtAddress = jwtObj!.address
+		const claims = await verifyToken(jwtString)
+		const user = await getUser(claims!.userId)
+		// console.log('user', user)
+		const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
+		jwtAddress = walletWithMetadata?.address?.toLowerCase()
+		// console.log('address', jwtAddress)
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })
@@ -45,6 +52,7 @@ export default async function handler(
 
 	if (
 		existingData?.[0]?.['host_address'] != jwtAddress &&
+		existingData?.[0]?.['co_host_addresses'] != null &&
 		existingData?.[0]?.['co_host_addresses'].indexOf(jwtAddress) == -1
 	) {
 		console.error('Not authorised to save payouts')

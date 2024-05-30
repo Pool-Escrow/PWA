@@ -5,7 +5,6 @@ import { createBrowserClient } from '@supabase/ssr'
 import { createSupabaseBrowserClient } from '@/utils/supabase/client'
 import { createClient } from '@supabase/supabase-js'
 import jwt from 'jsonwebtoken'
-import { jwtDuration } from '@/constants/constant'
 
 type ResponseData = {
 	message: string

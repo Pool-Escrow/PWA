@@ -129,8 +129,5 @@ export const provider = new ethers.JsonRpcProvider(
 	networkish,
 )
 
-export const jwtExpiryDurationInDays = 7
-export const jwtDuration = 60 * 60 * 24 * jwtExpiryDurationInDays // Given in seconds
-
 export const dropletIFace = new Interface(dropletContract.abi)
 export const poolIFace = new Interface(poolContract.abi)
