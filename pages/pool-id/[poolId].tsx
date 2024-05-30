@@ -525,14 +525,16 @@ const PoolPage = () => {
 															)
 														},
 													)}
-													<div
-														className={`rounded-full w-12 h-12 bg-white p-0.5 absolute   md:w-14 md:h-14`}
-														style={{ zIndex: 5, left: 4 * 36 }}
-													>
-														<div className='text-white numParticipantBackground'>{`+ ${
-															poolSCParticipants?.length - 4
-														}`}</div>
-													</div>
+													{poolSCParticipants?.length > 5 && (
+														<div
+															className={`rounded-full  bg-white p-0.5 absolute   md:w-14 md:h-14`}
+															style={{ zIndex: 5, left: 4 * 36 }}
+														>
+															<div className='text-white numParticipantBackground rounded-full w-12 h-12 items-center justify-center flex'>{`+ ${
+																poolSCParticipants?.length - 4
+															}`}</div>
+														</div>
+													)}
 												</div>
 											)}
 										</div>
