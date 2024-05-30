@@ -1,12 +1,3 @@
-import { createClient } from '@supabase/supabase-js'
-import Cookies from 'js-cookie'
-import { ErrorInfo } from 'react'
-import { decode } from 'jsonwebtoken'
-import { PostgrestSingleResponse } from '@supabase/supabase-js'
-import { getSupabaseBrowserClient } from '@/utils/supabase/client'
-import { UserDisplayRow } from '@/pages/pool-id/[poolId]'
-import { QueryFunction } from '@tanstack/react-query'
-import { ethers } from 'ethers'
 import {
 	contractAddress,
 	dropletIFace,
@@ -14,6 +5,9 @@ import {
 	provider,
 	tokenAddress,
 } from '@/constants/constant'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
+import { PostgrestSingleResponse } from '@supabase/supabase-js'
+import { ethers } from 'ethers'
 
 import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
 import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
@@ -446,7 +440,6 @@ export const handleRegister = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 
 	let depositDataString = poolIFace.encodeFunctionData('deposit', [
@@ -613,7 +606,6 @@ export const handleEnableDeposit = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -652,7 +644,6 @@ export const handleStartPool = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -691,7 +682,6 @@ export const handleEndPool = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -734,7 +724,6 @@ export const handleSetWinner = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -803,7 +792,6 @@ export const handleRefundParticipant = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -942,7 +930,6 @@ export const handleSetWinners = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -1022,7 +1009,6 @@ export const handleCheckIn = async ({
 		})
 		if (!response.ok) {
 			throw new Error('Network response was not ok')
-			return
 		}
 		const data = await response.json()
 		return data
@@ -1069,7 +1055,6 @@ export const handleClaimWinning = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 
@@ -1112,7 +1097,6 @@ export const handleClaimWinnings = async ({
 	} catch (e: any) {
 		console.log('User did not sign transaction')
 		throw new Error('User did not sign transaction')
-		return
 	}
 }
 

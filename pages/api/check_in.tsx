@@ -30,7 +30,8 @@ export default async function handler(
 	try {
 		const claims = await verifyToken(jwtString)
 		const user = await getUser(claims!.userId)
-		// jwtAddress = user?.linkedAccounts[0]?.address
+		const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
+		jwtAddress = walletWithMetadata?.address?.toLowerCase()
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })
