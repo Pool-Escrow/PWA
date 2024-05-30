@@ -1,23 +1,14 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Image from 'next/image'
 import frogImage from '@/public/images/frog.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
-import {
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
 
-import React, { useState, useEffect, ChangeEvent } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 
-import { ethers } from 'ethers'
 import Appbar from '@/components/appbar'
 
-import { FundWalletConfig } from '@privy-io/react-auth'
-import { provider } from '@/constants/constant'
-import { Inter } from 'next/font/google'
-import styles from './styles/user-profile.module.css'
 import {
 	fetchUserDisplayForAddress,
 	handleUpdateUserDisplayData,
@@ -25,14 +16,13 @@ import {
 } from '@/lib/api/clientAPI'
 import camera from '@/public/images/camera.png'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Inter } from 'next/font/google'
+import styles from './styles/user-profile.module.css'
 
-import * as _ from 'lodash'
 import { useToast } from '@/components/ui/use-toast'
-import { convertToBase64, formatAddress } from '@/lib/utils'
-import { createClient } from '@supabase/supabase-js'
-import { decode } from 'jsonwebtoken'
 import { useCookie } from '@/hooks/cookie'
-import { getSupabaseBrowserClient } from '@/utils/supabase/client'
+import { convertToBase64, formatAddress } from '@/lib/utils'
+import * as _ from 'lodash'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -191,12 +181,11 @@ const EditUserProfile = () => {
 		if (profileData?.profileImageUrl) {
 			setProfileImageUrl(profileData?.profileImageUrl)
 		}
-
 		setBio(profileData?.userDisplayData.bio ?? '')
 		setDisplayName(profileData?.userDisplayData.display_name ?? '')
 		setCompany(profileData?.userDisplayData.company ?? '')
 		console.log('displayName', profileData)
-	}, [profileData, ready, authenticated, router])
+	}, [profileData, ready, authenticated, router, wallets])
 
 	return (
 		<Page>
@@ -208,6 +197,7 @@ const EditUserProfile = () => {
 					<div className='flex flex-col w-96 pb-8'>
 						<div>
 							<input
+								title='Change Profile Image'
 								type='file'
 								accept='image/*'
 								id='fileInput'
@@ -218,19 +208,25 @@ const EditUserProfile = () => {
 
 						<div className='flex w-full justify-center flex-col items-center'>
 							<button
+								title='Change Profile Image'
+								type='button'
 								onClick={triggerFileInput}
 								className='relative rounded-full m-8 w-40 aspect-square '
 							>
-								<img
-									className='rounded-full w-40 aspect-square center object-cover z-0'
-									src={profileImageUrl}
-								/>
+								{profileImageUrl && (
+									<Image
+										className='rounded-full w-40 aspect-square center object-cover z-0'
+										src={profileImageUrl}
+										alt='profile image'
+									/>
+								)}
 								<div
 									className={`w-full h-full rounded-full absolute top-0 left-0 ${styles.overlay} z-10 flex items-center justify-center`}
 								>
-									<img
+									<Image
 										src={camera.src}
-										className='object-center   object-contain'
+										className='object-center object-contain'
+										alt='camera'
 									/>
 								</div>
 							</button>

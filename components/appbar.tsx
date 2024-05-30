@@ -131,7 +131,10 @@ const Appbar = ({ backRoute, pageTitle, rightMenu }: AppBarProps) => {
 						)}
 						{rightMenu == RightMenu.ManageParticipants && (
 							<div>
-								<button className='flex flex-col items-center'>
+								<button
+									className='flex flex-col items-center'
+									title='Manage Participants'
+								>
 									<Image
 										src={`${profileData?.profileImageUrl ?? frogImage.src}`}
 										className='rounded-full w-9 h-9 object-cover'

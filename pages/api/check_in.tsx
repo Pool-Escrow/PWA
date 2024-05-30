@@ -1,8 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { getUser, verifyToken } from '@/lib/server'
-import { WalletWithMetadata } from '@privy-io/react-auth'
+import { createClient } from '@supabase/supabase-js'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
 	req: NextApiRequest,
@@ -32,8 +30,7 @@ export default async function handler(
 	try {
 		const claims = await verifyToken(jwtString)
 		const user = await getUser(claims!.userId)
-		const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
-		jwtAddress = walletWithMetadata?.address?.toLowerCase()
+		// jwtAddress = user?.linkedAccounts[0]?.address
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })
