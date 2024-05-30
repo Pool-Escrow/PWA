@@ -6,9 +6,7 @@ import { useRouter } from 'next/router'
 import { useLogout, usePrivy, useWallets } from '@privy-io/react-auth'
 import { chain } from '@/constants/constant'
 import React, { useState, useEffect } from 'react'
-import { fetchNonce, fetchToken } from '@/lib/api/clientAPI'
 
-import { getTokenCookie, setTokenCookie } from '@/hooks/cookie'
 import Link from 'next/link'
 
 const LoginPage = () => {

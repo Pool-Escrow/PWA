@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { JwtPayload, decode } from 'jsonwebtoken'
+import { PrivyClient } from '@privy-io/server-auth'
+import { getUser, verifyToken } from '@/lib/server'
 
 export default async function handler(
 	req: NextApiRequest,
@@ -27,9 +28,11 @@ export default async function handler(
 	)
 
 	let jwtAddress: string = '0x'
+
 	try {
-		const jwtObj = decode(jwtString, { json: true })
-		jwtAddress = jwtObj!.address
+		const claims = await verifyToken(jwtString)
+		const user = await getUser(claims!.userId)
+		// jwtAddress = user?.linkedAccounts[0]?.address
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })

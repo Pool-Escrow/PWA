@@ -1,20 +1,20 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useWallets } from '@privy-io/react-auth'
-import Image from 'next/image'
-import { Comfortaa } from 'next/font/google'
-import { useState } from 'react'
+import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
 import frogImage from '@/public/images/frog.png'
 import keyboardReturnImage from '@/public/images/keyboard_return.svg'
+import { useWallets } from '@privy-io/react-auth'
 import { useQuery } from '@tanstack/react-query'
-import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
+import { ChevronLeftIcon } from 'lucide-react'
+import { Comfortaa } from 'next/font/google'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from './ui/dropdown-menu'
-import { ChevronLeftIcon } from 'lucide-react'
 
 const comfortaa = Comfortaa({ subsets: ['latin'] })
 

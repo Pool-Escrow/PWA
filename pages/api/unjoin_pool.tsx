@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server'
 import { hashMessage, recoverAddress, verifyMessage } from 'ethers'
 import { createClient } from '@supabase/supabase-js'
 import { JwtPayload, decode } from 'jsonwebtoken'
+import { getUser, verifyToken } from '@/lib/server'
+import { WalletWithMetadata } from '@privy-io/react-auth'
 
 type ResponseData = {
 	message: string
@@ -37,25 +39,24 @@ export default async function handler(
 		},
 	)
 
-	const supabaseRow = {
-		participant_address: walletAddressLower,
-		status: 0,
-		pool_id: poolId,
-		// Add other columns as needed
-	}
-
+	let jwtAddress: string = '0x'
 	try {
-		const jwtObj = decode(jwtString, { json: true })
-		const jwtAddress = jwtObj!.address
-		if (jwtAddress.toLowerCase() != walletAddress.toLowerCase()) {
-			res.status(401).json({ error: 'Invalid Permissons' })
-			return
-		}
+		const claims = await verifyToken(jwtString)
+		const user = await getUser(claims!.userId)
+		console.log('user', user)
+		const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
+		jwtAddress = walletWithMetadata?.address?.toLowerCase()
+		console.log('address', jwtAddress)
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })
-
 		return
+	}
+	const supabaseRow = {
+		participant_address: jwtAddress,
+		status: 0,
+		pool_id: poolId,
+		// Add other columns as needed
 	}
 
 	async function upsertData() {

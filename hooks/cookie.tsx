@@ -1,20 +1,11 @@
-import { jwtExpiryDurationInDays } from '@/constants/constant'
 import Cookies from 'js-cookie'
 import { useState } from 'react'
 import jwt from 'jsonwebtoken'
 import { useEffect } from 'react'
+import { getAccessToken, usePrivy } from '@privy-io/react-auth'
 
 export function getTokenCookie(): string | undefined {
 	return Cookies.get('token')
-}
-
-export function setTokenCookie(token: string) {
-	Cookies.set('token', token, {
-		expires: jwtExpiryDurationInDays, // Cookie will expire in 7 days
-		sameSite: 'strict', // Set the SameSite attribute
-		secure: process.env.NODE_ENV === 'production', // Set the secure flag based on the environment
-		path: '/', // Set the path for the cookie
-	})
 }
 
 export function removeTokenCookie() {
@@ -22,36 +13,25 @@ export function removeTokenCookie() {
 }
 
 export function useCookie() {
-	const [currentJwt, setJwt] = useState(getTokenCookie())
 	const [isJwtValid, setIsJwtValid] = useState(false)
+	const [currentJwt, setCurrentJwt] = useState<string | null>()
+
+	const { ready, authenticated } = usePrivy()
 
 	const saveJwt = (tokenString: string) => {
-		setJwt(tokenString)
-		setTokenCookie(tokenString)
+		setCurrentJwt(tokenString)
+	}
+
+	const retrieveAccessToken = async () => {
+		const token = await getAccessToken()
+		setCurrentJwt(token)
 	}
 
 	useEffect(() => {
-		const tokenString: string = currentJwt ?? ''
-		console.log('useEffect tokenString')
-		const decodedToken: any = jwt.decode(tokenString, { complete: true })
-		if (decodedToken !== null) {
-			const expirationTimestamp = decodedToken.exp as number
-			const currentTimestamp = Math.floor(Date.now() / 1000)
-
-			if (currentTimestamp > expirationTimestamp) {
-				console.log('Token has expired')
-				setIsJwtValid(false)
-			} else {
-				console.log('Token is valid and has not expired')
-				setIsJwtValid(true)
-			}
-		} else {
-			console.log(
-				'Invalid token or token does not contain expiration information',
-			)
-			setIsJwtValid(false)
+		if (ready && authenticated) {
+			retrieveAccessToken()
 		}
-	}, [currentJwt, saveJwt])
+	}, [currentJwt, saveJwt, ready, authenticated])
 
 	return { currentJwt, saveJwt, isJwtValid }
 }

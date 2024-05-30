@@ -23,8 +23,6 @@ import {
 	updateUserDisplayData,
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
-import { removeTokenCookie, useCookie } from '@/hooks/cookie'
-import { JwtPayload, decode } from 'jsonwebtoken'
 import camera from '@/public/images/camera.png'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
@@ -36,8 +34,15 @@ const inter = Inter({ subsets: ['latin'] })
 
 const EditUserProfile = () => {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const {
+		ready,
+		authenticated,
+		user,
+		signMessage,
+		sendTransaction,
+		getAccessToken,
+		logout,
+	} = usePrivy()
 
 	const { wallets } = useWallets()
 
@@ -48,12 +53,12 @@ const EditUserProfile = () => {
 	)
 	const [isImageReady, setIsImageReady] = useState<boolean>(true)
 
-	const { currentJwt } = useCookie()
 	const { toast } = useToast()
 
 	const [displayName, setDisplayName] = useState<string>('')
 	const [company, setCompany] = useState<string>('')
 	const [bio, setBio] = useState<string>('')
+	const [currentJwt, setCurrentJwt] = useState<string | null>()
 
 	const handleDisplayNameChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value)
@@ -147,8 +152,11 @@ const EditUserProfile = () => {
 			description: 'Please wait...',
 		})
 		await logout()
+	}
 
-		removeTokenCookie()
+	const retrieveAccessToken = async () => {
+		const token = await getAccessToken()
+		setCurrentJwt(token)
 	}
 
 	useEffect(() => {
@@ -169,6 +177,7 @@ const EditUserProfile = () => {
 		if (profileData?.profileImageUrl) {
 			setProfileImageUrl(profileData?.profileImageUrl)
 		}
+		retrieveAccessToken()
 		setBio(profileData?.userDisplayData.bio ?? '')
 		setDisplayName(profileData?.userDisplayData.display_name ?? '')
 		setCompany(profileData?.userDisplayData.company ?? '')
