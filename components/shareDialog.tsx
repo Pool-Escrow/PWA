@@ -1,12 +1,6 @@
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
-import useMediaQuery from '@/hooks/use-media-query'
 import { Button } from '@/components/ui/button'
-import shareIcon from '@/public/images/share_icon.svg'
-import QRCode from 'react-qr-code'
-import * as _ from 'lodash'
-
 import {
 	Dialog,
 	DialogContent,
@@ -26,9 +20,14 @@ import {
 	DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import useMediaQuery from '@/hooks/use-media-query'
+import { cn } from '@/lib/utils'
+import shareIcon from '@/public/images/share_icon.svg'
+import * as _ from 'lodash'
+import Image from 'next/image'
 import router from 'next/router'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import QRCode from 'react-qr-code'
 import Divider from './divider'
 import { toast } from './ui/use-toast'
 
@@ -40,18 +39,21 @@ const ShareDialog = (props: shareDialogProps) => {
 	const [open, setOpen] = React.useState(false)
 	const isDesktop = useMediaQuery('(min-width: 768px)')
 	const poolId = router.query.poolId
-	const [pageUrl, setPageUrl] = useState('')
-
-	useEffect(() => {
-		setPageUrl(window?.location?.href)
-	}, [window?.location?.href])
 
 	if (isDesktop) {
 		return (
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
-					<button className='rounded-full w-8 h-8  md:w-14 md:h-14 md:p-3 p-2 bg-black bg-opacity-40'>
-						<img className='w-full h-full flex' src={shareIcon.src} />
+					<button
+						type='button'
+						title='Share with Friends'
+						className='rounded-full w-8 h-8  md:w-14 md:h-14 md:p-3 p-2 bg-black bg-opacity-40'
+					>
+						<Image
+							className='w-full h-full flex'
+							src={shareIcon.src}
+							alt='Share with Friends'
+						/>
 					</button>
 				</DialogTrigger>
 				<DialogContent className='sm:max-w-[425px]'>
@@ -70,8 +72,16 @@ const ShareDialog = (props: shareDialogProps) => {
 	return (
 		<Drawer open={open} onOpenChange={setOpen}>
 			<DrawerTrigger asChild>
-				<button className='rounded-full w-8 h-8  md:w-14 md:h-14 md:p-3 p-2 bg-black bg-opacity-40'>
-					<img className='w-full h-full flex' src={shareIcon.src} />
+				<button
+					title='Share with Friends'
+					type='button'
+					className='rounded-full w-8 h-8  md:w-14 md:h-14 md:p-3 p-2 bg-black bg-opacity-40'
+				>
+					<Image
+						className='w-full h-full flex'
+						src={shareIcon.src}
+						alt='Share with Friends'
+					/>
 				</button>
 			</DrawerTrigger>
 			<DrawerContent>
@@ -94,12 +104,12 @@ const ShareDialog = (props: shareDialogProps) => {
 
 function ShareForm({ className }: React.ComponentProps<'form'>) {
 	const currentRoute = router.asPath
-	const [copied, setCopied] = useState(false)
+	const [, setCopied] = useState(false)
 	const [pageUrl, setPageUrl] = useState('')
 
 	useEffect(() => {
 		setPageUrl(window?.location?.href)
-	}, [window?.location?.href])
+	}, [])
 
 	const copyToClipboard = async () => {
 		console.log('copyToClipboard')

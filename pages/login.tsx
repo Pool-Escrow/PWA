@@ -1,12 +1,10 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Image from 'next/image'
 import poolImage from '@/public/images/pool.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useLogout, usePrivy, useWallets } from '@privy-io/react-auth'
-import { chain } from '@/constants/constant'
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useEffect } from 'react'
 
 const LoginPage = () => {
 	const router = useRouter()
@@ -20,8 +18,6 @@ const LoginPage = () => {
 	}
 
 	const { wallets } = useWallets()
-
-	const showBackend = ready && authenticated
 
 	const signOut = async () => {
 		await logout()
@@ -63,6 +59,8 @@ const LoginPage = () => {
 
 						<div className='flex justify-center items-center h-full w-full mt-28'>
 							<button
+								title='Connect wallet'
+								type='button'
 								className='rounded-full gradient-background px-28 py-3'
 								onClick={handleClick}
 							>
