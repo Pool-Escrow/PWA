@@ -2,6 +2,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
+import { useRouter } from 'next/router'
+
 import { useCookie } from '@/hooks/cookie'
 import {
 	handleCreatePool,
@@ -41,6 +43,7 @@ export default function CreatePoolPage() {
 	)
 
 	const { wallets } = useWallets()
+	const router = useRouter()
 
 	const handleImageChange = async (e: any) => {
 		setIsImageReady(false)
@@ -86,6 +89,7 @@ export default function CreatePoolPage() {
 		mutationFn: handleCreatePoolServer,
 		onSuccess: () => {
 			console.log('createPoolServerMutation Success')
+			router.push('/admin')
 		},
 		onError: () => {
 			console.log('registerMutation Error')
