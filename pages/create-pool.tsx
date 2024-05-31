@@ -2,23 +2,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
-import { useRouter } from 'next/router'
-
+import { tokenAddress } from '@/constants/constant'
 import { useCookie } from '@/hooks/cookie'
-import {
-	handleCreatePool,
-	handleCreatePoolServer,
-	uploadProfileImage,
-} from '@/lib/api/clientAPI'
+import { handleCreatePool, handleCreatePoolServer } from '@/lib/api/clientAPI'
 import { convertToBase64 } from '@/lib/utils'
-import { useEffect, useState } from 'react'
-import frogImage from '@/public/images/frog.png'
 import camera from '@/public/images/camera.png'
-import styles from './styles/user-profile.module.css'
-import { testnetTokenAddress, tokenAddress } from '@/constants/constant'
-import { useMutation } from '@tanstack/react-query'
+import frogImage from '@/public/images/frog.png'
 import { useWallets } from '@privy-io/react-auth'
-import { DatePickerDemo } from '@/components/datePicker'
+import { useMutation } from '@tanstack/react-query'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import styles from './styles/user-profile.module.css'
 
 export default function CreatePoolPage() {
 	// save the current form values in the state:
@@ -243,6 +238,7 @@ export default function CreatePoolPage() {
 				<div>
 					<div>
 						<input
+							title='Upload Image'
 							type='file'
 							accept='image/*'
 							id='fileInput'
@@ -250,19 +246,25 @@ export default function CreatePoolPage() {
 							className='hidden'
 						/>
 						<button
+							title='Upload Image'
+							type='button'
 							onClick={triggerFileInput}
 							className='relative rounded-full m-8 w-40 aspect-square '
 						>
-							<img
-								className='rounded-full w-40 aspect-square center object-cover z-0'
-								src={profileImageUrl}
-							/>
+							{profileImageUrl && (
+								<Image
+									alt='Profile Image'
+									className='rounded-full w-40 aspect-square center object-cover z-0'
+									src={profileImageUrl}
+								/>
+							)}
 							<div
 								className={`w-full h-full rounded-full absolute top-0 left-0 ${styles.overlay} z-10 flex items-center justify-center`}
 							>
-								<img
+								<Image
+									alt='Camera Icon'
 									src={camera.src}
-									className='object-center   object-contain'
+									className='object-center object-contain'
 								/>
 							</div>
 						</button>

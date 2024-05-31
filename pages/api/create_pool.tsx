@@ -1,12 +1,10 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { fetchLatestPoolId } from '@/lib/api/clientAPI'
 import { getUser, verifyToken } from '@/lib/server'
 import { WalletWithMetadata } from '@privy-io/react-auth'
+import { createClient } from '@supabase/supabase-js'
 import { decode } from 'jsonwebtoken'
-import { describe } from 'node:test'
 import * as _ from 'lodash'
-import { fetchLatestPoolId } from '@/lib/api/clientAPI'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 const prepareBase64DataUrl = (base64: string) =>
 	base64
