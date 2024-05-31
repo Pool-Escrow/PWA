@@ -33,7 +33,7 @@ const LoginPage = () => {
 
 		if (ready && authenticated && wallets?.length > 0) {
 			// Replace this code with however you'd like to handle an authenticated user
-			router.push('/authenticate')
+			router.push('/')
 			// console.log('ready and authenticated')
 		}
 	}, [ready, authenticated, wallets, router])
