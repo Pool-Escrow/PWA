@@ -865,22 +865,6 @@ export const fetchSavedPayoutsFromServer = async ({
 	return savedPayouts
 }
 
-export const fetchAdminUsersFromServer = async ({
-	queryKey,
-}: {
-	queryKey: [string]
-}) => {
-	const { data: adminUsers, error }: PostgrestSingleResponse<any[]> =
-		await supabaseBrowserClient.from('admin').select('*')
-	if (error) {
-		console.error('Error reading data:', error)
-		return
-	}
-
-	console.log('adminUsers', adminUsers)
-	return adminUsers
-}
-
 export const handleSetWinners = async ({
 	params,
 }: {
