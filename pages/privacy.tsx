@@ -1,12 +1,12 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
-import { useRouter } from 'next/router'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
 
-import React, { useState, useEffect } from 'react'
+import leftArrowImage from '@/public/images/left_arrow.svg'
 import { Inter } from 'next/font/google'
 import Link from 'next/link'
-import leftArrowImage from '@/public/images/left_arrow.svg'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,7 +22,7 @@ const Privacy = () => {
 			<Section>
 				<div className='flex flex-row'>
 					<Link href={'/home'}>
-						<img src={leftArrowImage.src} alt='Back' />
+						<Image src={leftArrowImage.src} alt='Back' width={24} height={24} />
 					</Link>
 				</div>
 				<div className='flex flex-col justify-center w-full py-20 leading-loose space-y-4'>
