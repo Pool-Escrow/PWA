@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import { useLogout, usePrivy, useWallets } from '@privy-io/react-auth'
 import { chain } from '@/constants/constant'
 import React, { useState, useEffect } from 'react'
-
 import Link from 'next/link'
 
 const LoginPage = () => {
@@ -16,10 +15,13 @@ const LoginPage = () => {
 	const handleClick = () => {
 		// Replace '/your-link' with the actual path you want to navigate to
 		// router.push('/wallet-selection')
+
 		login()
 	}
 
 	const { wallets } = useWallets()
+
+	const showBackend = ready && authenticated
 
 	const signOut = async () => {
 		await logout()
@@ -33,7 +35,7 @@ const LoginPage = () => {
 
 		if (ready && authenticated && wallets?.length > 0) {
 			// Replace this code with however you'd like to handle an authenticated user
-			router.push('/')
+			router.push('/authenticate')
 			// console.log('ready and authenticated')
 		}
 	}, [ready, authenticated, wallets, router])
