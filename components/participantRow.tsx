@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import rightArrow from '@/public/images/right_arrow.svg'
 import frogImage from '@/public/images/frog.png'
+import Image from 'next/image'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-	fetchAllPoolDataFromSC,
-	fetchUserDisplayForAddress,
-} from '@/lib/api/clientAPI'
-import router from 'next/router'
+import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
+import { useQuery } from '@tanstack/react-query'
 import * as _ from 'lodash'
 import Link from 'next/link'
 
@@ -37,10 +32,13 @@ const ParticipantRow: React.FC<ParticipantRowProps> = ({
 			className='flex flex-row space-x-4 bottomDivider py-4'
 			href={routeUrl ?? window.location.href}
 		>
-			<img
+			<Image
 				src={`${profileData?.profileImageUrl ?? frogImage.src}`}
 				className=' flex rounded-full w-14 h-14 object-cover'
-			></img>
+				alt='avatar'
+				width={56}
+				height={56}
+			/>
 			<div className='flex flex-1 flex-col '>
 				<h4 className='font-medium text-lg'>{name}</h4>
 				<p
