@@ -1,5 +1,20 @@
+import {
+	CurrencyAmount
+} from '@/components/forms/controls/currency-amount.control'
+import {
+	DateTimeRange
+} from '@/components/forms/controls/date-time-range.control'
+import { ImageUploader } from '@/components/forms/controls/image-uploader.control'
+import {
+	MultiSelect
+} from '@/components/forms/controls/multi-select.control'
+import { Number } from '@/components/forms/controls/number.control'
+import {
+	TextArea
+} from '@/components/forms/controls/text-area.control'
+import { Text } from '@/components/forms/controls/text.control'
+import { Url } from '@/components/forms/controls/url.control'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from '@/components/ui/use-toast'
 import { tokenAddress } from '@/constants/constant'
@@ -16,7 +31,6 @@ import { useEffect, useState } from 'react'
 import styles from './styles/user-profile.module.css'
 
 export default function CreatePoolPage() {
-	// save the current form values in the state:
 	const [bannerImage, setBannerImage] = useState('')
 	const [name, setName] = useState('')
 	const [mainHost, setMainHost] = useState('')
@@ -403,6 +417,113 @@ export default function CreatePoolPage() {
 				Create Pool
 			</Button>
 			{/* </form> */}
+				<section className='flex flex-1 flex-col gap-6'>
+					{/* Banner Image */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Choose Image
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Update a banner photo; ideal aspect ratio is 2:1
+						</p>
+						<ImageUploader value={bannerImage} setValue={setBannerImage} />
+					</div>
+
+					{/* Name */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Name of Pool
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Enter a name for your Pool
+						</p>
+						<Text value={name} setValue={setName} />
+					</div>
+
+					{/* Main Host */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Name of Host
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Enter the host name
+						</p>
+						<Text value={mainHost} setValue={setMainHost} />
+					</div>
+
+					{/* Co-Hosts  */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Add Co-Host
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Please add your Co-Host
+						</p>
+						<MultiSelect value={coHosts} setValue={setCoHosts} />
+					</div>
+
+					{/* Date of Event */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Date of Event
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Select the date and time of the Pool
+						</p>
+						<DateTimeRange value={date} setValue={setDate} />
+					</div>
+
+					{/* Description */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Description
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Enter a description for your Pool
+						</p>
+						<TextArea value={description} setValue={setDescription} />
+					</div>
+
+					{/* Price */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Price
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							What is the price to participate in the Pool?
+						</p>
+						<CurrencyAmount value={price} setValue={setPrice} />
+					</div>
+
+					{/* Soft Cap */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Soft Cap
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Enter the max amount of paid entries allowed to join
+						</p>
+						<Number value={softCap} setValue={setSoftCap} />
+					</div>
+
+					{/* Terms URL */}
+					<div>
+						<Label className='text-base font-medium text-[#090909]'>
+							Link To Rules, Terms, and Conditions
+						</Label>
+						<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
+							Paste a link to your rules
+						</p>
+						<Url value={termsUrl} setValue={setTermsUrl} />
+					</div>
+				</section>
+				<Button
+					type='submit'
+					className='bottom-6 left-1/2 w-[345px] rounded-[32px] bg-gradient-to-b from-[#36A0F7] to-[#1364DA] py-[11px] shadow-[inset_0px_1.75px_0px_0px_rgba(255,255,255,0.25)]'
+				>
+					Create Pool
+				</Button>
+			</form>
 		</div>
 	)
 }
