@@ -1,12 +1,12 @@
 'use client'
 
-import { ThemeProvider } from 'next-themes'
-import { PrivyProvider } from '@privy-io/react-auth'
-import { base, baseSepolia } from 'viem/chains'
-import { chain } from 'constants/constant'
-import { WagmiProvider } from 'wagmi'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config } from '@/constants/config'
+import { PrivyProvider } from '@privy-io/react-auth'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { chain } from 'constants/constant'
+import { ThemeProvider } from 'next-themes'
+import { base, baseSepolia } from 'viem/chains'
+import { WagmiProvider } from 'wagmi'
 
 import { Toaster } from '@/components/ui/toaster'
 
