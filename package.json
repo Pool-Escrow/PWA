@@ -3,6 +3,7 @@
 	"version": "0.0.0",
 	"license": "MIT",
 	"scripts": {
+		"db:gen-types": "pnpx supabase gen types typescript --project-id gyxqgibjvhmkrvsaddcj --schema public > types/db.d.ts",
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
