@@ -1,41 +1,29 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
 import frogImage from '@/public/images/frog.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useRouter } from 'next/router'
-import {
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
 
-import React, { useState, useEffect, ChangeEvent, useMemo, useRef } from 'react'
-
-import Appbar, { RightMenu } from '@/components/appbar'
+import Appbar from '@/components/appbar'
+import Image from 'next/image'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { Inter } from 'next/font/google'
 
 import {
-	fetchAdminUsersFromServer,
 	fetchUserDisplayForAddress,
-	handleDeleteParticipant,
 	handleRefundParticipant,
 } from '@/lib/api/clientAPI'
-import { removeTokenCookie, useCookie } from '@/hooks/cookie'
-import { JwtPayload, decode } from 'jsonwebtoken'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
-import * as _ from 'lodash'
-import { useToast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
-import styles from './styles/admin.module.css'
-import { ethers } from 'ethers'
+import { useToast } from '@/components/ui/use-toast'
 
 const inter = Inter({ subsets: ['latin'] })
 
 const RefundUser = () => {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const { ready, authenticated } = usePrivy()
 
 	const { wallets, ready: walletsReady } = useWallets()
 
@@ -43,12 +31,10 @@ const RefundUser = () => {
 		`${frogImage.src}`,
 	)
 
-	const { currentJwt } = useCookie()
 	const { toast } = useToast()
 
 	const [displayName, setDisplayName] = useState<string>('')
 
-	const address = wallets?.[0]?.address ?? '0x'
 	const { data: profileData } = useQuery({
 		queryKey: ['loadProfileImage', wallets?.[0]?.address],
 		queryFn: fetchUserDisplayForAddress,
@@ -70,23 +56,6 @@ const RefundUser = () => {
 	const poolId = router?.query?.poolId! ?? 0
 	const participantAddress = router?.query?.address! ?? '0x'
 
-	const queryClient = useQueryClient()
-
-	// Remove deleteParticipantMutation because might not want to delete participant
-	// const deleteParticipantMutation = useMutation({
-	// 	mutationFn: handleDeleteParticipant,
-	// 	onSuccess: () => {
-	// 		console.log('Delete Participant')
-	// 		toast({
-	// 			title: 'Transaction Successful',
-	// 			description: 'Deleted Participant',
-	// 		})
-	// 	},
-	// 	onError: () => {
-	// 		console.log('setWinner Error')
-	// 	},
-	// })
-
 	const refundParticipantMutation = useMutation({
 		mutationFn: handleRefundParticipant,
 		onSuccess: () => {
@@ -96,13 +65,6 @@ const RefundUser = () => {
 				description: 'Refunded User',
 			})
 			setInputValue('0')
-			// deleteParticipantMutation.mutate({
-			// 	params: [
-			// 		poolId?.toString() ?? '0',
-			// 		participantAddress.toString(), // Fix: Convert participantAddress to string
-			// 		currentJwt ?? '',
-			// 	],
-			// })
 		},
 		onError: () => {
 			console.log('refundParticipant Error')
@@ -125,26 +87,7 @@ const RefundUser = () => {
 		})
 	}
 
-	const { isSuccess: fetchAdminUsersSuccess, data: adminUsers } = useQuery({
-		queryKey: ['fetchAdminUsersFromServer'],
-		queryFn: fetchAdminUsersFromServer,
-	})
-
 	useEffect(() => {
-		if (ready && !authenticated) {
-			// Replace this code with however you'd like to handle an unauthenticated user
-			// As an example, you might redirect them to a sign-in page
-			router.push('/login')
-		}
-
-		if (wallets.length > 0) {
-			console.log(`Wallet Length: ${wallets.length}`)
-			// console.log(`Wallet Address: ${wallets[0].address}`)
-		}
-		for (var i = 0; i < wallets.length; i++) {
-			console.log(`Wallet ${i} Address: ${wallets[i].address}`)
-		}
-
 		if (profileData?.profileImageUrl) {
 			setProfileImageUrl(profileData?.profileImageUrl)
 		}
@@ -152,19 +95,6 @@ const RefundUser = () => {
 		console.log('displayName', profileData)
 		if (inputRef?.current) {
 			inputRef.current.focus()
-		}
-
-		if (fetchAdminUsersSuccess && ready && authenticated && walletsReady) {
-			const isAddressInList = adminUsers?.some(
-				(user) =>
-					user.address?.toLowerCase() === wallets?.[0]?.address?.toLowerCase(),
-			)
-			console.log('adminUsersData', adminUsers)
-			console.log('walletAddress', wallets?.[0]?.address?.toLowerCase())
-
-			if (!isAddressInList) {
-				router.push('/')
-			}
 		}
 	}, [
 		profileData,
@@ -174,9 +104,7 @@ const RefundUser = () => {
 		inputRef,
 		inputValue,
 		wallets,
-		fetchAdminUsersSuccess,
 		walletsReady,
-		adminUsers,
 	])
 
 	return (
@@ -188,10 +116,15 @@ const RefundUser = () => {
 				>
 					<div className='flex flex-col pb-8'>
 						<div className='flex w-full justify-center'>
-							<img
-								className='rounded-full w-24 aspect-square center object-cover z-0'
-								src={profileImageUrl}
-							/>
+							{profileImageUrl && (
+								<Image
+									className='rounded-full w-24 aspect-square center object-cover z-0'
+									src={profileImageUrl}
+									alt='profile image'
+									height={96}
+									width={96}
+								/>
+							)}
 						</div>
 
 						<div className='flex flex-row'>
