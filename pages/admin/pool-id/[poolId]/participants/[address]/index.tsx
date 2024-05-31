@@ -1,41 +1,28 @@
+import Appbar, { RightMenu } from '@/components/appbar'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import frogImage from '@/public/images/frog.png'
-import { useRouter } from 'next/router'
+import { Input } from '@/components/ui/input'
+import { useToast } from '@/components/ui/use-toast'
+import { useCookie } from '@/hooks/cookie'
 import {
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
-
-import React, { useState, useEffect, ChangeEvent, useMemo, useRef } from 'react'
-
-import Appbar, { RightMenu } from '@/components/appbar'
-
-import { Inter } from 'next/font/google'
-
-import {
-	fetchAdminUsersFromServer,
 	fetchUserDisplayForAddress,
 	handleSavePayout,
 	handleSetWinner,
 } from '@/lib/api/clientAPI'
-import { removeTokenCookie, useCookie } from '@/hooks/cookie'
-import { JwtPayload, decode } from 'jsonwebtoken'
+import frogImage from '@/public/images/frog.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-import * as _ from 'lodash'
-import { useToast } from '@/components/ui/use-toast'
-import { Input } from '@/components/ui/input'
-import styles from './styles/admin.module.css'
 import { ethers } from 'ethers'
+import { Inter } from 'next/font/google'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 const UserProfile = () => {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const { ready, authenticated } = usePrivy()
 
 	const { wallets, ready: walletsReady } = useWallets()
 
@@ -135,38 +122,7 @@ const UserProfile = () => {
 		})
 	}
 
-	const { isSuccess: fetchAdminUsersSuccess, data: adminUsers } = useQuery({
-		queryKey: ['fetchAdminUsersFromServer'],
-		queryFn: fetchAdminUsersFromServer,
-	})
-
 	useEffect(() => {
-		if (ready && !authenticated) {
-			// Replace this code with however you'd like to handle an unauthenticated user
-			// As an example, you might redirect them to a sign-in page
-			router.push('/login')
-		}
-		if (fetchAdminUsersSuccess && ready && authenticated && walletsReady) {
-			const isAddressInList = adminUsers?.some(
-				(user) =>
-					user.address?.toLowerCase() === wallets?.[0]?.address?.toLowerCase(),
-			)
-			console.log('adminUsersData', adminUsers)
-			console.log('walletAddress', wallets?.[0]?.address?.toLowerCase())
-
-			if (!isAddressInList) {
-				router.push('/')
-			}
-		}
-
-		if (wallets.length > 0) {
-			console.log(`Wallet Length: ${wallets.length}`)
-			// console.log(`Wallet Address: ${wallets[0].address}`)
-		}
-		for (var i = 0; i < wallets.length; i++) {
-			console.log(`Wallet ${i} Address: ${wallets[i].address}`)
-		}
-
 		if (profileData?.profileImageUrl) {
 			setProfileImageUrl(profileData?.profileImageUrl)
 		}
@@ -182,9 +138,7 @@ const UserProfile = () => {
 		router,
 		inputRef,
 		inputValue,
-		adminUsers,
 		wallets,
-		fetchAdminUsersSuccess,
 		walletsReady,
 	])
 
@@ -201,10 +155,15 @@ const UserProfile = () => {
 				>
 					<div className='flex flex-col w-96 pb-8'>
 						<div className='flex w-full justify-center'>
-							<img
-								className='rounded-full w-24 aspect-square center object-cover z-0'
-								src={profileImageUrl}
-							/>
+							{profileImageUrl && (
+								<Image
+									className='rounded-full w-24 aspect-square center object-cover z-0'
+									src={profileImageUrl}
+									alt='profile'
+									width={96}
+									height={96}
+								/>
+							)}
 						</div>
 
 						<div className='flex flex-row'>
@@ -227,9 +186,6 @@ const UserProfile = () => {
 									ref={inputRef}
 									inputMode='numeric'
 								/>
-								{/* <span className='absolute left-0 flex-row text-sm h-16 justify-center py-2'>
-									$
-								</span> */}
 							</div>
 						</div>
 						<div className='flex flex-col w-full items-center justify-center mt-8 space-y-2'>
