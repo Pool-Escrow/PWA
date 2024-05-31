@@ -1137,6 +1137,7 @@ export const handleCreatePool = async ({
 		wallets,
 	] = params
 
+	console.log('penaltyFeeRate', penaltyFeeRate)
 	const walletAddress = wallets[0].address
 	const wallet = wallets[0]
 
@@ -1146,6 +1147,7 @@ export const handleCreatePool = async ({
 		poolName,
 		depositAmountPerPerson,
 		penaltyFeeRate,
+		token,
 	])
 
 	try {
@@ -1190,6 +1192,7 @@ export const handleCreatePoolServer = async ({
 		string,
 		string,
 		string,
+		string,
 		string[],
 		string,
 		string,
@@ -1207,6 +1210,7 @@ export const handleCreatePoolServer = async ({
 		softCap,
 		penalty,
 		tokenAddr,
+		host,
 		coHosts,
 		termsUrl,
 		jwt,
@@ -1224,6 +1228,7 @@ export const handleCreatePoolServer = async ({
 		softCap,
 		penalty,
 		tokenAddr,
+		host,
 		coHosts,
 		termsUrl,
 		jwtString: jwt,

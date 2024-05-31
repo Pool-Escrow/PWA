@@ -124,8 +124,8 @@ export default function CreatePoolPage() {
 			// jwt,
 			createPoolServerMutation.mutate({
 				params: [
-					selectedFile.name,
-					selectedFile.type,
+					selectedFile?.name,
+					selectedFile?.type,
 					selectedFileBase64,
 					date,
 					endDate,
@@ -135,17 +135,20 @@ export default function CreatePoolPage() {
 					softCap,
 					'0',
 					tokenAddress,
+					mainHost,
 					coHosts.split(','),
 					termsUrl,
 					currentJwt ?? ' ',
 				],
 			})
 		},
-		onError: () => {
+		onError: (error) => {
 			console.log('createPoolMutation Error')
+			console.error(error)
 		},
 	})
 	const onCreatePoolButtonClicked = () => {
+		toast({ title: 'Creating Pool', description: 'Please wait...' })
 		createPoolMutation.mutate({
 			params: [date, endDate, name, price, '0', tokenAddress, wallets],
 		})
