@@ -1,49 +1,34 @@
+import Appbar from '@/components/appbar'
+import ClaimablePoolRow from '@/components/claimablePoolRow'
+import Divider from '@/components/divider'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Image from 'next/image'
-import frogImage from '@/public/images/frog.png'
-import { useRouter } from 'next/router'
-import {
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
-
-import React, { useState, useEffect, ChangeEvent } from 'react'
-
-import { ethers } from 'ethers'
-import Appbar from '@/components/appbar'
-
-import { FundWalletConfig } from '@privy-io/react-auth'
-import { provider } from '@/constants/constant'
-import { Inter } from 'next/font/google'
-import styles from './styles/user-profile.module.css'
+import { useToast } from '@/components/ui/use-toast'
 import {
 	fetchClaimablePoolsFromSC,
 	fetchUserDisplayForAddress,
 	handleClaimWinnings,
 } from '@/lib/api/clientAPI'
-import camera from '@/public/images/camera.png'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
-import * as _ from 'lodash'
-import { useToast } from '@/components/ui/use-toast'
 import {
 	formatAddress,
 	getAllIndicesMatching,
 	getValuesFromIndices,
 } from '@/lib/utils'
+import frogImage from '@/public/images/frog.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import _ from 'lodash'
+import { Inter } from 'next/font/google'
+import Image from 'next/image'
 import Link from 'next/link'
-import { Divide } from 'lucide-react'
-import Divider from '@/components/divider'
-import ClaimablePoolRow from '@/components/claimablePoolRow'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 const inter = Inter({ subsets: ['latin'] })
 
 const UserProfile = () => {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const { ready, authenticated } = usePrivy()
 
 	const { wallets } = useWallets()
 
@@ -54,7 +39,6 @@ const UserProfile = () => {
 	const queryClient = useQueryClient()
 	const { toast } = useToast()
 
-	const address = wallets?.[0]?.address ?? '0x'
 	const { data: profileData } = useQuery({
 		queryKey: ['loadProfileImage', wallets?.[0]?.address],
 		queryFn: fetchUserDisplayForAddress,
@@ -102,8 +86,6 @@ const UserProfile = () => {
 
 	useEffect(() => {
 		if (ready && !authenticated) {
-			// Replace this code with however you'd like to handle an unauthenticated user
-			// As an example, you might redirect them to a sign-in page
 			router.push('/login')
 		}
 
@@ -116,7 +98,7 @@ const UserProfile = () => {
 		}
 
 		console.log('displayName', profileData)
-	}, [profileData, ready, authenticated, router])
+	}, [profileData, ready, authenticated, router, wallets])
 
 	return (
 		<Page>
@@ -127,10 +109,15 @@ const UserProfile = () => {
 				>
 					<div className='flex flex-col w-full pb-8 space-y-4'>
 						<div className='flex w-full justify-center flex-col items-center space-y-4'>
-							<img
-								className='rounded-full w-40 aspect-square center object-cover z-0'
-								src={profileImageUrl}
-							/>
+							{profileImageUrl && (
+								<Image
+									className='rounded-full w-40 aspect-square center object-cover z-0'
+									src={profileImageUrl}
+									alt='avatar'
+									width={160}
+									height={160}
+								/>
+							)}
 							{!_.isEmpty(wallets?.[0]?.address) && (
 								<h3 className='font-medium'>
 									{formatAddress(wallets?.[0]?.address)}
