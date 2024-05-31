@@ -5,6 +5,7 @@ import { getUser, verifyToken } from '@/lib/server'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 import { decode } from 'jsonwebtoken'
 import { describe } from 'node:test'
+import * as _ from 'lodash'
 
 const prepareBase64DataUrl = (base64: string) =>
 	base64
@@ -30,6 +31,7 @@ export default async function handler(
 		softCap,
 		penalty,
 		tokenAddr,
+		host,
 		coHosts,
 		termsUrl,
 		jwtString,
@@ -62,27 +64,35 @@ export default async function handler(
 	}
 
 	const jwtObj = decode(jwtString, { json: true })
-
-	const { data, error } = await supabaseAdminClient.storage.from('pool').upload(
-		// `/public/${}/${Date.now()}-${selectedFile?.name}`,
-		`/public/${jwtObj?.sub}/${Date.now()}-${fileName}`,
-		// base64,
-		Buffer.from(prepareBase64DataUrl(fileBase64), 'base64'),
-		{ contentType: fileType },
-	)
-	if (error) {
-		console.error('Error uploading image:', error.message)
-		res.status(500).json({ error: 'Failed to upload pool.' })
+	let imagePath: any = null
+	if (!_.isEmpty(fileName)) {
+		const { data, error } = await supabaseAdminClient.storage
+			.from('pool')
+			.upload(
+				// `/public/${}/${Date.now()}-${selectedFile?.name}`,
+				`/public/${jwtObj?.sub}/${Date.now()}-${fileName}`,
+				// base64,
+				Buffer.from(prepareBase64DataUrl(fileBase64), 'base64'),
+				{ contentType: fileType },
+			)
+		if (error) {
+			console.error('Error uploading image:', error.message)
+			res.status(500).json({ error: 'Failed to upload pool.' })
+			return
+		}
+		imagePath = data?.path
+		console.log('imagePath', imagePath)
 	}
+
 	const { data: poolData, error: poolError } = await supabaseAdminClient
 		.from('pool')
 		.insert({
 			created_by: jwtAddress,
-			pool_image_url: data?.path,
+			pool_image_url: imagePath,
 			pool_name: poolName,
-			host_address: jwtAddress,
+			host_address: host.toLowerCase(),
 			co_host_addresses: coHosts,
-			event_timestamp: timeStart,
+			event_timestamp: new Date(timeStart * 1000).toISOString(),
 			description: description,
 			price: price,
 			soft_cap: softCap,
@@ -93,6 +103,7 @@ export default async function handler(
 	if (poolError) {
 		console.error('Error updating user data:', poolError.message)
 		res.status(500).json({ error: 'Failed to update user data.' })
+		return
 	}
 
 	console.log('Pool created successfully')
