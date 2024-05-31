@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { PrivyClient } from '@privy-io/server-auth'
 import { getUser, verifyToken } from '@/lib/server'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 
