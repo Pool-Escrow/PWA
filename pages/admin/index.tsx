@@ -1,88 +1,26 @@
+import Appbar from '@/components/appbar'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Image from 'next/image'
-import poolImage from '@/public/images/pool.png'
-import { useRouter } from 'next/router'
-import {
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
-
-import React, { useState, useEffect } from 'react'
-
-import { ethers } from 'ethers'
-import Appbar from '@/components/appbar'
-
-import { Inter } from 'next/font/google'
-import styles from './styles/admin.module.css'
-import PoolRow from '@/components/poolRow'
-import UpcomingPoolTab from '@/components/tabs/UpcomingPoolTab'
 import PastPoolTab from '@/components/tabs/PastPoolTab'
-import { useQuery } from '@tanstack/react-query'
-import { fetchAdminUsersFromServer } from '@/lib/api/clientAPI'
+import UpcomingPoolTab from '@/components/tabs/UpcomingPoolTab'
+import { Button } from '@/components/ui/button'
+import { Inter } from 'next/font/google'
+import Link from 'next/link'
+import { useState } from 'react'
+import styles from './styles/admin.module.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const Admin = () => {
-	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
-
-	const { wallets, ready: walletsReady } = useWallets()
-
-	const handleCreatePool = async () => {
-		router.push('/create-pool')
-	}
-
+export default function AdminPage() {
 	const [selectedTab, setSelectedTab] = useState(0)
 
 	const selectTab = (tabIndex: number) => {
 		setSelectedTab(tabIndex)
 	}
 
-	const { isSuccess: fetchAdminUsersSuccess, data: adminUsers } = useQuery({
-		queryKey: ['fetchAdminUsersFromServer'],
-		queryFn: fetchAdminUsersFromServer,
-	})
-
-	useEffect(() => {
-		// Update the document title using the browser API
-		if (wallets.length > 0) {
-			console.log(`Wallet Length: ${wallets.length}`)
-			console.log(`Wallet Address: ${wallets[0].address}`)
-		}
-		if (ready && !authenticated) {
-			router.push('/login')
-		}
-		console.log('wallet', wallets[0]?.address)
-
-		if (fetchAdminUsersSuccess && ready && authenticated && walletsReady) {
-			const isAddressInList = adminUsers?.some(
-				(user) =>
-					user.address?.toLowerCase() === wallets?.[0]?.address?.toLowerCase(),
-			)
-			console.log('adminUsersData', adminUsers)
-			console.log('walletAddress', wallets?.[0]?.address?.toLowerCase())
-
-			if (!isAddressInList) {
-				router.push('/')
-			}
-		}
-	}, [
-		wallets,
-		ready,
-		authenticated,
-		adminUsers,
-		router,
-		fetchAdminUsersSuccess,
-		walletsReady,
-	])
-
 	return (
 		<Page>
 			<Appbar />
-
 			<Section>
 				<div className='flex justify-center min-h-screen w-full mt-20'>
 					<div className='flex flex-col w-96 min-h-full'>
@@ -113,12 +51,12 @@ const Admin = () => {
 						{selectedTab === 0 ? <UpcomingPoolTab /> : <PastPoolTab />}
 
 						<div className='fixed bottom-6 left-1/2 transform -translate-x-1/2 w-96'>
-							<button
+							<Button
+								asChild
 								className={`bg-black w-full h-12 text-white font-bold py-2 px-4 rounded-full focus:outline-none focus:shadow-outline ${inter.className}`}
-								onClick={handleCreatePool}
 							>
-								+ Create a Pool
-							</button>
+								<Link href='/create-pool'>+ Create a Pool</Link>
+							</Button>
 						</div>
 					</div>
 				</div>
@@ -126,5 +64,3 @@ const Admin = () => {
 		</Page>
 	)
 }
-
-export default Admin
