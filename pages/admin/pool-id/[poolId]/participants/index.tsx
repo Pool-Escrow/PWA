@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useMemo, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
-import Image from 'next/image'
-
-import Page from '@/components/page'
-import Section from '@/components/section'
 import Appbar from '@/components/appbar'
-
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-
+import Page from '@/components/page'
+import ParticipantRow from '@/components/participantRow'
+import Section from '@/components/section'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { toast } from '@/components/ui/use-toast'
+import WinnerRow from '@/components/winnerRow'
+import { useCookie } from '@/hooks/cookie'
 import {
-	fetchAdminUsersFromServer,
 	fetchAllPoolDataFromDB,
 	fetchAllPoolDataFromSC,
 	fetchParticipantsDataFromServer,
@@ -19,28 +18,14 @@ import {
 	handleDeleteSavedPayouts,
 	handleSetWinners,
 } from '@/lib/api/clientAPI'
+import { dictionaryToArray, dictionaryToNestedArray } from '@/lib/utils'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCookie } from '@/hooks/cookie'
-
-import frogImage from '@/public/images/frog.png'
-import searchIcon from '@/public/images/search.svg'
-import qrIcon from '@/public/images/qr_code_icon.svg'
-
-import ParticipantRow from '@/components/participantRow'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Input } from '@/components/ui/input'
-import WinnerRow from '@/components/winnerRow'
-import {
-	dictionaryToArray,
-	dictionaryToNestedArray,
-	getAllIndicesMatching,
-} from '@/lib/utils'
 import { ethers } from 'ethers'
-import { toast } from '@/components/ui/use-toast'
+import { SearchIcon } from 'lucide-react'
 import Link from 'next/link'
-import Divider from '@/components/divider'
-import { Progress } from '@/components/ui/progress'
-import * as _ from 'lodash'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 
 const ManageParticipantsPage = () => {
 	const router = useRouter()
@@ -221,7 +206,7 @@ const ManageParticipantsPage = () => {
 		)
 		setFilteredCheckedInParticipantsInfo(filteredData)
 	}
-	const [filteredWinnersInfo, setFilteredWinnersInfo] = useState(winnersInfo)
+	const [, setFilteredWinnersInfo] = useState(winnersInfo)
 	const filterWinnersInfo = (searchQuery: string) => {
 		const filteredData = winnersInfo?.filter(
 			(item: any) =>
@@ -234,25 +219,9 @@ const ManageParticipantsPage = () => {
 		setFilteredWinnersInfo(filteredData)
 	}
 
-	const { isSuccess: fetchAdminUsersSuccess, data: adminUsers } = useQuery({
-		queryKey: ['fetchAdminUsersFromServer'],
-		queryFn: fetchAdminUsersFromServer,
-	})
-
 	useEffect(() => {
-		// Update the document title using the browser API
-		if (ready && authenticated) {
-			const walletAddress = user!.wallet!.address
-			console.log(`Wallet Address ${walletAddress}`)
-		}
-		console.log('participants', poolSCParticipants)
-
 		setPoolDbData(poolDBInfo?.poolDBInfo)
 
-		console.log('participantsInfo', JSON.stringify(participantsInfo))
-
-		console.log('poolDBInfo', poolDBInfo)
-		console.log('poolSCInfo', poolSCInfo)
 		setWinnerAddresses(dictionaryToArray(poolWinnersDetails?.[0]))
 		setWinnerDetails(dictionaryToNestedArray(poolWinnersDetails?.[1]))
 		// for loop to get the winner details
@@ -264,27 +233,6 @@ const ManageParticipantsPage = () => {
 			})
 		}
 		setWinnersInfo(tempWinnersInfo)
-		console.log('winnersDetailsAddresses', winnerAddresses)
-		console.log('winnersDetails', winnerDetails)
-
-		console.log('savedPayoutsInfo', savedPayoutsInfo)
-		console.log(
-			'savedPayoutsParticipantsAddress',
-			savedPayoutsParticipantsAddresses,
-		)
-
-		if (fetchAdminUsersSuccess && ready && authenticated && walletsReady) {
-			const isAddressInList = adminUsers?.some(
-				(user) =>
-					user.address?.toLowerCase() === wallets?.[0]?.address?.toLowerCase(),
-			)
-			console.log('adminUsersData', adminUsers)
-			console.log('walletAddress', wallets?.[0]?.address?.toLowerCase())
-
-			if (!isAddressInList) {
-				router.push('/')
-			}
-		}
 
 		setPageUrl(window?.location.href)
 		setFilteredParticipantsInfo(participantsInfo)
@@ -296,9 +244,10 @@ const ManageParticipantsPage = () => {
 		poolDBInfo,
 		participantsInfo,
 		poolWinnersDetails,
-		fetchAdminUsersSuccess,
 		walletsReady,
-		adminUsers,
+		checkedInParticipantsInfo,
+		winnerAddresses,
+		winnerDetails,
 	])
 
 	const parentRoute = useMemo(() => {
@@ -320,12 +269,11 @@ const ManageParticipantsPage = () => {
 					<div className='relative flex flex-col pt-16 w-full min-h-screen space-y-0 pb-20 md:pb-24 justify-start'>
 						<div className='relative h-10 mb-2'>
 							<span className='w-4 h-full absolute left-4 flex items-center'>
-								<img className='flex' src={searchIcon.src} />
+								<SearchIcon />
 							</span>
 							<Link
 								href={`${pageUrl}/payout-scan`}
 								className='w-6 h-10 absolute right-0 flex items-center'
-								// onClick={onQrButtonClicked}
 							>
 								<span className='w-full h-full flex items-center'>
 									<svg
