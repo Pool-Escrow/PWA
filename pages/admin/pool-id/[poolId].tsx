@@ -97,20 +97,22 @@ const AdminPoolPage = () => {
 		enabled: !_.isEmpty(poolSCToken),
 	})
 
-	const calculatedPoolSCBalance = (
-		BigInt(poolSCInfo?.[2][0]) /
-		BigInt(Math.pow(10, Number(tokenDecimals ?? 18)))
-	).toString()
+	const calculatedPoolSCBalance = (poolSCInfo: any) =>
+		(
+			BigInt(poolSCInfo?.[2][0]) /
+			BigInt(Math.pow(10, Number(tokenDecimals ?? 18)))
+		).toString()
 
-	let poolSCBalance = poolSCInfo ? calculatedPoolSCBalance : 0
+	let poolSCBalance = poolSCInfo ? calculatedPoolSCBalance(poolSCInfo) : 0
 
-	const calculatedPoolSCDepositPerPerson = (
-		BigInt(poolSCInfo?.[1][3]) /
-		BigInt(Math.pow(10, Number(tokenDecimals ?? 18)))
-	).toString()
+	const calculatedPoolSCDepositPerPerson = (poolSCInfo: any) =>
+		(
+			BigInt(poolSCInfo?.[1][3]) /
+			BigInt(Math.pow(10, Number(tokenDecimals ?? 18)))
+		).toString()
 
 	const poolSCDepositPerPersonString = poolSCInfo
-		? calculatedPoolSCDepositPerPerson
+		? calculatedPoolSCDepositPerPerson(poolSCInfo)
 		: 0
 
 	const { data: tokenSymbol } = useQuery({
