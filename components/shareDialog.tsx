@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import router from 'next/router'
 import Divider from './divider'
 import { toast } from './ui/use-toast'
@@ -40,6 +40,11 @@ const ShareDialog = (props: shareDialogProps) => {
 	const [open, setOpen] = React.useState(false)
 	const isDesktop = useMediaQuery('(min-width: 768px)')
 	const poolId = router.query.poolId
+	const [pageUrl, setPageUrl] = useState('')
+
+	useEffect(() => {
+		setPageUrl(window?.location?.href)
+	}, [window?.location?.href])
 
 	if (isDesktop) {
 		return (
@@ -90,12 +95,17 @@ const ShareDialog = (props: shareDialogProps) => {
 function ShareForm({ className }: React.ComponentProps<'form'>) {
 	const currentRoute = router.asPath
 	const [copied, setCopied] = useState(false)
+	const [pageUrl, setPageUrl] = useState('')
+
+	useEffect(() => {
+		setPageUrl(window?.location?.href)
+	}, [window?.location?.href])
 
 	const copyToClipboard = async () => {
 		console.log('copyToClipboard')
 
 		try {
-			await navigator.clipboard.writeText(window.location.href)
+			await navigator.clipboard.writeText(pageUrl.replace('admin/', ''))
 			toast({
 				title: 'Share Link',
 				description: 'Copied link to clipboard!',
@@ -116,7 +126,7 @@ function ShareForm({ className }: React.ComponentProps<'form'>) {
 					<QRCode
 						size={256}
 						style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
-						value={window.location.href}
+						value={pageUrl.replace('admin/', '')}
 						viewBox={`0 0 256 256`}
 					/>
 				)}
@@ -126,7 +136,7 @@ function ShareForm({ className }: React.ComponentProps<'form'>) {
 				<h4 className='text-sm'>Share the link:</h4>
 				<div className='flex flex-col'>
 					<div className='flex flex-row space-x-2'>
-						<Input value={window.location.href} readOnly />
+						<Input value={pageUrl.replace('admin/', '')} readOnly />
 						<Button onClick={copyToClipboard}>Copy</Button>
 					</div>
 				</div>
