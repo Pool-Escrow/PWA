@@ -126,10 +126,13 @@ export default function CreatePoolPage() {
 					date,
 					endDate,
 					name,
+					description,
 					price,
+					softCap,
 					'0',
 					tokenAddress,
 					coHosts.split(','),
+					termsUrl,
 					currentJwt ?? ' ',
 				],
 			})
@@ -263,7 +266,7 @@ export default function CreatePoolPage() {
 				{/* Ending Date and Time of Event */}
 				<div>
 					<Label className='text-base font-medium text-[#090909]'>
-						Date Start
+						Date End
 					</Label>
 					<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
 						End Date and Time
@@ -287,11 +290,9 @@ export default function CreatePoolPage() {
 
 				{/* Price */}
 				<div>
-					<Label className='text-base font-medium text-[#090909]'>
-						Choose Image
-					</Label>
+					<Label className='text-base font-medium text-[#090909]'>Price</Label>
 					<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
-						Update a banner photo; ideal aspect ratio is 2:1.
+						Price
 					</p>
 					<Input value={price} onChange={(e) => setPrice(e.target.value)} />
 				</div>
