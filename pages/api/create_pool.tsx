@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { getUser, verifyToken } from '@/lib/server'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 import { decode } from 'jsonwebtoken'
+import { describe } from 'node:test'
 
 const prepareBase64DataUrl = (base64: string) =>
 	base64
@@ -16,15 +17,23 @@ export default async function handler(
 ) {
 	// Parse the request body
 	const requestData = await req.body
-	const { fileName, fileType, selectedFileBase64, formValues, jwtString } =
-		requestData
 
-	const base64 = selectedFileBase64.split('base64,')[1]
-	console.log('base64', base64)
-	console.log('fileName', fileName)
-	console.log('fileType', fileType)
-
-	console.log('jwtString', jwtString)
+	const {
+		fileName,
+		fileType,
+		fileBase64,
+		timeStart,
+		timeEnd,
+		poolName,
+		description,
+		price,
+		softCap,
+		penalty,
+		tokenAddr,
+		coHosts,
+		termsUrl,
+		jwtString,
+	} = requestData
 
 	// Return a response
 	const supabaseAdminClient = createClient(
@@ -58,26 +67,26 @@ export default async function handler(
 		// `/public/${}/${Date.now()}-${selectedFile?.name}`,
 		`/public/${jwtObj?.sub}/${Date.now()}-${fileName}`,
 		// base64,
-		Buffer.from(prepareBase64DataUrl(selectedFileBase64), 'base64'),
+		Buffer.from(prepareBase64DataUrl(fileBase64), 'base64'),
 		{ contentType: fileType },
 	)
 	if (error) {
 		console.error('Error uploading image:', error.message)
 		res.status(500).json({ error: 'Failed to upload pool.' })
 	}
-	const { data: userData, error: poolError } = await supabaseAdminClient
+	const { data: poolData, error: poolError } = await supabaseAdminClient
 		.from('pool')
 		.insert({
 			created_by: jwtAddress,
 			pool_image_url: data?.path,
-			pool_name: formValues.name,
-			host_address: formValues.mainHost,
-			co_host_addresses: formValues.coHosts,
-			event_timestamp: formValues.date,
-			description: formValues.description,
-			price: formValues.price,
-			soft_cap: formValues.softCap,
-			link_to_rules: formValues.termsUrl,
+			pool_name: poolName,
+			host_address: jwtAddress,
+			co_host_addresses: coHosts,
+			event_timestamp: timeStart,
+			description: description,
+			price: price,
+			soft_cap: softCap,
+			link_to_rules: termsUrl,
 			participant_count: 0,
 		})
 

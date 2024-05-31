@@ -1188,7 +1188,10 @@ export const handleCreatePoolServer = async ({
 		string,
 		string,
 		string,
+		string,
+		string,
 		string[],
+		string,
 		string,
 	]
 }) => {
@@ -1199,24 +1202,30 @@ export const handleCreatePoolServer = async ({
 		timeStart,
 		timeEnd,
 		poolName,
+		description,
 		price,
+		softCap,
 		penalty,
 		tokenAddr,
 		coHosts,
+		termsUrl,
 		jwt,
 	] = params
 
 	let dataObj = {
 		fileName,
 		fileType,
-		selectedFileBase64: fileBase64,
+		fileBase64,
 		timeStart,
 		timeEnd,
 		poolName,
+		description,
 		price,
+		softCap,
 		penalty,
 		tokenAddr,
 		coHosts,
+		termsUrl,
 		jwtString: jwt,
 	}
 
