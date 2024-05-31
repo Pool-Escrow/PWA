@@ -9,4 +9,12 @@ const withPWA = require('next-pwa')({
 
 module.exports = withPWA({
 	reactStrictMode: true,
+	images: {
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: '*.supabase.co',
+			},
+		],
+	},
 })
