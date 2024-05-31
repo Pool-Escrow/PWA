@@ -1,69 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import Image from 'next/image'
-
-import Page from '@/components/page'
-import Section from '@/components/section'
 import Appbar from '@/components/appbar'
-
-import {
-	TransactionReceipt,
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
-
-import { useReadContract, createConfig, http } from 'wagmi'
-import { readContract, readContracts } from '@wagmi/core'
-import { foundry, hardhat, mainnet, sepolia } from 'viem/chains'
-import { Interface, ethers } from 'ethers'
-
-import {
-	chain,
-	tokenAddress,
-	contractAddress,
-	provider,
-	dropletIFace,
-	poolIFace,
-} from 'constants/constant'
-import { config } from '@/constants/config'
-
-import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
-import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
-
-import { getSupabaseBrowserClient } from '@/utils/supabase/client'
-import DropdownChecklist from '@/components/dropdown-checklist'
-
-import defaultPoolImage from '@/public/images/frog.png'
-import qrCodeIcon from '@/public/images/qr_code_icon.svg'
-import shareIcon from '@/public/images/share_icon.svg'
-import editIcon from '@/public/images/edit_icon.svg'
-import tripleDotsIcon from '@/public/images/tripleDots.svg'
-import userUnregisterIcon from '@/public/images/user_delete.svg'
-
-import rightArrow from '@/public/images/right_arrow.svg'
+import AvatarImage from '@/components/avatarImage'
 import Divider from '@/components/divider'
-import { Tables, Database } from '@/types/supabase'
+import Page from '@/components/page'
+import PoolStatus from '@/components/poolStatus'
+import Section from '@/components/section'
+import ShareDialog from '@/components/shareDialog'
+import TransactionDialog from '@/components/transactionDialog'
 import {
-	dictionaryToArray,
-	dictionaryToNestedArray,
-	formatCountdownTime,
-	formatEventDateTime,
-	formatTimeDiff,
-	getAllIndicesMatching,
-	getRowIndicesByColumnValue,
-	getRowsByColumnValue,
-	getValuesFromIndices,
-} from '@/lib/utils'
-import { PostgrestSingleResponse } from '@supabase/supabase-js'
-import CountdownTimer from '@/components/countdown'
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Progress } from '@/components/ui/progress'
+import { useToast } from '@/components/ui/use-toast'
 import {
 	fetchAllPoolDataFromDB,
 	fetchAllPoolDataFromSC,
-	fetchParticipantsDataFromServer,
 	fetchTokenSymbol,
 	fetchUserDisplayForAddress,
-	fetchUserDisplayInfoFromServer,
 	fetchWinnersDetailsFromSC,
 	handleClaimWinning,
 	handleRegister,
@@ -71,31 +26,27 @@ import {
 	handleUnregister,
 	handleUnregisterServer,
 } from '@/lib/api/clientAPI'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-
-import LoadingAnimation from '@/components/loadingAnimation'
-import TransactionDialog from '@/components/transactionDialog'
-import circleTick from '@/public/images/circle-tick.svg'
-
-import { useToast } from '@/components/ui/use-toast'
-
-import * as _ from 'lodash'
-import PoolStatus from '@/components/poolStatus'
-import { Progress } from '@/components/ui/progress'
-import MyProgressBar from '@/components/myProgressBar'
-import ShareDialog from '@/components/shareDialog'
-
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import AvatarImage from '@/components/avatarImage'
+	dictionaryToNestedArray,
+	formatEventDateTime,
+	getAllIndicesMatching,
+	getRowsByColumnValue,
+	getValuesFromIndices,
+} from '@/lib/utils'
+import circleTick from '@/public/images/circle-tick.svg'
+import defaultPoolImage from '@/public/images/frog.png'
+import rightArrow from '@/public/images/right_arrow.svg'
+import tripleDotsIcon from '@/public/images/tripleDots.svg'
+import userUnregisterIcon from '@/public/images/user_delete.svg'
+import { Database } from '@/types/supabase'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { ethers } from 'ethers'
+import _ from 'lodash'
+import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 export type PoolRow = Database['public']['Tables']['pool']['Row']
 export type UserDisplayRow = Database['public']['Tables']['usersDisplay']['Row']
@@ -103,24 +54,12 @@ export type UserDisplayRow = Database['public']['Tables']['usersDisplay']['Row']
 const PoolPage = () => {
 	const router = useRouter()
 
-	const {
-		ready,
-		authenticated,
-		user,
-		signMessage,
-		sendTransaction,
-		logout,
-		login,
-		getAccessToken,
-	} = usePrivy()
+	const { ready, authenticated, user, getAccessToken } = usePrivy()
 
 	const { wallets } = useWallets()
 
-	const [poolBalance, setPoolBalance] = useState<number>(0)
-	const [poolParticipants, setPoolParticipants] = useState<number>(0)
-
 	const [winnerAddresses, setWinnerAddresses] = useState<string[]>([])
-	const [winnerDetails, setWinnerDetails] = useState<string[][] | null>([[]])
+	const [, setWinnerDetails] = useState<string[][] | null>([[]])
 
 	const [poolDbData, setPoolDbData] = useState<any | undefined>()
 	const [poolImageUrl, setPoolImageUrl] = useState<String | null | undefined>()
@@ -128,22 +67,8 @@ const PoolPage = () => {
 	const [transactionInProgress, setTransactionInProgress] =
 		useState<boolean>(false)
 
-	const [pageUrl, setPageUrl] = useState('')
-	const [timeLeft, setTimeLeft] = useState<number>()
+	const [, setPageUrl] = useState('')
 	const [currentJwt, setCurrentJwt] = useState<string | null>()
-
-	const calculateTimeLeft = (startTime: string) => {
-		const currentTimestamp: Date = new Date()
-		const startDateObject: Date = new Date(startTime)
-		const timeDiff = startDateObject.getTime() - currentTimestamp.getTime()
-		const { days, minutes, seconds } = formatTimeDiff(timeDiff)
-		console.log('days', days)
-		console.log('minutes', minutes)
-		console.log('seconds', seconds)
-		console.log('timeLeft', Math.floor(timeDiff / 1000))
-
-		setTimeLeft(timeDiff)
-	}
 
 	const { toast } = useToast()
 
@@ -153,25 +78,24 @@ const PoolPage = () => {
 	const { data: poolSCInfo } = useQuery({
 		queryKey: ['fetchAllPoolDataFromSC', poolId.toString()],
 		queryFn: fetchAllPoolDataFromSC,
-		enabled: !!poolId,
+		enabled: Boolean(poolId),
 	})
 
 	const { data: poolDBInfo } = useQuery({
 		queryKey: ['fetchAllPoolDataFromDB', poolId.toString()],
 		queryFn: fetchAllPoolDataFromDB,
-		enabled: !!poolId,
+		enabled: Boolean(poolId),
 	})
 
 	const poolSCAdmin = poolSCInfo?.[0]
 	const poolSCDetail = poolSCInfo?.[1]
-
 	let poolSCBalance = poolSCInfo
-		? (BigInt(poolSCInfo?.[2][0]) / BigInt(1000000000000000000)).toString()
+		? (BigInt(poolSCInfo?.[2][0]) / BigInt('1000000000000000000')).toString()
 		: 0
 	const poolSCName = poolSCInfo?.[1][2]
 	const poolSCDepositPerPerson = poolSCInfo ? BigInt(poolSCInfo?.[1][3]) : 0
 	const poolSCDepositPerPersonString = poolSCInfo
-		? (BigInt(poolSCInfo?.[1][3]) / BigInt(1000000000000000000)).toString()
+		? (BigInt(poolSCInfo?.[1][3]) / BigInt('1000000000000000000')).toString()
 		: 0
 	const poolSCStatus = poolSCInfo?.[3]
 	const poolSCToken = poolSCInfo?.[4]
@@ -222,6 +146,8 @@ const PoolPage = () => {
 		setCurrentJwt(token)
 	}
 
+	const poolSCTimeStart = poolSCDetail?.[0]?.toString()
+
 	useEffect(() => {
 		// Update the document title using the browser API
 		if (ready && authenticated) {
@@ -234,7 +160,6 @@ const PoolPage = () => {
 		setPoolDbData(poolDBInfo?.poolDBInfo)
 		setCohostDbData(poolDBInfo?.cohostUserDisplayData ?? [])
 		setPoolImageUrl(poolDBInfo?.poolImageUrl)
-		// setWinnerAddresses(dictionaryToArray(poolWinnersDetails?.[0]))
 		setWinnerAddresses(poolWinnersDetails?.[0])
 
 		setWinnerDetails(dictionaryToNestedArray(poolWinnersDetails?.[1]))
@@ -247,9 +172,23 @@ const PoolPage = () => {
 		console.log('poolSCTimeStart', poolSCTimeStart)
 
 		setPageUrl(window?.location.href)
-	}, [ready, authenticated, poolSCInfo, poolDBInfo, poolWinnersDetails])
+	}, [
+		ready,
+		authenticated,
+		poolSCInfo,
+		poolDBInfo,
+		poolWinnersDetails,
+		poolSCParticipants,
+		setWinnerDetails,
+		poolSCWinners,
+		winnerAddresses,
+		userWonDetails,
+		cohostDbData,
+		setPageUrl,
+		user,
+		poolSCTimeStart,
+	])
 
-	const poolSCTimeStart = poolSCDetail?.[0]?.toString()
 	const eventDate = formatEventDateTime(poolSCTimeStart) ?? '0'
 
 	const registerServerMutation = useMutation({
@@ -331,17 +270,8 @@ const PoolPage = () => {
 			console.log('claimMutation Error')
 		},
 	})
-	// const percentFunded = poolDbData?.price
-	// 	? poolBalance / (poolDbData?.soft_cap * poolDbData?.price)
-	// 	: poolParticipants / poolDbData?.soft_cap
-
 	const participantPercent =
 		(poolSCParticipants?.length / poolDbData?.soft_cap) * 100
-	const viewParticipantsClicked = () => {
-		const currentRoute = router.asPath
-
-		router.push(`${currentRoute}/participants`)
-	}
 
 	const viewTicketClicked = () => {
 		const currentRoute = router.asPath
@@ -363,7 +293,6 @@ const PoolPage = () => {
 	}
 	const onRegisterButtonClicked = (e: any) => {
 		redirectIfNotLoggedIn()
-		// setTransactionInProgress(true)
 
 		console.log('onRegisterButtonClicked')
 		const connectorType = wallets?.[0]?.connectorType
@@ -378,7 +307,6 @@ const PoolPage = () => {
 	}
 
 	const onUnregisterButtonClicked = (e: any) => {
-		// setTransactionInProgress(true)
 		redirectIfNotLoggedIn()
 		console.log('onUnregisterButtonClicked')
 		const connectorType = wallets[0].connectorType
@@ -425,14 +353,16 @@ const PoolPage = () => {
 							className={`flex flex-col rounded-3xl cardBackground w-full p-4 md:p-10 md:space-y-10 space-y-4`}
 						>
 							<div className='relative rounded-3xl overflow-hidden'>
-								<img
+								<Image
+									alt='pool image'
 									src={`${
 										_.isEmpty(poolImageUrl)
 											? defaultPoolImage.src
 											: poolImageUrl
 									}`}
 									className='bg-black w-full h-full object-contain object-center'
-								></img>
+									fill
+								/>
 								<div className='absolute top-0 md:right-4 right-2  w-10 md:w-20  h-full flex flex-col items-center space-y-3 md:space-y-5 md:py-6 py-4 text-white'>
 									<ShareDialog />
 								</div>
@@ -543,15 +473,14 @@ const PoolPage = () => {
 											)}
 										</div>
 										<div className='flex flex-row items-center'>
-											{/* <button
-												className='flex flex-row items-center space-x-2 md:space-x-6 px-1 md:px-2'
-												onClick={viewParticipantsClicked}
-											> */}
-											{/* <span>View all</span> */}
 											<span>
-												<img src={`${rightArrow.src}`}></img>
+												<Image
+													src={`${rightArrow.src}`}
+													alt='right arrow'
+													width={20}
+													height={20}
+												/>
 											</span>
-											{/* </button> */}
 										</div>
 									</Link>
 								</div>
@@ -564,7 +493,13 @@ const PoolPage = () => {
 								<div className='flex flex-row items-center justify-between'>
 									<div className=' flex flex-row space-x-2'>
 										<span className='flex items-center'>
-											<img className='w-5 h-5' src={circleTick.src} />
+											<Image
+												className='w-5 h-5'
+												src={circleTick.src}
+												alt='circle tick'
+												width={20}
+												height={20}
+											/>
 										</span>
 										<span className='font-semibold'>Winner</span>
 									</div>
@@ -611,20 +546,24 @@ const PoolPage = () => {
 								<DropdownMenu>
 									<DropdownMenuTrigger>
 										<div className='w-12 h-12 p-3 bg-black rounded-full'>
-											<img
+											<Image
 												className='flex w-full h-full'
 												src={tripleDotsIcon.src}
-											></img>
+												fill
+												alt='triple dots'
+											/>
 										</div>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent sideOffset={16}>
 										<DropdownMenuItem onClick={onUnregisterButtonClicked}>
 											<div className='flex flex-row space-x-2'>
 												<span>
-													<img
+													<Image
 														className='flex w-full h-full'
 														src={userUnregisterIcon.src}
-													></img>
+														fill
+														alt='user unregister'
+													/>
 												</span>
 												<span>Unregister from Pool</span>
 											</div>
