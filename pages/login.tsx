@@ -19,6 +19,8 @@ const LoginPage = () => {
 
 	const { wallets } = useWallets()
 
+	const showBackend = ready && authenticated
+
 	const signOut = async () => {
 		await logout()
 	}
@@ -31,7 +33,7 @@ const LoginPage = () => {
 
 		if (ready && authenticated && wallets?.length > 0) {
 			// Replace this code with however you'd like to handle an authenticated user
-			router.push('/')
+			router.push('/authenticate')
 			// console.log('ready and authenticated')
 		}
 	}, [ready, authenticated, wallets, router])
