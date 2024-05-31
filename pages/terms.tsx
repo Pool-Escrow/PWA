@@ -1,30 +1,17 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
-import { useRouter } from 'next/router'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-
-import React, { useState, useEffect } from 'react'
-import { Inter } from 'next/font/google'
-import Appbar from '@/components/appbar'
+import Image from 'next/image'
 import Link from 'next/link'
 
 import leftArrowImage from '@/public/images/left_arrow.svg'
 
-const inter = Inter({ subsets: ['latin'] })
-
 const Terms = () => {
-	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
-
-	const { wallets } = useWallets()
-
 	return (
 		<Page>
 			<Section>
 				<div className='flex flex-row'>
 					<Link href={'/home'}>
-						<img src={leftArrowImage.src} alt='Back' />
+						<Image src={leftArrowImage.src} alt='Back' width={24} height={24} />
 					</Link>
 				</div>
 				<div className='flex flex-col justify-center w-full py-20 leading-loose space-y-4'>
