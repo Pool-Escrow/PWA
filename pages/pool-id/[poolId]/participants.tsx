@@ -1,37 +1,21 @@
-import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
+import { useEffect, useMemo, useState } from 'react'
 
+import Appbar from '@/components/appbar'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Appbar from '@/components/appbar'
 
-import { createBrowserClient } from '@supabase/ssr'
+import { usePrivy } from '@privy-io/react-auth'
 
-import QRCode from 'react-qr-code'
-
-import {
-	TransactionReceipt,
-	UnsignedTransactionRequest,
-	usePrivy,
-	useWallets,
-} from '@privy-io/react-auth'
-
-import { Tables, Database } from '@/types/supabase'
+import { Database } from '@/types/supabase'
 
 import {
 	fetchAllPoolDataFromDB,
 	fetchAllPoolDataFromSC,
 	fetchParticipantsDataFromServer,
-	handleRegister,
-	handleRegisterServer,
-	handleUnregister,
-	handleUnregisterServer,
 } from '@/lib/api/clientAPI'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCookie } from '@/hooks/cookie'
+import { useQuery } from '@tanstack/react-query'
 
-import frogImage from '@/public/images/frog.png'
 import ParticipantRow from '@/components/participantRow'
 
 export type PoolRow = Database['public']['Tables']['pool']['Row']
@@ -39,27 +23,10 @@ export type UserDisplayRow = Database['public']['Tables']['usersDisplay']['Row']
 
 const ParticipantsPage = () => {
 	const router = useRouter()
-
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
-
-	const { wallets } = useWallets()
-
-	const [poolBalance, setPoolBalance] = useState<number>(0)
-	const [poolParticipants, setPoolParticipants] = useState<number>(0)
-
-	const [poolDbData, setPoolDbData] = useState<any | undefined>()
-	const [poolImageUrl, setPoolImageUrl] = useState<String | undefined>()
-	const [cohostDbData, setCohostDbData] = useState<any[]>([])
-
-	const [copied, setCopied] = useState(false)
-
-	const [pageUrl, setPageUrl] = useState('')
-
-	const { currentJwt } = useCookie()
-
+	const { ready, authenticated, user } = usePrivy()
+	const [, setPoolDbData] = useState<any | undefined>()
+	const [, setPageUrl] = useState('')
 	const poolId = router?.query?.poolId
-	const queryClient = useQueryClient()
 
 	const { data: poolSCInfo } = useQuery({
 		queryKey: ['fetchAllPoolDataFromSC', poolId?.toString() ?? ' '],
@@ -73,10 +40,7 @@ const ParticipantsPage = () => {
 		enabled: !!poolId,
 	})
 
-	const poolSCStatus = poolSCInfo?.[3]
-
 	let poolSCParticipants = poolSCInfo?.[5]
-	const poolSCWinners = poolSCInfo?.[6]
 
 	const { data: participantsInfo } = useQuery({
 		queryKey: [
@@ -102,7 +66,15 @@ const ParticipantsPage = () => {
 
 		console.log('poolDBInfo', poolDBInfo)
 		setPageUrl(window?.location.href)
-	}, [ready, authenticated, poolSCInfo, poolDBInfo, participantsInfo])
+	}, [
+		ready,
+		authenticated,
+		poolSCInfo,
+		poolDBInfo,
+		participantsInfo,
+		poolSCParticipants,
+		user,
+	])
 
 	const parentRoute = useMemo(() => {
 		const paths = router.asPath.split('/')
