@@ -1,23 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import rightArrow from '@/public/images/right_arrow.svg'
-import frogImage from '@/public/images/frog.png'
 import circleTick from '@/public/images/circle-tick.svg'
+import frogImage from '@/public/images/frog.png'
+import Image from 'next/image'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
 	fetchAllPoolDataFromDB,
-	fetchUserDisplayForAddress,
 	fetchWinnersDetailsFromSC,
 } from '@/lib/api/clientAPI'
-import router from 'next/router'
-import * as _ from 'lodash'
-import { ParticipantStatus } from './participantRow'
-import { ethers } from 'ethers'
 import {
 	getAllIndicesMatching,
 	getRowsByColumnValue,
 	getValuesFromIndices,
 } from '@/lib/utils'
+import { useQuery } from '@tanstack/react-query'
+import { ethers } from 'ethers'
+import * as _ from 'lodash'
 
 import { useWallets } from '@privy-io/react-auth'
 
@@ -56,10 +52,13 @@ const ClaimablePoolRow: React.FC<ClaimablePoolRowProps> = ({ poolId }) => {
 
 	return (
 		<div className='flex flex-row space-x-4 py-4'>
-			<img
+			<Image
 				src={`${poolData?.poolImageUrl ?? frogImage.src}`}
 				className=' flex rounded-xl w-14 h-14 object-cover'
-			></img>
+				alt='avatar'
+				width={56}
+				height={56}
+			/>
 			<div className='flex flex-1 flex-col '>
 				<h4 className='font-medium text-lg '>
 					{poolData?.poolDBInfo?.['pool_name'] ?? ` Pool Id ${poolId}`}
@@ -69,7 +68,13 @@ const ClaimablePoolRow: React.FC<ClaimablePoolRowProps> = ({ poolId }) => {
 			{
 				<div className='flex flex-row items-center justify-center space-x-2'>
 					<div>
-						<img className='w-6 h-6' src={circleTick.src} />
+						<Image
+							className='w-6 h-6'
+							src={circleTick.src}
+							alt='circle-tick'
+							height={24}
+							width={24}
+						/>
 					</div>
 					<div className='rounded-2xl paidBackground px-6 py-4 fontCheckedIn font-medium'>
 						{ethers.formatEther(totalWinningAmount ?? 0).toString()} USD
