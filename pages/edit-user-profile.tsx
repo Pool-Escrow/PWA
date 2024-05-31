@@ -1,22 +1,19 @@
+import Appbar from '@/components/appbar'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import frogImage from '@/public/images/frog.png'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
-import Image from 'next/image'
-import { useRouter } from 'next/router'
-
-import { ChangeEvent, useEffect, useState } from 'react'
-
-import Appbar from '@/components/appbar'
-
 import {
 	fetchUserDisplayForAddress,
 	handleUpdateUserDisplayData,
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import camera from '@/public/images/camera.png'
+import frogImage from '@/public/images/frog.png'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Inter } from 'next/font/google'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useEffect, useState } from 'react'
 import styles from './styles/user-profile.module.css'
 
 import { useToast } from '@/components/ui/use-toast'
@@ -28,15 +25,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 const EditUserProfile = () => {
 	const router = useRouter()
-	const {
-		ready,
-		authenticated,
-		user,
-		signMessage,
-		sendTransaction,
-		getAccessToken,
-		logout,
-	} = usePrivy()
+	const { ready, authenticated, logout } = usePrivy()
 
 	const { wallets } = useWallets()
 	const queryClient = useQueryClient()
@@ -141,7 +130,6 @@ const EditUserProfile = () => {
 		})
 	}
 
-	const address = wallets?.[0]?.address ?? '0x'
 	const { data: profileData } = useQuery({
 		queryKey: ['loadProfileImage', wallets?.[0]?.address],
 		queryFn: fetchUserDisplayForAddress,
@@ -165,17 +153,7 @@ const EditUserProfile = () => {
 
 	useEffect(() => {
 		if (ready && !authenticated) {
-			// Replace this code with however you'd like to handle an unauthenticated user
-			// As an example, you might redirect them to a sign-in page
 			router.push('/')
-		}
-
-		if (wallets.length > 0) {
-			console.log(`Wallet Length: ${wallets.length}`)
-			// console.log(`Wallet Address: ${wallets[0].address}`)
-		}
-		for (var i = 0; i < wallets.length; i++) {
-			console.log(`Wallet ${i} Address: ${wallets[i].address}`)
 		}
 
 		if (profileData?.profileImageUrl) {
@@ -218,6 +196,8 @@ const EditUserProfile = () => {
 										className='rounded-full w-40 aspect-square center object-cover z-0'
 										src={profileImageUrl}
 										alt='profile image'
+										width={160}
+										height={160}
 									/>
 								)}
 								<div
@@ -226,7 +206,8 @@ const EditUserProfile = () => {
 									<Image
 										src={camera.src}
 										className='object-center object-contain'
-										alt='camera'
+										alt='camera icon'
+										fill
 									/>
 								</div>
 							</button>
@@ -278,6 +259,8 @@ const EditUserProfile = () => {
 						<div className='flex justify-center mt-8'>
 							{isImageReady && (
 								<button
+									title='Save Profile Details'
+									type='button'
 									className='bg-black rounded-full text-white py-4 px-8 w-full mt-4'
 									onClick={handleSaveButtonClicked}
 								>
@@ -286,7 +269,9 @@ const EditUserProfile = () => {
 							)}
 						</div>
 						<div className='mt-8 flex justify-center'>
-							<button onClick={handleSignOut}>Sign Out</button>
+							<button title='Sign Out' type='button' onClick={handleSignOut}>
+								Sign Out
+							</button>
 						</div>
 					</div>
 				</div>
