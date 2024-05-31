@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
 
+import Appbar from '@/components/appbar'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import Appbar from '@/components/appbar'
 
 import QRCode from 'react-qr-code'
 
-import * as _ from 'lodash'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
+import * as _ from 'lodash'
 
-import { Tables, Database } from '@/types/supabase'
+import { Database } from '@/types/supabase'
 
 import { fetchAllPoolDataFromDB } from '@/lib/api/clientAPI'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 export type PoolRow = Database['public']['Tables']['pool']['Row']
 export type UserDisplayRow = Database['public']['Tables']['usersDisplay']['Row']
@@ -21,23 +21,20 @@ export type UserDisplayRow = Database['public']['Tables']['usersDisplay']['Row']
 const TicketPage = () => {
 	const router = useRouter()
 
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const { ready, authenticated, user } = usePrivy()
 
 	const { wallets } = useWallets()
 
 	const [poolDbData, setPoolDbData] = useState<any | undefined>()
 
-	const [copied, setCopied] = useState(false)
-
-	const [pageUrl, setPageUrl] = useState('')
+	const [, setPageUrl] = useState('')
 
 	const poolId = router?.query?.poolId
 
 	const { data: poolDBInfo } = useQuery({
 		queryKey: ['fetchAllPoolDataFromDB', poolId?.toString() ?? ' '],
 		queryFn: fetchAllPoolDataFromDB,
-		enabled: !!poolId,
+		enabled: Boolean(poolId),
 	})
 
 	useEffect(() => {
@@ -51,7 +48,7 @@ const TicketPage = () => {
 
 		console.log('poolDBInfo', poolDBInfo)
 		setPageUrl(window?.location.href)
-	}, [ready, authenticated, poolDBInfo])
+	}, [ready, authenticated, poolDBInfo, user])
 
 	const parentRoute = useMemo(() => {
 		const paths = router.asPath.split('/')
