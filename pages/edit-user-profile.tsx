@@ -23,37 +23,47 @@ import {
 	updateUserDisplayData,
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
-import { removeTokenCookie, useCookie } from '@/hooks/cookie'
-import { JwtPayload, decode } from 'jsonwebtoken'
 import camera from '@/public/images/camera.png'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import * as _ from 'lodash'
 import { useToast } from '@/components/ui/use-toast'
 import { formatAddress } from '@/lib/utils'
+import { createClient } from '@supabase/supabase-js'
+import { decode } from 'jsonwebtoken'
+import { useCookie } from '@/hooks/cookie'
 
 const inter = Inter({ subsets: ['latin'] })
 
 const EditUserProfile = () => {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-		usePrivy()
+	const {
+		ready,
+		authenticated,
+		user,
+		signMessage,
+		sendTransaction,
+		getAccessToken,
+		logout,
+	} = usePrivy()
 
 	const { wallets } = useWallets()
 
 	const [fileBlob, setFileBlob] = useState<any>(null)
 	const [selectedFile, setSelectedFile] = useState<any>(null)
+	const [selectedFileBase64, setSelectedFileBase64] = useState<any>(null)
+
 	const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(
 		`${frogImage.src}`,
 	)
 	const [isImageReady, setIsImageReady] = useState<boolean>(true)
 
-	const { currentJwt } = useCookie()
 	const { toast } = useToast()
 
 	const [displayName, setDisplayName] = useState<string>('')
 	const [company, setCompany] = useState<string>('')
 	const [bio, setBio] = useState<string>('')
+	const { currentJwt } = useCookie()
 
 	const handleDisplayNameChange = (e: ChangeEvent<HTMLInputElement>) => {
 		setDisplayName(e.target.value)
@@ -65,7 +75,24 @@ const EditUserProfile = () => {
 		setBio(e.target.value)
 	}
 
-	const handleImageChange = (e: any) => {
+	const convertToBase64 = (file: File): Promise<string> => {
+		return new Promise((resolve, reject) => {
+			const fileReader = new FileReader()
+			fileReader.readAsDataURL(file)
+			fileReader.onload = () => {
+				if (typeof fileReader.result === 'string') {
+					resolve(fileReader.result)
+				} else {
+					reject('Error converting file to base64')
+				}
+			}
+			fileReader.onerror = (error) => {
+				reject(error)
+			}
+		})
+	}
+
+	const handleImageChange = async (e: any) => {
 		setIsImageReady(false)
 		if (e.target.files?.length === 0) {
 			// User cancelled selection
@@ -77,6 +104,7 @@ const EditUserProfile = () => {
 			setProfileImageUrl(URL.createObjectURL(file))
 		}
 		setSelectedFile(file)
+
 		if (file) {
 			const reader = new FileReader()
 			reader.onload = () => {
@@ -95,36 +123,28 @@ const EditUserProfile = () => {
 			}
 			reader.readAsArrayBuffer(file)
 		}
+
+		const base64 = await convertToBase64(file)
+		setSelectedFileBase64(base64)
 	}
 
 	const handleSaveButtonClicked = async (e: any) => {
+		toast({
+			title: 'Saving Details',
+			description: 'Please wait',
+		})
 		if (fileBlob != null) {
 			await uploadProfileImage(
 				fileBlob!,
 				selectedFile,
-				wallets[0].address,
+				selectedFileBase64,
 				currentJwt!,
 			)
 		}
-		const { userData, userError } = await updateUserDisplayData(
-			displayName,
-			company,
-			bio,
-			currentJwt!,
-			wallets[0].address,
-		)
-
-		if (userError) {
-			toast({
-				title: 'Error',
-				description: userError.message,
-			})
-		} else {
-			toast({
-				title: 'Saving Details',
-				description: 'You have saved the data successfully',
-			})
-		}
+		toast({
+			title: 'Details Saved',
+			description: 'You have saved the data successfully',
+		})
 	}
 
 	const address = wallets?.[0]?.address ?? '0x'
@@ -147,8 +167,6 @@ const EditUserProfile = () => {
 			description: 'Please wait...',
 		})
 		await logout()
-
-		removeTokenCookie()
 	}
 
 	useEffect(() => {
@@ -169,6 +187,7 @@ const EditUserProfile = () => {
 		if (profileData?.profileImageUrl) {
 			setProfileImageUrl(profileData?.profileImageUrl)
 		}
+
 		setBio(profileData?.userDisplayData.bio ?? '')
 		setDisplayName(profileData?.userDisplayData.display_name ?? '')
 		setCompany(profileData?.userDisplayData.company ?? '')

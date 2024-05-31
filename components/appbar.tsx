@@ -5,13 +5,11 @@ import {
 	usePrivy,
 	useWallets,
 } from '@privy-io/react-auth'
-import { removeTokenCookie, useCookie } from '@/hooks/cookie'
 
 import leftArrowImage from '@/public/images/left_arrow.svg'
 
 import { Comfortaa } from 'next/font/google'
 import { useEffect, useState } from 'react'
-import { JwtPayload, decode } from 'jsonwebtoken'
 import frogImage from '@/public/images/frog.png'
 import keyboardReturnImage from '@/public/images/keyboard_return.svg'
 
@@ -34,7 +32,6 @@ interface AppBarProps {
 
 const Appbar = ({ backRoute, pageTitle, rightMenu }: AppBarProps) => {
 	const router = useRouter()
-	const { currentJwt } = useCookie()
 	const { wallets, ready: walletsReady } = useWallets()
 	const [pageUrl, setPageUrl] = useState('')
 
@@ -46,7 +43,6 @@ const Appbar = ({ backRoute, pageTitle, rightMenu }: AppBarProps) => {
 
 	const handleSignOut = () => {
 		logout()
-		removeTokenCookie()
 	}
 	const [profileImageUrl, setProfileImageUrl] = useState<string>(
 		`${frogImage.src}`,

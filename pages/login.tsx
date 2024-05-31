@@ -6,9 +6,6 @@ import { useRouter } from 'next/router'
 import { useLogout, usePrivy, useWallets } from '@privy-io/react-auth'
 import { chain } from '@/constants/constant'
 import React, { useState, useEffect } from 'react'
-import { fetchNonce, fetchToken } from '@/lib/api/clientAPI'
-
-import { getTokenCookie, setTokenCookie } from '@/hooks/cookie'
 import Link from 'next/link'
 
 const LoginPage = () => {
@@ -18,35 +15,11 @@ const LoginPage = () => {
 	const handleClick = () => {
 		// Replace '/your-link' with the actual path you want to navigate to
 		// router.push('/wallet-selection')
+
 		login()
 	}
 
 	const { wallets } = useWallets()
-
-	const handleBackendLogin = async () => {
-		console.log('handleBackendLogin')
-		let result = await fetchNonce({ address: user?.wallet?.address! })
-		console.log('nonce', result)
-
-		const message = 'Sign message'
-
-		let signedMessage = ''
-		try {
-			signedMessage = await signMessage(message)
-		} catch (e: any) {
-			console.log('User did not sign transaction')
-		}
-
-		let tokenResult = await fetchToken({
-			address: user?.wallet?.address!,
-			message,
-			signedMessage,
-			nonce: result.nonce,
-		})
-		console.log('tokenResult', tokenResult)
-		setTokenCookie(tokenResult.token)
-		console.log('cookie', getTokenCookie())
-	}
 
 	const showBackend = ready && authenticated
 

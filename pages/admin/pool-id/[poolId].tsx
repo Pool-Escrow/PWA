@@ -67,7 +67,6 @@ import {
 	handleUnregisterServer,
 } from '@/lib/api/clientAPI'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCookie } from '@/hooks/cookie'
 import { Button } from '@/components/ui/button'
 
 import LoadingAnimation from '@/components/loadingAnimation'
@@ -103,8 +102,6 @@ const AdminPoolPage = () => {
 
 	const [pageUrl, setPageUrl] = useState('')
 	const [timeLeft, setTimeLeft] = useState<number>()
-
-	const { currentJwt } = useCookie()
 
 	const calculateTimeLeft = (startTime: string) => {
 		const currentTimestamp: Date = new Date()

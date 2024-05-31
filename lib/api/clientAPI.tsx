@@ -44,97 +44,41 @@ export interface FileObj {
 
 const supabaseBrowserClient = createSupabaseBrowserClient()
 
-export async function fetchNonce(addressObject: addressObject) {
-	try {
-		const response = await fetch('/api/nonce', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(addressObject),
-		})
-		if (!response.ok) {
-			throw new Error('Network response was not ok')
-		}
-		const data = await response.json()
-		return data
-	} catch (error) {
-		console.error('There was a problem with the fetch operation:', error)
-	}
-}
-
-export async function fetchToken(backendLoginObj: backendLoginObject) {
-	try {
-		const response = await fetch('/api/backend_login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(backendLoginObj),
-		})
-		if (!response.ok) {
-			throw new Error('Network response was not ok')
-		}
-		const data = await response.json()
-		return data
-	} catch (error) {
-		console.error('There was a problem with the fetch operation:', error)
-	}
-}
-
 export const uploadProfileImage = async (
 	fileBlob: any,
 	selectedFile: any,
-	address: string,
+	selectedFileBase64: string,
 	jwt: string,
 ) => {
-	// Upload image to Supabase storage
-	const supabaseClient = createClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			global: {
-				headers: {
-					Authorization: `Bearer ${jwt}`,
-				},
-			},
-		},
-	)
+	let dataObj = {
+		fileName: selectedFile.name,
+		fileType: selectedFile.type,
 
-	const jwtObj = decode(jwt, { json: true })
-	console.log('jwtObj', jwtObj)
-	console.log('file name', fileBlob.name)
+		selectedFileBase64: selectedFileBase64,
+		jwtString: jwt,
+	}
+
 	console.log('selectedFile', selectedFile)
+	console.log('fileBlob', selectedFile)
 
-	const { data, error } = await supabaseClient.storage
-		.from('profile')
-		.upload(
-			`/public/${jwtObj?.sub}/${Date.now()}-${selectedFile?.name}`,
-			fileBlob,
-		)
-
-	if (error) {
-		console.error('Error uploading image:', error.message)
-		return
-	}
-	console.log('Image uploaded successfully')
-
-	// Update user profile with image URL
-
-	const { data: userData, error: userError } = await supabaseClient
-		.from('usersDisplay')
-		.upsert(
-			{ avatar_url: data.path, id: jwtObj?.sub, address: jwtObj?.address },
-			{
-				onConflict: 'id',
+	try {
+		const response = await fetch('/api/upload_profile_image', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
 			},
-		)
+			body: JSON.stringify(dataObj),
+		})
 
-	if (userError) {
-		console.error('Error updating user data:', userError.message)
+		if (response.ok) {
+			const data = await response.json()
+			// setFileUrl(data.fileUrl)
+		} else {
+			console.error('Error uploading file')
+		}
+	} catch (error) {
+		console.error('Error uploading file:', error)
 	}
-
-	console.log('usersDisplay updated successfully')
 }
 
 export const updateUserDisplayData = async (

@@ -72,7 +72,6 @@ import {
 	handleUnregisterServer,
 } from '@/lib/api/clientAPI'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCookie } from '@/hooks/cookie'
 import { Button } from '@/components/ui/button'
 
 import LoadingAnimation from '@/components/loadingAnimation'
@@ -112,6 +111,7 @@ const PoolPage = () => {
 		sendTransaction,
 		logout,
 		login,
+		getAccessToken,
 	} = usePrivy()
 
 	const { wallets } = useWallets()
@@ -130,8 +130,7 @@ const PoolPage = () => {
 
 	const [pageUrl, setPageUrl] = useState('')
 	const [timeLeft, setTimeLeft] = useState<number>()
-
-	const { currentJwt } = useCookie()
+	const [currentJwt, setCurrentJwt] = useState<string | null>()
 
 	const calculateTimeLeft = (startTime: string) => {
 		const currentTimestamp: Date = new Date()
@@ -217,6 +216,11 @@ const PoolPage = () => {
 		queryFn: fetchUserDisplayForAddress,
 		enabled: !_.isEmpty(poolSCAdmin?.[0]?.toString()),
 	})
+
+	const retrieveAccessToken = async () => {
+		const token = await getAccessToken()
+		setCurrentJwt(token)
+	}
 
 	useEffect(() => {
 		// Update the document title using the browser API
@@ -525,14 +529,16 @@ const PoolPage = () => {
 															)
 														},
 													)}
-													<div
-														className={`rounded-full w-12 h-12 bg-white p-0.5 absolute   md:w-14 md:h-14`}
-														style={{ zIndex: 5, left: 4 * 36 }}
-													>
-														<div className='text-white numParticipantBackground'>{`+ ${
-															poolSCParticipants?.length - 4
-														}`}</div>
-													</div>
+													{poolSCParticipants?.length > 5 && (
+														<div
+															className={`rounded-full  bg-white p-0.5 absolute   md:w-14 md:h-14`}
+															style={{ zIndex: 5, left: 4 * 36 }}
+														>
+															<div className='text-white numParticipantBackground rounded-full w-12 h-12 items-center justify-center flex'>{`+ ${
+																poolSCParticipants?.length - 4
+															}`}</div>
+														</div>
+													)}
 												</div>
 											)}
 										</div>

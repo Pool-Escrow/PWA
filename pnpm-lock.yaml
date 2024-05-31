@@ -8,6 +8,9 @@ dependencies:
   '@privy-io/react-auth':
     specifier: ^1.55.2
     version: 1.55.2(@babel/core@7.23.0)(@types/react@18.2.28)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)(typescript@5.2.2)
+  '@privy-io/server-auth':
+    specifier: ^1.7.3
+    version: 1.7.3
   '@privy-io/wagmi-connector':
     specifier: ^0.1.12
     version: 0.1.12(@privy-io/react-auth@1.55.2)(react-dom@18.2.0)(react@18.2.0)(viem@2.7.8)(wagmi@2.5.6)
@@ -2965,6 +2968,17 @@ packages:
       - typescript
       - utf-8-validate
       - zod
+    dev: false
+
+  /@privy-io/server-auth@1.7.3:
+    resolution: {integrity: sha512-Z7h13T+QTtgLlDmbJi1oQCHOXCnPGlV/CTIpeXz0DSwxFfk9lb/+Z2ymNeDPpyn6HydJnl6heiIWIcBgiGqJ2g==}
+    dependencies:
+      dotenv: 16.4.1
+      jose: 4.15.4
+      node-fetch-native: 1.6.2
+      redaxios: 0.5.1
+      ts-case-convert: 2.0.7
+      type-fest: 3.13.1
     dev: false
 
   /@privy-io/wagmi-connector@0.1.12(@privy-io/react-auth@1.55.2)(react-dom@18.2.0)(react@18.2.0)(viem@2.7.8)(wagmi@2.5.6):
@@ -10546,6 +10560,10 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /redaxios@0.5.1:
+    resolution: {integrity: sha512-FSD2AmfdbkYwl7KDExYQlVvIrFz6Yd83pGfaGjBzM9F6rpq8g652Q4Yq5QD4c+nf4g2AgeElv1y+8ajUPiOYMg==}
+    dev: false
+
   /redis-errors@1.2.0:
     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
     engines: {node: '>=4'}
@@ -10683,6 +10701,7 @@ packages:
 
   /rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
+    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
     dependencies:
       glob: 7.2.3
@@ -11571,6 +11590,10 @@ packages:
       typescript: 5.2.2
     dev: true
 
+  /ts-case-convert@2.0.7:
+    resolution: {integrity: sha512-Kqj8wrkuduWsKUOUNRczrkdHCDt4ZNNd6HKjVw42EnMIGHQUABS4pqfy0acETVLwUTppc1fzo/yi11+uMTaqzw==}
+    dev: false
+
   /ts-custom-error@3.3.1:
     resolution: {integrity: sha512-5OX1tzOjxWEgsr/YEUWSuPrQ00deKLh6D7OTWcvNHm12/7QPyRh8SYpyWvA4IZv8H/+GQWQEh/kwo95Q9OVW1A==}
     engines: {node: '>=14.0.0'}
@@ -11637,6 +11660,11 @@ packages:
   /type-fest@0.7.1:
     resolution: {integrity: sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==}
     engines: {node: '>=8'}
+    dev: false
+
+  /type-fest@3.13.1:
+    resolution: {integrity: sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==}
+    engines: {node: '>=14.16'}
     dev: false
 
   /type@1.2.0:
