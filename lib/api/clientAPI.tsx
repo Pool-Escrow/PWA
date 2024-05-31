@@ -1121,3 +1121,139 @@ export const handleClaimWinnings = async ({
 		return
 	}
 }
+
+export const handleCreatePool = async ({
+	params,
+}: {
+	params: [string, string, string, string, string, string, ConnectedWallet[]]
+}) => {
+	const [
+		timeStart,
+		timeEnd,
+		poolName,
+		depositAmountPerPerson,
+		penaltyFeeRate,
+		token,
+		wallets,
+	] = params
+
+	const walletAddress = wallets[0].address
+	const wallet = wallets[0]
+
+	let createPoolDataString = poolIFace.encodeFunctionData('createPool', [
+		timeStart,
+		timeEnd,
+		poolName,
+		depositAmountPerPerson,
+		penaltyFeeRate,
+	])
+
+	try {
+		const provider = await wallet.getEthereumProvider()
+		const signedTxn = await provider.request({
+			method: 'eth_sendTransaction',
+			params: [
+				{
+					from: walletAddress,
+					to: contractAddress,
+					data: createPoolDataString,
+				},
+			],
+		})
+		let transactionReceipt = null
+		while (transactionReceipt === null) {
+			transactionReceipt = await provider.request({
+				method: 'eth_getTransactionReceipt',
+				params: [signedTxn],
+			})
+			await new Promise((resolve) => setTimeout(resolve, 2000)) // Wait 2 seconds before checking again
+		}
+		console.log('Transaction confirmed!', transactionReceipt)
+	} catch (e: any) {
+		console.log('User did not sign transaction')
+		return
+	}
+}
+
+export const handleCreatePoolServer = async ({
+	params,
+}: {
+	params: [
+		string,
+		string,
+		string,
+		string,
+		string,
+		string,
+		string,
+		string,
+		string,
+		string[],
+		string,
+	]
+}) => {
+	const [
+		fileName,
+		fileType,
+		fileBase64,
+		timeStart,
+		timeEnd,
+		poolName,
+		price,
+		penalty,
+		tokenAddr,
+		coHosts,
+		jwt,
+	] = params
+
+	let dataObj = {
+		fileName,
+		fileType,
+		selectedFileBase64: fileBase64,
+		timeStart,
+		timeEnd,
+		poolName,
+		price,
+		penalty,
+		tokenAddr,
+		coHosts,
+		jwtString: jwt,
+	}
+
+	try {
+		const response = await fetch('/api/create_pool', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(dataObj),
+		})
+
+		if (response.ok) {
+			const data = await response.json()
+		} else {
+			console.error('Error uploading file')
+		}
+	} catch (error) {
+		console.error('Error uploading file:', error)
+	}
+}
+
+// export const handleCreatePoolServer = async ({
+// 	params,
+// }: {
+// 	params: [string, string, string, string, string, string, ConnectedWallet[]]
+// }) => {
+// 	const [
+// 		timeStart,
+// 		timeEnd,
+// 		poolName,
+// 		depositAmountPerPerson,
+// 		penaltyFeeRate,
+// 		token,
+// 		wallets,
+// 	] = params
+
+// 	const walletAddress = wallets[0].address
+// 	const wallet = wallets[0]
+// }

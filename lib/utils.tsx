@@ -127,3 +127,20 @@ export function getValuesFromIndices(arr: any, indices: any) {
 export function formatAddress(address: string) {
 	return `${address?.slice(0, 6)}...${address?.slice(-4)}`
 }
+
+export function convertToBase64(file: File): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const fileReader = new FileReader()
+		fileReader.readAsDataURL(file)
+		fileReader.onload = () => {
+			if (typeof fileReader.result === 'string') {
+				resolve(fileReader.result)
+			} else {
+				reject('Error converting file to base64')
+			}
+		}
+		fileReader.onerror = (error) => {
+			reject(error)
+		}
+	})
+}

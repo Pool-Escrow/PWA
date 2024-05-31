@@ -28,7 +28,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import * as _ from 'lodash'
 import { useToast } from '@/components/ui/use-toast'
-import { formatAddress } from '@/lib/utils'
+import { convertToBase64, formatAddress } from '@/lib/utils'
 import { createClient } from '@supabase/supabase-js'
 import { decode } from 'jsonwebtoken'
 import { useCookie } from '@/hooks/cookie'
@@ -73,23 +73,6 @@ const EditUserProfile = () => {
 	}
 	const handleBioChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
 		setBio(e.target.value)
-	}
-
-	const convertToBase64 = (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			const fileReader = new FileReader()
-			fileReader.readAsDataURL(file)
-			fileReader.onload = () => {
-				if (typeof fileReader.result === 'string') {
-					resolve(fileReader.result)
-				} else {
-					reject('Error converting file to base64')
-				}
-			}
-			fileReader.onerror = (error) => {
-				reject(error)
-			}
-		})
 	}
 
 	const handleImageChange = async (e: any) => {
