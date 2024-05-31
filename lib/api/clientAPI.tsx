@@ -582,6 +582,22 @@ export const fetchTokenDecimals = async ({
 	return tokenDecimals
 }
 
+export const fetchLatestPoolId = async ({
+	queryKey,
+}: {
+	queryKey: [string]
+}) => {
+	const [_] = queryKey
+	const contract = new ethers.Contract(
+		contractAddress,
+		poolContract.abi,
+		provider,
+	)
+	const latestPoolId = await contract.latestPoolId()
+	console.log('latestPoolId', latestPoolId)
+	return latestPoolId
+}
+
 export const handleEnableDeposit = async ({
 	params,
 }: {

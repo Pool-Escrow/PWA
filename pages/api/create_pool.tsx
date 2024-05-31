@@ -6,6 +6,7 @@ import { WalletWithMetadata } from '@privy-io/react-auth'
 import { decode } from 'jsonwebtoken'
 import { describe } from 'node:test'
 import * as _ from 'lodash'
+import { fetchLatestPoolId } from '@/lib/api/clientAPI'
 
 const prepareBase64DataUrl = (base64: string) =>
 	base64
@@ -84,9 +85,12 @@ export default async function handler(
 		console.log('imagePath', imagePath)
 	}
 
+	const latestPoolId = await fetchLatestPoolId({ queryKey: [''] })
+	console.log('latestPoolId', latestPoolId)
 	const { data: poolData, error: poolError } = await supabaseAdminClient
 		.from('pool')
 		.insert({
+			pool_id: latestPoolId?.toString(),
 			created_by: jwtAddress,
 			pool_image_url: imagePath,
 			pool_name: poolName,
