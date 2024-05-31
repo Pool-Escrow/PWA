@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import rightArrow from '@/public/images/right_arrow.svg'
-import frogImage from '@/public/images/frog.png'
-
 import { formatTimeDiff } from '@/lib/utils'
+import frogImage from '@/public/images/frog.png'
+import rightArrow from '@/public/images/right_arrow.svg'
 import { getSupabaseBrowserClient } from '@/utils/supabase/client'
-import Link from 'next/link'
-import router from 'next/router'
 import * as _ from 'lodash'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 
 interface PoolRowProps {
 	title: string
@@ -34,20 +33,20 @@ const PoolRow: React.FC<PoolRowProps> = ({
 
 	const supabaseClient = getSupabaseBrowserClient()
 
-	const loadPoolImage = async () => {
+	const loadPoolImage = useCallback(async () => {
 		if (_.isEmpty(poolImagePath)) {
 			return
 		}
-		const { data: storageData } = supabaseClient.storage
+		const { data: storageData } = await supabaseClient.storage
 			.from('pool')
 			.getPublicUrl(poolImagePath)
 		setPoolImageUrl(storageData.publicUrl)
-	}
+	}, [poolImagePath, supabaseClient.storage])
 
 	useEffect(() => {
 		console.log('poolImagePath', poolImagePath)
 		loadPoolImage()
-	}, [poolImagePath])
+	}, [loadPoolImage, poolImagePath])
 
 	const trailingSlash =
 		window?.location?.href[window?.location?.href.length - 1] == '/' ? '' : '/'
@@ -57,12 +56,14 @@ const PoolRow: React.FC<PoolRowProps> = ({
 			className='flex flex-row space-x-4'
 		>
 			<div className='relative w-20 h-20 rounded-2xl overflow-hidden bg-red-500'>
-				<img
+				<Image
 					src={`
 						${_.isEmpty(poolImageUrl) ? frogImage.src : poolImageUrl}
 					`}
 					className='bg-black w-full h-full object-cover object-center'
-				></img>
+					alt='avatar'
+					fill
+				/>
 				<div className='absolute bottom-0 bg-black bg-opacity-40 text-xs w-full text-center text-white py-1'>
 					Upcoming
 				</div>
@@ -79,7 +80,13 @@ const PoolRow: React.FC<PoolRowProps> = ({
 				)}
 			</div>
 			<div className=' flex flex-col items-center justify-center'>
-				<img src={`${rightArrow.src}`}></img>
+				<Image
+					src={`${rightArrow.src}`}
+					className='w-8 h-8'
+					alt='right-arrow'
+					height={32}
+					width={32}
+				/>
 			</div>
 		</Link>
 	)
