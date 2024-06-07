@@ -1,9 +1,9 @@
-import { Network } from '@/models/types'
-import { defineChain } from 'viem'
-import { mainnet, baseSepolia, base } from 'viem/chains'
-import { Interface, ethers } from 'ethers'
-import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
 import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
+import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
+import { Network } from '@/models/types'
+import { Interface, ethers } from 'ethers'
+import { defineChain } from 'viem'
+import { base, baseSepolia } from 'viem/chains'
 
 export const localChain = defineChain({
 	id: 31337, // Replace this with your chain's ID
