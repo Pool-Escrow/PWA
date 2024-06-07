@@ -1,42 +1,17 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
 import poolImage from '@/public/images/pool.png'
-import { usePrivy, useWallets } from '@privy-io/react-auth'
+import { useLogin } from '@privy-io/react-auth'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
 
-const LoginPage = () => {
+export default function LoginPage() {
 	const router = useRouter()
-	const { ready, authenticated, user, signMessage, login, logout } = usePrivy()
-
-	const handleClick = () => {
-		// Replace '/your-link' with the actual path you want to navigate to
-		// router.push('/wallet-selection')
-
-		login()
-	}
-
-	const { wallets } = useWallets()
-
-	const showBackend = ready && authenticated
-
-	const signOut = async () => {
-		await logout()
-	}
-
-	useEffect(() => {
-		if (ready && !authenticated) {
-			// Replace this code with however you'd like to handle an unauthenticated user
-			// As an example, you might redirect them to a sign-in page
-		}
-
-		if (ready && authenticated && wallets?.length > 0) {
-			// Replace this code with however you'd like to handle an authenticated user
+	const { login } = useLogin({
+		onComplete: () => {
 			router.push('/')
-			// console.log('ready and authenticated')
-		}
-	}, [ready, authenticated, wallets, router])
+		},
+	})
 
 	return (
 		<Page>
@@ -64,7 +39,7 @@ const LoginPage = () => {
 								title='Connect wallet'
 								type='button'
 								className='rounded-full gradient-background px-28 py-3'
-								onClick={handleClick}
+								onClick={login}
 							>
 								Connect wallet
 							</button>
@@ -74,9 +49,4 @@ const LoginPage = () => {
 			</Section>
 		</Page>
 	)
-}
-
-export default LoginPage
-function setToken(tokenCookie: string) {
-	throw new Error('Function not implemented.')
 }
