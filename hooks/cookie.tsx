@@ -1,8 +1,6 @@
-import Cookies from 'js-cookie'
-import { useState } from 'react'
-import jwt from 'jsonwebtoken'
-import { useEffect } from 'react'
 import { getAccessToken, usePrivy } from '@privy-io/react-auth'
+import Cookies from 'js-cookie'
+import { useCallback, useEffect, useState } from 'react'
 
 export function getTokenCookie(): string | undefined {
 	return Cookies.get('token')
@@ -18,9 +16,9 @@ export function useCookie() {
 
 	const { ready, authenticated } = usePrivy()
 
-	const saveJwt = (tokenString: string) => {
+	const saveJwt = useCallback((tokenString: string) => {
 		setCurrentJwt(tokenString)
-	}
+	}, [])
 
 	const retrieveAccessToken = async () => {
 		const token = await getAccessToken()
