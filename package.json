@@ -10,6 +10,7 @@
 		"lint": "next lint"
 	},
 	"dependencies": {
+		"@biconomy/account": "^4.4.6",
 		"@privy-io/react-auth": "^1.55.2",
 		"@privy-io/server-auth": "^1.7.3",
 		"@radix-ui/react-alert-dialog": "^1.0.5",
