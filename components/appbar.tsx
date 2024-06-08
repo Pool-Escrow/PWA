@@ -73,6 +73,8 @@ const Appbar = ({ backRoute, pageTitle, rightMenu }: AppBarProps) => {
 							(rightMenu == undefined && (
 								<div>
 									<button
+										type='button'
+										title='Account'
 										className='flex flex-col items-center'
 										onClick={handleAccountClick}
 									>
@@ -132,8 +134,9 @@ const Appbar = ({ backRoute, pageTitle, rightMenu }: AppBarProps) => {
 						{rightMenu == RightMenu.ManageParticipants && (
 							<div>
 								<button
-									className='flex flex-col items-center'
+									type='button'
 									title='Manage Participants'
+									className='flex flex-col items-center'
 								>
 									<Image
 										src={`${profileData?.profileImageUrl ?? frogImage.src}`}
