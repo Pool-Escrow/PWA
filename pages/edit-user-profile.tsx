@@ -20,7 +20,7 @@ import { Inter } from 'next/font/google'
 import styles from './styles/user-profile.module.css'
 import {
 	fetchUserDisplayForAddress,
-	updateUserDisplayData,
+	handleUpdateUserDisplayData,
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import camera from '@/public/images/camera.png'
@@ -49,6 +49,7 @@ const EditUserProfile = () => {
 	} = usePrivy()
 
 	const { wallets } = useWallets()
+	const queryClient = useQueryClient()
 
 	const [fileBlob, setFileBlob] = useState<any>(null)
 	const [selectedFile, setSelectedFile] = useState<any>(null)
@@ -112,6 +113,25 @@ const EditUserProfile = () => {
 		setSelectedFileBase64(base64)
 	}
 
+	const updateUserDisplayDataMutation = useMutation({
+		mutationFn: handleUpdateUserDisplayData,
+		onSuccess: () => {
+			toast({
+				title: 'Profile Updated',
+				description: 'Profile has been updated successfully',
+			})
+			queryClient.invalidateQueries({
+				queryKey: ['loadProfileImage', wallets?.[0]?.address],
+			})
+		},
+		onError: (error) => {
+			toast({
+				title: 'Failed to update profile',
+				description: `${error.message}. Try again later`,
+			})
+		},
+	})
+
 	const handleSaveButtonClicked = async (e: any) => {
 		toast({
 			title: 'Saving Details',
@@ -126,25 +146,9 @@ const EditUserProfile = () => {
 			)
 		}
 		console.log('wallet address', wallets[0]?.address)
-		const { userError } = await updateUserDisplayData(
-			displayName,
-			company,
-			bio,
-			currentJwt!,
-			wallets[0]?.address,
-		)
-		if (userError) {
-			toast({
-				title: 'Error',
-				description: 'Error saving data',
-			})
-			return
-		} else {
-			toast({
-				title: 'Details Saved',
-				description: 'You have saved the data successfully',
-			})
-		}
+		updateUserDisplayDataMutation.mutate({
+			params: [displayName, company, bio, currentJwt!],
+		})
 	}
 
 	const address = wallets?.[0]?.address ?? '0x'
