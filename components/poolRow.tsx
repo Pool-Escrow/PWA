@@ -3,7 +3,7 @@ import rightArrow from '@/public/images/right_arrow.svg'
 import frogImage from '@/public/images/frog.png'
 
 import { formatTimeDiff } from '@/lib/utils'
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import Link from 'next/link'
 import router from 'next/router'
 import * as _ from 'lodash'
@@ -32,7 +32,7 @@ const PoolRow: React.FC<PoolRowProps> = ({
 
 	const [poolImageUrl, setPoolImageUrl] = useState<String | undefined>()
 
-	const supabaseClient = createSupabaseBrowserClient()
+	const supabaseClient = getSupabaseBrowserClient()
 
 	const loadPoolImage = async () => {
 		if (_.isEmpty(poolImagePath)) {

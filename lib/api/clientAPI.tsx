@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 import { ErrorInfo } from 'react'
 import { decode } from 'jsonwebtoken'
 import { PostgrestSingleResponse } from '@supabase/supabase-js'
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import { UserDisplayRow } from '@/pages/pool-id/[poolId]'
 import { QueryFunction } from '@tanstack/react-query'
 import { ethers } from 'ethers'
@@ -42,7 +42,7 @@ export interface FileObj {
 	data: Blob
 }
 
-const supabaseBrowserClient = createSupabaseBrowserClient()
+const supabaseBrowserClient = getSupabaseBrowserClient()
 
 export const uploadProfileImage = async (
 	fileBlob: any,
@@ -89,17 +89,7 @@ export const updateUserDisplayData = async (
 	address: string,
 ) => {
 	// Upload image to Supabase storage
-	const supabaseClient = createClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			global: {
-				headers: {
-					Authorization: `Bearer ${jwt}`,
-				},
-			},
-		},
-	)
+	const supabaseClient = getSupabaseBrowserClient()
 
 	const jwtObj = decode(jwt, { json: true })
 
@@ -116,7 +106,7 @@ export const updateUserDisplayData = async (
 				company: company,
 				bio: bio,
 				id: jwtObj!.sub,
-				address: jwtObj!.address?.toLowerCase(),
+				address: address.toLowerCase(),
 			},
 			{
 				onConflict: 'id',

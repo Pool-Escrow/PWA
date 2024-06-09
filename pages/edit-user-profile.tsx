@@ -32,6 +32,7 @@ import { convertToBase64, formatAddress } from '@/lib/utils'
 import { createClient } from '@supabase/supabase-js'
 import { decode } from 'jsonwebtoken'
 import { useCookie } from '@/hooks/cookie'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -124,10 +125,26 @@ const EditUserProfile = () => {
 				currentJwt!,
 			)
 		}
-		toast({
-			title: 'Details Saved',
-			description: 'You have saved the data successfully',
-		})
+		console.log('wallet address', wallets[0]?.address)
+		const { userError } = await updateUserDisplayData(
+			displayName,
+			company,
+			bio,
+			currentJwt!,
+			wallets[0]?.address,
+		)
+		if (userError) {
+			toast({
+				title: 'Error',
+				description: 'Error saving data',
+			})
+			return
+		} else {
+			toast({
+				title: 'Details Saved',
+				description: 'You have saved the data successfully',
+			})
+		}
 	}
 
 	const address = wallets?.[0]?.address ?? '0x'
