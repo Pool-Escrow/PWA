@@ -11,13 +11,14 @@ import {
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import { convertToBase64 } from '@/lib/utils'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import frogImage from '@/public/images/frog.png'
 import camera from '@/public/images/camera.png'
 import styles from './styles/user-profile.module.css'
 import { testnetTokenAddress, tokenAddress } from '@/constants/constant'
 import { useMutation } from '@tanstack/react-query'
 import { useWallets } from '@privy-io/react-auth'
+import { DatePickerDemo } from '@/components/datePicker'
 
 export default function CreatePoolPage() {
 	// save the current form values in the state:
@@ -25,8 +26,14 @@ export default function CreatePoolPage() {
 	const [name, setName] = useState('')
 	const [mainHost, setMainHost] = useState('')
 	const [coHosts, setCoHosts] = useState('')
-	const [date, setDate] = useState('')
-	const [endDate, setEndDate] = useState('')
+	const [startDate, setStartDate] = useState<string>(
+		new Date().toLocaleTimeString(),
+	)
+	const [endDate, setEndDate] = useState<string>(
+		new Date().toLocaleTimeString(),
+	)
+	const [startTime, setStartTime] = useState(new Date().toLocaleTimeString())
+	const [endTime, setEndTime] = useState(new Date().toLocaleTimeString())
 
 	const [description, setDescription] = useState('')
 	const [price, setPrice] = useState('')
@@ -85,6 +92,30 @@ export default function CreatePoolPage() {
 		document.getElementById('fileInput')?.click()
 	}
 
+	const getUnixTimestamp = (selectedDate: string, selectedTime: string) => {
+		console.log(`selectedDate: ${selectedDate}`)
+		console.log(`selectedTime: ${selectedTime}`)
+		if (!selectedDate || !selectedTime) {
+			return (Date.now() / 1000).toString()
+		}
+		const date = new Date(selectedDate)
+
+		let unixTimestamp = Math.floor(date.getTime() / 1000)
+
+		// Set the hours and minutes of the date object to match the time
+		const [hours, minutes] = selectedTime.split(':').map(Number)
+
+		// Convert hours and minutes to seconds
+		const secondsFromTime = hours * 3600 + minutes * 60
+
+		console.log(`UNIX getTime: ${unixTimestamp + secondsFromTime}`)
+		unixTimestamp += secondsFromTime
+		return unixTimestamp.toString()
+	}
+
+	const startTimestamp = getUnixTimestamp(startDate!, startTime)
+	const endTimestamp = getUnixTimestamp(endDate!, endTime)
+
 	const createPoolServerMutation = useMutation({
 		mutationFn: handleCreatePoolServer,
 		onSuccess: () => {
@@ -127,8 +158,8 @@ export default function CreatePoolPage() {
 					selectedFile?.name,
 					selectedFile?.type,
 					selectedFileBase64,
-					date,
-					endDate,
+					startTimestamp,
+					endTimestamp,
 					name,
 					description,
 					price,
@@ -150,7 +181,15 @@ export default function CreatePoolPage() {
 	const onCreatePoolButtonClicked = () => {
 		toast({ title: 'Creating Pool', description: 'Please wait...' })
 		createPoolMutation.mutate({
-			params: [date, endDate, name, price, '0', tokenAddress, wallets],
+			params: [
+				startTimestamp,
+				endTimestamp,
+				name,
+				price,
+				'0',
+				tokenAddress,
+				wallets,
+			],
 		})
 	}
 
@@ -185,6 +224,8 @@ export default function CreatePoolPage() {
 	// 	)
 	// 	console.log(formValues)
 	// }
+
+	useEffect(() => {}, [])
 
 	return (
 		<div className='mt-8 px-6'>
@@ -268,7 +309,18 @@ export default function CreatePoolPage() {
 					<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
 						Start Date and Time
 					</p>
-					<Input value={date} onChange={(e) => setDate(e.target.value)} />
+					<Input
+						type='date'
+						value={startDate}
+						onChange={(e) => setStartDate(e.target.value)}
+						className='mt-4 w-[280px]'
+					/>
+					<Input
+						type='time'
+						value={startTime}
+						onChange={(e) => setStartTime(e.target.value)}
+						className='mt-4 w-[280px]'
+					/>
 				</div>
 				{/* Ending Date and Time of Event */}
 				<div>
@@ -278,7 +330,20 @@ export default function CreatePoolPage() {
 					<p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>
 						End Date and Time
 					</p>
-					<Input value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+					{/* <DatePicker date={endDate!} setDate={setEndDate} /> */}
+					<Input
+						type='date'
+						value={endDate}
+						onChange={(e) => setEndDate(e.target.value)}
+						className='mt-4 w-[280px]'
+					/>
+					<br />
+					<Input
+						type='time'
+						value={endTime}
+						onChange={(e) => setEndTime(e.target.value)}
+						className='mt-4 w-[280px]'
+					/>
 				</div>
 
 				{/* Description */}
