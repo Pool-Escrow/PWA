@@ -22,8 +22,6 @@ import {
 	fetchClaimablePoolsFromSC,
 	fetchUserDisplayForAddress,
 	handleClaimWinnings,
-	updateUserDisplayData,
-	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import camera from '@/public/images/camera.png'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
