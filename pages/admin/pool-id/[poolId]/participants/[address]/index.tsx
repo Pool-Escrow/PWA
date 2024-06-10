@@ -19,8 +19,6 @@ import {
 	fetchUserDisplayForAddress,
 	handleSavePayout,
 	handleSetWinner,
-	updateUserDisplayData,
-	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import { removeTokenCookie, useCookie } from '@/hooks/cookie'
 import { JwtPayload, decode } from 'jsonwebtoken'

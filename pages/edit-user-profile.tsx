@@ -20,7 +20,7 @@ import { Inter } from 'next/font/google'
 import styles from './styles/user-profile.module.css'
 import {
 	fetchUserDisplayForAddress,
-	updateUserDisplayData,
+	handleUpdateUserDisplayData,
 	uploadProfileImage,
 } from '@/lib/api/clientAPI'
 import camera from '@/public/images/camera.png'
@@ -32,6 +32,7 @@ import { convertToBase64, formatAddress } from '@/lib/utils'
 import { createClient } from '@supabase/supabase-js'
 import { decode } from 'jsonwebtoken'
 import { useCookie } from '@/hooks/cookie'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -48,6 +49,7 @@ const EditUserProfile = () => {
 	} = usePrivy()
 
 	const { wallets } = useWallets()
+	const queryClient = useQueryClient()
 
 	const [fileBlob, setFileBlob] = useState<any>(null)
 	const [selectedFile, setSelectedFile] = useState<any>(null)
@@ -111,6 +113,25 @@ const EditUserProfile = () => {
 		setSelectedFileBase64(base64)
 	}
 
+	const updateUserDisplayDataMutation = useMutation({
+		mutationFn: handleUpdateUserDisplayData,
+		onSuccess: () => {
+			toast({
+				title: 'Profile Updated',
+				description: 'Profile has been updated successfully',
+			})
+			queryClient.invalidateQueries({
+				queryKey: ['loadProfileImage', wallets?.[0]?.address],
+			})
+		},
+		onError: (error) => {
+			toast({
+				title: 'Failed to update profile',
+				description: `${error.message}. Try again later`,
+			})
+		},
+	})
+
 	const handleSaveButtonClicked = async (e: any) => {
 		toast({
 			title: 'Saving Details',
@@ -124,9 +145,9 @@ const EditUserProfile = () => {
 				currentJwt!,
 			)
 		}
-		toast({
-			title: 'Details Saved',
-			description: 'You have saved the data successfully',
+		console.log('wallet address', wallets[0]?.address)
+		updateUserDisplayDataMutation.mutate({
+			params: [displayName, company, bio, currentJwt!],
 		})
 	}
 

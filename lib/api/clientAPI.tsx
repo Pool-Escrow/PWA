@@ -3,7 +3,7 @@ import Cookies from 'js-cookie'
 import { ErrorInfo } from 'react'
 import { decode } from 'jsonwebtoken'
 import { PostgrestSingleResponse } from '@supabase/supabase-js'
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import { UserDisplayRow } from '@/pages/pool-id/[poolId]'
 import { QueryFunction } from '@tanstack/react-query'
 import { ethers } from 'ethers'
@@ -42,7 +42,7 @@ export interface FileObj {
 	data: Blob
 }
 
-const supabaseBrowserClient = createSupabaseBrowserClient()
+const supabaseBrowserClient = getSupabaseBrowserClient()
 
 export const uploadProfileImage = async (
 	fileBlob: any,
@@ -81,61 +81,42 @@ export const uploadProfileImage = async (
 	}
 }
 
-export const updateUserDisplayData = async (
-	displayName: string,
-	company: string,
-	bio: string,
-	jwt: string,
-	address: string,
-) => {
-	// Upload image to Supabase storage
-	const supabaseClient = createClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			global: {
-				headers: {
-					Authorization: `Bearer ${jwt}`,
-				},
-			},
-		},
-	)
-
-	const jwtObj = decode(jwt, { json: true })
-
-	console.log('jwtObj', jwtObj)
-
-	console.log('upload user address', address)
-	// Update user profile with image URL
-
-	const { data: userData, error: userError } = await supabaseClient
-		.from('usersDisplay')
-		.upsert(
-			{
-				display_name: displayName,
-				company: company,
-				bio: bio,
-				id: jwtObj!.sub,
-				address: jwtObj!.address?.toLowerCase(),
-			},
-			{
-				onConflict: 'id',
-			},
-		)
-
-	if (userError) {
-		console.error('Error updating user data:', userError.message)
+export const handleUpdateUserDisplayData = async ({
+	params,
+}: {
+	params: [string, string, string, string]
+}) => {
+	const [displayName, company, bio, jwt] = params
+	let dataObj = {
+		display_name: displayName,
+		company: company,
+		bio: bio,
+		jwtString: jwt,
 	}
-	return { userData, userError }
-	console.log('usersDisplay Information updated successfully')
+	try {
+		const response = await fetch('/api/update_user_display_data', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(dataObj),
+		})
+
+		if (response.ok) {
+			const data = await response.json()
+		} else {
+			console.error('Error updating profile')
+			throw new Error('Error updating profile')
+		}
+	} catch (error) {
+		console.error('Error uploading file:', error)
+		throw new Error('Error updating profile')
+	}
 }
 
 export const fetchUpcomingPools = async () => {
 	// Upload image to Supabase storage
-	const supabaseClient = createClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-	)
+	const supabaseClient = getSupabaseBrowserClient()
 	const currentTimestamp = new Date().toISOString()
 
 	const { data, error } = await supabaseClient
@@ -152,10 +133,7 @@ export const fetchUpcomingPools = async () => {
 
 export const fetchPastPools = async () => {
 	// Upload image to Supabase storage
-	const supabaseClient = createClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-	)
+	const supabaseClient = getSupabaseBrowserClient()
 	const currentTimestamp = new Date().toISOString()
 
 	const { data, error } = await supabaseClient

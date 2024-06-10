@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import rightArrow from '@/public/images/right_arrow.svg'
 import PoolRow from '../poolRow'
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import { fetchPastPools } from '@/lib/api/clientAPI'
 import router from 'next/router'
 import { poolData } from '@/types/types'
 
-const supabase = createSupabaseBrowserClient()
+const supabase = getSupabaseBrowserClient()
 
 const PastPoolTab: React.FC = () => {
 	const [poolsData, setPoolsData] = useState<poolData[] | undefined>([])

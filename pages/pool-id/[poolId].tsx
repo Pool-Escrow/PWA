@@ -31,7 +31,7 @@ import { config } from '@/constants/config'
 import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
 import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
 
-import { createSupabaseBrowserClient } from '@/utils/supabase/client'
+import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import DropdownChecklist from '@/components/dropdown-checklist'
 
 import defaultPoolImage from '@/public/images/frog.png'
