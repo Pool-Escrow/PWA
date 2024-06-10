@@ -94,6 +94,7 @@ export const ImageUploader = ({ value, setValue }: ImageUploaderProps) => {
 				</div>
 			)}
 			<input
+				title='image upload control'
 				className='hidden'
 				ref={inputRef}
 				onChange={handleImageChange}
