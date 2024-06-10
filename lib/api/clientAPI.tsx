@@ -1139,6 +1139,14 @@ export const handleCreatePool = async ({
 	}
 }
 
+export interface PoolEntity {
+	bannerImageBase64: string // base 64 encoded image
+	poolName: string
+	description: string
+	dateTimeStart: string
+	dateTimeEnd: string
+}
+
 export const handleCreatePoolServer = async ({
 	params,
 }: {
