@@ -13,58 +13,66 @@ concurrency:
 
 jobs:
   build-and-deploy:
+    if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout branch
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # - name: Setup pnpm
-      #   uses: pnpm/action-setup@v4
-      #   with:
-      #     version: '9'
-
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: '20'
-      #     cache: 'pnpm'
-
-      # - name: Cache pnpm store
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: ~/.pnpm-store
-      #     key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pnpm-
-
-      # - name: Install dependencies
-      #   run: pnpm install --frozen-lockfile
-
-      # - name: Build the project
-      #   run: pnpm run build
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
+      - name: Cache pnpm store
+        uses: actions/cache@v4
         with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_TEAM_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
-          working-directory: './'
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
-      - name: Update Deployment Status
-        run: |
-          curl \
-            -X POST \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/${{ github.repository }}/deployments \
-            -d '{
-              "ref": "${{ github.sha }}",
-              "environment": "${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}",
-              "description": "Deploy to Vercel",
-              "auto_merge": false,
-              "required_contexts": []
-            }'
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+          run_install: |
+            args: [--global, vercel]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Pull environment variables
+        run: vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the project
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: vercel build --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+
+      # - name: Deploy to Vercel
+      #   uses: amondnet/vercel-action@v25
+      #   if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
+      #   with:
+      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     vercel-org-id: ${{ secrets.VERCEL_TEAM_ID }}
+      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+      #     scope: ${{ secrets.VERCEL_TEAM_ID}}
+
+      # - name: Update Deployment Status
+      #   run: |
+      #     curl \
+      #       -X POST \
+      #       -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #       -H "Accept: application/vnd.github.v3+json" \
+      #       https://api.github.com/repos/${{ github.repository }}/deployments \
+      #       -d '{
+      #         "ref": "${{ github.sha }}",
+      #         "environment": "${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}",
+      #         "description": "Deploy to Vercel",
+      #         "auto_merge": false,
+      #         "required_contexts": []
+      #       }'
