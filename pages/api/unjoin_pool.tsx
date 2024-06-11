@@ -1,10 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { NextResponse } from 'next/server'
-import { hashMessage, recoverAddress, verifyMessage } from 'ethers'
-import { createClient } from '@supabase/supabase-js'
-import { JwtPayload, decode } from 'jsonwebtoken'
 import { getUser, verifyToken } from '@/lib/server'
 import { WalletWithMetadata } from '@privy-io/react-auth'
+import { createClient } from '@supabase/supabase-js'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 type ResponseData = {
 	message: string
@@ -30,7 +27,7 @@ export default async function handler(
 	// Return a response
 	const supabaseAdminClient = createClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.SUPABASE_SERVICE_KEY!,
+		process.env.SUPABASE_SERVICE_ROLE_KEY!,
 		{
 			auth: {
 				autoRefreshToken: false,

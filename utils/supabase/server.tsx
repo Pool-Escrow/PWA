@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { safeLoadEnv } from '../environment'
 
 const supabaseUrl = safeLoadEnv('NEXT_PUBLIC_SUPABASE_URL')
-const supabaseServiceKey = safeLoadEnv('SERVICE_ROLE')
+const supabaseServiceKey = safeLoadEnv('SUPABASE_SERVICE_ROLE_KEY')
 
 export function createServiceClient() {
 	const cookieStore = cookies()
