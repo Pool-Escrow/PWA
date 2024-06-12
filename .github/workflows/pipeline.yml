@@ -31,9 +31,11 @@ jobs:
           repository: ${{ github.repository }}
           number: ${{ github.event.pull_request.number}}
           id: deploying-comment
-          message: >-
-            Starting deployment of this pull request. You can follow the progress
-            here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          message: |
+            🚀 **Deployment Started!** 🚧
+            | Details | Link |
+            | --- | --- |
+            | **Follow Progress** | [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -90,4 +92,8 @@ jobs:
           number: ${{ github.event.pull_request.number }}
           id: deploying-comment
           recreate: true
-          message: 'Deployment of this pull request is complete. [View deployment](${{ steps.deploy.outputs.url }})'
+          message: |
+            ✅ **Deployment Complete!** 🌐
+            | Details | Link |
+            | --- | --- |
+            | **View Deployment** | [Visit Site](${{ steps.deploy.outputs.url }}) |
