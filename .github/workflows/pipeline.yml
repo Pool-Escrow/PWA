@@ -26,7 +26,7 @@ jobs:
       - name: Notify about starting this deployment
         uses: hasura/comment-progress@v2.3.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.COMMENTER_TOKEN }}
           repository: ${{ github.repository }}
           commit-sha: ${{ github.sha }}
           id: deploying-comment
@@ -81,7 +81,7 @@ jobs:
       - name: Notify about the result of this deployment
         uses: hasura/comment-progress@v2.3.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.COMMENTER_TOKEN }}
           repository: ${{ github.repository }}
           commit-sha: ${{ github.sha }}
           id: deploying-comment
