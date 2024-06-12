@@ -31,7 +31,9 @@ jobs:
           repository: ${{ github.repository }}
           number: ${{ github.event.pull_request.number}}
           id: deploying-comment
-          message: 'Starting deployment of this pull request.'
+          message: >-
+            Starting deployment of this pull request. You can follow the progress
+            here: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -85,7 +87,7 @@ jobs:
         with:
           github-token: ${{ secrets.COMMENTER_TOKEN }}
           repository: ${{ github.repository }}
-          commit-sha: ${{ github.event.pull_request.number }}
+          number: ${{ github.event.pull_request.number }}
           id: deploying-comment
           recreate: true
           message: 'Deployment of this pull request is complete. [View deployment](${{ steps.deploy.outputs.url }})'
