@@ -25,10 +25,11 @@ jobs:
     steps:
       - name: Notify about starting this deployment
         uses: hasura/comment-progress@v2.3.0
+        if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.COMMENTER_TOKEN }}
           repository: ${{ github.repository }}
-          commit-sha: ${{ github.sha }}
+          number: ${{ github.event.pull_request.number}}
           id: deploying-comment
           message: 'Starting deployment of this pull request.'
 
@@ -80,10 +81,11 @@ jobs:
 
       - name: Notify about the result of this deployment
         uses: hasura/comment-progress@v2.3.0
+        if: github.event_name == 'pull_request'
         with:
           github-token: ${{ secrets.COMMENTER_TOKEN }}
           repository: ${{ github.repository }}
-          commit-sha: ${{ github.sha }}
+          commit-sha: ${{ github.event.pull_request.number }}
           id: deploying-comment
           recreate: true
           message: 'Deployment of this pull request is complete. [View deployment](${{ steps.deploy.outputs.url }})'
