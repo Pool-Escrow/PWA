@@ -5,7 +5,7 @@ on:
     branches: ['main']
   pull_request:
     types: [opened, synchronize, reopened]
-  workflow_dispatch: # allows to trigger builds manually
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,7 +15,19 @@ jobs:
   build-and-deploy:
     if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
     runs-on: ubuntu-22.04
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      url: ${{ steps.deploy.outputs.url }}
     steps:
+      - name: Notify about starting this deployment
+        uses: hasura/comment-progress@v2.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          commit-sha: ${{ github.sha }}
+          id: deploying-comment
+          message: 'Starting deployment of this pull request.'
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -49,30 +61,25 @@ jobs:
       - name: Build the project
         env:
           NEXT_TELEMETRY_DISABLED: 1
-        run: vercel build --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+        run: |
+          echo "building the project"
+          vercel build --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
 
-      # - name: Deploy to Vercel
-      #   uses: amondnet/vercel-action@v25
-      #   if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
-      #   with:
-      #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     vercel-org-id: ${{ secrets.VERCEL_TEAM_ID }}
-      #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-      #     vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
-      #     scope: ${{ secrets.VERCEL_TEAM_ID}}
+      - name: Deploy the project
+        id: deploy
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_TEAM_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          echo "deploying the project"
+          echo "url=$(vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod'  || '' }})" >> $GITHUB_OUTPUT
 
-      # - name: Update Deployment Status
-      #   run: |
-      #     curl \
-      #       -X POST \
-      #       -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-      #       -H "Accept: application/vnd.github.v3+json" \
-      #       https://api.github.com/repos/${{ github.repository }}/deployments \
-      #       -d '{
-      #         "ref": "${{ github.sha }}",
-      #         "environment": "${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}",
-      #         "description": "Deploy to Vercel",
-      #         "auto_merge": false,
-      #         "required_contexts": []
-      #       }'
+      - name: Notify about the result of this deployment
+        uses: hasura/comment-progress@v2.3.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          commit-sha: ${{ github.sha }}
+          id: deploying-comment
+          recreate: true
+          message: 'Deployment of this pull request is complete. [View deployment](${{ steps.deploy.outputs.url }})'
