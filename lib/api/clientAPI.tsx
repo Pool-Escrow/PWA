@@ -9,10 +9,9 @@ import { getSupabaseBrowserClient } from '@/utils/supabase/client'
 import { PostgrestSingleResponse } from '@supabase/supabase-js'
 import { ethers } from 'ethers'
 
-import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
-import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
 import { ConnectedWallet } from '@privy-io/react-auth'
 import * as lodash from 'lodash'
+import { dropletAbi, poolAbi } from '../contracts/generated'
 
 export interface writeTestObject {
 	address: string
@@ -251,11 +250,7 @@ export const fetchAllPoolDataFromSC = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, poolId] = queryKey
-	const contract = new ethers.Contract(
-		contractAddress,
-		poolContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(contractAddress, poolAbi, provider)
 
 	const poolSCInfo = await contract.getAllPoolInfo(poolId)
 
@@ -524,11 +519,7 @@ export const fetchTokenSymbol = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, poolTokenAddress] = queryKey
-	const contract = new ethers.Contract(
-		poolTokenAddress,
-		dropletContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(poolTokenAddress, dropletAbi, provider)
 	console.log('poolTokenAddress', poolTokenAddress)
 
 	const tokenSymbol = await contract.symbol()
@@ -543,11 +534,7 @@ export const fetchTokenDecimals = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, poolTokenAddress] = queryKey
-	const contract = new ethers.Contract(
-		poolTokenAddress,
-		dropletContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(poolTokenAddress, dropletAbi, provider)
 	const tokenDecimals = await contract.decimals()
 	console.log('tokenDecimals', tokenDecimals)
 	return tokenDecimals
@@ -559,11 +546,7 @@ export const fetchLatestPoolId = async ({
 	queryKey: [string]
 }) => {
 	const [_] = queryKey
-	const contract = new ethers.Contract(
-		contractAddress,
-		poolContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(contractAddress, poolAbi, provider)
 	const latestPoolId = await contract.latestPoolId()
 	console.log('latestPoolId', latestPoolId)
 	return latestPoolId
@@ -801,11 +784,7 @@ export const fetchWinnersDetailsFromSC = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, poolId] = queryKey
-	const contract = new ethers.Contract(
-		contractAddress,
-		poolContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(contractAddress, poolAbi, provider)
 
 	const winnersDetails = await contract.getWinnersDetails(poolId)
 	console.log('winnersDetails', winnersDetails)
@@ -818,11 +797,7 @@ export const fetchClaimablePoolsFromSC = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, address] = queryKey
-	const contract = new ethers.Contract(
-		contractAddress,
-		poolContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(contractAddress, poolAbi, provider)
 
 	const claimablePools = await contract.getClaimablePools(address)
 	return claimablePools
@@ -834,11 +809,7 @@ export const fetchPoolBalanceFromSC = async ({
 	queryKey: [string, string]
 }) => {
 	const [_, poolId] = queryKey
-	const contract = new ethers.Contract(
-		contractAddress,
-		poolContract.abi,
-		provider,
-	)
+	const contract = new ethers.Contract(contractAddress, poolAbi, provider)
 
 	const poolBalance = await contract.poolBalance(poolId)
 	console.log('winnersDetails', poolBalance)

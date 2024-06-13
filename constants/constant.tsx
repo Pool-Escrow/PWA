@@ -1,5 +1,4 @@
-import poolContract from '@/SC-Output/out/Pool.sol/Pool.json'
-import dropletContract from '@/SC-Output/out_old/Droplet.sol/Droplet.json'
+import { dropletAbi, poolAbi } from '@/lib/contracts/generated'
 import { Network } from '@/models/types'
 import { Interface, ethers } from 'ethers'
 import { defineChain } from 'viem'
@@ -100,21 +99,21 @@ export const tokenAddress =
 	network.toString() === Network.Localnet
 		? localnetTokenAddress
 		: network.toString() === Network.Testnet
-		? testnetTokenAddress
-		: mainnetTokenAddress
+			? testnetTokenAddress
+			: mainnetTokenAddress
 export const contractAddress =
 	network.toString() === Network.Localnet
 		? localnetContractAddress
 		: network.toString() === Network.Testnet
-		? testnetContractAddress
-		: mainnetContractAddress
+			? testnetContractAddress
+			: mainnetContractAddress
 
 export const chain =
 	network.toString() === Network.Localnet
 		? localChain
 		: network.toString() === Network.Testnet
-		? testChain
-		: mainChain
+			? testChain
+			: mainChain
 
 const networkish: ethers.Networkish = {
 	name: chain.name,
@@ -129,5 +128,5 @@ export const provider = new ethers.JsonRpcProvider(
 	networkish,
 )
 
-export const dropletIFace = new Interface(dropletContract.abi)
-export const poolIFace = new Interface(poolContract.abi)
+export const dropletIFace = new Interface(dropletAbi)
+export const poolIFace = new Interface(poolAbi)
