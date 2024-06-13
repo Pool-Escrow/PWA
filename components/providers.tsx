@@ -3,12 +3,12 @@
 import { config } from '@/constants/config'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { chain } from 'constants/constant'
 import { ThemeProvider } from 'next-themes'
 import { base, baseSepolia } from 'viem/chains'
 import { WagmiProvider } from 'wagmi'
 
 import { Toaster } from '@/components/ui/toaster'
+import { chain } from '@/constants/constant'
 
 export default function Providers({ children }: React.PropsWithChildren) {
 	const queryClient = new QueryClient()
