@@ -5,3 +5,14 @@ export const safeLoadEnv = (name: string): string => {
 	}
 	return value
 }
+
+export const loadEnvironmentUrls = () => {
+	const bundlerUrl = process.env.NEXT_PUBLIC_BICONOMY_BUNDLER_URL
+	const paymasterUrl = process.env.NEXT_PUBLIC_BICONOMY_PAYMASTER_URL
+
+	if (!bundlerUrl || !paymasterUrl) {
+		throw new Error('Missing Biconomy environment variables')
+	}
+
+	return { bundlerUrl, paymasterUrl }
+}
