@@ -1,17 +1,11 @@
 import Page from '@/components/page'
 import Section from '@/components/section'
+import { useSmartAccount } from '@/hooks/use-smart-account'
 import poolImage from '@/public/images/pool.png'
-import { useLogin } from '@privy-io/react-auth'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 
 export default function LoginPage() {
-	const router = useRouter()
-	const { login } = useLogin({
-		onComplete: () => {
-			router.push('/')
-		},
-	})
+	const { login } = useSmartAccount()
 
 	return (
 		<Page>
