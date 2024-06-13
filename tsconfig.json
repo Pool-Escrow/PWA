@@ -12,6 +12,7 @@
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
+		"tsBuildInfoFile": ".next/cache/.tsbuildinfo",
 		"jsx": "preserve",
 		"baseUrl": ".",
 		"paths": {
@@ -22,7 +23,8 @@
 			{
 				"name": "next"
 			}
-		]
+		],
+		"types": ["vitest/globals"]
 	},
 	"exclude": ["node_modules"],
 	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
