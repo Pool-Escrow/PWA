@@ -8,8 +8,6 @@ node_modules
 **/public/workbox**
 **/public/sw**
 
-.vscode/
-
 .DS_Store
 
 .env.local

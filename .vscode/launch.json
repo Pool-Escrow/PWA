@@ -1,0 +1,84 @@
+{
+	"configurations": [
+		{
+			"name": "Attach to Arc",
+			"type": "chrome",
+			"request": "attach",
+			"port": 9222,
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"name": "Launch Thorium",
+			"type": "chrome",
+			"request": "launch",
+			"runtimeArgs": ["--remote-debugging-port=9222"],
+			"url": "http://localhost:3000",
+			"osx": {
+				"runtimeExecutable": "/Applications/Thorium.app/Contents/MacOS/Thorium"
+			},
+			"presentation": {
+				"hidden": true
+			}
+		},
+		{
+			"name": "Launch Thorium in headless mode",
+			"type": "msedge",
+			"request": "launch",
+			"runtimeArgs": ["--headless", "--remote-debugging-port=9222"],
+			"url": "http://localhost:3000",
+			"osx": {
+				"runtimeExecutable": "/Applications/Thorium.app/Contents/MacOS/Thorium"
+			},
+			"presentation": {
+				"hidden": true
+			}
+		},
+		{
+			"name": "Open Edge DevTools",
+			"type": "vscode-edge-devtools.debug",
+			"request": "attach",
+			"url": "http://localhost:3000",
+			"presentation": {
+				"hidden": true
+			}
+		},
+		{
+			"name": "Next.js: debug server-side",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "npm run dev",
+			"presentation": {
+				"hidden": true
+			}
+		}
+	],
+	"compounds": [
+		{
+			"name": "Next.js: debug full stack with Thorium",
+			"configurations": [
+				"Next.js: debug server-side",
+				"Launch Thorium",
+				"Open Edge DevTools"
+			],
+			"stopAll": true
+		},
+		{
+			"name": "Next.js: debug full stack with headless Thorium",
+			"configurations": [
+				"Next.js: debug server-side",
+				"Launch Thorium in headless mode",
+				"Open Edge DevTools"
+			],
+			"stopAll": true
+		},
+		{
+			"name": "Next.js: debug full stack with Arc",
+			"configurations": [
+				"Next.js: debug server-side",
+				"Attach to Arc",
+				"Open Edge DevTools"
+			]
+		}
+	]
+}
