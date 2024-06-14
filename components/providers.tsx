@@ -1,58 +1,27 @@
 'use client'
 
-import { config } from '@/constants/config'
+import { Toaster } from '@/components/ui/toaster'
+import { privy, queryClient, theme, wagmi } from '@/configs'
 import { PrivyProvider } from '@privy-io/react-auth'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { ThemeProvider } from 'next-themes'
-import { base, baseSepolia } from 'viem/chains'
 import { WagmiProvider } from 'wagmi'
 
-import { Toaster } from '@/components/ui/toaster'
-import { chain } from '@/constants/constant'
-
 export default function Providers({ children }: React.PropsWithChildren) {
-	const queryClient = new QueryClient()
-
 	return (
-		<PrivyProvider
-			appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
-			config={{
-				loginMethods: ['email', 'wallet', 'farcaster'],
-				appearance: {
-					theme: 'light',
-					accentColor: '#676FFF',
-					logo: '/images/pool.png',
-					showWalletLoginFirst: false,
-				},
-				embeddedWallets: {
-					createOnLogin: 'users-without-wallets',
-					noPromptOnSignature: true,
-					priceDisplay: {
-						primary: 'native-token',
-						secondary: null,
-					},
-				},
-				defaultChain: chain,
-				supportedChains: [base, baseSepolia],
-				legal: {
-					privacyPolicyUrl: '/privacy',
-					termsAndConditionsUrl: '/terms',
-				},
-				fiatOnRamp: { useSandbox: true },
-			}}
-		>
-			<QueryClientProvider client={queryClient}>
-				<WagmiProvider config={config}>
-					<ThemeProvider
-						attribute='class'
-						defaultTheme='system'
-						disableTransitionOnChange
-					>
+		<PrivyProvider {...privy}>
+			<WagmiProvider {...wagmi}>
+				<PersistQueryClientProvider {...queryClient}>
+					<ThemeProvider {...theme}>
 						{children}
 						<Toaster />
 					</ThemeProvider>
-				</WagmiProvider>
-			</QueryClientProvider>
+					{process.env.NODE_ENV === 'development' && (
+						<ReactQueryDevtools initialIsOpen={false} />
+					)}
+				</PersistQueryClientProvider>
+			</WagmiProvider>
 		</PrivyProvider>
 	)
 }
