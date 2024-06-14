@@ -24,6 +24,12 @@ export default {
                 secondary: null,
             },
         },
+        externalWallets: {
+            coinbaseWallet: {
+                // Valid connection options include 'eoaOnly' (default), 'smartWalletOnly', or 'all'
+                connectionOptions: 'smartWalletOnly',
+            },
+        },
         defaultChain: baseSepolia,
         supportedChains: [baseSepolia],
         legal: {
