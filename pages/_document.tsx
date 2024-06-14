@@ -1,4 +1,6 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Head, Html, Main, NextScript } from 'next/document'
+
+import fonts from '@/utils/fonts'
 
 export default function Document() {
 	return (
@@ -15,7 +17,7 @@ export default function Document() {
 				<link rel='apple-touch-icon' href='/images/icon-maskable-512.png' />
 				<link rel='manifest' href='/manifest.json' />
 			</Head>
-			<body>
+			<body className={fonts.inter.className}>
 				<Main />
 				<NextScript />
 			</body>
