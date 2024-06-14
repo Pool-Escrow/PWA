@@ -1,22 +1,21 @@
-import Appbar from '@/components/appbar'
 import Page from '@/components/page'
-import Section from '@/components/section'
-import UpcomingPoolTab from '@/components/tabs/UpcomingPoolTab'
+import PoolList from '@/components/pool-list/pool-list'
+import { TopBar } from '@/components/top-bar'
 
 export default function App() {
 	return (
 		<Page>
-			<Appbar />
-			<Section>
-				<div className='flex justify-center  w-full pt-20'>
-					<div className='flex flex-col w-96 space-y-8'>
-						<div>
-							<h3 className='font-semibold'>Upcoming Pools</h3>
-							<UpcomingPoolTab />
-						</div>
-					</div>
+			<TopBar center={<TopBar.Logo />} right={<TopBar.Button />} />
+			<main className='pt-20'>
+				<div className='mb-6'>
+					<h1 className='font-semibold text-lg'>Your Pools</h1>
+					<PoolList maxPools={3} />
 				</div>
-			</Section>
+				<div>
+					<h1 className='font-semibold text-lg'>Upcoming Pools</h1>
+					<PoolList />
+				</div>
+			</main>
 		</Page>
 	)
 }
