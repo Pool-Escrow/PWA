@@ -9,6 +9,7 @@ export const useInitializeAccount = (
 
 	const initializeAccount = useCallback(async () => {
 		if (!ready || !wallets.length) return
+
 		const embeddedWallet = wallets.find(
 			(wallet) => wallet.walletClientType === 'privy',
 		)
