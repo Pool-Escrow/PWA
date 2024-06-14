@@ -1,11 +1,11 @@
 import { loadEnvironmentUrls } from '@/utils/environment'
 import {
 	BiconomyPaymaster,
-	BiconomySmartAccountV2,
 	Bundler,
 	DEFAULT_ECDSA_OWNERSHIP_MODULE,
 	DEFAULT_ENTRYPOINT_ADDRESS,
 	ECDSAOwnershipValidationModule,
+	createSmartAccountClient,
 } from '@biconomy/account'
 import { ConnectedWallet } from '@privy-io/react-auth'
 import { WalletClient } from 'viem'
@@ -31,7 +31,7 @@ export const initializeSmartAccount = async (
 		moduleAddress: DEFAULT_ECDSA_OWNERSHIP_MODULE,
 	})
 
-	const smartAccount = await BiconomySmartAccountV2.create({
+	const smartAccount = await createSmartAccountClient({
 		provider: embeddedProvider as unknown as WalletClient,
 		chainId: baseSepolia.id,
 		bundler,
