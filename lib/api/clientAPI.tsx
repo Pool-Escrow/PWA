@@ -107,40 +107,6 @@ export const handleUpdateUserDisplayData = async ({
 	}
 }
 
-export const fetchUpcomingPools = async () => {
-	// Upload image to Supabase storage
-	const supabaseClient = getSupabaseBrowserClient()
-	const currentTimestamp = new Date().toISOString()
-
-	const { data, error } = await supabaseClient
-		.from('pool')
-		.select('*')
-		.filter('event_timestamp', 'gte', currentTimestamp)
-
-	if (error) {
-		console.error('Error fetching pool data:', error.message)
-	} else {
-		return data
-	}
-}
-
-export const fetchPastPools = async () => {
-	// Upload image to Supabase storage
-	const supabaseClient = getSupabaseBrowserClient()
-	const currentTimestamp = new Date().toISOString()
-
-	const { data, error } = await supabaseClient
-		.from('pool')
-		.select('*')
-		.filter('event_timestamp', 'lt', currentTimestamp)
-
-	if (error) {
-		console.error('Error fetching pool data:', error.message)
-	} else {
-		return data
-	}
-}
-
 export const fetchUserDisplayInfoFromServer = async (addressList: string[]) => {
 	console.log('addressList', addressList)
 	const lowerAddressList = addressList.map((address) => address?.toLowerCase())
