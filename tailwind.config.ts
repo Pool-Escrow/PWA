@@ -1,4 +1,22 @@
 import type { Config } from 'tailwindcss'
+import { fontFamily } from 'tailwindcss/defaultTheme'
+
+const textShadow = ({
+	matchUtilities,
+	theme,
+}: {
+	matchUtilities: any
+	theme: any
+}) => {
+	matchUtilities(
+		{
+			'text-shadow': (value: string) => ({ textShadow: value }),
+		},
+		{
+			values: theme('textShadow'),
+		},
+	)
+}
 
 const config = {
 	darkMode: ['class'],
@@ -18,16 +36,15 @@ const config = {
 			},
 		},
 		extend: {
-			width: {
-				100: '25rem',
-				104: '26rem',
-				108: '27rem',
-				112: '28rem',
-				116: '29rem',
-				120: '30rem',
-				124: '31rem',
-				128: '32rem',
-				256: '64rem',
+			animation: {
+				'accordion-down': 'accordion-down 0.2s ease-out',
+				'accordion-up': 'accordion-up 0.2s ease-out',
+			},
+			borderRadius: {
+				lg: 'var(--radius)',
+				md: 'calc(var(--radius) - 2px)',
+				sm: 'calc(var(--radius) - 4px)',
+				mini: 'var(--border-radius-mini)',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -64,10 +81,9 @@ const config = {
 					foreground: 'hsl(var(--card-foreground))',
 				},
 			},
-			borderRadius: {
-				lg: 'var(--radius)',
-				md: 'calc(var(--radius) - 2px)',
-				sm: 'calc(var(--radius) - 4px)',
+			fontFamily: {
+				body: ['var(--font-sans)', ...fontFamily.sans],
+				logo: 'var(--font-logo)',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -79,13 +95,27 @@ const config = {
 					to: { height: '0' },
 				},
 			},
-			animation: {
-				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
+			textShadow: {
+				inner: '0px 3px 4px #fff, 0 0 0 #151515, 0px 3px 4px #fff',
+			},
+			width: {
+				100: '25rem',
+				104: '26rem',
+				108: '27rem',
+				112: '28rem',
+				116: '29rem',
+				120: '30rem',
+				124: '31rem',
+				128: '32rem',
+				256: '64rem',
 			},
 		},
 	},
-	plugins: [require('tailwindcss-animate'), require('tailwindcss-safe-area')],
+	plugins: [
+		require('tailwindcss-animate'),
+		require('tailwindcss-safe-area'),
+		textShadow,
+	],
 } satisfies Config
 
 export default config
