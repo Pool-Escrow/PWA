@@ -71,12 +71,10 @@ const Home = () => {
 			// }}
 		>
 			<div className='flex min-h-screen w-full justify-center'>
-				<div className=' flex flex-col mt-4 w-full items-center max-w-4xl'>
-					<section
-						className={` ${styles.homeTopSection} rounded-3xl rounded-b-none`}
-					>
+				<div className=' flex flex-col w-full items-center max-w-4xl space-y-6'>
+					<section className={` ${styles.homeTopSection} `}>
 						<div
-							className={`rounded-3xl  flex ${styles.hero} w-full flex-col py-4 px-8`}
+							className={`  flex ${styles.hero} w-full flex-col py-4 md:pb-20 pb-12 px-8`}
 						>
 							<ul className='flex flex-row justify-between h-20 items-center'>
 								<li
@@ -93,15 +91,15 @@ const Home = () => {
 							</ul>
 							<div className='flex flex-col md:flex-row w-full space-y-16'>
 								<div className=' md:w-7/12 flex flex-col '>
-									<div className='flex flex-col space-y-4 mt-16'>
-										<p className='text-white text-3xl md:text-5xl font-bold'>
+									<div className='flex flex-col space-y-4 md:mt-32 mt-16'>
+										<p className='text-white text-4xl md:text-5xl font-extrabold'>
 											POOLING FUNDS <br />
 											MADE SIMPLE
 										</p>
 										<p className='text-white text-sm md:text-md font-semibold'>
 											Effortlessly create, fund, and manage your own 'Pool
-											parties.' Enjoy a seamless and fun event planning
-											experience.
+											parties.' <br />
+											Enjoy a seamless and fun event planning experience.
 										</p>
 										<div className='flex flex-row items-center space-x-8'>
 											<Link
@@ -116,59 +114,61 @@ const Home = () => {
 										</div>
 									</div>
 								</div>
-								<div className='md:w-5/12 md:mb-16'>
+								<div className='md:w-5/12 md:mb-16 flex flex-col'>
 									<Image src={poolEventImage} alt='pool background' />
 								</div>
 							</div>
 						</div>
 					</section>
-					<section
-						className={`flex flex-col py-16 space-y-8 items-center ${styles.poolMidSection} w-full lg:px-4 px-1`}
-					>
-						<h1 className='md:text-5xl text-4xl font-extrabold text-center'>
-							HOW DOES POOL WORK?
-						</h1>
-						<p className='text-center px-12'>
-							Joining a Pool party is easy and fun. Follow these simple steps to
-							get started:
-						</p>
-						<Link
-							href={'/'}
-							className={`text-white ${styles.poolButton} py-3 rounded-full w-36 text-center`}
+					<section className={`flex w-full bg-white`}>
+						<div
+							className={`flex flex-col py-16  mx-4 md:mx-0 w-full space-y-8 items-center ${styles.poolMidSection} lg:px-4 px-1 rounded-2xl`}
 						>
-							Join a Pool
-						</Link>
-						<ul className='mt-8 flex flex-col space-y-4 md:flex-row md:space-x-4 md:items-baseline'>
-							{cardContent.map((card, index) => {
-								return (
-									<li
-										key={index}
-										className='flex flex-col h-84 w-64 lg:w-64 rounded-lg overflow-hidden'
-									>
-										<div
-											className={` h-1/2 flex relative ${styles.cardBackground} items-center justify-center overflow-hidden`}
+							<h1 className='md:text-5xl text-2xl font-extrabold text-center'>
+								HOW DOES POOL WORK?
+							</h1>
+							<p className='text-center px-12 md:text-md text-sm'>
+								Joining a Pool party is easy and fun. Follow these simple steps
+								to get started:
+							</p>
+							<Link
+								href={'/'}
+								className={`text-white ${styles.poolButton} py-3 rounded-full w-36 text-center`}
+							>
+								Join a Pool
+							</Link>
+							<ul className='mt-8 flex flex-col space-y-4 md:flex-row md:space-x-4 md:items-baseline'>
+								{cardContent.map((card, index) => {
+									return (
+										<li
+											key={index}
+											className='flex flex-col h-84 w-64 lg:w-64 rounded-lg overflow-hidden'
 										>
-											<Image
-												className='object-cover'
-												src={card.image}
-												alt={card.alt}
-												width={192}
-												height={192}
-												// layout='fill'
-											/>
-										</div>
-										<div className='flex flex-col p-4 space-y-2 bg-white h-1/2'>
-											<h3 className='text-sm md:text-md lg:text-lg font-medium'>
-												{card.title}
-											</h3>
-											<p className={`text-sm ${styles.fontGrey}`}>
-												{card.description}
-											</p>
-										</div>
-									</li>
-								)
-							})}
-						</ul>
+											<div
+												className={` h-1/2 flex relative ${styles.cardBackground} items-center justify-center overflow-hidden`}
+											>
+												<Image
+													className='object-cover'
+													src={card.image}
+													alt={card.alt}
+													width={192}
+													height={192}
+													// layout='fill'
+												/>
+											</div>
+											<div className='flex flex-col p-4 space-y-2 bg-white h-1/2'>
+												<h3 className='text-sm md:text-md lg:text-lg font-medium'>
+													{card.title}
+												</h3>
+												<p className={`text-sm ${styles.fontGrey}`}>
+													{card.description}
+												</p>
+											</div>
+										</li>
+									)
+								})}
+							</ul>
+						</div>
 					</section>
 					<section className='w-full'>
 						<PoolFooter />
