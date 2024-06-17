@@ -1,5 +1,6 @@
-import { fetchLatestPoolId } from '@/lib/api/clientAPI'
-import { getUser, verifyToken } from '@/lib/server'
+import 'server-only'
+
+import { getUser, verifyToken } from '@/lib/server/auth'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 import { createClient } from '@supabase/supabase-js'
 import { decode } from 'jsonwebtoken'
@@ -83,7 +84,13 @@ export default async function handler(
 		console.log('imagePath', imagePath)
 	}
 
-	const latestPoolId = await fetchLatestPoolId({ queryKey: [''] })
+	// TODO: fetch from the smart contract instead of the database
+	const latestPoolId = await supabaseAdminClient
+		.from('pool')
+		.select('pool_id')
+		.order('pool_id', { ascending: false })
+		.limit(1)
+
 	console.log('latestPoolId', latestPoolId)
 	const { data: poolData, error: poolError } = await supabaseAdminClient
 		.from('pool')

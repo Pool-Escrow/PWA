@@ -1,5 +1,7 @@
-import { getUser, verifyToken } from '@/lib/server'
-import type { WalletWithMetadata } from '@privy-io/react-auth'
+import 'server-only'
+
+import { getUser, verifyToken } from '@/lib/server/auth'
+import { WalletWithMetadata } from '@privy-io/react-auth'
 import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
@@ -9,9 +11,9 @@ export default async function handler(
 ) {
 	// Parse the request body
 	const requestData = await req.body
-	const { poolId, address, jwtString } = requestData
+	const { poolId, winnerAddress, amount, jwtString } = requestData
 
-	const walletAddressLower = address.toLowerCase()
+	const walletAddressLower = winnerAddress.toLowerCase()
 	console.log('jwt', JSON.stringify(jwtString))
 
 	// Return a response
@@ -31,8 +33,10 @@ export default async function handler(
 	try {
 		const claims = await verifyToken(jwtString)
 		const user = await getUser(claims!.userId)
+		// console.log('user', user)
 		const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
 		jwtAddress = walletWithMetadata?.address?.toLowerCase()
+		// console.log('address', jwtAddress)
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: 'Failed to decode Jwt.' })
@@ -48,9 +52,10 @@ export default async function handler(
 
 	if (
 		existingData?.[0]?.['host_address'] != jwtAddress &&
+		existingData?.[0]?.['co_host_addresses'] != null &&
 		existingData?.[0]?.['co_host_addresses'].indexOf(jwtAddress) == -1
 	) {
-		console.error('Not authorised to register')
+		console.error('Not authorised to save payouts')
 		res.status(500).json({ message: 'Error' })
 
 		return
@@ -58,43 +63,41 @@ export default async function handler(
 
 	async function upsertData() {
 		const { data: existingData, error: selectError } = await supabaseAdminClient
-			.from('participantStatus')
+			.from('savedPayouts')
 			.select('*')
 			.match({
 				pool_id: poolId,
-				participant_address: walletAddressLower,
+				address: winnerAddress,
 			})
 
 		if (existingData?.length === 0) {
-			console.log('User not Registered previously', selectError)
+			console.log('No previous user activity for pool', selectError)
 			// Insert a new row
-			// const { data: insertedData, error: insertError } =
-			// 	await supabaseAdminClient.from('participantStatus').insert({
-			// 		participant_address: walletAddressLower,
-			// 		status: 2,
-			// 		pool_id: poolId,
-			// 	})
-			// if (insertError) {
-			// 	console.log('Error inserting into participantStatus')
-			// 	res.status(500).json({ message: 'Error' })
-			// } else {
-			// 	console.log('Data inserted successfully:', insertedData)
-			// }
-			res.status(500).json({ error: 'Internal Server Error' })
+			const { data: insertedData, error: insertError } =
+				await supabaseAdminClient.from('savedPayouts').insert({
+					address: walletAddressLower,
+					payout_amount: amount,
+					pool_id: poolId,
+				})
+			if (insertError) {
+				console.log('Error inserting into savedPayouts')
+				res.status(500).json({ message: 'Error' })
+			} else {
+				console.log('Data inserted successfully:', insertedData)
+			}
 		} else {
 			// Update the existing row
 			const { data: updatedData, error: updateError } =
 				await supabaseAdminClient
-					.from('participantStatus')
+					.from('savedPayouts')
 					.update({
-						participant_address: walletAddressLower,
-						status: 2,
+						address: walletAddressLower,
+						payout_amount: amount,
 						pool_id: poolId,
-						check_in_time: new Date(),
 					})
 					.match({
 						pool_id: poolId,
-						participant_address: walletAddressLower,
+						address: walletAddressLower,
 					})
 
 			if (updateError) {
@@ -106,6 +109,25 @@ export default async function handler(
 		}
 	}
 
-	await upsertData()
+	async function deleteData() {
+		const { data: existingData, error: deleteError } = await supabaseAdminClient
+			.from('savedPayouts')
+			.delete()
+			.match({
+				pool_id: poolId,
+				address: winnerAddress,
+			})
+
+		if (deleteError) {
+			console.error(deleteError)
+			res.status(500).json({ error: 'Internal Server Error' })
+		}
+	}
+
+	if (amount == 0) {
+		await deleteData()
+	} else {
+		await upsertData()
+	}
 	res.status(200).json({ message: 'Success' })
 }

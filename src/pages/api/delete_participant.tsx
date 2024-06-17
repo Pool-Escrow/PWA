@@ -1,4 +1,6 @@
-import { getUser, verifyToken } from '@/lib/server'
+import 'server-only'
+
+import { getUser, verifyToken } from '@/lib/server/auth'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 import { createClient } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
