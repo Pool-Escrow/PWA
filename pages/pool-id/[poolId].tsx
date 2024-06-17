@@ -182,11 +182,12 @@ const PoolPage = () => {
 		setWinnerDetails,
 		poolSCWinners,
 		winnerAddresses,
+		// Commented these out as it leads to infinite loop.
 		// userWonDetails,
 		// cohostDbData,
-		// setPageUrl,
-		// user,
-		// poolSCTimeStart,
+		setPageUrl,
+		user,
+		poolSCTimeStart,
 	])
 
 	const eventDate = formatEventDateTime(poolSCTimeStart) ?? '0'
