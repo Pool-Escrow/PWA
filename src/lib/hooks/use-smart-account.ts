@@ -1,3 +1,5 @@
+'use client'
+
 import { useLogin, type CallbackError } from '@privy-io/react-auth'
 import { useState } from 'react'
 import { useErrorHandling } from './use-error-handling'

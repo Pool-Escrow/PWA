@@ -1,6 +1,6 @@
-import { initializeSmartAccount } from '@/lib/initializeSmartAccount'
 import { useWallets } from '@privy-io/react-auth'
 import { useCallback } from 'react'
+import { initializeSmartAccount } from '../contracts/initializeSmartAccount'
 
 export const useInitializeAccount = (
 	handleError: (message: string, error: Error) => void,
