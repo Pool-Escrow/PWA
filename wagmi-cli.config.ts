@@ -3,7 +3,7 @@ import { foundry } from '@wagmi/cli/plugins'
 import { baseSepolia } from 'viem/chains'
 
 export default defineConfig({
-	out: 'src/lib/contracts/generated.ts',
+	out: 'src/types/contracts.ts',
 	plugins: [
 		foundry({
 			project: 'contracts',
