@@ -5,7 +5,7 @@ import withSerwistInit from '@serwist/next'
 const inProduction = process.env.NODE_ENV === 'production'
 
 const withSerwist = withSerwistInit({
-	swSrc: 'lib/sw.ts',
+	swSrc: 'src/sw.ts',
 	swDest: 'public/sw.js',
 	disable: !inProduction,
 })
@@ -24,5 +24,8 @@ export default withBundleAnalyzer(
 		images: {
 			remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
 		},
+		redirects: async () => [
+			{ source: '/', destination: '/pools', permanent: true },
+		],
 	}),
 )
