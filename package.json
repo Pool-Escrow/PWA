@@ -4,6 +4,7 @@
 	"license": "MIT",
 	"scripts": {
 		"check-types": "tsc --noemit",
+		"init-contracts": "git submodule update --recursive --remote",
 		"gen-types:db": "pnpx supabase gen types typescript --project-id nmwbprtqvwjgctctsrsg --schema public > src/types/db.ts",
 		"gen-types:contract": "wagmi --config wagmi-cli.config.ts generate",
 		"dev": "next dev",
