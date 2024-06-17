@@ -110,10 +110,9 @@ const Home = () => {
 											>
 												Get Started
 											</Link>
-											<p className='text-white text-xs'>
-												{' '}
+											<Link href={'terms'} className='text-white text-xs'>
 												Terms and conditions
-											</p>
+											</Link>
 										</div>
 									</div>
 								</div>
@@ -126,10 +125,10 @@ const Home = () => {
 					<section
 						className={`flex flex-col py-16 space-y-8 items-center ${styles.poolMidSection} w-full lg:px-4 px-1`}
 					>
-						<h1 className='text-5xl font-extrabold text-center'>
+						<h1 className='md:text-5xl text-4xl font-extrabold text-center'>
 							HOW DOES POOL WORK?
 						</h1>
-						<p className='text-center'>
+						<p className='text-center px-12'>
 							Joining a Pool party is easy and fun. Follow these simple steps to
 							get started:
 						</p>
