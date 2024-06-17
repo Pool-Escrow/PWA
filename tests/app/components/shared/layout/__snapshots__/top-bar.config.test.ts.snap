@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getTopBarElements > should return default elements for /participant/:id/some-other-path 1`] = `
+{
+  "center": <TopBarLogo />,
+  "left": null,
+  "right": <TopBarButton />,
+}
+`;
+
+exports[`getTopBarElements > should return default elements for root path 1`] = `
+{
+  "center": <TopBarLogo />,
+  "left": null,
+  "right": <TopBarButton />,
+}
+`;
+
+exports[`getTopBarElements > should return default elements for unknown paths 1`] = `
+{
+  "center": <TopBarLogo />,
+  "left": null,
+  "right": <TopBarButton />,
+}
+`;
+
+exports[`getTopBarElements > should return elements for /participant/:id/pools/ 1`] = `
+{
+  "center": <TopBarLogo />,
+  "left": <TopBarBack />,
+  "right": <TopBarButton />,
+}
+`;
