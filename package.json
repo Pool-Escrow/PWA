@@ -119,5 +119,12 @@
 		"singleQuote": true,
 		"jsxSingleQuote": true,
 		"useTabs": true
+	},
+	"eslintConfig": {
+		"extends": [
+			"next",
+			"next/core-web-vitals",
+			"prettier"
+		]
 	}
 }
