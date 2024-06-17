@@ -1,31 +1,9 @@
 import type { Config } from 'tailwindcss'
-import { fontFamily } from 'tailwindcss/defaultTheme'
-
-const textShadow = ({
-	matchUtilities,
-	theme,
-}: {
-	matchUtilities: any
-	theme: any
-}) => {
-	matchUtilities(
-		{
-			'text-shadow': (value: string) => ({ textShadow: value }),
-		},
-		{
-			values: theme('textShadow'),
-		},
-	)
-}
+import { textShadow } from './src/lib/utils/tailwind'
 
 const config = {
 	darkMode: ['class'],
-	content: [
-		'./pages/**/*.{ts,tsx}',
-		'./components/**/*.{ts,tsx}',
-		'./app/**/*.{ts,tsx}',
-		'./src/**/*.{ts,tsx}',
-	],
+	content: ['./src/**/*.tsx'],
 	prefix: '',
 	theme: {
 		container: {
@@ -40,11 +18,19 @@ const config = {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 			},
+			backgroundImage: {
+				cta: 'linear-gradient(180deg, #36a0f7, #1364da)',
+				'text-inner':
+					'radial-gradient(circle at center, #2989EC 80%, #151515 100%)',
+			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
 				mini: 'var(--border-radius-mini)',
+			},
+			boxShadow: {
+				panel: '0px -2px 22.6px 0px rgba(79, 79, 79, 0.25)',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -80,10 +66,17 @@ const config = {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))',
 				},
+				panel: {
+					DEFAULT: 'hsl(var(--panel))',
+				},
 			},
 			fontFamily: {
-				body: ['var(--font-sans)', ...fontFamily.sans],
-				logo: 'var(--font-logo)',
+				logo: 'var(--font-logo), "Comfortaa-fallback", sans-serif',
+				body: 'var(--font-body), "Inter-fallback", sans-serif',
+			},
+			height: {
+				'top-bar': 'var(--top-bar-height)',
+				'bottom-bar': 'var(--bottom-bar-height)',
 			},
 			keyframes: {
 				'accordion-down': {
@@ -95,8 +88,12 @@ const config = {
 					to: { height: '0' },
 				},
 			},
+			padding: {
+				'top-bar-h': 'var(--top-bar-height)',
+				'bottom-bar-h': 'var(--bottom-bar-height)',
+			},
 			textShadow: {
-				inner: '0px 3px 4px #fff, 0 0 0 #151515, 0px 3px 4px #fff',
+				inner: '0 3px 4px #fff, 0 0 0 #151515, 0px 3px 4px #fff',
 			},
 			width: {
 				100: '25rem',
