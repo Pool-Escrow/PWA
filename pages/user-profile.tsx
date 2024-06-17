@@ -3,15 +3,13 @@ import ClaimablePoolRow from '@/components/claimablePoolRow'
 import Divider from '@/components/divider'
 import Page from '@/components/page'
 import Section from '@/components/section'
-import { Button } from '@/components/ui/button'
+
 import { useToast } from '@/components/ui/use-toast'
 import { useCookie } from '@/hooks/cookie'
 import {
 	fetchClaimablePoolsFromSC,
 	fetchUserDisplayForAddress,
 	handleClaimWinnings,
-	handleOnRamp,
-	handleOnRampByPaySDK,
 } from '@/lib/api/clientAPI'
 import {
 	formatAddress,
@@ -27,17 +25,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { baseSepolia, base, mainnet } from 'viem/chains'
-import { initOnRamp, InitOnRampParams } from '@coinbase/cbpay-js'
-import { generateOnRampURL } from '@coinbase/cbpay-js'
+import OnRampButton from '@/components/onRampButton'
 
 const inter = Inter({ subsets: ['latin'] })
-
-type InitOnRampOptions = Parameters<any>[0]
-
-type CoinbaseButtonProps = {
-	destinationWalletAddress: string
-}
 
 const UserProfile = () => {
 	const router = useRouter()
@@ -98,24 +88,6 @@ const UserProfile = () => {
 		})
 	}
 
-	const onRampMutation = useMutation({
-		mutationFn: handleOnRampByPaySDK,
-		onSuccess: (data) => {
-			// Perform actions on the returned data
-			console.log('onramp url', data)
-			window.open(data.onRampUrl, '_blank')
-		},
-		onError: () => {
-			console.log('claimMutation Error')
-		},
-	})
-
-	const onOnRampButtonClicked = () => {
-		onRampMutation.mutate({
-			params: [baseSepolia.name, currentJwt!],
-		})
-	}
-
 	useEffect(() => {
 		if (ready && !authenticated) {
 			router.push('/login')
@@ -165,7 +137,7 @@ const UserProfile = () => {
 							</Link>
 						</div>
 						<div className='flex justify-center'>
-							<Button onClick={onOnRampButtonClicked}>On Ramp</Button>
+							<OnRampButton />
 						</div>
 						<div
 							className={`flex flex-col rounded-3xl cardBackground w-full p-6 md:p-10 md:space-y-10`}
