@@ -9,21 +9,17 @@ import { WagmiProvider } from 'wagmi'
 import { queryClient as getQueryClient, privy, wagmi } from './configs'
 
 export default function Providers({ children }: React.PropsWithChildren) {
-	const queryClient = getQueryClient()
+    const queryClient = getQueryClient()
 
-	return (
-		<PrivyProvider {...privy}>
-			<WagmiProvider {...wagmi}>
-				<PersistQueryClientProvider {...queryClient}>
-					<HydrationBoundary state={dehydrate(queryClient.client)}>
-						{children}
-					</HydrationBoundary>
-					<Toaster />
-					{process.env.NODE_ENV === 'development' && (
-						<ReactQueryDevtools initialIsOpen={false} />
-					)}
-				</PersistQueryClientProvider>
-			</WagmiProvider>
-		</PrivyProvider>
-	)
+    return (
+        <PrivyProvider {...privy}>
+            <WagmiProvider {...wagmi}>
+                <PersistQueryClientProvider {...queryClient}>
+                    <HydrationBoundary state={dehydrate(queryClient.client)}>{children}</HydrationBoundary>
+                    <Toaster />
+                    {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
+                </PersistQueryClientProvider>
+            </WagmiProvider>
+        </PrivyProvider>
+    )
 }
