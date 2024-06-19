@@ -8,11 +8,12 @@ if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
 export default {
 	appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
 	config: {
-		loginMethods: ['email', 'wallet', 'farcaster'],
 		appearance: {
 			theme: 'light',
-			accentColor: '#676FFF',
-			logo: '/images/pool.png',
+			accentColor: '#1364DA',
+			logo: '/images/pool-logo-4x.png',
+			landingHeader: 'Log in or sign up to continue',
+			loginMessage: 'Pooling funds made simple.',
 			showWalletLoginFirst: false,
 		},
 		embeddedWallets: {
@@ -26,8 +27,23 @@ export default {
 		defaultChain: baseSepolia,
 		supportedChains: [baseSepolia],
 		legal: {
-			privacyPolicyUrl: '/privacy',
+			privacyPolicyUrl: '/privacy-policy',
 			termsAndConditionsUrl: '/terms',
+		},
+		loginMethodsAndOrder: {
+			primary: ['email', 'sms', 'coinbase_wallet', 'detected_wallets'],
+			overflow: [
+				'wallet_connect',
+				'farcaster',
+				'telegram',
+				'apple',
+				'google',
+				'twitter',
+				'discord',
+				'tiktok',
+				'linkedin',
+				'instagram',
+			],
 		},
 		fiatOnRamp: { useSandbox: true },
 	},
