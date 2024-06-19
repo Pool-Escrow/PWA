@@ -1,58 +1,42 @@
 import { cn } from '@/lib/utils/tailwind'
-import {
-	ComponentPropsWithoutRef,
-	ComponentType,
-	ForwardRefExoticComponent,
-	PropsWithChildren,
-	ReactNode,
-	RefAttributes,
-	forwardRef,
-} from 'react'
+import type { ComponentType, ForwardedRef, ReactNode } from 'react'
+import { forwardRef } from 'react'
+import type { ClassNameValue } from 'tailwind-merge'
 
-interface WithForwardRefOptions {
-	className?: string | string[]
-	inner?: (children: ReactNode) => ReactNode
-	outer?: (content: ReactNode) => ReactNode
+interface ForwardRefOptions {
+    className?: ClassNameValue
+    renderInner?: (children: ReactNode) => ReactNode
+    renderOuter?: (content: ReactNode) => ReactNode
 }
 
-function withForwardRef<
-	T extends ComponentType<any> | ForwardRefExoticComponent<any>,
->(
-	PrimitiveComponent: T,
-	{ className: defaultClassName, inner, outer }: WithForwardRefOptions,
+type ForwardRefProps<P> = P & {
+    className?: ClassNameValue
+    children?: ReactNode
+}
+
+function withForwardRef<T extends HTMLElement, P extends object>(
+    Component: ComponentType<P>,
+    options: ForwardRefOptions = {},
 ) {
-	type Ref =
-		T extends ForwardRefExoticComponent<infer Props>
-			? Props extends RefAttributes<infer RefType>
-				? RefType
-				: never
-			: never
+    const { className: baseClassName, renderInner, renderOuter } = options
 
-	type Props = PropsWithChildren<
-		ComponentPropsWithoutRef<T> & { className?: string | string[] }
-	>
+    const EnhancedComponent = forwardRef<T, ForwardRefProps<P>>((props, ref: ForwardedRef<T>) => {
+        const { className, children, ...remainingProps } = props
+        const content = renderInner ? renderInner(children) : children
+        const combinedClassName = cn(baseClassName, className)
 
-	const Component = forwardRef<Ref, Props>((props, ref) => {
-		const { className, children, ...otherProps } = props
-		const finalClassName = cn(defaultClassName, className)
-		const processedChildren = inner ? inner(children) : children
+        const element = (
+            <Component ref={ref} className={combinedClassName} {...(remainingProps as P)}>
+                {content}
+            </Component>
+        )
 
-		const content = (
-			<PrimitiveComponent
-				ref={ref}
-				className={finalClassName}
-				{...(otherProps as any)}
-			>
-				{processedChildren}
-			</PrimitiveComponent>
-		)
+        return renderOuter ? renderOuter(element) : element
+    })
 
-		return outer ? outer(content) : content
-	})
+    EnhancedComponent.displayName = `withEnhancedForwardRef(${Component.displayName || Component.name || 'Component'})`
 
-	Component.displayName = PrimitiveComponent.displayName
-
-	return Component
+    return EnhancedComponent
 }
 
 export default withForwardRef
