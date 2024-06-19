@@ -10,8 +10,7 @@ node_modules
 
 .DS_Store
 
-.env.local
-*.env.*
+.env.*.local
 
 info.md
 .vercel
