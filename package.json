@@ -140,7 +140,19 @@
         "singleQuote": true,
         "trailingComma": "all",
         "useTabs": false,
-        "tabWidth": 4
+        "tabWidth": 4,
+        "plugins": [
+            "prettier-plugin-tailwindcss"
+        ],
+        "tailwindConfig": "./tailwind.config.ts",
+        "tailwindFunctions": [
+            "clsx",
+            "classnames",
+            "cn",
+            "cva",
+            "tw",
+            "twMerge"
+        ]
     },
     "eslintConfig": {
         "parserOptions": {
