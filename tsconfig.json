@@ -25,8 +25,9 @@
             "@/*": ["./src/*"],
             "tailwindcss-classnames": ["./src/types/tailwindcss-classnames.ts"]
         },
-        "types": ["vitest/globals"]
+        // allows Serwist to type `window.serwist`.
+        "types": ["vitest/globals", "@serwist/next/typings"]
     },
     "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "public/sw.js"]
 }
