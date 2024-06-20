@@ -16,7 +16,7 @@ export default function Providers({ children }: React.PropsWithChildren) {
             <WagmiProvider {...wagmi}>
                 <PersistQueryClientProvider {...queryClient}>
                     <HydrationBoundary state={dehydrate(queryClient.client)}>{children}</HydrationBoundary>
-                    <Toaster />
+                    <Toaster position='top-center' />
                     {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />}
                 </PersistQueryClientProvider>
             </WagmiProvider>
