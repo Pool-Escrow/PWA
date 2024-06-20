@@ -8,6 +8,7 @@
         "build": "next build",
         "check-types": "tsc --noemit",
         "dev": "next dev",
+        "dev:turbo": "next dev --turbo",
         "gen": "node scripts/generate-types.mjs",
         "gen:contracts": "pnpm gen contracts",
         "gen:css": "pnpm gen css",
