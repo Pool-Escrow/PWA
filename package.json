@@ -51,6 +51,7 @@
         "jsonwebtoken": "9.0.2",
         "lodash": "4.17.21",
         "lucide-react": "0.394.0",
+        "native-querystring": "1.1.1",
         "next": "14.2.4",
         "next-themes": "0.3.0",
         "react": "18.3.1",
@@ -121,6 +122,9 @@
             "sourcemap-codec": "1.4.8",
             "workbox-cacheable-response": "6.6.0",
             "workbox-google-analytics": "6.6.0"
+        },
+        "patchedDependencies": {
+            "@privy-io/server-auth@1.7.3": "patches/@privy-io__server-auth@1.7.3.patch"
         }
     },
     "prettier": {
