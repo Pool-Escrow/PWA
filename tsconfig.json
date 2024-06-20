@@ -22,8 +22,7 @@
             }
         ],
         "paths": {
-            "@/*": ["./src/*"],
-            "tailwindcss-classnames": ["./src/types/tailwindcss-classnames.ts"]
+            "@/*": ["./src/*"]
         },
         // allows Serwist to type `window.serwist`.
         "types": ["vitest/globals", "@serwist/next/typings"]
