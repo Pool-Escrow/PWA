@@ -51,7 +51,7 @@
         /* custom sizes */
         --border-radius-mini: 0.5625rem;
         --top-bar-height: 5rem;
-        --bottom-bar-height: 4.75rem;
+        --bottom-bar-height: 5.5rem;
 
         /* privy customizations */
         --privy-color-background: #f5f5f5 !important;
@@ -96,9 +96,9 @@
 
     body {
         height: -webkit-fill-available;
-        @apply min-h-dvh max-w-screen-md flex flex-col mx-auto;
-        @apply px-safe-or-6 pt-safe-or-[var(--top-bar-height)] pb-safe-or-[var(--bottom-bar-height)];
-        @apply bg-background text-foreground antialiased select-none overflow-y-auto;
+        @apply mx-auto flex max-w-screen-md flex-col min-h-screen-safe-or-[min-h-dvg];
+        @apply mb-safe-or-[var(--bottom-bar-height)] mt-safe-or-[var(--top-bar-height)] px-safe-or-6;
+        @apply select-none overflow-y-hidden bg-background text-foreground antialiased;
 
         /* PWA enhancements */
         -webkit-overflow-scrolling: touch;
@@ -128,7 +128,7 @@
 
 @layer components {
     .flex-center {
-        @apply flex justify-center items-center mx-auto w-full;
+        @apply mx-auto flex w-full items-center justify-center;
     }
 
     .no-spinner {
