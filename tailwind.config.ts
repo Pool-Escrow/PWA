@@ -1,10 +1,9 @@
-// @ts-check
+import type { Config } from 'tailwindcss'
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+const config: Config = {
     content: ['./src/**/*.tsx'],
     darkMode: ['class'],
-    prefix: '',
+    // prefix: '',
     theme: {
         container: {
             center: true,
@@ -30,7 +29,6 @@ module.exports = {
             boxShadow: {
                 'panel': '0px -2px 22.6px 0px rgba(79, 79, 79, 0.25)',
                 'button': '0px 1.75px 0px 0px rgba(255, 255, 255, 0.25) inset',
-                // now a shadow to mimic the button being pushed down, so it needs to be the opposite of the button shadow
                 'button-push': '0px -1.75px 0px 0px rgba(255, 255, 255, 0.25) inset',
             },
             colors: {
@@ -111,3 +109,5 @@ module.exports = {
     },
     plugins: [require('tailwindcss-animate'), require('tailwindcss-safe-area')],
 }
+
+export default config
