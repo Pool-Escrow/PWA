@@ -1,16 +1,15 @@
 import { cn } from '@/lib/utils/tailwind'
 import type { ComponentType, ForwardedRef, ReactNode } from 'react'
 import { forwardRef } from 'react'
-import type { ClassNameValue } from 'tailwind-merge'
 
 interface ForwardRefOptions {
-    className?: ClassNameValue
+    className?: string
     renderInner?: (children: ReactNode) => ReactNode
     renderOuter?: (content: ReactNode) => ReactNode
 }
 
 type ForwardRefProps<P> = P & {
-    className?: ClassNameValue
+    className?: string
     children?: ReactNode
 }
 
@@ -34,7 +33,7 @@ function withForwardRef<T extends HTMLElement, P extends object>(
         return renderOuter ? renderOuter(element) : element
     })
 
-    EnhancedComponent.displayName = `withEnhancedForwardRef(${Component.displayName || Component.name || 'Component'})`
+    EnhancedComponent.displayName = `withForwardRef(${Component.displayName || Component.name || 'Component'})`
 
     return EnhancedComponent
 }
