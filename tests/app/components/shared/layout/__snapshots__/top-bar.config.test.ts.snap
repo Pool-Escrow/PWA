@@ -2,32 +2,80 @@
 
 exports[`getTopBarElements > should return default elements for /participant/:id/some-other-path 1`] = `
 {
-  "center": <TopBarLogo />,
+  "center": <ForwardRef(LoadableComponent) />,
   "left": null,
-  "right": <TopBarButton />,
+  "right": <ForwardRef(LoadableComponent) />,
 }
 `;
 
 exports[`getTopBarElements > should return default elements for root path 1`] = `
 {
-  "center": <TopBarLogo />,
+  "center": <ForwardRef(LoadableComponent) />,
   "left": null,
-  "right": <TopBarButton />,
+  "right": <ForwardRef(LoadableComponent) />,
 }
 `;
 
 exports[`getTopBarElements > should return default elements for unknown paths 1`] = `
 {
-  "center": <TopBarLogo />,
+  "center": <ForwardRef(LoadableComponent) />,
   "left": null,
-  "right": <TopBarButton />,
+  "right": <ForwardRef(LoadableComponent) />,
 }
 `;
 
-exports[`getTopBarElements > should return elements for /participant/:id/pools/ 1`] = `
+exports[`getTopBarElements > should return elements for /my-pools 1`] = `
 {
-  "center": <TopBarLogo />,
-  "left": <TopBarBack />,
-  "right": <TopBarButton />,
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LoadableComponent) />,
+}
+`;
+
+exports[`getTopBarElements > should return elements for /participant/[id] 1`] = `
+{
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LoadableComponent) />,
+}
+`;
+
+exports[`getTopBarElements > should return elements for /participant/new 1`] = `
+{
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LinkComponent)
+    href="/"
+  >
+    Skip
+  </ForwardRef(LinkComponent)>,
+}
+`;
+
+exports[`getTopBarElements > should return elements for /pool/[poolId] 1`] = `
+{
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LoadableComponent) />,
+}
+`;
+
+exports[`getTopBarElements > static route should have priority over dynamic route 1`] = `
+{
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LinkComponent)
+    href="/"
+  >
+    Skip
+  </ForwardRef(LinkComponent)>,
+}
+`;
+
+exports[`getTopBarElements > static route should have priority over dynamic route 2`] = `
+{
+  "center": <ForwardRef(LoadableComponent) />,
+  "left": <ForwardRef(LoadableComponent) />,
+  "right": <ForwardRef(LoadableComponent) />,
 }
 `;
