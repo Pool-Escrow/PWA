@@ -1,13 +1,13 @@
 import {
-	BiconomyPaymaster,
-	Bundler,
-	DEFAULT_ECDSA_OWNERSHIP_MODULE,
-	DEFAULT_ENTRYPOINT_ADDRESS,
-	ECDSAOwnershipValidationModule,
-	createSmartAccountClient,
+    BiconomyPaymaster,
+    Bundler,
+    DEFAULT_ECDSA_OWNERSHIP_MODULE,
+    DEFAULT_ENTRYPOINT_ADDRESS,
+    ECDSAOwnershipValidationModule,
+    createSmartAccountClient,
 } from '@biconomy/account'
-import { ConnectedWallet } from '@privy-io/react-auth'
-import { WalletClient } from 'viem'
+import type { ConnectedWallet } from '@privy-io/react-auth'
+import type { WalletClient } from 'viem'
 import { baseSepolia } from 'viem/chains'
 
 const bundlerUrl = process.env.NEXT_PUBLIC_BUNDLER_URL
