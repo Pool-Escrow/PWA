@@ -1,5 +1,4 @@
 'use client'
-
 import type { CurrencyAmountValue } from '@/components/shared/forms/currency-amount.control'
 import { CurrencyAmount } from '@/components/shared/forms/currency-amount.control'
 import type { DateTimeRangeValue } from '@/components/shared/forms/date-time-range.control'
@@ -37,7 +36,6 @@ export default function CreatePoolPage() {
     const router = useRouter()
 
     // const { currentJwt: jwt } = useCookie()
-
     const createPoolServerMutation = useMutation({
         // mutationFn: handleCreatePoolServer,
         onSuccess: () => {
@@ -95,6 +93,7 @@ export default function CreatePoolPage() {
         e.stopPropagation()
 
         const creatingToastId = toast.message('Creating Pool', { description: 'Please wait...' })
+
         // createPoolMutation.mutate({
         // 	params: [
         // 		startTimestamp,
@@ -106,8 +105,6 @@ export default function CreatePoolPage() {
         // 		wallets,
         // 	],
         // })
-
-        // white 1 second and resolve the promise
         await new Promise(() => {
             setTimeout(() => {
                 toast.dismiss(creatingToastId)
