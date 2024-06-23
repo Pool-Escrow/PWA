@@ -3,4 +3,9 @@
  * @description This file is the wrapper for the pool details page.
  */
 
-export { PoolDetails as default } from '@/components/pool-details'
+import { PoolDetails } from '@/components/pool-details'
+
+export default function Page({ params }: { params: { 'pool-id': string } }) {
+    return <PoolDetails poolId={params['pool-id']} />
+}
+// export { PoolDetails as default } from '@/components/pool-details'
