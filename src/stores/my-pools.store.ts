@@ -18,7 +18,6 @@ const defaultInitState: MyPoolsTabState = {
 }
 
 const createMyPoolsTabStore = (initState: MyPoolsTabState = defaultInitState) => {
-    console.log('Initial state:', initState)
     return createStore<MyPoolsTabStore>()(
         persist(
             set => ({
@@ -26,8 +25,8 @@ const createMyPoolsTabStore = (initState: MyPoolsTabState = defaultInitState) =>
                 setCurrentTab: tab => set({ currentTab: tab }),
             }),
             {
-                name: 'my-pools-tab-storage', // nombre único para este almacenamiento
-                storage: createJSONStorage(() => localStorage), // puedes usar sessionStorage aquí si prefieres
+                name: 'my-pools-tab-storage',
+                storage: createJSONStorage(() => localStorage),
             },
         ),
     )
