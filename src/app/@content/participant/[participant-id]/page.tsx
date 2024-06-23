@@ -1,12 +1,12 @@
 export default function ParticipantPage() {
-	return <div>ParticipantPage</div>
+    return <div>ParticipantPage</div>
 }
 
 // import Appbar from '@/components/appbar'
 // import ClaimablePoolRow from '@/components/claimablePoolRow'
 // import Divider from '@/components/divider'
 // import Section from '@/components/section'
-// import { useToast } from '@/components/ui/use-toast'
+// import { toast } from 'sonner'
 // import {
 // 	fetchClaimablePoolsFromSC,
 // 	fetchUserDisplayForAddress,
