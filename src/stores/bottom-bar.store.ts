@@ -25,15 +25,12 @@ const createBottomBarStore = (initState: BottomBarState = defaultInitState) => {
     return createStore<BottomBarStore>()(set => ({
         ...initState,
         showBar: () => {
-            console.log('Showing bottom bar')
             set({ isVisible: true })
         },
         hideBar: () => {
-            console.log('Hiding bottom bar')
             set({ isVisible: false })
         },
         setContent: content => {
-            console.log('Setting content:', { content })
             set({ content })
         },
     }))
