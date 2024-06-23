@@ -1,4 +1,3 @@
-import { getAbiItem, parseAbiItem } from 'viem'
 import { poolAbi, poolAddress } from './contracts'
 
 declare global {

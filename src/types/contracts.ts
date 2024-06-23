@@ -1651,7 +1651,7 @@ export const poolAbi = [
 export const poolAddress = {
     8453: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     84532: '0x44432A98ea8dA37F844B89A324204ee6642b785A',
-} as const
+} as { [key: number]: string }
 
 /**
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0)

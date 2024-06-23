@@ -1,14 +1,24 @@
 // src/components/pool-detail/pool-detail.tsx
+'use client'
 
 import frog from '@/../public/images/frog.png'
+import { usePoolDetails } from '@/lib/hooks/use-pool-details'
+import { formatEventDateTime } from '@/lib/utils/date-time'
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Avatars from '../avatars/avatars'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
-interface PoolDetailsProps {}
+interface PoolDetailsProps {
+    poolId: string
+}
 const PoolDetails = (props: PoolDetailsProps) => {
+    const { poolDetails, isLoading, error } = usePoolDetails(BigInt(props.poolId))
+
+    // useEffect(() => {
+    //     console.log(props.poolId)
+    // }, [])
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
@@ -26,14 +36,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     </span>
                 </div>
 
-                <h2 className='mb-1 text-xl font-bold text-blue-800'>The Original Pool Poker Party</h2>
-                <p className='mb-4 text-gray-600'>Today at 6:00PM</p>
+                <h2 className='mb-1 text-xl font-bold text-blue-800'>{poolDetails?.[1].poolName}</h2>
+                <p className='mb-4 text-gray-600'>{formatEventDateTime(poolDetails?.[1].timeStart ?? 0)}</p>
 
                 <div className='mb-4 flex items-center'>
-                    <span className='mr-2 text-gray-700'>Hoste by:</span>
+                    <span className='mr-2 text-gray-700'>Hosted by:</span>
                     <div className='flex'>
-                        <span className='mr-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
-                            Pool
+                        <span className='mr-2 overflow-clip rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
+                            {poolDetails?.[0].host}
                         </span>
                         <span className='mr-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
                             Supermoon
@@ -46,7 +56,10 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
                 <div className='mb-4'>
                     <div className='mb-1 flex justify-between'>
-                        <span className='font-bold text-blue-800'>$825 USDC</span>
+                        <span className='font-bold text-blue-800'>
+                            ${poolDetails?.[1].depositAmountPerPerson}
+                            USDC
+                        </span>
                         <span className='text-gray-600'>Goal of $1,125 Prize Pool</span>
                     </div>
                     <div className='h-2.5 w-full rounded-full bg-blue-200'>
