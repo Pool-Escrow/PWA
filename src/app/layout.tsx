@@ -1,7 +1,9 @@
+// src/app/layout.tsx
+
 import '@/styles/globals.css'
 
-import Providers from '@/components/shared/providers'
 import { comfortaa, inter } from '@/lib/utils/fonts'
+import { Providers } from '@/providers'
 
 export { metadata, viewport } from '@/lib/utils/metadata'
 
@@ -12,7 +14,13 @@ export default function RootLayout({ top, content, bottom }: LayoutWithSlots<'to
             <body className={`${(inter.variable, comfortaa.variable)}`}>
                 <Providers>
                     {top}
-                    <main>{content}</main>
+                    {/* <PageTransitionEffect> */}
+                    {/* <Template> */}
+                    <main className='mx-auto flex size-full w-dvw max-w-screen-md flex-1 flex-col py-safe-offset-24 px-safe-or-6'>
+                        {content}
+                    </main>
+                    {/* </Template> */}
+                    {/* </PageTransitionEffect> */}
                     {bottom}
                 </Providers>
             </body>
