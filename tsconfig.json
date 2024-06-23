@@ -16,17 +16,11 @@
         "jsx": "preserve",
         "incremental": true,
         "tsBuildInfoFile": ".next/cache/.tsbuildinfo",
-        "plugins": [
-            {
-                "name": "next"
-            }
-        ],
-        "paths": {
-            "@/*": ["./src/*"]
-        },
+        "plugins": [{ "name": "next" }],
+        "paths": { "@/*": ["./src/*"] },
         // allows Serwist to type `window.serwist`.
         "types": ["vitest/globals", "@serwist/next/typings"]
     },
-    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.test.ts", "**/*.test.tsx"],
     "exclude": ["node_modules", "public/sw.js"]
 }
