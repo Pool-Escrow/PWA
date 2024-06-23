@@ -1,9 +1,9 @@
 export default function AvatarImage() {
-	return (
-		<div>
-			<h1>Avatar Image</h1>
-		</div>
-	)
+    return (
+        <div>
+            <h1>Avatar Image</h1>
+        </div>
+    )
 }
 
 // import frogImage from '@/public/images/frog.png'
