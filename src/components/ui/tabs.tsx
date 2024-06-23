@@ -1,5 +1,5 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import withForwardRef from '../shared/hocs/with-forward-ref'
+import withForwardRef from '../common/hocs/with-forward-ref'
 
 const Tabs = TabsPrimitive.Root
 const TabsList = withForwardRef(TabsPrimitive.List, {

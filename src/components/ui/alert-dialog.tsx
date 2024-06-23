@@ -2,8 +2,8 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils/tailwind'
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 import type { DialogProps } from '@radix-ui/react-dialog'
-import withClassNameDiv from '../shared/hocs/with-classname-div'
-import withForwardRef from '../shared/hocs/with-forward-ref'
+import withForwardRef from '../common/hocs/with-forward-ref'
+import withClassNameDiv from '../common/hocs/with-classname-div'
 
 const AlertDialog: React.FC<DialogProps> & {
     Action: typeof AlertDialogPrimitive.Action

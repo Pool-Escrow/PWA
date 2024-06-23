@@ -1,7 +1,7 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { XIcon } from 'lucide-react'
-import withClassNameDiv from '../shared/hocs/with-classname-div'
-import withForwardRef from '../shared/hocs/with-forward-ref'
+import withForwardRef from '../common/hocs/with-forward-ref'
+import withClassNameDiv from '../common/hocs/with-classname-div'
 
 const Dialog: React.FC<DialogPrimitive.DialogProps> & {
     Trigger: typeof DialogPrimitive.Trigger
