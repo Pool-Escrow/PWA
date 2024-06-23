@@ -1,15 +1,15 @@
 export default function CheckInPage() {
-	return (
-		<div>
-			<h1>Check In Page</h1>
-		</div>
-	)
+    return (
+        <div>
+            <h1>Check In Page</h1>
+        </div>
+    )
 }
 
 // import Appbar from '@/components/appbar'
 // import Page from '@/components/page'
 // import Section from '@/components/section'
-// import { useToast } from '@/components/ui/use-toast'
+// import { toast } from 'sonner'
 // import { useCookie } from '@/hooks/cookie'
 // import { handleCheckIn } from '@/lib/api/clientAPI'
 // import { usePrivy, useWallets } from '@privy-io/react-auth'

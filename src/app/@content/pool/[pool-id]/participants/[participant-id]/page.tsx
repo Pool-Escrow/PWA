@@ -1,5 +1,5 @@
 export default function ParticipantPage() {
-	return <div>Participant Page</div>
+    return <div>Participant Page</div>
 }
 
 // 'use client'
@@ -7,7 +7,7 @@ export default function ParticipantPage() {
 // import Appbar, { RightMenu } from '@/components/appbar'
 // import Section from '@/components/section'
 // import { Input } from '@/components/ui/input'
-// import { useToast } from '@/components/ui/use-toast'
+// import { toast } from 'sonner'
 // import { useCookie } from '@/hooks/cookie'
 // import {
 // 	fetchUserDisplayForAddress,
