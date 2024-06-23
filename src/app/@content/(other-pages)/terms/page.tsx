@@ -16,8 +16,8 @@ const Terms = () => {
 					/>
 				</Link>
 			</div>
-			<div className='flex flex-col justify-center w-full py-20 leading-loose space-y-4'>
-				<h1 className='font-bold text-4xl'>Terms and Conditions</h1>
+			<div className='flex w-full flex-col justify-center space-y-4 py-20 leading-loose'>
+				<h1 className='text-4xl font-bold'>Terms and Conditions</h1>
 				<p>Last updated: May 23, 2024</p>
 				<h3 className='text-2xl font-bold'>Overview</h3>
 				<p>
@@ -79,7 +79,7 @@ const Terms = () => {
 				time. Users are responsible for regularly reviewing the Terms and
 				Conditions for any changes. By using this website, you acknowledge that
 				you have read, understood, and agreed to these Terms and Conditions.
-				<h2 className='font-bold text-3xl'>Contact Us</h2>
+				<h2 className='text-3xl font-bold'>Contact Us</h2>
 				<p>
 					If you have any questions about this Privacy Policy, You can contact
 					us:
