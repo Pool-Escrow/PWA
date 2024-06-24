@@ -25,7 +25,7 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({ currentTab, onChangeTab, init
         if (!initialLoad && currentTab !== prevTabRef.current) {
             const currentIndex = myPoolsTabsConfig.findIndex(tab => tab.id === prevTabRef.current)
             const newIndex = myPoolsTabsConfig.findIndex(tab => tab.id === currentTab)
-            setDirection(newIndex > currentIndex ? 1 : -1)
+            setDirection(newIndex > currentIndex ? -1 : 1)
             setIsAnimating(true)
         }
         prevTabRef.current = currentTab
