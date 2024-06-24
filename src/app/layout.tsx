@@ -16,7 +16,7 @@ export default function RootLayout({ top, content, bottom }: LayoutWithSlots<'to
                     {top}
                     {/* <PageTransitionEffect> */}
                     {/* <Template> */}
-                    <main className='mx-auto flex size-full w-dvw max-w-screen-md flex-1 flex-col py-safe-offset-24 px-safe-or-6'>
+                    <main className='mx-auto flex size-full w-dvw max-w-screen-md flex-1 flex-col pt-safe-offset-24 mb-safe-or-44 px-safe-or-6'>
                         {content}
                     </main>
                     {/* </Template> */}

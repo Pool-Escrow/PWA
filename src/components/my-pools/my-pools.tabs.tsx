@@ -1,8 +1,9 @@
 import PoolList from '@/components/pools/pool-list/pool-list'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { myPoolsTabsConfig, type MyPoolsTab } from './my-pools.tabs.config'
+import { LoaderIcon } from 'lucide-react'
 
 interface MyPoolsTabsProps {
     currentTab: MyPoolsTab['id']
@@ -14,8 +15,13 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({ currentTab, onChangeTab, init
     const [direction, setDirection] = useState(1)
     const [isAnimating, setIsAnimating] = useState(false)
     const prevTabRef = useRef(currentTab)
+    const [isClient, setIsClient] = useState(false)
 
-    useEffect(() => {
+    useLayoutEffect(() => {
+        setIsClient(true)
+    }, [])
+
+    useLayoutEffect(() => {
         if (!initialLoad && currentTab !== prevTabRef.current) {
             const currentIndex = myPoolsTabsConfig.findIndex(tab => tab.id === prevTabRef.current)
             const newIndex = myPoolsTabsConfig.findIndex(tab => tab.id === currentTab)
@@ -35,23 +41,33 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({ currentTab, onChangeTab, init
         setIsAnimating(false)
     }
 
+    if (!isClient) {
+        return (
+            <div className='flex h-full items-center justify-center'>
+                <LoaderIcon className='animate-spin' />
+            </div>
+        )
+    }
+
     return (
-        <Tabs value={currentTab} onValueChange={handleTabChange} className='flex-1'>
-            <TabsList>
-                {myPoolsTabsConfig.map(({ name, id }) => (
-                    <TabsTrigger className='relative' key={id} value={id}>
-                        {currentTab === id && (
-                            <motion.div
-                                layoutId='active-tab-indicator'
-                                className='absolute inset-0 h-full rounded-full bg-cta mix-blend-multiply'
-                                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-                            />
-                        )}
-                        <span className='z-10 w-full text-center text-base font-semibold'>{name}</span>
-                    </TabsTrigger>
-                ))}
-            </TabsList>
-            <div className='relative overflow-hidden' style={{ height: '300px' }}>
+        <Tabs value={currentTab} onValueChange={handleTabChange}>
+            <div className='fixed left-0 right-0 top-24 z-10 mx-auto my-auto w-[calc(100%-2rem)] bg-white py-3'>
+                <TabsList>
+                    {myPoolsTabsConfig.map(({ name, id }) => (
+                        <TabsTrigger className='relative' key={id} value={id}>
+                            {currentTab === id && (
+                                <motion.div
+                                    layoutId='active-tab-indicator'
+                                    className='absolute inset-0 h-full rounded-full bg-cta mix-blend-multiply'
+                                    transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                                />
+                            )}
+                            <span className='z-10 w-full text-center text-base font-semibold'>{name}</span>
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+            </div>
+            <div className='relative top-[4rem]'>
                 <AnimatePresence initial={false} custom={direction}>
                     <motion.div
                         key={currentTab}

@@ -1,12 +1,17 @@
 /**
- * @file src/components/pools-list/pools.list.tsx
+ * @file src/components/pool-list/pool-list.tsx
  * @description component for displaying a list of pools
  */
 'use client'
 
+import { usePools } from '@/lib/hooks/use-pools'
 import { usePoolStore } from '@/stores/pool.store'
-import PoolCard from './pool-list-card'
+import { useEffect, useState } from 'react'
+// import PoolCard from './pool-list-card'
 import PoolListSkeleton from './skeleton'
+import dynamic from 'next/dynamic'
+
+const DynamicPoolCard = dynamic(() => import('./pool-list-card'), { ssr: false })
 
 type FilterCriteria<T> = {
     [Key in keyof T]?: T[Key] | T[Key][] | ((value: T[Key]) => boolean)
@@ -66,26 +71,33 @@ interface PoolListProps {
 }
 
 export default function PoolList({ limit = 7, filter, sort = { sortBy: 'status', sortOrder: 'asc' } }: PoolListProps) {
-    // const { pools = [], isLoading, error } = usePools() // uncomment this line to use real data
-    const { pools, isLoading, error } = usePoolStore(state => ({
-        pools: state.pools,
-        isLoading: state.isLoading,
-        error: state.error,
-    }))
+    const { pools, isLoading, error } = usePoolStore()
+    const { data: fetchedPools, isLoading: isFetching, error: fetchError } = usePools()
+    const [isClient, setIsClient] = useState(false)
 
-    if (isLoading) return <PoolListSkeleton limit={limit} />
-    if (error) return <div>Error: {error.message}</div>
-    if (pools?.length === 0) return <div>No pools found</div>
+    useEffect(() => {
+        setIsClient(true)
+
+        if (fetchedPools !== undefined) {
+            usePoolStore.getState().setPools(fetchedPools)
+        }
+        if (fetchError) {
+            usePoolStore.getState().setError(fetchError as Error)
+        }
+    }, [fetchedPools, fetchError])
+
+    if (!isClient || isLoading || isFetching) return <PoolListSkeleton limit={limit} />
+    if (error) return <div suppressHydrationWarning>Error: {error.message}</div>
+    if (pools.length === 0) return <div>No pools found</div>
 
     const filteredPools = filter && filterPools(pools, filter)
     const sortedPools = sort && sortPools(filteredPools || pools, sort)
     const visiblePools = (sortedPools || pools).slice(0, limit)
 
     return (
-        <div className='mt-3 flex size-full flex-col space-y-4'>
+        <div className='flex flex-col gap-4'>
             {visiblePools.map(pool => {
-                if (!pool) return null
-                return <PoolCard key={pool.id} {...pool} />
+                return <DynamicPoolCard key={pool.id} {...pool} />
             })}
         </div>
     )
