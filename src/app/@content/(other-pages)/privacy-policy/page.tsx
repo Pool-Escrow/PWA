@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-import Section from '@/components/shared/layout/section'
+import Section from '@/components/common/layout/section'
 import Link from 'next/link'
 
 const Privacy = () => {

@@ -8,7 +8,7 @@ export const usePoolDetails = (poolId: bigint) => {
         isLoading,
         error,
     } = useQuery({
-        queryKey: ['pools', poolId, wagmi.config.state.chainId],
+        queryKey: ['poolDetails', poolId, wagmi.config.state.chainId],
         queryFn: fetchPoolDetails,
     })
 
