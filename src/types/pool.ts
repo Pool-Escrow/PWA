@@ -1,3 +1,16 @@
+export interface PoolFormData {
+    bannerImage: string
+    name: string
+    // Añade aquí otros campos según sea necesario
+}
+
+export interface ServerResponse {
+    data?: PoolFormData
+    errorMap?: {
+        onServer?: string
+    }
+}
+
 // interface PoolLog {
 // 	args: { poolId: string }
 // }

@@ -1,6 +1,6 @@
 export const poolsMock: () => Pool[] = () => [
     {
-        id: 1n,
+        id: '1',
         name: 'Pool 1',
         status: 'upcoming',
         // it starts in 1 day and ends in 2 days
@@ -8,7 +8,7 @@ export const poolsMock: () => Pool[] = () => [
         endTime: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
     },
     {
-        id: 2n,
+        id: '2',
         name: 'Pool 2',
         status: 'upcoming',
         // it starts in 30 minutes and ends in 1 hour
@@ -16,7 +16,7 @@ export const poolsMock: () => Pool[] = () => [
         endTime: new Date(Date.now() + 1000 * 60 * 60),
     },
     {
-        id: 3n,
+        id: '3',
         name: 'Pool 3',
         status: 'past',
         // it started 1 week ago and ended 40 seconds ago
@@ -24,7 +24,7 @@ export const poolsMock: () => Pool[] = () => [
         endTime: new Date(Date.now() - 1000 * 40),
     },
     {
-        id: 4n,
+        id: '4',
         name: 'Pool 4',
         status: 'past',
         // it started 2 days ago and ended 1 day ago
@@ -32,7 +32,7 @@ export const poolsMock: () => Pool[] = () => [
         endTime: new Date(Date.now() - 1000 * 60 * 60 * 24),
     },
     {
-        id: 5n,
+        id: '5',
         name: 'Pool 5',
         status: 'live',
         // it started 1 day ago and ends in 1 day
@@ -40,7 +40,7 @@ export const poolsMock: () => Pool[] = () => [
         endTime: new Date(Date.now() + 1000 * 60 * 60 * 24),
     },
     {
-        id: 6n,
+        id: '6',
         name: 'Pool 6',
         status: 'live',
         // it started 2 hours ago and ends in 3 hours
