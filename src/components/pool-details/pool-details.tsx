@@ -2,8 +2,12 @@
 'use client'
 
 import frog from '@/../public/images/frog.png'
+import { startPool } from '@/lib/contracts/start-pool'
+import { useAdmin } from '@/lib/hooks/use-admin'
 import { usePoolDetails } from '@/lib/hooks/use-pool-details'
 import { formatEventDateTime } from '@/lib/utils/date-time'
+import { useWallets } from '@privy-io/react-auth'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Avatars from '../avatars/avatars'
@@ -15,10 +19,68 @@ interface PoolDetailsProps {
 }
 const PoolDetails = (props: PoolDetailsProps) => {
     const { poolDetails, isLoading, error } = usePoolDetails(BigInt(props.poolId))
+    const queryClient = useQueryClient()
+    const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
+    const { wallets } = useWallets()
+    const { isAdmin } = useAdmin()
+    // const enableDepositMutation = useMutation({
+    //     mutationFn: handleEnableDeposit,
+    //     onSuccess: () => {
+    //         console.log('startPool Success')
+    //         queryClient.invalidateQueries({
+    //             queryKey: ['fetchAllPoolDataFromSC', props.poolId],
+    //         })
+    //     },
+    //     onError: () => {
+    //         console.log('enableDepositMutation Error')
+    //     },
+    // })
 
-    // useEffect(() => {
-    //     console.log(props.poolId)
-    // }, [])
+    // const onEnableDepositButtonClicked = () => {
+    //     enableDepositMutation.mutate({
+    //         params: [props.poolId, wallets],
+    //     })
+    // }
+
+    const startPoolMutation = useMutation({
+        mutationFn: startPool,
+        onSuccess: () => {
+            console.log('startPool Success')
+            queryClient.invalidateQueries({
+                queryKey: ['fetchAllPoolDataFromSC', props.poolId],
+            })
+        },
+        onError: () => {
+            console.log('startPoolMutation Error')
+        },
+    })
+
+    const onStartPoolButtonClicked = () => {
+        startPoolMutation.mutate({
+            params: [props.poolId, wallets],
+        })
+    }
+
+    // const endPoolMutation = useMutation({
+    //     mutationFn: handleEndPool,
+    //     onSuccess: () => {
+    //         console.log('endPool Success')
+    //         queryClient.invalidateQueries({
+    //             queryKey: ['fetchAllPoolDataFromSC', props.poolId],
+    //         })
+    //     },
+    //     onError: () => {
+    //         console.log('endPoolMutation Error')
+    //     },
+    // })
+    // const onEndPoolButtonClicked = (e: any) => {
+    //     toast('Requesting End Pool Transaction')
+
+    //     endPoolMutation.mutate({
+    //         params: [poolId.toString(), wallets],
+    //     })
+    // }
+
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
@@ -36,14 +98,16 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     </span>
                 </div>
 
-                <h2 className='mb-1 text-xl font-bold text-blue-800'>{poolDetails?.[1].poolName}</h2>
-                <p className='mb-4 text-gray-600'>{formatEventDateTime(poolDetails?.[1].timeStart ?? 0)}</p>
+                <h2 className='mb-1 text-xl font-bold text-blue-800'>{poolDetails?.poolDetailFromSC?.[1].poolName}</h2>
+                <p className='mb-4 text-gray-600'>
+                    {formatEventDateTime(poolDetails?.poolDetailFromSC?.[1].timeStart ?? 0)}
+                </p>
 
                 <div className='mb-4 flex items-center'>
                     <span className='mr-2 text-gray-700'>Hosted by:</span>
                     <div className='flex'>
                         <span className='mr-2 overflow-clip rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
-                            {poolDetails?.[0].host}
+                            {poolDetails?.poolDetailFromSC?.[0].host}
                         </span>
                         <span className='mr-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
                             Supermoon
@@ -57,7 +121,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 <div className='mb-4'>
                     <div className='mb-1 flex justify-between'>
                         <span className='font-bold text-blue-800'>
-                            ${poolDetails?.[1].depositAmountPerPerson}
+                            ${poolDetails?.poolDetailFromSC?.[1].depositAmountPerPerson}
                             USDC
                         </span>
                         <span className='text-gray-600'>Goal of $1,125 Prize Pool</span>
@@ -73,10 +137,23 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         <ChevronRight className='text-blue-500' />
                     </div>
                 </div>
-
-                <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
-                    Start Pool
-                </button>
+                {poolSCStatus === 0 && isAdmin && (
+                    <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
+                        Enable Deposit
+                    </button>
+                )}
+                {poolSCStatus === 1 && isAdmin && (
+                    <button
+                        className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'
+                        onClick={onStartPoolButtonClicked}>
+                        Start Pool
+                    </button>
+                )}
+                {poolSCStatus === 2 && isAdmin && (
+                    <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
+                        End Pool
+                    </button>
+                )}
             </div>
         </div>
     )
