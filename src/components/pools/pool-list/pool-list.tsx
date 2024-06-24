@@ -7,7 +7,6 @@
 import { usePools } from '@/lib/hooks/use-pools'
 import { usePoolStore } from '@/stores/pool.store'
 import { useEffect, useState } from 'react'
-// import PoolCard from './pool-list-card'
 import PoolListSkeleton from './skeleton'
 import dynamic from 'next/dynamic'
 
