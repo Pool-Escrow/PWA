@@ -5,6 +5,7 @@ import frog from '@/../public/images/frog.png'
 import { startPool } from '@/lib/contracts/start-pool'
 import { useAdmin } from '@/lib/hooks/use-admin'
 import { usePoolDetails } from '@/lib/hooks/use-pool-details'
+import { usePoolDetailsDB } from '@/lib/hooks/use-pool-details-db'
 import { formatEventDateTime } from '@/lib/utils/date-time'
 import { useWallets } from '@privy-io/react-auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -19,6 +20,12 @@ interface PoolDetailsProps {
 }
 const PoolDetails = (props: PoolDetailsProps) => {
     const { poolDetails, isLoading, error } = usePoolDetails(BigInt(props.poolId))
+    const {
+        poolDetailsDB,
+        isLoading: isLoadingPoolDetailsDB,
+        error: poolDetailsDBError,
+    } = usePoolDetailsDB(BigInt(props.poolId))
+
     const queryClient = useQueryClient()
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
@@ -86,7 +93,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
             <div className='p-4'>
                 <div className='relative mb-4'>
                     <Image
-                        src={frog.src}
+                        src={poolDetailsDB?.poolImageUrl ?? frog.src}
                         alt='Indoor pool with inflatable flamingo'
                         width={400}
                         height={300}
@@ -136,6 +143,10 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     <div className='flex items-center'>
                         <ChevronRight className='text-blue-500' />
                     </div>
+                </div>
+                <div className='mb-4'>
+                    <div className='mb-1 flex justify-between'>Description</div>
+                    <div>{poolDetailsDB?.poolDBInfo?.description}</div>
                 </div>
                 {poolSCStatus === 0 && isAdmin && (
                     <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
