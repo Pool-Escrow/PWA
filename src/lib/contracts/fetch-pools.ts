@@ -1,9 +1,23 @@
-import { wagmi } from '@/providers/configs'
-import wagmiConfig from '@/providers/configs/wagmi.config'
-import { poolAbi, poolAddress } from '@/types/contracts'
-import { getPublicClient } from '@wagmi/core'
+// src/lib/contracts/fetch-pools.ts
 
-export const fetchPools = async () => {
+import { wagmi } from '@/providers/configs'
+import { poolAbi, poolAddress } from '@/types/contracts'
+import { getPublicClient, multicall } from '@wagmi/core'
+import { getAbiItem } from 'viem'
+
+type ChainId = keyof typeof poolAddress
+
+const CreatePoolEvent = getAbiItem({
+    abi: poolAbi,
+    name: 'PoolCreated',
+})
+
+const PoolDetailsFunction = getAbiItem({
+    abi: poolAbi,
+    name: 'getPoolDetail',
+})
+
+export const fetchPools = async (): Promise<Pool[]> => {
     if (!process.env.NEXT_PUBLIC_INITIAL_BLOCK) {
         throw new Error('Initial block not set')
     }
@@ -11,51 +25,56 @@ export const fetchPools = async () => {
     const initialBlock = BigInt(process.env.NEXT_PUBLIC_INITIAL_BLOCK)
     const publicClient = getPublicClient(wagmi.config)
 
-    const chainId = wagmiConfig.config.state.chainId as keyof typeof poolAddress
+    const chainId = wagmi.config.state.chainId as ChainId
     if (!(chainId in poolAddress)) {
         throw new Error(`Invalid chainId: ${chainId}`)
     }
 
-    const poolLogs = await publicClient?.getContractEvents({
-        abi: poolAbi,
+    const createdPoolEvents = await publicClient?.getContractEvents({
+        abi: [CreatePoolEvent],
         address: poolAddress[chainId],
         eventName: 'PoolCreated',
         fromBlock: initialBlock,
         toBlock: 'latest',
+        strict: true,
     })
 
-    if (!poolLogs) {
+    if (!createdPoolEvents) {
         throw new Error('No pool logs found')
     }
 
-    const pools = await Promise.all(
-        poolLogs.map(async log => {
-            const { poolId } = log.args
-            if (!poolId) return
-            const pool = await publicClient?.readContract({
-                abi: poolAbi,
-                address: poolAddress[chainId],
-                functionName: 'getPoolDetail',
-                args: [poolId],
-            })
+    const poolIds = createdPoolEvents.map(log => log.args.poolId).filter((id): id is bigint => id !== undefined)
 
-            if (!pool) {
-                throw new Error(`No pool found for id: ${poolId}`)
-            }
+    const results = await multicall(wagmi.config, {
+        contracts: poolIds.map(id => ({
+            abi: [PoolDetailsFunction],
+            address: poolAddress[chainId],
+            functionName: 'getPoolDetail',
+            args: [id],
+        })),
+    })
 
-            const startTime = new Date(pool.timeStart * 1000)
-            const endTime = new Date(pool.timeEnd * 1000)
-            const now = new Date()
-            const status: 'upcoming' | 'live' | 'past' = startTime > now ? 'upcoming' : endTime > now ? 'live' : 'past'
+    const now = new Date()
 
-            return {
-                id: poolId,
-                name: pool.poolName,
-                startTime,
-                endTime,
-                status,
-            }
-        }),
-    )
-    return pools
+    // TODO: add these fields dinamically on the frontend:
+    /**
+     * const status: 'upcoming' | 'live' | 'past' = startTime > now ? 'upcoming' : endTime > now ? 'live' : 'past'
+     */
+    return poolIds.map((id, index) => {
+        const pool = results[index].result
+        if (!pool) {
+            throw new Error(`No pool found for id: ${id}`)
+        }
+
+        const startTime = new Date(Number(pool.timeStart) * 1000)
+        const endTime = new Date(Number(pool.timeEnd) * 1000)
+
+        return {
+            id: id.toString(),
+            name: pool.poolName,
+            startTime,
+            endTime,
+            status: startTime > now ? 'upcoming' : endTime > now ? 'live' : 'past',
+        } as Pool
+    })
 }
