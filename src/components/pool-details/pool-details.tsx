@@ -11,7 +11,10 @@ import { useWallets } from '@privy-io/react-auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import Avatars from '../avatars/avatars'
+import ShareDialog from '../common/dialogs/share.dialog'
+import PoolStatus from '../common/other/poolStatus'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -30,6 +33,15 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
     const { isAdmin } = useAdmin()
+
+    const calculatedPoolSCDepositPerPerson = (
+        BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0) /
+        BigInt(Math.pow(10, Number(18 ?? 18)))
+    ).toString()
+
+    const cohostNames: string | undefined = poolDetailsDB?.cohostUserDisplayData
+        ?.map((data: any) => data.display_name)
+        .join(',')
     // const enableDepositMutation = useMutation({
     //     mutationFn: handleEnableDeposit,
     //     onSuccess: () => {
@@ -92,7 +104,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
                 <div className='relative mb-4'>
-                    <Image
+                    {/* <Image
                         src={poolDetailsDB?.poolImageUrl ?? frog.src}
                         alt='Indoor pool with inflatable flamingo'
                         width={400}
@@ -102,7 +114,33 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     />
                     <span className='absolute bottom-2 left-2 rounded-full bg-red-500 px-2 py-1 text-xs text-white'>
                         Live
-                    </span>
+                    </span> */}
+                </div>
+                <div className={`cardBackground mb-4 flex w-full flex-col space-y-4 rounded-3xl md:space-y-10 md:p-10`}>
+                    <div className='relative h-full w-full overflow-hidden rounded-3xl bg-black'>
+                        <div className='relative h-full w-full object-contain object-center'>
+                            <Image
+                                src={poolDetailsDB?.poolImageUrl ?? frog.src}
+                                alt='Pool Image'
+                                width={500}
+                                height={400}
+                            />
+                        </div>
+                        {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity-60 text-white backdrop-blur-sm backdrop-filter md:space-y-6'>
+                                {timeLeft != undefined && timeLeft > 0 && (
+                                    <div>
+                                        <h4 className='text-xs md:text-2xl'>Starts in</h4>
+                                        <h3 className='text-4xl font-semibold md:text-7xl'>
+                                            {<CountdownTimer timeleft={timeLeft} />}
+                                        </h3>
+                                    </div>
+                                )}
+                            </div> */}
+                        <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
+                            <ShareDialog />
+                        </div>
+                        <PoolStatus status={poolSCStatus} />
+                    </div>
                 </div>
 
                 <h2 className='mb-1 text-xl font-bold text-blue-800'>{poolDetails?.poolDetailFromSC?.[1].poolName}</h2>
@@ -111,8 +149,8 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 </p>
 
                 <div className='mb-4 flex items-center'>
-                    <span className='mr-2 text-gray-700'>Hosted by:</span>
-                    <div className='flex'>
+                    <span className='mr-2 text-gray-700'>Hosted by {cohostNames}</span>
+                    {/* <div className='flex'>
                         <span className='mr-2 overflow-clip rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
                             {poolDetails?.poolDetailFromSC?.[0].host}
                         </span>
@@ -122,32 +160,45 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         <span className='rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
                             Halborne
                         </span>
+                    </div> */}
+                </div>
+                <div className='mb-4 rounded-3xl bg-[#F4F4F4] p-6 shadow-md'>
+                    <div className='mb-4'>
+                        <div className='mb-1 flex justify-between'>
+                            <span className='font-bold text-blue-800'>
+                                ${calculatedPoolSCDepositPerPerson}
+                                {``}
+                                USDC
+                            </span>
+                            <span className='text-[#003073]'>
+                                Goal of $
+                                {Number(calculatedPoolSCDepositPerPerson) * poolDetailsDB?.poolDBInfo?.soft_cap} Prize
+                                {` `}
+                                Pool
+                            </span>
+                        </div>
+                        <div className='h-2.5 w-full rounded-full bg-blue-200'>
+                            <div
+                                className='h-2.5 rounded-full bg-blue-500'
+                                style={{
+                                    width: `${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / poolDetailsDB?.poolDBInfo?.soft_cap}%`,
+                                }}></div>
+                        </div>
+                    </div>
+                    <div className='mb-4 flex'>Participants</div>
+                    <div className='mb-4 flex items-center justify-between'>
+                        <Avatars avatarUrls={avatarUrls} numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0} />
+                        <Link href={`/pool/${props.poolId}/participants`} className='flex items-center'>
+                            <ChevronRight className='text-blue-500' />
+                        </Link>
                     </div>
                 </div>
-
-                <div className='mb-4'>
-                    <div className='mb-1 flex justify-between'>
-                        <span className='font-bold text-blue-800'>
-                            ${poolDetails?.poolDetailFromSC?.[1].depositAmountPerPerson}
-                            USDC
-                        </span>
-                        <span className='text-gray-600'>Goal of $1,125 Prize Pool</span>
-                    </div>
-                    <div className='h-2.5 w-full rounded-full bg-blue-200'>
-                        <div className='h-2.5 rounded-full bg-blue-500' style={{ width: '73%' }}></div>
-                    </div>
-                </div>
-
-                <div className='mb-4 flex items-center justify-between'>
-                    <Avatars avatarUrls={avatarUrls} numPeople={47} />
-                    <div className='flex items-center'>
-                        <ChevronRight className='text-blue-500' />
-                    </div>
-                </div>
-                <div className='mb-4'>
-                    <div className='mb-1 flex justify-between'>Description</div>
+                <div className='mb-4 rounded-3xl bg-[#F4F4F4] p-6 shadow-md'>
+                    <div className='mb-1 flex justify-between font-medium text-[#003073]'>Description</div>
                     <div>{poolDetailsDB?.poolDBInfo?.description}</div>
                 </div>
+
+                {/*Admin buttons*/}
                 {poolSCStatus === 0 && isAdmin && (
                     <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
                         Enable Deposit
