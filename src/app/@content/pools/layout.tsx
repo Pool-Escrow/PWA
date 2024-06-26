@@ -1,15 +1,14 @@
 'use client'
 
 import { useBottomBarStore } from '@/providers/bottom-bar.provider'
-import { dehydrate, HydrationBoundary, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { queryClient } from '@/providers/configs'
 import { usePoolStore } from '@/stores/pool.store'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { getAuthStatus } from '@/lib/server/auth.action'
-import { fetchPools, fetchUserPools } from '@/lib/hooks/use-pools'
+import { fetchUserPools } from '@/lib/hooks/use-pools'
 
 export default function PoolsLayout({ yours, upcoming }: LayoutWithSlots<'yours' | 'upcoming'>) {
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
@@ -49,11 +48,9 @@ export default function PoolsLayout({ yours, upcoming }: LayoutWithSlots<'yours'
     }, [])
 
     return (
-        <HydrationBoundary state={dehydrate(queryClient as any)}>
-            <div className='flex min-h-dvh scroll-py-6 flex-col gap-6'>
-                {isAuthenticated && userPools && userPools.length > 0 && yours}
-                {upcoming}
-            </div>
-        </HydrationBoundary>
+        <div className='flex min-h-dvh scroll-py-6 flex-col gap-6'>
+            {isAuthenticated && userPools && userPools.length > 0 && yours}
+            {upcoming}
+        </div>
     )
 }
