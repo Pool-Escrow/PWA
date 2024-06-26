@@ -1,6 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import UserAvatar from '../user-dropdown/user-avatar'
+import { UserDropdown } from '../user-dropdown'
 
 const TopBarLogo = dynamic(() => import('./top-bar-logo'), {
     loading: () => <Skeleton className='h-[43px] w-[96px] max-w-full' />,
@@ -25,7 +27,7 @@ type TopBarConfig = {
 const defaultElements: TopBarElements = {
     left: null,
     center: <TopBarLogo />,
-    right: <TopBarButton />,
+    right: <UserAvatar />,
 }
 
 const topBarConfig: TopBarConfig = {
@@ -36,7 +38,7 @@ const topBarConfig: TopBarConfig = {
     '/profile': {
         left: <TopBarBack />,
         center: 'User Profile',
-        right: null,
+        right: <UserDropdown />,
     },
     '/participant/new': {
         left: <TopBarBack />,

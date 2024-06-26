@@ -7,6 +7,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import frog from '@/../public/images/frog.png'
 import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import Link from 'next/link'
 
 /**
  * UserDropdownAvatar component renders the user's avatar
@@ -15,11 +16,13 @@ import { DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
  * @component
  * @returns {JSX.Element} The rendered user avatar trigger.
  */
-const UserDropdownAvatar = (): JSX.Element => (
-    <Avatar className='size-10 cursor-pointer' aria-label='User menu'>
-        <AvatarImage alt='User Avatar' src={frog.src} />
-        <AvatarFallback className='bg-[#d9d9d9]' />
+const UserAvatar = (): JSX.Element => (
+    <Avatar className='size-10 cursor-pointer' aria-label='Go to Profile' asChild>
+        <Link href='/profile'>
+            <AvatarImage alt='User Avatar' src={frog.src} />
+            <AvatarFallback className='bg-[#d9d9d9]' />
+        </Link>
     </Avatar>
 )
 
-export default UserDropdownAvatar
+export default UserAvatar
