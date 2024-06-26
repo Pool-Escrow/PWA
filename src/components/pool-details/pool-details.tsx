@@ -23,6 +23,7 @@ import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
 import ShareDialog from '../common/dialogs/share.dialog'
 import PoolStatus from '../common/other/poolStatus'
+import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
 
 const avatarUrls = new Array(4).fill(frog.src)
@@ -250,13 +251,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
             )
         } else {
             setContent(
-                <div className='flex w-full flex-row space-x-2'>
+                <div className='flex w-full flex-row items-center space-x-2'>
                     <Link
                         href={`/pool/${props.poolId}/ticket`}
-                        className='mb-3 h-[46px] flex-1 flex-grow rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        className='mb-3 h-[46px] flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         <span>Ticket</span>
                     </Link>
-                    <Button className='h-[46px] w-[46px] rounded-full'>Unregister</Button>
+                    {/* <Button className='h-[46px] w-[46px] rounded-full'>Unregister</Button> */}
+                    <RegisteredDropdown poolId={props.poolId} />
                 </div>,
             )
         }
@@ -399,9 +401,8 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         End Pool
                     </button>
                 )}
-                <Button onClick={onApproveButtonClicked}>Approve</Button>
                 <OnRampDialog open={openOnRampDialog} setOpen={setOpenOnRampDialog} />
-                <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button>
+                {/* <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button> */}
             </div>
         </div>
     )
