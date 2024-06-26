@@ -2,10 +2,27 @@
 
 import { usePathname } from 'next/navigation'
 import { getTopBarElements } from './top-bar.config'
+import { useUserStore } from '@/stores/profile.store'
+import { useEffect } from 'react'
+import { getUserProfile } from '../profile/profile.action'
 
 export default function TopBarLayout(): JSX.Element {
     const pathname = usePathname()
     const { left, center, right } = getTopBarElements(pathname)
+    const { setProfile, setError } = useUserStore()
+
+    useEffect(() => {
+        async function loadUserProfile() {
+            try {
+                const profile = await getUserProfile()
+                setProfile(profile)
+            } catch (error) {
+                setError(error as Error)
+            }
+        }
+
+        loadUserProfile()
+    }, [setProfile, setError])
 
     return (
         <header className='fixed left-0 top-0 z-30 w-dvw'>
