@@ -18,7 +18,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { getAbiItem } from 'viem'
-import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
 import ShareDialog from '../common/dialogs/share.dialog'
@@ -43,6 +43,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
     const { isAdmin } = useAdmin()
+    const embeddedWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
+    const walletNativeBalance = useBalance({
+        address: wallets[0]?.address as HexString,
+    })
+    const walletTokenBalance = useBalance({
+        address: wallets[0]?.address as HexString,
+        token: poolDetails?.poolDetailFromSC?.[4] as HexString,
+    })
 
     const calculatedPoolSCDepositPerPerson = (
         BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0) /
@@ -190,20 +198,29 @@ const PoolDetails = (props: PoolDetailsProps) => {
         }
     }
 
-    const onRegisterButtonClicked = async () => {
-        // await registerPoolMutation.mutateAsync({
-        //     params: [props.poolId, BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
-        // })
+    const onRegisterButtonClicked = async (deposit: bigint, balance: bigint, poolId: string) => {
+        // if (!poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson) {
+        //     return
+        // }
+        // console.log('walletTokenBalance: ', walletTokenBalance.data?.value)
+        // console.log(
+        //     'walletTokenBalance Requirement: ',
+        //     BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson),
+        // )
+        if (balance < deposit) {
+            setOpenOnRampDialog(true)
+            return
+        }
         await onApproveButtonClicked()
 
         try {
             console.log('Approved')
 
             console.log('registering pool')
-            const [poolId, deposit] = [
-                props.poolId,
-                BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0),
-            ]
+            // const [poolId, deposit] = [
+            //     props.poolId,
+            //     BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0),
+            // ]
 
             const RegisterPoolFunction = getAbiItem({
                 abi: poolAbi,
@@ -242,9 +259,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
     useEffect(() => {
         console.log('isRegisteredOnSC', isRegisteredOnSC)
         if (!isRegisteredOnSC) {
+            const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
+            const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
             setContent(
                 <Button
-                    onClick={onRegisterButtonClicked}
+                    onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
                 </Button>,
@@ -263,7 +282,20 @@ const PoolDetails = (props: PoolDetailsProps) => {
             )
         }
         showBar()
-    }, [setContent, showBar, hideBar, calculatedPoolSCDepositPerPerson, isRegisteredOnSC])
+        console.log('wallet address: ', wallets[0]?.address)
+        console.log('wallet native balance: ', walletNativeBalance)
+        console.log('wallet token balance: ', walletTokenBalance)
+        console.log('wallet deposit requirement: ', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
+    }, [
+        setContent,
+        showBar,
+        hideBar,
+        calculatedPoolSCDepositPerPerson,
+        isRegisteredOnSC,
+        wallets,
+        poolDetails,
+        walletTokenBalance?.data?.value,
+    ])
 
     useEffect(() => {
         console.log('isConfirmed', isConfirmed)
@@ -401,7 +433,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         End Pool
                     </button>
                 )}
-                <OnRampDialog open={openOnRampDialog} setOpen={setOpenOnRampDialog} />
+                <OnRampDialog
+                    open={openOnRampDialog}
+                    setOpen={setOpenOnRampDialog}
+                    balance={walletTokenBalance?.data?.value}
+                />
                 {/* <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button> */}
             </div>
         </div>

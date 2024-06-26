@@ -1,4 +1,8 @@
+'use client'
 import frog from '@/../public/images/frog.png'
+import { useBottomBarStore } from '@/providers/bottom-bar.provider'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import Container from './container'
 import PoolCardRow from './pool-card-row'
 import SectionContent from './section-content'
@@ -11,6 +15,10 @@ const mockClaimablePrizes = [
 ]
 
 export default function ClaimablePrizesList() {
+    const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
+    const queryClient = useQueryClient()
+
+    useEffect(() => {}, [])
     return (
         <Container>
             <SectionTitle />
