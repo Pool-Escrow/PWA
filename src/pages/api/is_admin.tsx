@@ -5,6 +5,8 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     // Parse the request body
+    console.log('is_admin API Hit')
+
     const privyAuthToken = req.cookies?.['privy-token']
     // .get('privy-token')?.value
     if (!privyAuthToken) {

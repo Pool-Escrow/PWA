@@ -7,14 +7,23 @@ import { useAdmin } from '@/lib/hooks/use-admin'
 import { usePoolDetails } from '@/lib/hooks/use-pool-details'
 import { usePoolDetailsDB } from '@/lib/hooks/use-pool-details-db'
 import { formatEventDateTime } from '@/lib/utils/date-time'
+import { useBottomBarStore } from '@/providers/bottom-bar.provider'
+import { wagmi } from '@/providers/configs'
+import { dropletAbi, dropletAddress, poolAbi, poolAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { getAbiItem } from 'viem'
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
+import OnRampDialog from '../common/dialogs/onramp.dialog'
 import ShareDialog from '../common/dialogs/share.dialog'
 import PoolStatus from '../common/other/poolStatus'
+import { Button } from '../ui/button'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -42,6 +51,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const cohostNames: string | undefined = poolDetailsDB?.cohostUserDisplayData
         ?.map((data: any) => data.display_name)
         .join(',')
+
+    const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
+    const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     // const enableDepositMutation = useMutation({
     //     mutationFn: handleEnableDeposit,
     //     onSuccess: () => {
@@ -74,9 +86,88 @@ const PoolDetails = (props: PoolDetailsProps) => {
         },
     })
 
+    const { data: hash, isPending, writeContract } = useWriteContract()
+    const {
+        isLoading: isConfirming,
+        isSuccess: isConfirmed,
+        isError,
+        error: registerError,
+        data: txData,
+    } = useWaitForTransactionReceipt({
+        hash,
+    })
+
+    const registerPoolMutation = useMutation({
+        mutationFn: async ({ params }: { params: [string, bigint] }) => {
+            console.log('registerPool')
+            const [poolId, deposit] = params
+            console.log('poolId', poolId)
+            console.log('deposit', deposit)
+
+            const RegisterPoolFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'deposit',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId] as HexString,
+                abi: [RegisterPoolFunction],
+                functionName: 'deposit',
+                args: [BigInt(poolId), deposit],
+            })
+        },
+        onSuccess: () => {
+            console.log('registerPool Success')
+            queryClient.invalidateQueries({
+                queryKey: ['fetchAllPoolDataFromSC', props.poolId],
+            })
+        },
+        onError: error => {
+            console.log('registerPoolMutation Error', error)
+        },
+    })
+
+    const approveSpendMutation = useMutation({
+        mutationFn: async ({ params }: { params: [bigint] }) => {
+            console.log('approveSpend')
+            const [deposit] = params
+            console.log('deposit', deposit)
+
+            const RegisterPoolFunction = getAbiItem({
+                abi: dropletAbi,
+                name: 'approve',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId] as HexString,
+                abi: [RegisterPoolFunction],
+                functionName: 'approve',
+                args: [dropletAddress[wagmi.config.state.chainId] as HexString, deposit],
+            })
+        },
+        onSuccess: () => {
+            console.log('approveSpend Success')
+        },
+        onError: error => {
+            console.log('approveSpend Error', error)
+        },
+    })
+
     const onStartPoolButtonClicked = () => {
         startPoolMutation.mutate({
             params: [props.poolId, wallets],
+        })
+    }
+
+    const onApproveButtonClicked = async () => {
+        await approveSpendMutation.mutateAsync({
+            params: [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
+        })
+    }
+
+    const onRegisterButtonClicked = async () => {
+        await registerPoolMutation.mutateAsync({
+            params: [props.poolId, BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
         })
     }
 
@@ -100,6 +191,36 @@ const PoolDetails = (props: PoolDetailsProps) => {
     //     })
     // }
 
+    useEffect(() => {
+        setContent(
+            <Button
+                onClick={onRegisterButtonClicked}
+                className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
+            </Button>,
+        )
+        showBar()
+    }, [setContent, showBar, hideBar, calculatedPoolSCDepositPerPerson])
+
+    useEffect(() => {
+        console.log('isConfirmed', isConfirmed)
+        console.log('hash', hash)
+        if (isConfirming) {
+            console.log('isConfirming')
+        }
+        if (isConfirmed && hash) {
+            const updatePoolToastId = toast.loading('Registering to Pool', {
+                description: 'Finalizing pool registration...',
+            })
+            // toast.dismiss(updatePoolToastId)
+        }
+        if (isError || registerError) {
+            console.log('registerError', registerError)
+        }
+        if (txData) {
+            console.log('txData', txData)
+        }
+    }, [isConfirmed, isConfirming, hash, isError, registerError, txData, registerPoolMutation.data])
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
@@ -216,6 +337,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         End Pool
                     </button>
                 )}
+                <Button onClick={onApproveButtonClicked}>Approve</Button>
+                <OnRampDialog open={openOnRampDialog} setOpen={setOpenOnRampDialog} />
+                <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button>
             </div>
         </div>
     )
