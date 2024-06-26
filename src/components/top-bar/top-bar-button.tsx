@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useSmartAccount } from '@/lib/hooks/use-smart-account'
 import { usePrivy } from '@privy-io/react-auth'
 import { toast } from 'sonner'
-import { UserDropdown } from '@/components/user-dropdown'
+import UserAvatar from '../user-dropdown/user-avatar'
 
 const notifyLoginError = (error: string) => {
     console.log('error', error)
@@ -24,7 +24,7 @@ export default function TopBarButton() {
     }
 
     if (loading || !ready) return <Skeleton className='h-[30px] w-[46px] px-[10px] py-[5px]' />
-    if (ready && authenticated) return <UserDropdown />
+    if (ready && authenticated) return <UserAvatar />
 
     return (
         <Button className='h-[30px] w-[46px] rounded-mini bg-cta px-[10px] py-[5px] text-[10px]' onClick={login}>

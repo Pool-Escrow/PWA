@@ -27,7 +27,7 @@ type TopBarConfig = {
 const defaultElements: TopBarElements = {
     left: null,
     center: <TopBarLogo />,
-    right: <UserAvatar />,
+    right: <TopBarButton />,
 }
 
 const topBarConfig: TopBarConfig = {
@@ -42,7 +42,7 @@ const topBarConfig: TopBarConfig = {
     },
     '/participant/new': {
         left: <TopBarBack />,
-        right: <Link href='/'>Skip</Link>,
+        right: <Link href='/pools'>Skip</Link>,
     },
     '/participant/[id]': {
         left: <TopBarBack />,
