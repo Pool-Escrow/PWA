@@ -1,8 +1,15 @@
 'use client'
 import frog from '@/../public/images/frog.png'
+import { useClaimablePools } from '@/lib/hooks/use-claimable-pools'
 import { useBottomBarStore } from '@/providers/bottom-bar.provider'
+import { wagmi } from '@/providers/configs'
+import { poolAbi, poolAddress } from '@/types/contracts'
+import { useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { getAbiItem } from 'viem'
+import { useWriteContract } from 'wagmi'
+import { Button } from '../ui/button'
 import Container from './container'
 import PoolCardRow from './pool-card-row'
 import SectionContent from './section-content'
@@ -17,8 +24,53 @@ const mockClaimablePrizes = [
 export default function ClaimablePrizesList() {
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
     const queryClient = useQueryClient()
+    const { wallets } = useWallets()
+    const { writeContract } = useWriteContract()
+    const walletAddress = wallets?.[0]?.address
+    const { claimablePools, isLoading, error } = useClaimablePools(walletAddress)
 
-    useEffect(() => {}, [])
+    const onClaimFromPoolsButtonClicked = async (
+        claimablePools: readonly [readonly bigint[], readonly boolean[]] | undefined,
+    ) => {
+        if (!claimablePools) return
+        console.log('claimablePools', claimablePools)
+        try {
+            const poolIdIndices = claimablePools?.[1].reduce((indices: any, element: any, index: any) => {
+                if (element === false) {
+                    indices.push(index)
+                }
+                return indices
+            }, [])
+
+            const poolIdsToClaimFrom = poolIdIndices?.map((index: any) => claimablePools?.[0]?.[index])
+
+            const walletAddresses = poolIdsToClaimFrom.map(() => walletAddress as HexString)
+
+            const ClaimWinningsFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'claimWinnings',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
+                abi: [ClaimWinningsFunction],
+                functionName: 'claimWinnings',
+                args: [poolIdsToClaimFrom, walletAddresses],
+            })
+        } catch (error) {
+            console.log('claimWinnings Error', error)
+        }
+    }
+    useEffect(() => {
+        setContent(
+            <Button
+                onClick={() => onClaimFromPoolsButtonClicked(claimablePools)}
+                className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                <span>Claim</span>
+            </Button>,
+        )
+        showBar()
+    }, [claimablePools, wallets])
     return (
         <Container>
             <SectionTitle />
