@@ -28,7 +28,6 @@ const baseOutputDir = 'src/types'
  */
 const commands = {
     contracts: 'wagmi generate -c wagmi-cli.config.ts',
-    css: 'tailwindcss-classnames -i tailwind.config.cjs -o',
     db: `pnpm dlx supabase gen types typescript --project-id ${projectID} >`,
 }
 
@@ -57,7 +56,7 @@ function generateTypes(type) {
 function main() {
     const type = process.argv[2] // Takes the type argument from the command line
     if (!type) {
-        console.log('No type specified, generating all types for contracts, css, and db.')
+        console.log('No type specified, generating all types for contracts and db.')
         for (const key of Object.keys(commands)) {
             generateTypes(key)
         }

@@ -11,7 +11,6 @@
         "dev:turbo": "TURBO=true next dev --turbo",
         "gen": "node scripts/generate-types.mjs",
         "gen:contracts": "pnpm gen contracts",
-        "gen:css": "pnpm gen css",
         "gen:db": "pnpm gen db",
         "lint": "next lint",
         "preinstall": "npx only-allow pnpm",
