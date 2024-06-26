@@ -40,7 +40,7 @@ exports[`getTopBarElements > should return elements for /participant/[id] 1`] = 
 }
 `;
 
-exports[`getTopBarElements > should return elements for /participant/new 1`] = `
+exports[`getTopBarElements > should return elements for /profile/new 1`] = `
 {
   "center": <ForwardRef(LoadableComponent) />,
   "left": <ForwardRef(LoadableComponent) />,

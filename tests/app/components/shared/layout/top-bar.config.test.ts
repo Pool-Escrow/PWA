@@ -16,8 +16,8 @@ describe('getTopBarElements', () => {
         expect(elements).toMatchSnapshot()
     })
 
-    test('should return elements for /participant/new', () => {
-        const elements = getTopBarElements('/participant/new')
+    test('should return elements for /profile/new', () => {
+        const elements = getTopBarElements('/profile/new')
         expect(elements).toMatchSnapshot()
     })
 
@@ -37,7 +37,7 @@ describe('getTopBarElements', () => {
     })
 
     test('static route should have priority over dynamic route', () => {
-        const elementsForStaticRoute = getTopBarElements('/participant/new')
+        const elementsForStaticRoute = getTopBarElements('/profile/new')
         const elementsForDynamicRoute = getTopBarElements('/participant/123')
 
         expect(elementsForStaticRoute).not.toEqual(elementsForDynamicRoute)
