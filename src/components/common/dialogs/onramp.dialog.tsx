@@ -10,9 +10,10 @@ import ShareForm from './share.form'
 interface OnRampDialogProps {
     open: boolean
     setOpen: (open: boolean) => void
+    balance: bigint | undefined
 }
 
-const OnRampDialog = ({ open, setOpen }: OnRampDialogProps) => {
+const OnRampDialog = ({ open, setOpen, balance }: OnRampDialogProps) => {
     // const [open, setOpen] = useState(false)
     const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -42,7 +43,9 @@ const OnRampDialog = ({ open, setOpen }: OnRampDialogProps) => {
                     <div>
                         <div className='flex flex-row justify-between text-sm'>
                             <span className='font-medium'>Current Pool balance:</span>
-                            <span className='font-medium'>$7 USDC</span>
+                            <span className='font-medium'>
+                                ${((balance ?? BigInt(0)) / BigInt(Math.pow(10, Number(18)))).toString()} USDC
+                            </span>
                         </div>
                         <Divider className='my-0 h-0 py-0' />
                     </div>
