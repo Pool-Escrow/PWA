@@ -27,7 +27,6 @@ export async function middleware(request: NextRequest) {
 
     // Verify auth token
     const privyAuthToken = request.cookies.get('privy-token')?.value
-    console.log('Auth token:', privyAuthToken)
 
     if (!privyAuthToken) {
         console.log('No auth token, redirecting to /pools')

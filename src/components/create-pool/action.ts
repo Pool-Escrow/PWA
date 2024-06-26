@@ -16,7 +16,6 @@ export async function createPoolAction(
     // Verify auth token
     const cookieStore = cookies()
     const privyAuthToken = cookieStore.get('privy-token')?.value
-    console.log('Auth token:', privyAuthToken)
 
     if (!privyAuthToken) {
         throw new Error('Unauthorized. Missing or expired auth token.')

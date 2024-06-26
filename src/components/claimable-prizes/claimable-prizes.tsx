@@ -3,6 +3,7 @@ import Container from './container'
 import PoolCardRow from './pool-card-row'
 import SectionContent from './section-content'
 import SectionTitle from './section-title'
+// import { getClaimablePrizes } from '@/lib/api'
 
 const mockClaimablePrizes = [
     { name: 'Pool Poker Party', prize: '250 USD', result: 'winner', image: frog.src },
@@ -11,6 +12,8 @@ const mockClaimablePrizes = [
 ]
 
 export default function ClaimablePrizesList() {
+    // const { data: claimablePrizes } = useQuery(['claimablePrizes'], getClaimablePrizes)
+
     return (
         <Container>
             <SectionTitle />
@@ -18,6 +21,9 @@ export default function ClaimablePrizesList() {
                 {mockClaimablePrizes.map((pool, index) => (
                     <PoolCardRow key={index} {...pool} />
                 ))}
+                {/* {claimablePrizes?.map((pool, index) => (
+                    <PoolCardRow key={index} {...pool} />
+                ))} */}
             </SectionContent>
         </Container>
     )
