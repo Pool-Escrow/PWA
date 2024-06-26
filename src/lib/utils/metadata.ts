@@ -16,7 +16,7 @@ const APP_TITLE_TEMPLATE = '%s - Pool'
 const APP_DESCRIPTION = 'Pool Party! 🏖️'
 
 export const metadata: Metadata = {
-    metadataBase: new URL(process.env.NODE_ENV == 'development' ? 'http://192.168.31.59:3000' : 'https://poolparty.cc'),
+    ...(process.env.NODE_ENV === 'production' ? { metadataBase: new URL('https://poolparty.cc') } : {}),
     icons: {
         icon: '/images/favicon.png',
         apple: '/images/icon-maskable-512.png',
