@@ -13,7 +13,8 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/api/') ||
         pathname.startsWith('/images/') ||
         pathname === '/favicon.ico' ||
-        pathname === '/manifest.json'
+        pathname === '/manifest.json' ||
+        pathname === '/sw.js'
     ) {
         return NextResponse.next()
     }
@@ -72,25 +73,7 @@ export const config = {
          * - favicon.ico (favicon file)
          */
         {
-            source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
-            missing: [
-                { type: 'header', key: 'next-router-prefetch' },
-                { type: 'header', key: 'purpose', value: 'prefetch' },
-            ],
-        },
-
-        {
-            source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
-            has: [
-                { type: 'header', key: 'next-router-prefetch' },
-                { type: 'header', key: 'purpose', value: 'prefetch' },
-            ],
-        },
-
-        {
-            source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
-            has: [{ type: 'header', key: 'x-present' }],
-            missing: [{ type: 'header', key: 'x-missing', value: 'prefetch' }],
+            source: '/((?!api|_next/static|_next/image|favicon.ico|sw.js).*)',
         },
     ],
 }
