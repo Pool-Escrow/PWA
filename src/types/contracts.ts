@@ -181,7 +181,7 @@ export const dropletAbi = [
 export const dropletAddress = {
     8453: '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512',
     84532: '0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b',
-} as { [key: number]: string }
+} as const
 
 /**
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512)
@@ -1651,7 +1651,7 @@ export const poolAbi = [
 export const poolAddress = {
     8453: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
     84532: '0x44432A98ea8dA37F844B89A324204ee6642b785A',
-} as { [key: number]: string }
+} as const
 
 /**
  * - [__View Contract on Base Basescan__](https://basescan.org/address/0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0)

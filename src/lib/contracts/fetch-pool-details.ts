@@ -11,7 +11,7 @@ export const fetchPoolDetails = async ({ queryKey }: { queryKey: [string, bigint
     const poolDetailFromSC = await publicClient?.readContract({
         abi: poolAbi,
         functionName: 'getAllPoolInfo',
-        address: poolAddress[publicClient.chain.id] as HexString,
+        address: poolAddress[publicClient.chain.id as ChainId],
         args: [poolId],
     })
 
