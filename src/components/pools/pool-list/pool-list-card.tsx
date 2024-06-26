@@ -5,8 +5,13 @@ import { cn } from '@/lib/utils/tailwind'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { getPoolStatus } from '@/lib/utils/get-pool.status'
 
-export default function PoolCard({ id, name, endTime, startTime, status }: Pool) {
+type PoolCardProps = Pick<PoolFrontend, 'id' | 'name' | 'endDate' | 'startDate'>
+
+export default function PoolCard({ id, name, endDate, startDate }: PoolCardProps) {
+    const status = getPoolStatus({ startDate, endDate })
+
     return (
         <Link href={`/pool/${id}`}>
             <motion.div
@@ -37,7 +42,7 @@ export default function PoolCard({ id, name, endTime, startTime, status }: Pool)
                     <h1 className='truncate text-sm font-semibold'>{name}</h1>
                     <span className='truncate text-xs font-medium tracking-tight'>0/200 Registered</span>
                     <span className='truncate text-xs font-medium tracking-tight'>
-                        {getStatusString({ status, startTime, endTime })}
+                        {getStatusString({ status, startDate, endDate })}
                     </span>
                 </div>
             </motion.div>
