@@ -1,7 +1,13 @@
 export interface PoolFormData {
-    bannerImage: string
     name: string
-    // Añade aquí otros campos según sea necesario
+    description: string
+    bannerImage: string
+    termsURL: string
+    softCap: number
+    startDate: string
+    endDate: string
+    price: number
+    tokenAddress: string
 }
 
 export interface ServerResponse {
@@ -11,22 +17,30 @@ export interface ServerResponse {
     }
 }
 
-// interface PoolLog {
-// 	args: { poolId: string }
-// }
+// TODO: Conflicts with the PoolStatus from global types
+export type PoolStatus =
+    | 'draft'
+    | 'unconfirmed'
+    | 'inactive'
+    | 'depositsEnabled'
+    | 'started'
+    | 'paused'
+    | 'ended'
+    | 'deleted'
 
-// export interface poolData {
-// 	co_host_addresses: null | string
-// 	created_at: string
-// 	created_by: string
-// 	description: string
-// 	event_timestamp: Date
-// 	host_address: string
-// 	link_to_rules: string
-// 	pool_id: number
-// 	pool_image_url: string
-// 	pool_name: string
-// 	participant_count: number
-// 	price: number
-// 	soft_cap: number
-// }
+export interface PoolData {
+    internal_id: string
+    contract_id: string | null
+    name: string
+    description: string
+    bannerImage: string | null
+    termsURL: string
+    softCap: number
+    createdAt: string
+    updatedAt: string
+    startDate: string
+    endDate: string
+    price: number
+    tokenAddress: string
+    status: PoolStatus
+}
