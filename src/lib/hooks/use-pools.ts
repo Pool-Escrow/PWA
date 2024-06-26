@@ -66,7 +66,10 @@ const fetchPoolsFromContract = async (): Promise<PoolFromContract[]> => {
         return {
             id: Number(id),
             tokenAddress: token,
-            ...pool,
+            // fixes issue with bigint serialization
+            ...Object.fromEntries(
+                Object.entries(pool).map(([key, value]) => [key, typeof value === 'bigint' ? value.toString() : value]),
+            ),
         }
     })
 }
@@ -95,14 +98,15 @@ export const fetchUserPools = async (address: Address): Promise<PoolFrontend[]> 
         ],
     })
 
-    const userPoolIds: Set<bigint> = new Set(
+    const userPoolIds: Set<string> = new Set(
         userParticipatedPools
             .map(({ result }) => result)
             .filter((result): result is readonly bigint[] => result != null)
-            .flat(),
+            .flat()
+            .map(id => id.toString()),
     )
 
-    const userPools = (await fetchPools()).filter(pool => userPoolIds.has(BigInt(pool.contract_id)))
+    const userPools = (await fetchPools()).filter(pool => userPoolIds.has(pool.contract_id))
 
     return userPools
 }
