@@ -40,9 +40,13 @@ const topBarConfig: TopBarConfig = {
         center: 'User Profile',
         right: <UserDropdown />,
     },
-    '/participant/new': {
-        left: <TopBarBack />,
-        right: <Link href='/pools'>Skip</Link>,
+    '/profile/new': {
+        center: null, // Hide logo
+        right: (
+            <Link href='/pools' className='text-[#2989EC]'>
+                Skip
+            </Link>
+        ),
     },
     '/participant/[id]': {
         left: <TopBarBack />,
