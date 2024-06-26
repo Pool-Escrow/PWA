@@ -21,14 +21,15 @@ export const useSmartAccount = () => {
 
             const result = await createOrUpdateUser(user.id, user.wallet.address)
 
-            if (result.isNewUser) {
-                router.push('/participant/new')
-            } else if (!isNewUser) {
-                // user already exists in privy, but not in our db
-                console.log('User already exists in privy, but not in our db')
-                router.push('/participant/new')
+            if (result.isNewUser || isNewUser) {
+                router.push('/profile/new')
             } else {
-                router.push('/')
+                // Check if the user has a displayName and avatar
+                if (result.user.displayName && result.user.avatar) {
+                    router.push('/')
+                } else {
+                    router.push('/profile/new')
+                }
             }
 
             setLoading(true)
