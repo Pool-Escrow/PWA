@@ -52,7 +52,7 @@ describe('handleUserAuthentication', () => {
 
         const result = await handleUserAuthentication('privy123', '0x123', true)
 
-        expect(result).toEqual({ redirect: '/participant/new', user: { id: 1 } })
+        expect(result).toEqual({ redirect: '/profile/new', user: { id: 1 } })
         expect(mockSupabase.from).toHaveBeenCalledWith('users')
         expect(mockSupabase.from().insert).toHaveBeenCalledWith({
             privyId: 'privy123',
@@ -91,7 +91,7 @@ describe('handleUserAuthentication', () => {
 
         const result = await handleUserAuthentication('privy123', '0x123', false)
 
-        expect(result).toEqual({ redirect: '/participant/new', user: { id: 1 } })
+        expect(result).toEqual({ redirect: '/profile/new', user: { id: 1 } })
         expect(mockSupabase.from).toHaveBeenCalledWith('users')
         expect(mockSupabase.from().insert).toHaveBeenCalledWith({
             privyId: 'privy123',

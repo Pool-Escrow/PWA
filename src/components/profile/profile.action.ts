@@ -1,9 +1,16 @@
+// src/components/profile/profile.action.ts
 'use server'
 
 import { createServiceClient } from '@/lib/server/db'
 import { revalidatePath } from 'next/cache'
+import { cookies } from 'next/headers'
+import { PrivyClient } from '@privy-io/server-auth'
+import { Database } from '@/types/db'
 
 const supabase = createServiceClient()
+const privyClient = new PrivyClient(process.env.NEXT_PUBLIC_PRIVY_APP_ID!, process.env.PRIVY_APP_SECRET!)
+
+type ProfileUpdate = Pick<Database['public']['Tables']['users']['Update'], 'displayName' | 'avatar'>
 
 export async function handleUserAuthentication(privyId: string, walletAddress: string, isNewPrivyUser: boolean) {
     console.log('handleUserAuthentication called with:', { privyId, walletAddress, isNewPrivyUser })
@@ -13,7 +20,7 @@ export async function handleUserAuthentication(privyId: string, walletAddress: s
         const { user, isNewUser } = result
 
         if (isNewUser || isNewPrivyUser) {
-            return { redirect: '/participant/new', user }
+            return { redirect: '/profile/new', user }
         } else {
             return { redirect: '/', user }
         }
@@ -25,13 +32,12 @@ export async function handleUserAuthentication(privyId: string, walletAddress: s
 
 export async function createOrUpdateUser(privyId: string, walletAddress: string) {
     console.log('createOrUpdateUser called with:', { privyId, walletAddress })
-    console.log('Supabase instance:')
     const response = await supabase.from('users').select().eq('privyId', privyId).single()
 
     if (!response) {
         throw new Error('Unexpected null response from Supabase')
     }
-    console.log('Supabase response:', response)
+    console.log('Supabase response successful for ', response.data?.displayName)
     const { data: existingUser, error: fetchError } = response
 
     if (fetchError && fetchError.code !== 'PGRST116') {
@@ -44,6 +50,7 @@ export async function createOrUpdateUser(privyId: string, walletAddress: string)
                 .from('users')
                 .update({ walletAddress })
                 .eq('privyId', privyId)
+                .select('*')
                 .single()
 
             if (updateError) throw updateError
@@ -59,6 +66,7 @@ export async function createOrUpdateUser(privyId: string, walletAddress: string)
                 walletAddress,
                 role: 'user',
             })
+            .select('*')
             .single()
 
         if (insertError) throw insertError
@@ -67,12 +75,27 @@ export async function createOrUpdateUser(privyId: string, walletAddress: string)
     }
 }
 
-export async function updateUserProfile(privyId: string, displayName: string, avatarUrl: string | null) {
+export async function updateUserProfile(profileData: ProfileUpdate) {
+    const cookieStore = cookies()
+    const privyAuthToken = cookieStore.get('privy-token')?.value
+
+    if (!privyAuthToken) {
+        throw new Error('Unauthorized. Missing or expired auth token.')
+    }
+
     try {
+        const verifiedClaim = await privyClient.verifyAuthToken(privyAuthToken)
+        const privyId = verifiedClaim.userId
+
         const { data, error } = await supabase
             .from('users')
-            .update({ displayName, avatar: avatarUrl })
+            .update({
+                displayName: profileData.displayName,
+                avatar: profileData.avatar,
+                updatedAt: new Date().toISOString(),
+            })
             .eq('privyId', privyId)
+            .select()
             .single()
 
         if (error) throw error
@@ -81,6 +104,29 @@ export async function updateUserProfile(privyId: string, displayName: string, av
         return data
     } catch (error) {
         console.error('Error in updateUserProfile:', error)
+        throw error
+    }
+}
+
+export async function getUserProfile() {
+    const cookieStore = cookies()
+    const privyAuthToken = cookieStore.get('privy-token')?.value
+
+    if (!privyAuthToken) {
+        throw new Error('Unauthorized. Missing or expired auth token.')
+    }
+
+    try {
+        const verifiedClaim = await privyClient.verifyAuthToken(privyAuthToken)
+        const privyId = verifiedClaim.userId
+
+        const { data, error } = await supabase.from('users').select().eq('privyId', privyId).single()
+
+        if (error) throw error
+
+        return data
+    } catch (error) {
+        console.error('Error in getUserProfile:', error)
         throw error
     }
 }
