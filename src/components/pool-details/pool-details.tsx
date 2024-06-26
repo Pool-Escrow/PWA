@@ -52,6 +52,8 @@ const PoolDetails = (props: PoolDetailsProps) => {
         ?.map((data: any) => data.display_name)
         .join(',')
 
+    const isRegisteredOnSC = poolDetails?.poolDetailFromSC?.[5]?.indexOf(wallets[0]?.address as HexString) !== -1
+
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     // const enableDepositMutation = useMutation({
@@ -86,7 +88,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         },
     })
 
-    const { data: hash, isPending, writeContract } = useWriteContract()
+    const { data: hash, isPending, writeContract, writeContractAsync } = useWriteContract()
     const {
         isLoading: isConfirming,
         isSuccess: isConfirmed,
@@ -103,14 +105,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
             const [poolId, deposit] = params
             console.log('poolId', poolId)
             console.log('deposit', deposit)
-
+            console.log('contract address', '0x44432A98ea8dA37F844B89A324204ee6642b785A')
             const RegisterPoolFunction = getAbiItem({
                 abi: poolAbi,
                 name: 'deposit',
             })
 
             writeContract({
-                address: poolAddress[wagmi.config.state.chainId] as HexString,
+                address: '0x44432A98ea8dA37F844B89A324204ee6642b785A',
                 abi: [RegisterPoolFunction],
                 functionName: 'deposit',
                 args: [BigInt(poolId), deposit],
@@ -129,20 +131,22 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
     const approveSpendMutation = useMutation({
         mutationFn: async ({ params }: { params: [bigint] }) => {
-            console.log('approveSpend')
-            const [deposit] = params
+            const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
+            console.log('approve')
+
             console.log('deposit', deposit)
 
-            const RegisterPoolFunction = getAbiItem({
+            const ApprovePoolFunction = getAbiItem({
                 abi: dropletAbi,
                 name: 'approve',
             })
+            console.log('contract address', '0x44432A98ea8dA37F844B89A324204ee6642b785A')
 
             writeContract({
-                address: poolAddress[wagmi.config.state.chainId] as HexString,
-                abi: [RegisterPoolFunction],
+                address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                abi: [ApprovePoolFunction],
                 functionName: 'approve',
-                args: [dropletAddress[wagmi.config.state.chainId] as HexString, deposit],
+                args: [poolAddress[wagmi.config.state.chainId as ChainId], deposit],
             })
         },
         onSuccess: () => {
@@ -160,15 +164,58 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     const onApproveButtonClicked = async () => {
-        await approveSpendMutation.mutateAsync({
-            params: [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
-        })
+        try {
+            // const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
+            console.log('approve')
+
+            console.log('deposit', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
+
+            const ApprovePoolFunction = getAbiItem({
+                abi: dropletAbi,
+                name: 'approve',
+            })
+
+            writeContract({
+                address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                abi: [ApprovePoolFunction],
+                functionName: 'approve',
+                args: [
+                    poolAddress[wagmi.config.state.chainId as ChainId],
+                    poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                ],
+            })
+        } catch (error) {
+            console.log('approveSpend Error', error)
+        }
     }
 
     const onRegisterButtonClicked = async () => {
-        await registerPoolMutation.mutateAsync({
-            params: [props.poolId, BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
-        })
+        // await registerPoolMutation.mutateAsync({
+        //     params: [props.poolId, BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)],
+        // })
+        await onApproveButtonClicked()
+
+        try {
+            console.log('Approved')
+
+            console.log('registering pool')
+            const [poolId, deposit] = [
+                props.poolId,
+                BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0),
+            ]
+
+            const RegisterPoolFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'deposit',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
+                abi: [RegisterPoolFunction],
+                functionName: 'deposit',
+                args: [BigInt(poolId), deposit],
+            })
+        } catch (error) {}
     }
 
     // const endPoolMutation = useMutation({
@@ -192,27 +239,42 @@ const PoolDetails = (props: PoolDetailsProps) => {
     // }
 
     useEffect(() => {
-        setContent(
-            <Button
-                onClick={onRegisterButtonClicked}
-                className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
-            </Button>,
-        )
+        console.log('isRegisteredOnSC', isRegisteredOnSC)
+        if (!isRegisteredOnSC) {
+            setContent(
+                <Button
+                    onClick={onRegisterButtonClicked}
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
+                </Button>,
+            )
+        } else {
+            setContent(
+                <div className='flex w-full flex-row space-x-2'>
+                    <Link
+                        href={`/pool/${props.poolId}/ticket`}
+                        className='mb-3 h-[46px] flex-1 flex-grow rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        <span>Ticket</span>
+                    </Link>
+                    <Button className='h-[46px] w-[46px] rounded-full'>Unregister</Button>
+                </div>,
+            )
+        }
         showBar()
-    }, [setContent, showBar, hideBar, calculatedPoolSCDepositPerPerson])
+    }, [setContent, showBar, hideBar, calculatedPoolSCDepositPerPerson, isRegisteredOnSC])
 
     useEffect(() => {
         console.log('isConfirmed', isConfirmed)
         console.log('hash', hash)
+        let updatePoolToastId
         if (isConfirming) {
+            updatePoolToastId = toast.loading('Registering to Pool', {
+                description: 'Finalizing pool registration...',
+            })
             console.log('isConfirming')
         }
         if (isConfirmed && hash) {
-            const updatePoolToastId = toast.loading('Registering to Pool', {
-                description: 'Finalizing pool registration...',
-            })
-            // toast.dismiss(updatePoolToastId)
+            toast.dismiss(updatePoolToastId)
         }
         if (isError || registerError) {
             console.log('registerError', registerError)
