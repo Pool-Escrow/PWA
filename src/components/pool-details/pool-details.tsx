@@ -2,7 +2,6 @@
 'use client'
 
 import frog from '@/../public/images/frog.png'
-import { startPool } from '@/lib/contracts/start-pool'
 import { useAdmin } from '@/lib/hooks/use-admin'
 import { usePoolDetails } from '@/lib/hooks/use-pool-details'
 import { usePoolDetailsDB } from '@/lib/hooks/use-pool-details-db'
@@ -11,9 +10,8 @@ import { useBottomBarStore } from '@/providers/bottom-bar.provider'
 import { wagmi } from '@/providers/configs'
 import { dropletAbi, dropletAddress, poolAbi, poolAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -21,11 +19,10 @@ import { getAbiItem } from 'viem'
 import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
-import ShareDialog from '../common/dialogs/share.dialog'
-import PoolStatus from '../common/other/poolStatus'
 import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
 import PoolClaimRow from './pool-claim-row'
+import PoolImageRow from './pool-image-row'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -66,37 +63,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
-    // const enableDepositMutation = useMutation({
-    //     mutationFn: handleEnableDeposit,
-    //     onSuccess: () => {
-    //         console.log('startPool Success')
-    //         queryClient.invalidateQueries({
-    //             queryKey: ['fetchAllPoolDataFromSC', props.poolId],
-    //         })
-    //     },
-    //     onError: () => {
-    //         console.log('enableDepositMutation Error')
-    //     },
-    // })
-
-    // const onEnableDepositButtonClicked = () => {
-    //     enableDepositMutation.mutate({
-    //         params: [props.poolId, wallets],
-    //     })
-    // }
-
-    const startPoolMutation = useMutation({
-        mutationFn: startPool,
-        onSuccess: () => {
-            console.log('startPool Success')
-            queryClient.invalidateQueries({
-                queryKey: ['fetchAllPoolDataFromSC', props.poolId],
-            })
-        },
-        onError: () => {
-            console.log('startPoolMutation Error')
-        },
-    })
 
     const { data: hash, isPending, writeContract, writeContractAsync } = useWriteContract()
     const {
@@ -109,67 +75,61 @@ const PoolDetails = (props: PoolDetailsProps) => {
         hash,
     })
 
-    const registerPoolMutation = useMutation({
-        mutationFn: async ({ params }: { params: [string, bigint] }) => {
-            console.log('registerPool')
-            const [poolId, deposit] = params
-
-            const RegisterPoolFunction = getAbiItem({
+    const onEnableDepositButtonClicked = () => {
+        try {
+            const EnableDepositFunction = getAbiItem({
                 abi: poolAbi,
-                name: 'deposit',
+                name: 'enableDeposit',
             })
 
             writeContract({
                 address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [RegisterPoolFunction],
-                functionName: 'deposit',
-                args: [BigInt(poolId), deposit],
+                abi: [EnableDepositFunction],
+                functionName: 'enableDeposit',
+                args: [BigInt(props.poolId)],
             })
-        },
-        onSuccess: () => {
-            console.log('registerPool Success')
-            queryClient.invalidateQueries({
-                queryKey: ['fetchAllPoolDataFromSC', props.poolId],
-            })
-        },
-        onError: error => {
-            console.log('registerPoolMutation Error', error)
-        },
-    })
-
-    // const approveSpendMutation = useMutation({
-    //     mutationFn: async ({ params }: { params: [bigint] }) => {
-    //         const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
-
-    //         const ApprovePoolFunction = getAbiItem({
-    //             abi: dropletAbi,
-    //             name: 'approve',
-    //         })
-
-    //         writeContract({
-    //             address: dropletAddress[wagmi.config.state.chainId as ChainId],
-    //             abi: [ApprovePoolFunction],
-    //             functionName: 'approve',
-    //             args: [poolAddress[wagmi.config.state.chainId as ChainId], deposit],
-    //         })
-    //     },
-    //     onSuccess: () => {
-    //         console.log('approveSpend Success')
-    //     },
-    //     onError: error => {
-    //         console.log('approveSpend Error', error)
-    //     },
-    // })
+        } catch (error) {
+            console.log('enableDeposit Error', error)
+        }
+    }
 
     const onStartPoolButtonClicked = () => {
-        startPoolMutation.mutate({
-            params: [props.poolId, wallets],
-        })
+        try {
+            const StartPoolFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'startPool',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
+                abi: [StartPoolFunction],
+                functionName: 'startPool',
+                args: [BigInt(props.poolId)],
+            })
+        } catch (error) {
+            console.log('startPool Error', error)
+        }
+    }
+    const onEndPoolButtonClicked = (e: any) => {
+        try {
+            const EndPoolFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'endPool',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
+                abi: [EndPoolFunction],
+                functionName: 'endPool',
+                args: [BigInt(props.poolId)],
+            })
+        } catch (error) {
+            console.log('endPool Error', error)
+        }
     }
 
     const onApproveButtonClicked = async () => {
         try {
-            // const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
             console.log('approve')
 
             console.log('deposit', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
@@ -194,14 +154,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     const onRegisterButtonClicked = async (deposit: bigint, balance: bigint, poolId: string) => {
-        // if (!poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson) {
-        //     return
-        // }
-        // console.log('walletTokenBalance: ', walletTokenBalance.data?.value)
-        // console.log(
-        //     'walletTokenBalance Requirement: ',
-        //     BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson),
-        // )
         if (balance < deposit) {
             setOpenOnRampDialog(true)
             return
@@ -212,10 +164,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
             console.log('Approved')
 
             console.log('registering pool')
-            // const [poolId, deposit] = [
-            //     props.poolId,
-            //     BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0),
-            // ]
 
             const RegisterPoolFunction = getAbiItem({
                 abi: poolAbi,
@@ -231,55 +179,60 @@ const PoolDetails = (props: PoolDetailsProps) => {
         } catch (error) {}
     }
 
-    // const endPoolMutation = useMutation({
-    //     mutationFn: handleEndPool,
-    //     onSuccess: () => {
-    //         console.log('endPool Success')
-    //         queryClient.invalidateQueries({
-    //             queryKey: ['fetchAllPoolDataFromSC', props.poolId],
-    //         })
-    //     },
-    //     onError: () => {
-    //         console.log('endPoolMutation Error')
-    //     },
-    // })
-    // const onEndPoolButtonClicked = (e: any) => {
-    //     toast('Requesting End Pool Transaction')
-
-    //     endPoolMutation.mutate({
-    //         params: [poolId.toString(), wallets],
-    //     })
-    // }
-
     useEffect(() => {
         console.log('isRegisteredOnSC', isRegisteredOnSC)
         if (adminData?.isAdmin) {
-            hideBar()
-            return
-        }
-        if (!isRegisteredOnSC) {
-            const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
-            const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
-            setContent(
-                <Button
-                    onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                    <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
-                </Button>,
-            )
+            if (poolSCStatus === 0) {
+                setContent(
+                    <Button
+                        onClick={onEnableDepositButtonClicked}
+                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        <span>Enable Deposit</span>
+                    </Button>,
+                )
+            } else if (poolSCStatus === 1) {
+                setContent(
+                    <Button
+                        onClick={onStartPoolButtonClicked}
+                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        <span>Start Pool</span>
+                    </Button>,
+                )
+            } else if (poolSCStatus === 2) {
+                setContent(
+                    <Button
+                        onClick={onEndPoolButtonClicked}
+                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        <span>End Pool</span>
+                    </Button>,
+                )
+            }
         } else {
-            setContent(
-                <div className='flex w-full flex-row items-center space-x-2'>
-                    <Link
-                        href={`/pool/${props.poolId}/ticket`}
-                        className='mb-3 h-[46px] flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                        <span>Ticket</span>
-                    </Link>
-                    {/* <Button className='h-[46px] w-[46px] rounded-full'>Unregister</Button> */}
-                    <RegisteredDropdown poolId={props.poolId} />
-                </div>,
-            )
+            if (!isRegisteredOnSC) {
+                const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
+                const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
+                setContent(
+                    <Button
+                        onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
+                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
+                    </Button>,
+                )
+            } else {
+                setContent(
+                    <div className='flex w-full flex-row items-center space-x-2'>
+                        <Link
+                            href={`/pool/${props.poolId}/ticket`}
+                            className='mb-3 h-[46px] flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            <span>Ticket</span>
+                        </Link>
+                        {/* <Button className='h-[46px] w-[46px] rounded-full'>Unregister</Button> */}
+                        <RegisteredDropdown poolId={props.poolId} />
+                    </div>,
+                )
+            }
         }
+
         showBar()
     }, [
         setContent,
@@ -304,41 +257,21 @@ const PoolDetails = (props: PoolDetailsProps) => {
             toast.dismiss(updatePoolToastId)
         }
         if (isError || registerError) {
-            console.log('registerError', registerError)
+            console.log('Error', registerError)
         }
         if (txData) {
             console.log('txData', txData)
         }
-    }, [isConfirmed, isConfirming, hash, isError, registerError, txData, registerPoolMutation.data])
+    }, [isConfirmed, isConfirming, hash, isError, registerError, txData])
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
-                <div className={`cardBackground mb-4 flex w-full flex-col space-y-4 rounded-3xl md:space-y-10 md:p-10`}>
-                    <div className='relative h-full w-full overflow-hidden rounded-3xl bg-black'>
-                        <div className='relative h-full w-full object-contain object-center'>
-                            <Image
-                                src={poolDetailsDB?.poolImageUrl ?? frog.src}
-                                alt='Pool Image'
-                                width={500}
-                                height={400}
-                            />
-                        </div>
-                        {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity-60 text-white backdrop-blur-sm backdrop-filter md:space-y-6'>
-                                {timeLeft != undefined && timeLeft > 0 && (
-                                    <div>
-                                        <h4 className='text-xs md:text-2xl'>Starts in</h4>
-                                        <h3 className='text-4xl font-semibold md:text-7xl'>
-                                            {<CountdownTimer timeleft={timeLeft} />}
-                                        </h3>
-                                    </div>
-                                )}
-                            </div> */}
-                        <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
-                            <ShareDialog />
-                        </div>
-                        <PoolStatus status={poolSCStatus} />
-                    </div>
-                </div>
+                <PoolImageRow
+                    poolStatus={poolSCStatus}
+                    admin={adminData?.isAdmin}
+                    poolImage={poolDetailsDB?.poolImageUrl}
+                    poolId={props.poolId}
+                />
 
                 <h2 className='mb-1 text-xl font-bold text-blue-800'>{poolDetails?.poolDetailFromSC?.[1].poolName}</h2>
                 <p className='mb-4 text-gray-600'>
@@ -401,24 +334,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     <div>{poolDetailsDB?.poolDBInfo?.termsURL}</div>
                 </div>
 
-                {/*Admin buttons*/}
-                {poolSCStatus === 0 && adminData.isAdmin && (
-                    <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
-                        Enable Deposit
-                    </button>
-                )}
-                {poolSCStatus === 1 && adminData.isAdmin && (
-                    <button
-                        className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'
-                        onClick={onStartPoolButtonClicked}>
-                        Start Pool
-                    </button>
-                )}
-                {poolSCStatus === 2 && adminData.isAdmin && (
-                    <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
-                        End Pool
-                    </button>
-                )}
                 <OnRampDialog
                     open={openOnRampDialog}
                     setOpen={setOpenOnRampDialog}
