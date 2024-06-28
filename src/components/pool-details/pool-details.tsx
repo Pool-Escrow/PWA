@@ -282,11 +282,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
             )
         }
         showBar()
-        console.log('wallet address: ', wallets[0]?.address)
-        console.log('wallet native balance: ', walletNativeBalance)
-        console.log('wallet token balance: ', walletTokenBalance)
-        console.log('wallet deposit requirement: ', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
-        console.log('useEffect isAdmin', adminData)
     }, [
         setContent,
         showBar,
@@ -300,14 +295,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
     ])
 
     useEffect(() => {
-        console.log('isConfirmed', isConfirmed)
-        console.log('hash', hash)
         let updatePoolToastId
         if (isConfirming) {
             updatePoolToastId = toast.loading('Registering to Pool', {
                 description: 'Finalizing pool registration...',
             })
-            console.log('isConfirming')
         }
         if (isConfirmed && hash) {
             toast.dismiss(updatePoolToastId)
@@ -322,19 +314,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
-                <div className='relative mb-4'>
-                    {/* <Image
-                        src={poolDetailsDB?.poolImageUrl ?? frog.src}
-                        alt='Indoor pool with inflatable flamingo'
-                        width={400}
-                        height={300}
-                        className='rounded-lg'
-                        priority
-                    />
-                    <span className='absolute bottom-2 left-2 rounded-full bg-red-500 px-2 py-1 text-xs text-white'>
-                        Live
-                    </span> */}
-                </div>
                 <div className={`cardBackground mb-4 flex w-full flex-col space-y-4 rounded-3xl md:space-y-10 md:p-10`}>
                     <div className='relative h-full w-full overflow-hidden rounded-3xl bg-black'>
                         <div className='relative h-full w-full object-contain object-center'>
