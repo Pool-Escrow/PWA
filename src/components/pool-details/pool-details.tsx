@@ -120,7 +120,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
             })
 
             writeContract({
-                address: '0x44432A98ea8dA37F844B89A324204ee6642b785A',
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
                 abi: [RegisterPoolFunction],
                 functionName: 'deposit',
                 args: [BigInt(poolId), deposit],
@@ -137,29 +137,29 @@ const PoolDetails = (props: PoolDetailsProps) => {
         },
     })
 
-    const approveSpendMutation = useMutation({
-        mutationFn: async ({ params }: { params: [bigint] }) => {
-            const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
+    // const approveSpendMutation = useMutation({
+    //     mutationFn: async ({ params }: { params: [bigint] }) => {
+    //         const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
 
-            const ApprovePoolFunction = getAbiItem({
-                abi: dropletAbi,
-                name: 'approve',
-            })
+    //         const ApprovePoolFunction = getAbiItem({
+    //             abi: dropletAbi,
+    //             name: 'approve',
+    //         })
 
-            writeContract({
-                address: dropletAddress[wagmi.config.state.chainId as ChainId],
-                abi: [ApprovePoolFunction],
-                functionName: 'approve',
-                args: [poolAddress[wagmi.config.state.chainId as ChainId], deposit],
-            })
-        },
-        onSuccess: () => {
-            console.log('approveSpend Success')
-        },
-        onError: error => {
-            console.log('approveSpend Error', error)
-        },
-    })
+    //         writeContract({
+    //             address: dropletAddress[wagmi.config.state.chainId as ChainId],
+    //             abi: [ApprovePoolFunction],
+    //             functionName: 'approve',
+    //             args: [poolAddress[wagmi.config.state.chainId as ChainId], deposit],
+    //         })
+    //     },
+    //     onSuccess: () => {
+    //         console.log('approveSpend Success')
+    //     },
+    //     onError: error => {
+    //         console.log('approveSpend Error', error)
+    //     },
+    // })
 
     const onStartPoolButtonClicked = () => {
         startPoolMutation.mutate({
