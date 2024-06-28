@@ -27,12 +27,12 @@ const ShareDialog = () => {
         return (
             <Dialog open={open} onOpenChange={setOpen}>
                 <Dialog.Trigger asChild>
-                    <button
+                    <Button
                         type='button'
                         title='Share with Friends'
                         className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'>
                         <Image className='flex h-6 w-6' src={shareIcon as StaticImport} alt='Share with Friends' />
-                    </button>
+                    </Button>
                 </Dialog.Trigger>
                 <Dialog.Content className='bg-white sm:max-w-[425px]'>
                     <Dialog.Header>
