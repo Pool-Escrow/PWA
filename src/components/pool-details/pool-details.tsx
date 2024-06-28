@@ -42,7 +42,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const queryClient = useQueryClient()
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
-    const { isAdmin } = useAdmin()
+    const { adminData } = useAdmin()
     const embeddedWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
     const walletNativeBalance = useBalance({
         address: wallets[0]?.address as HexString,
@@ -254,6 +254,10 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
     useEffect(() => {
         console.log('isRegisteredOnSC', isRegisteredOnSC)
+        if (adminData.isAdmin) {
+            hideBar()
+            return
+        }
         if (!isRegisteredOnSC) {
             const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
             const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
@@ -282,6 +286,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         console.log('wallet native balance: ', walletNativeBalance)
         console.log('wallet token balance: ', walletTokenBalance)
         console.log('wallet deposit requirement: ', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
+        console.log('useEffect isAdmin', adminData)
     }, [
         setContent,
         showBar,
@@ -291,6 +296,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         wallets,
         poolDetails,
         walletTokenBalance?.data?.value,
+        adminData,
     ])
 
     useEffect(() => {
@@ -385,7 +391,8 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             </span>
                             <span className='text-[#003073]'>
                                 Goal of $
-                                {Number(calculatedPoolSCDepositPerPerson) * poolDetailsDB?.poolDBInfo?.soft_cap} Prize
+                                {Number(calculatedPoolSCDepositPerPerson) * (poolDetailsDB?.poolDBInfo?.soft_cap ?? 0)}{' '}
+                                Prize
                                 {` `}
                                 Pool
                             </span>
@@ -410,21 +417,25 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     <div className='mb-1 flex justify-between font-medium text-[#003073]'>Description</div>
                     <div>{poolDetailsDB?.poolDBInfo?.description}</div>
                 </div>
+                <div className='mb-4 rounded-3xl bg-[#F4F4F4] p-6 shadow-md'>
+                    <div className='mb-1 flex justify-between font-medium text-[#003073]'>Link to Terms</div>
+                    <div>{poolDetailsDB?.poolDBInfo?.termsURL}</div>
+                </div>
 
                 {/*Admin buttons*/}
-                {poolSCStatus === 0 && isAdmin && (
+                {poolSCStatus === 0 && adminData.isAdmin && (
                     <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
                         Enable Deposit
                     </button>
                 )}
-                {poolSCStatus === 1 && isAdmin && (
+                {poolSCStatus === 1 && adminData.isAdmin && (
                     <button
                         className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'
                         onClick={onStartPoolButtonClicked}>
                         Start Pool
                     </button>
                 )}
-                {poolSCStatus === 2 && isAdmin && (
+                {poolSCStatus === 2 && adminData.isAdmin && (
                     <button className='w-full rounded-lg bg-blue-500 py-2 font-semibold text-white transition duration-300 hover:bg-blue-600'>
                         End Pool
                     </button>

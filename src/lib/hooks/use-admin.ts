@@ -3,13 +3,13 @@ import { fetchIsUserAdmin } from '../database/is-admin'
 
 export const useAdmin = () => {
     const {
-        data: isAdmin,
+        data: adminData,
         isLoading,
         error,
     } = useQuery({
         queryKey: ['fetchIsUserAdmin'],
         queryFn: fetchIsUserAdmin,
     })
-    console.log('useAdmin', isAdmin, isLoading, error)
-    return { isAdmin, isLoading, error }
+    console.log('useAdmin', adminData, isLoading, error)
+    return { adminData, isLoading, error }
 }
