@@ -25,6 +25,7 @@ import ShareDialog from '../common/dialogs/share.dialog'
 import PoolStatus from '../common/other/poolStatus'
 import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
+import PoolClaimRow from './pool-claim-row'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -112,9 +113,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         mutationFn: async ({ params }: { params: [string, bigint] }) => {
             console.log('registerPool')
             const [poolId, deposit] = params
-            console.log('poolId', poolId)
-            console.log('deposit', deposit)
-            console.log('contract address', '0x44432A98ea8dA37F844B89A324204ee6642b785A')
+
             const RegisterPoolFunction = getAbiItem({
                 abi: poolAbi,
                 name: 'deposit',
@@ -254,7 +253,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
     useEffect(() => {
         console.log('isRegisteredOnSC', isRegisteredOnSC)
-        if (adminData.isAdmin) {
+        if (adminData?.isAdmin) {
             hideBar()
             return
         }
@@ -360,6 +359,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         </span>
                     </div> */}
                 </div>
+                <PoolClaimRow poolId={props.poolId} />
                 <div className='mb-4 rounded-3xl bg-[#F4F4F4] p-6 shadow-md'>
                     <div className='mb-4'>
                         <div className='mb-1 flex justify-between'>
