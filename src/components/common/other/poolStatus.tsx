@@ -7,25 +7,25 @@ const PoolStatus = (poolStatus: poolStatusProps) => {
             {poolStatus.status == 0 && (
                 <div className='flex flex-row items-center space-x-3'>
                     <div className={`dotBackground h-1.5 w-1.5 rounded-full md:h-3 md:w-3`}></div>
-                    <div className='text-xs md:text-2xl'>Unavailable</div>
+                    <div className='md:text-md text-md'>Unavailable</div>
                 </div>
             )}
             {poolStatus.status == 1 && (
                 <div className='flex flex-row items-center space-x-3'>
                     <div className={`dotBackground h-1.5 w-1.5 rounded-full md:h-3 md:w-3`}></div>
-                    <div className='text-xs md:text-2xl'>Upcoming</div>
+                    <div className='md:text-md text-xs'>Upcoming</div>
                 </div>
             )}
             {poolStatus.status == 2 && (
                 <div className='flex flex-row items-center space-x-3'>
                     <div className={`liveDotBackground h-1.5 w-1.5 rounded-full md:h-3 md:w-3`}></div>
-                    <div className='text-xs md:text-2xl'>Live</div>
+                    <div className='md:text-md text-xs'>Live</div>
                 </div>
             )}
             {poolStatus.status == 3 && (
                 <div className='flex flex-row items-center space-x-3'>
                     <div className={`dotBackground h-1.5 w-1.5 rounded-full md:h-3 md:w-3`}></div>
-                    <div className='text-xs md:text-2xl'>Ended</div>
+                    <div className='md:text-md text-xs'>Ended</div>
                 </div>
             )}
             {poolStatus.status == 4 && (
