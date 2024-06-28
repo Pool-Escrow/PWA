@@ -33,6 +33,8 @@ export default function ClaimablePrizesList() {
         claimablePools: readonly [readonly bigint[], readonly boolean[]] | undefined,
     ) => {
         if (!claimablePools) return
+        if (claimablePools[0].length === 0) return
+
         console.log('claimablePools', claimablePools)
         try {
             const poolIdIndices = claimablePools?.[1].reduce((indices: any, element: any, index: any) => {
@@ -43,6 +45,7 @@ export default function ClaimablePrizesList() {
             }, [])
 
             const poolIdsToClaimFrom = poolIdIndices?.map((index: any) => claimablePools?.[0]?.[index])
+            console.log('poolIdsToClaimFrom', poolIdsToClaimFrom)
 
             const walletAddresses = poolIdsToClaimFrom.map(() => walletAddress as HexString)
 
@@ -62,14 +65,18 @@ export default function ClaimablePrizesList() {
         }
     }
     useEffect(() => {
-        setContent(
-            <Button
-                onClick={() => onClaimFromPoolsButtonClicked(claimablePools)}
-                className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                <span>Claim</span>
-            </Button>,
-        )
-        showBar()
+        if (claimablePools?.[0].length === 0) {
+            hideBar()
+        } else {
+            setContent(
+                <Button
+                    onClick={() => onClaimFromPoolsButtonClicked(claimablePools)}
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    <span>Claim</span>
+                </Button>,
+            )
+            showBar()
+        }
     }, [claimablePools, wallets])
     return (
         <Container>
