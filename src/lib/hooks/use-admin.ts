@@ -10,6 +10,6 @@ export const useAdmin = () => {
         queryKey: ['fetchIsUserAdmin'],
         queryFn: fetchIsUserAdmin,
     })
-
+    console.log('useAdmin', isAdmin, isLoading, error)
     return { isAdmin, isLoading, error }
 }

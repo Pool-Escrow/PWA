@@ -141,15 +141,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const approveSpendMutation = useMutation({
         mutationFn: async ({ params }: { params: [bigint] }) => {
             const [deposit] = [BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)]
-            console.log('approve')
-
-            console.log('deposit', deposit)
 
             const ApprovePoolFunction = getAbiItem({
                 abi: dropletAbi,
                 name: 'approve',
             })
-            console.log('contract address', '0x44432A98ea8dA37F844B89A324204ee6642b785A')
 
             writeContract({
                 address: dropletAddress[wagmi.config.state.chainId as ChainId],
