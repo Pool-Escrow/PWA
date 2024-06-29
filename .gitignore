@@ -11,6 +11,9 @@ node_modules
 .DS_Store
 
 .env.*.local
+.env
+env.local
+env.prod
 
 info.md
 .vercel

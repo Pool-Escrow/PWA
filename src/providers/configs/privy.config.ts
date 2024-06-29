@@ -24,6 +24,11 @@ export default {
                 secondary: null,
             },
         },
+        externalWallets: { 
+            coinbaseWallet: { 
+              connectionOptions: 'all', 
+            }, 
+        },
         defaultChain: baseSepolia,
         supportedChains: [baseSepolia],
         legal: {
