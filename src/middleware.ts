@@ -17,39 +17,23 @@ export const config = {
 export async function middleware(req: NextRequest) {
     const url = req.nextUrl
     const pathname = url.pathname
+    let hostname = req.headers.get('host')!
 
-    // Get hostname of request (e.g. app.poolparty.cc, app.localhost:3000)
-    let hostname = req.headers.get('host')!.replace('.localhost:3000', `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
+    // Handle localhost:3000 and app.poolparty.cc
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    const rootDomain = isDevelopment ? 'localhost:3000' : process.env.NEXT_PUBLIC_ROOT_DOMAIN
 
-    // special case for Vercel preview deployment URLs
-    if (hostname.includes('---') && hostname.endsWith(`.${process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_SUFFIX}`)) {
-        hostname = `${hostname.split('---')[0]}.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`
+    // handle subdomains
+    if (hostname.startsWith('app.')) {
+        // for app.poolparty.cc or app.localhost:3000
+        return NextResponse.rewrite(new URL(`/pwa${pathname}`, req.url))
+    } else if (hostname === rootDomain || hostname.startsWith('www.')) {
+        // for localhost:3000, poolparty.cc or www.poolparty.cc
+        return NextResponse.rewrite(new URL(`/landing${pathname}`, req.url))
     }
 
-    const searchParams = req.nextUrl.searchParams.toString()
-    // Get the pathname of the request (e.g. /, /about, /blog/first-post)
-    const path = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ''}`
-
-    console.log('Hostname:', hostname, pathname)
-    console.log('Search params:', searchParams)
-    console.log('Path:', path)
-
-    // rewrites for app pages
-    if (hostname == `app.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`) {
-        // const session = await getToken({ req });
-        // if (!session && path !== "/login") {
-        //   return NextResponse.redirect(new URL("/login", req.url));
-        //   } else
-        //   if (session && path == "/login") {
-        //   return NextResponse.redirect(new URL("/", req.url));
-        // }
-        return NextResponse.rewrite(new URL(`/pwa${path === '/' ? '' : path}`, req.url))
-    }
-
-    // rewrite root application to `/home` folder
-    if (hostname === 'localhost:3000' || hostname === process.env.NEXT_PUBLIC_ROOT_DOMAIN) {
-        return NextResponse.rewrite(new URL(`/landing${path === '/' ? '' : path}`, req.url))
-    }
+    // if there is no condition match, continue with the regular request
+    return NextResponse.next()
 
     // const subdomain = hostname.split('.')[0]
 

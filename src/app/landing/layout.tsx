@@ -1,15 +1,16 @@
 import '@/styles/globals.css'
 
 // TODO: separate styles between app / landing and keep base styles for tailwind
-import poolEvent from '@/../public/landing/pool-event.png'
-import poolHeroBg from '@/../public/landing/pool-hero-bg.png'
-import { comfortaa, inter } from '@/lib/utils/fonts'
-import cardSearch from '@/../public/landing/card-search.png'
 import cardConnect from '@/../public/landing/card-connect.png'
 import cardFind from '@/../public/landing/card-find.png'
+import cardSearch from '@/../public/landing/card-search.png'
+import poolEvent from '@/../public/landing/pool-event.png'
+import poolHeroBg from '@/../public/landing/pool-hero-bg.png'
+import PoolFooter from '@/components/landing-footer'
+import { comfortaa, inter } from '@/lib/utils/fonts'
+import { Route } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import PoolFooter from '@/components/landing-footer'
 
 export const metadata = {
     title: 'Pool Party',
@@ -37,6 +38,14 @@ const cardContent = [
     },
 ]
 
+const isProduction = process.env.NODE_ENV === 'production'
+
+const getAppUrl = (path: string = '') => {
+    const isDevelopment = process.env.NODE_ENV === 'development'
+    const appDomain = isDevelopment ? 'http://app.localhost:3000' : 'https://app.poolparty.cc'
+    return `${appDomain}${path}` as Route
+}
+
 export function Header() {
     return (
         <header className='sticky top-0'>
@@ -45,7 +54,7 @@ export function Header() {
                     pool
                 </Link>
                 <Link
-                    href='https://app.poolparty.cc'
+                    href={getAppUrl('/')}
                     className='rounded-full bg-zinc-100 px-8 py-[0.875rem] text-xl font-medium text-black'>
                     Get started
                 </Link>
@@ -86,7 +95,7 @@ export function Hero() {
                         </p>
                         <div className='inline-flex flex-col items-center gap-2 text-nowrap text-base font-semibold *:w-1/2 md:flex-row md:items-start'>
                             <Link
-                                href='https://app.poolparty.cc'
+                                href={getAppUrl('/')}
                                 className='rounded-full bg-zinc-100 py-3 text-center font-semibold text-black transition duration-300 hover:bg-opacity-90 md:px-10'>
                                 Get Started
                             </Link>
@@ -126,7 +135,7 @@ export function Features() {
                     Joining a Pool party is easy and fun. Follow these simple steps to get started:
                 </p>
                 <Link
-                    href='https://app.poolparty.cc'
+                    href={getAppUrl('/')}
                     className='w-36 rounded-full bg-gradient-to-b from-[#36a0f7] to-[#1364da] py-3 text-center text-white'>
                     Join a Pool
                 </Link>

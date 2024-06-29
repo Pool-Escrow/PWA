@@ -32,23 +32,60 @@ export default withBundleAnalyzer(
             remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
         },
         redirects: async () => Promise.resolve([{ source: '/pwa', destination: '/pwa/pools', permanent: true }]),
-        rewrites: async () => [
-            {
-                source: '/:path*',
-                destination: '/landing/:path*',
-                has: [{ type: 'host', value: 'poolparty.cc' }],
-            },
-            {
-                source: '/:path*',
-                destination: '/landing/:path*',
-                has: [{ type: 'host', value: 'www.poolparty.cc' }],
-            },
-            {
-                source: '/:path*',
-                destination: '/pwa/:path*',
-                has: [{ type: 'host', value: 'app.poolparty.cc' }],
-            },
-        ],
+        async rewrites() {
+            return [
+                {
+                    source: '/:path*',
+                    destination: '/pwa/:path*',
+                    has: [
+                        {
+                            type: 'host',
+                            value: 'app.localhost:3000',
+                        },
+                    ],
+                },
+                {
+                    source: '/:path*',
+                    destination: '/pwa/:path*',
+                    has: [
+                        {
+                            type: 'host',
+                            value: 'app.poolparty.cc',
+                        },
+                    ],
+                },
+                {
+                    source: '/:path*',
+                    destination: '/landing/:path*',
+                    has: [
+                        {
+                            type: 'host',
+                            value: 'localhost:3000',
+                        },
+                    ],
+                },
+                {
+                    source: '/:path*',
+                    destination: '/landing/:path*',
+                    has: [
+                        {
+                            type: 'host',
+                            value: 'poolparty.cc',
+                        },
+                    ],
+                },
+                {
+                    source: '/:path*',
+                    destination: '/landing/:path*',
+                    has: [
+                        {
+                            type: 'host',
+                            value: 'www.poolparty.cc',
+                        },
+                    ],
+                },
+            ]
+        },
         webpack: (config, { dev, isServer }) => {
             // Exclude *.test.ts(x) files from being compiled by Next.js
             config.module.rules.push({
