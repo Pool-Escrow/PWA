@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@biconomy/account": "4.4.6",
+    "@coinbase/cbpay-js": "2.2.0",
     "@privy-io/react-auth": "1.71.0",
     "@privy-io/server-auth": "1.7.3",
     "@privy-io/wagmi": "0.2.10",
