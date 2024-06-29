@@ -1,3 +1,5 @@
+'use client'
+
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import editIcon from '@/public/images/edit_icon.svg'
 import defaultPoolImage from '@/public/images/frog.png'
