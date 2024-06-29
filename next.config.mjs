@@ -23,12 +23,32 @@ export default withBundleAnalyzer(
         experimental: {
             typedRoutes: !inProduction && !turboEnabled,
             ...(turboEnabled ? { turbo: { useSwcCss: true } } : {}),
+            serverActions: {
+                allowedOrigins: ['app.localhost:3000'],
+            },
         },
         reactStrictMode: !inProduction,
         images: {
             remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
         },
-        redirects: async () => Promise.resolve([{ source: '/', destination: '/pools', permanent: true }]),
+        redirects: async () => Promise.resolve([{ source: '/pwa', destination: '/pwa/pools', permanent: true }]),
+        rewrites: async () => [
+            {
+                source: '/:path*',
+                destination: '/landing/:path*',
+                has: [{ type: 'host', value: 'poolparty.cc' }],
+            },
+            {
+                source: '/:path*',
+                destination: '/landing/:path*',
+                has: [{ type: 'host', value: 'www.poolparty.cc' }],
+            },
+            {
+                source: '/:path*',
+                destination: '/pwa/:path*',
+                has: [{ type: 'host', value: 'app.poolparty.cc' }],
+            },
+        ],
         webpack: (config, { dev, isServer }) => {
             // Exclude *.test.ts(x) files from being compiled by Next.js
             config.module.rules.push({
