@@ -13,7 +13,7 @@ export const fetchPools = async () => {
 
     const poolLogs = await publicClient?.getContractEvents({
         abi: poolAbi,
-        address: poolAddress[publicClient.chain.id] as Address,
+        address: poolAddress[publicClient.chain.id as ChainId] as Address,
         eventName: 'PoolCreated',
         fromBlock: initialBlock,
         toBlock: 'latest',
@@ -25,7 +25,7 @@ export const fetchPools = async () => {
             if (!poolId) return
             const pool = await publicClient?.readContract({
                 abi: poolAbi,
-                address: poolAddress[publicClient.chain.id] as Address,
+                address: poolAddress[publicClient.chain.id as ChainId] as Address,
                 functionName: 'getPoolDetail',
                 args: [poolId],
             })

@@ -8,9 +8,9 @@ export const fetchPoolDetailsFromDB = async ({ queryKey }: { queryKey: [string, 
     console.log('fetchPoolDataFromDB')
     const [_, poolId] = queryKey
     const { data, error }: PostgrestSingleResponse<any[]> = await supabaseBrowserClient
-        .from('pool') // Replace 'your_table_name' with your actual table name
+        .from('pools') // Replace 'your_table_name' with your actual table name
         .select()
-        .eq('pool_id', poolId)
+        .eq('contract_id', poolId)
 
     if (error) {
         // console.error('Error fetchPoolDataFromDB:', error.message)
@@ -55,7 +55,7 @@ export const fetchUserDisplayInfoFromServer = async (addressList: string[]) => {
     console.log('addressList', addressList)
     const lowerAddressList = addressList.map(address => address?.toLowerCase())
     const { data, error }: PostgrestSingleResponse<any[]> = await supabaseBrowserClient
-        .from('usersDisplay')
+        .from('users')
         .select()
         .in('address', lowerAddressList)
 

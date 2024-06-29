@@ -2,10 +2,11 @@
 'use client'
 
 import frog from '@/../public/images/frog.png'
+import { usePoolDetails } from '@/hooks/use-pool-details'
 import { useAdmin } from '@/lib/hooks/use-admin'
-import { usePoolDetails } from '@/lib/hooks/use-pool-details'
 import { usePoolDetailsDB } from '@/lib/hooks/use-pool-details-db'
 import { formatEventDateTime } from '@/lib/utils/date-time'
+import { cn } from '@/lib/utils/tailwind'
 import { useBottomBarStore } from '@/providers/bottom-bar.provider'
 import { wagmi } from '@/providers/configs'
 import { dropletAbi, dropletAddress, poolAbi, poolAddress } from '@/types/contracts'
@@ -15,7 +16,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { getAbiItem } from 'viem'
+import { Address, getAbiItem } from 'viem'
 import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
@@ -43,11 +44,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const { adminData } = useAdmin()
     const embeddedWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
     const walletNativeBalance = useBalance({
-        address: wallets[0]?.address as HexString,
+        address: wallets[0]?.address as Address,
     })
     const walletTokenBalance = useBalance({
-        address: wallets[0]?.address as HexString,
-        token: poolDetails?.poolDetailFromSC?.[4] as HexString,
+        address: wallets[0]?.address as Address,
+        token: poolDetails?.poolDetailFromSC?.[4] as Address,
     })
 
     const calculatedPoolSCDepositPerPerson = (
@@ -59,7 +60,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         ?.map((data: any) => data.display_name)
         .join(',')
 
-    const isRegisteredOnSC = poolDetails?.poolDetailFromSC?.[5]?.indexOf(wallets[0]?.address as HexString) !== -1
+    const isRegisteredOnSC = poolDetails?.poolDetailFromSC?.[5]?.indexOf(wallets[0]?.address as Address) !== -1
 
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
@@ -313,11 +314,12 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             </span>
                         </div>
                         <div className='h-2.5 w-full rounded-full bg-blue-200'>
+                            {/* TODO: fix styles mixing here */}
                             <div
-                                className='h-2.5 rounded-full bg-blue-500'
-                                style={{
-                                    width: `${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / poolDetailsDB?.poolDBInfo?.soft_cap}%`,
-                                }}></div>
+                                className={cn(
+                                    'h-2.5 rounded-full bg-blue-500',
+                                    `w-[${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / poolDetailsDB?.poolDBInfo?.soft_cap}%]`,
+                                )}></div>
                         </div>
                     </div>
                     <div className='mb-4 flex'>Participants</div>

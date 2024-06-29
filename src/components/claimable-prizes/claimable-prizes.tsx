@@ -7,7 +7,7 @@ import { poolAbi, poolAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { getAbiItem } from 'viem'
+import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { Button } from '../ui/button'
 import Container from './container'
@@ -47,7 +47,7 @@ export default function ClaimablePrizesList() {
             const poolIdsToClaimFrom = poolIdIndices?.map((index: any) => claimablePools?.[0]?.[index])
             console.log('poolIdsToClaimFrom', poolIdsToClaimFrom)
 
-            const walletAddresses = poolIdsToClaimFrom.map(() => walletAddress as HexString)
+            const walletAddresses = poolIdsToClaimFrom.map(() => walletAddress as Address)
 
             const ClaimWinningsFunction = getAbiItem({
                 abi: poolAbi,

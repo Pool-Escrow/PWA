@@ -11,7 +11,7 @@ import { useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { getAbiItem } from 'viem'
+import { Address, getAbiItem } from 'viem'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import CircleCheckIcon from '../claimable-prizes/circle-check.icon'
 import { Button } from '../ui/button'
@@ -56,7 +56,7 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
                 address: poolAddress[wagmi.config.state.chainId as ChainId],
                 abi: [ClaimWinningFunction],
                 functionName: 'claimWinning',
-                args: [BigInt(props.poolId), wallets[0]?.address as HexString],
+                args: [BigInt(props.poolId), wallets[0]?.address as Address],
             })
         } catch (error) {
             console.log('claimWinning Error', error)

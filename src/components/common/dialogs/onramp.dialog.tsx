@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
-import useMediaQuery from '@/lib/hooks/use-media-query'
+import useMediaQuery from '@/hooks/use-media-query'
 import Divider from '../other/divider'
 import ShareForm from './share.form'
 
