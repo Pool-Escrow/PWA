@@ -9,6 +9,7 @@ const withSerwist = withSerwistInit({
     swSrc: 'src/lib/utils/sw.ts',
     swDest: 'public/sw.js',
     disable: !inProduction,
+    scope: '/pwa',
 })
 
 const withBundleAnalyzer = bundleAnalyzer({
