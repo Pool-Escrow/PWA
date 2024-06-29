@@ -4,12 +4,12 @@
  */
 'use client'
 
-import { usePools } from '@/lib/hooks/use-pools'
+import { usePools } from '@/hooks/use-pools'
+import { getPoolStatus } from '@/lib/utils/get-pool.status'
 import { usePoolStore } from '@/stores/pool.store'
+import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useState } from 'react'
 import PoolListSkeleton from './skeleton'
-import dynamic from 'next/dynamic'
-import { getPoolStatus } from '@/lib/utils/get-pool.status'
 
 const DynamicPoolCard = dynamic(() => import('./pool-list-card'), { ssr: false })
 

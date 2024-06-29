@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useSmartAccount } from '@/lib/hooks/use-smart-account'
+import { useSmartAccount } from '@/hooks/use-smart-account'
 import { usePrivy } from '@privy-io/react-auth'
 import { toast } from 'sonner'
 import UserAvatar from '../user-dropdown/user-avatar'

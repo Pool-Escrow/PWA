@@ -4,7 +4,7 @@
  */
 
 import { combinePoolData } from '@/components/pools/combine-pool-data'
-import { fetchPools, fetchUserPools } from '@/lib/hooks/use-pools'
+import { fetchPools, fetchUserPools } from '@/hooks/use-pools'
 import { Address } from 'viem'
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
