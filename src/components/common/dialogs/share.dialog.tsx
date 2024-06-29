@@ -13,7 +13,7 @@ import {
     DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Input } from '@/components/ui/input'
-import useMediaQuery from '@/lib/hooks/use-media-query'
+import useMediaQuery from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils/tailwind'
 import shareIcon from '@/public/images/share_icon.svg'
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
@@ -26,6 +26,7 @@ import Divider from '../other/divider'
 
 const ShareDialog = () => {
     const [open, setOpen] = useState(false)
+    // TODO: THIS IS NOT NEEDED, USE THE PROPER TAILWIND BREAKPOINT
     const isDesktop = useMediaQuery('(min-width: 768px)')
 
     if (isDesktop) {

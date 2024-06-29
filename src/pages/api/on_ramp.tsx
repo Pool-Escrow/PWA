@@ -1,5 +1,6 @@
-// @ts-nocheck
-import { getUser, verifyToken } from '@/lib/server'
+import 'server-only'
+
+import { getUser, verifyToken } from '@/lib/server/auth'
 import { generateOnRampURL } from '@coinbase/cbpay-js'
 import { WalletWithMetadata } from '@privy-io/react-auth'
 
@@ -31,6 +32,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const key_name = process.env.COINBASE_KEY_NAME
     const key_secret = process.env.COINBASE_KEY_SECRET
+
+    if (!key_name || !key_secret) {
+        console.error('Coinbase key name or secret not found')
+        res.status(500).json({ error: 'Coinbase key' })
+        return
+    }
+
     const request_method = 'POST'
     const host = 'api.developer.coinbase.com'
     const request_path = '/onramp/v1/token'
@@ -50,6 +58,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         algorithm: 'ES256',
         header: {
             kid: key_name,
+            // TODO: fix this because it is not supposed to be here
+            // @ts-expect-error
             nonce: crypto.randomBytes(16).toString('hex'),
         },
     }
@@ -97,6 +107,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
 }
 
-const constructURL = token => {
+const constructURL = (token: string) => {
     return `https://pay.coinbase.com/buy/select-asset?sessionToken=${token}`
 }
