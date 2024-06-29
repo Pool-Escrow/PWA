@@ -19,7 +19,7 @@ export default function ProfileHeader() {
                 <AvatarFallback className='bg-[#d9d9d9]' />
             </Avatar>
             <div>{truncatedAddress}</div>
-            <Unlimit email={"dev@poolparty.cc"} amount={"20"} purchaseCurrency={"USDT_XLAYER"}/>
+            <Unlimit email={"dev@poolparty.cc"} amount={"20"} purchaseCurrency={"USDT-BEP20"}/>
         </header>
     )
 }
