@@ -1,5 +1,5 @@
 import frogImage from '@/../public/images/frog.png'
-import keyboardReturnImage from '@/public/images/keyboard_return.svg'
+import keyboardReturnImage from '@/../public/images/keyboard_return.svg'
 import { useWallets } from '@privy-io/react-auth'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeftIcon } from 'lucide-react'

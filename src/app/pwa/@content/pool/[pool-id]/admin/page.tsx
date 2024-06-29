@@ -1,9 +1,9 @@
 'use client'
 
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import editIcon from '@/public/images/edit_icon.svg'
-import defaultPoolImage from '@/public/images/frog.png'
-import qrCodeIcon from '@/public/images/qr_code_icon.svg'
+import editIcon from '@/../public/images/edit_icon.svg'
+import defaultPoolImage from '@/../public/images/frog.png'
+import qrCodeIcon from '@/../public/images/qr_code_icon.svg'
 import Divider from '@/components/divider'
 import ShareDialog from '@/components/shareDialog'
 import { Progress } from '@/components/ui/progress'
@@ -16,7 +16,7 @@ import {
     handleEndPool,
     handleStartPool,
 } from '@/lib/api/clientAPI'
-import rightArrow from '@/public/images/right_arrow.svg'
+import rightArrow from '@/../public/images/right_arrow.svg'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import _ from 'lodash'
 import Image from 'next/image'

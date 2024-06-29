@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import useMediaQuery from '@/hooks/use-media-query'
 
-import shareIcon from '@/public/images/share_icon.svg'
+import shareIcon from '@/../public/images/share_icon.svg'
 import _ from 'lodash'
 import Image from 'next/image'
 import router from 'next/router'
