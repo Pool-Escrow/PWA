@@ -21,7 +21,7 @@ export const metadata: Metadata = {
         icon: '/images/favicon.png',
         apple: '/images/icon-maskable-512.png',
     },
-    manifest: '/manifest.json',
+    manifest: '/pwa/manifest.json',
     applicationName: APP_NAME,
     title: {
         default: APP_DEFAULT_TITLE,
