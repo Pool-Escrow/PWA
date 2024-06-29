@@ -1,14 +1,15 @@
 'use client'
 
-import { useBottomBarStore } from '@/providers/bottom-bar.provider'
-import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { usePoolStore } from '@/stores/pool.store'
-import { useAuth } from '@/lib/hooks/use-auth'
+import { useAuth } from '@/hooks/use-auth'
+import { fetchUserPools } from '@/hooks/use-pools'
 import { getAuthStatus } from '@/lib/server/auth.action'
-import { fetchUserPools } from '@/lib/hooks/use-pools'
+import { useBottomBarStore } from '@/providers/bottom-bar.provider'
+import { usePoolStore } from '@/stores/pool.store'
+import { useQuery } from '@tanstack/react-query'
+import Link from 'next/link'
+import { useEffect } from 'react'
+// import { fetchUserPools } from '@/lib/hooks/use-pools'
 
 export default function PoolsLayout({ yours, upcoming }: LayoutWithSlots<'yours' | 'upcoming'>) {
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
