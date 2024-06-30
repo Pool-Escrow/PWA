@@ -14,7 +14,7 @@ import { useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
@@ -24,6 +24,8 @@ import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
 import PoolClaimRow from './pool-claim-row'
 import PoolImageRow from './pool-image-row'
+import { useAccount, useReadContract } from "wagmi";
+import { useCapabilities, useWriteContracts } from "wagmi/experimental";
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -75,6 +77,53 @@ const PoolDetails = (props: PoolDetailsProps) => {
     } = useWaitForTransactionReceipt({
         hash,
     })
+    /// Check allowance
+    const { data: allowance } = useReadContract({
+        address: dropletAddress[wagmi.config.state.chainId as ChainId],
+        abi: dropletAbi,
+        functionName: 'allowance',
+        args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
+    })
+
+
+    /// Coinbase Paymaster hooks
+    const account = useAccount();
+    const { writeContracts } = useWriteContracts();
+    const { data: availableCapabilities } = useCapabilities({
+        account: account.address,
+    });
+
+    /// Coinbase Paymaster function
+    const sponsoredTxn = (args: {
+        targetAddress: `0x${string}`,
+        abi: any,
+        functionName: string,
+        args: any[],
+    }) => {
+        if (!availableCapabilities || !account.chainId) return {};
+        const capabilitiesForChain = availableCapabilities[account.chainId];
+        if (
+            capabilitiesForChain["paymasterService"] &&
+            capabilitiesForChain["paymasterService"].supported
+        ) {
+            const capabilities = {
+                paymasterService: {
+                    url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+                },
+            };
+            writeContracts({
+                contracts: [
+                    {
+                        address: args.targetAddress,
+                        abi: args.abi,
+                        functionName: args.functionName,
+                        args: args.args,
+                    },
+                ],
+                capabilities,
+            });
+        }
+    }
 
     const onEnableDepositButtonClicked = () => {
         try {
@@ -130,27 +179,38 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     const onApproveButtonClicked = async () => {
-        try {
-            console.log('approve')
+        console.log('approve')
+        console.log('deposit', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
 
-            console.log('deposit', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
-
-            const ApprovePoolFunction = getAbiItem({
+        if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            sponsoredTxn({
+                targetAddress: dropletAddress[wagmi.config.state.chainId as ChainId],
                 abi: dropletAbi,
-                name: 'approve',
-            })
-
-            writeContract({
-                address: dropletAddress[wagmi.config.state.chainId as ChainId],
-                abi: [ApprovePoolFunction],
                 functionName: 'approve',
                 args: [
                     poolAddress[wagmi.config.state.chainId as ChainId],
                     poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
                 ],
             })
-        } catch (error) {
-            console.log('approveSpend Error', error)
+        } else {
+            try {
+                const ApprovePoolFunction = getAbiItem({
+                    abi: dropletAbi,
+                    name: 'approve',
+                })
+    
+                await writeContract({
+                    address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [ApprovePoolFunction],
+                    functionName: 'approve',
+                    args: [
+                        poolAddress[wagmi.config.state.chainId as ChainId],
+                        poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                    ],
+                })
+            } catch (error) {
+                console.log('approveSpend Error', error)
+            }
         }
     }
 
@@ -159,25 +219,33 @@ const PoolDetails = (props: PoolDetailsProps) => {
             setOpenOnRampDialog(true)
             return
         }
-        await onApproveButtonClicked()
 
-        try {
-            console.log('Approved')
+        console.log('Approved')
+        console.log('registering pool')
+        console.log(poolId)
 
-            console.log('registering pool')
-
-            const RegisterPoolFunction = getAbiItem({
+        if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            sponsoredTxn({
+                targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                 abi: poolAbi,
-                name: 'deposit',
-            })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [RegisterPoolFunction],
                 functionName: 'deposit',
                 args: [BigInt(poolId), deposit],
             })
-        } catch (error) {}
+        } else {
+            try {
+                const RegisterPoolFunction = getAbiItem({
+                    abi: poolAbi,
+                    name: 'deposit',
+                })
+    
+                await writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [RegisterPoolFunction],
+                    functionName: 'deposit',
+                    args: [BigInt(poolId), deposit],
+                })
+            } catch (error) {}
+        }
     }
 
     useEffect(() => {
@@ -211,14 +279,25 @@ const PoolDetails = (props: PoolDetailsProps) => {
         } else {
             if (!isRegisteredOnSC) {
                 const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
-                const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
-                setContent(
-                    <Button
-                        onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
-                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                        <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
-                    </Button>,
-                )
+                console.log(allowance, deposit)
+                if ((allowance ?? BigInt(0)) < deposit) {
+                    setContent(
+                        <Button
+                            onClick={() => onApproveButtonClicked()}
+                            className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            <span>Please approve to spend ${calculatedPoolSCDepositPerPerson} USDC</span>
+                        </Button>
+                    )
+                } else {
+                    const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
+                    setContent(
+                        <Button
+                            onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
+                            className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
+                        </Button>,
+                    )
+                }
             } else {
                 setContent(
                     <div className='flex w-full flex-row items-center space-x-2'>
@@ -239,6 +318,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         setContent,
         showBar,
         hideBar,
+        allowance,
         calculatedPoolSCDepositPerPerson,
         isRegisteredOnSC,
         wallets,

@@ -6,6 +6,7 @@ import frog from '@/../public/images/frog.png'
 import { useUserStore } from '@/stores/profile.store'
 
 import SponsoredTxn from '@/components/sponsored-txn/sponsored-txn-CoinbaseSmartWallet'
+import { dropletAbi, dropletAddress } from '@/types/contracts'
 
 export default function ProfileHeader() {
     const account = useAccount()
@@ -25,7 +26,13 @@ export default function ProfileHeader() {
                 <AvatarFallback className='bg-[#d9d9d9]' />
             </Avatar>
             <div>{truncatedAddress}</div>
-            <SponsoredTxn />
+            <SponsoredTxn
+                text='Mint 1000 DROPLET'
+                targetAddress='0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b'
+                abi={dropletAbi}
+                functionName='mint'
+                args={[account.address, '1000000000000000000000']}
+            />
         </header>
     )
 }

@@ -3,7 +3,13 @@ import { useCapabilities, useWriteContracts } from "wagmi/experimental";
 import { useMemo } from "react";
 import { Button } from "../ui/button";
  
-export default function SponsoredTxn() {
+export default function SponsoredTxn(prop: {
+	text: string,
+	targetAddress: `0x${string}`,
+	abi: any,
+	functionName: string,
+	args: any[],
+}) {
   const account = useAccount();
   const { writeContracts } = useWriteContracts({
     mutation: { onSuccess: (id) => alert(`Transaction completed: ${id}`) },
@@ -26,26 +32,26 @@ export default function SponsoredTxn() {
     }
     return {};
   }, [availableCapabilities, account.chainId]);
+
+  const sendTransaction = () => {
+	writeContracts({
+	  contracts: [
+		{
+		  address: prop.targetAddress,
+		  abi: prop.abi,
+		  functionName: prop.functionName,
+		  args: prop.args,
+		},
+	  ],
+	  capabilities,
+	});
+  }
  
   return (
     <div>
       <div>
-        <Button
-          onClick={() => {
-            writeContracts({
-              contracts: [
-                {
-                  address: "0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b",
-                  abi: [{"type":"function","name":"mint","inputs":[{"name":"to","type":"address","internalType":"address"},{"name":"amount","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"}],
-                  functionName: "mint",
-                  args: [account.address, "1000000000000000000000"],
-                },
-              ],
-              capabilities,
-            });
-          }}
-        >
-          Mint
+        <Button onClick={sendTransaction}>
+          {`${prop.text}`}
         </Button>
       </div>
     </div>
