@@ -89,7 +89,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                         />
                     </div>
                 </div>
-                <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2'>
+                <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2 px-4'>
                     <Button
                         onClick={onPayoutButtonClicked}
                         className='mb-3 h-[46px] w-full flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
