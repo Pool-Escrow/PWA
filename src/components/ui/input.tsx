@@ -1,35 +1,33 @@
-import { cn } from '@/lib/utils/tailwind'
 import { forwardRef } from 'react'
 
-export interface InputProps
-	extends React.InputHTMLAttributes<HTMLInputElement> {
-	startAdornment?: React.ReactNode
-	endAdornment?: React.ReactNode
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+    startAdornment?: React.ReactNode
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, startAdornment, ...props }, ref) => {
-		return (
-			<>
-				{startAdornment && (
-					<span className='absolute z-10 h-[38px] content-center pl-6 text-xs font-normal leading-tight text-stone-500'>
-						{startAdornment}
-					</span>
-				)}
-				<input
-					type={type}
-					className={cn(
-						'h-[38px] w-full rounded-[70px] border border-[#ebebeb] text-sm font-normal leading-tight text-black backdrop-blur-[2px]',
-						startAdornment ? 'pl-8' : 'pl-6',
-						className,
-					)}
-					ref={ref}
-					{...props}
-				/>
-			</>
-		)
-	},
+    ({ className = '', type = 'text', startAdornment, ...props }, ref) => {
+        const inputElement = (
+            <input
+                type={type}
+                className={`${startAdornment ? 'pl-9' : 'pl-6'} backdrop-blur-[2px]', 'relative h-[38px] w-full rounded-[70px] border border-[#ebebeb] pr-6 text-sm font-normal leading-tight text-black ${className}`}
+                ref={ref}
+                {...props}
+            />
+        )
+
+        if (startAdornment) {
+            return (
+                <div className='relative inline-flex gap-2 align-baseline'>
+                    <span className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-6 text-sm font-normal leading-tight text-zinc-500'>
+                        {startAdornment}
+                    </span>
+                    {inputElement}
+                </div>
+            )
+        }
+
+        return inputElement
+    },
 )
-Input.displayName = 'Input'
 
 export { Input }
