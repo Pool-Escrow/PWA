@@ -2,13 +2,14 @@ import 'server-only'
 
 import { PrivyClient } from '@privy-io/server-auth'
 // import { createServiceClient } from './db'
-import { Address, createPublicClient, http } from 'viem'
+import { Address, createPublicClient, http, toHex } from 'viem'
 import { baseSepolia } from 'viem/chains'
 import { poolAbi, poolAddress } from '@/types/contracts'
+import { keccak256 } from 'viem'
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
 const privyAppSecret = process.env.PRIVY_APP_SECRET
-const adminRole = '0xe799c73ff785ac053943f5d98452f7fa0bcf54da67826fc217d6094dec75c5ee'
+const adminRole = keccak256(toHex('WHITELISTED_HOST'))
 
 if (!privyAppId || !privyAppSecret) {
     throw new Error('Missing Privy app ID or app secret')

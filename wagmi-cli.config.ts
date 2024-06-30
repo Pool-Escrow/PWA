@@ -10,7 +10,7 @@ export default defineConfig({
             include: ['Droplet.json', 'Pool.json'],
             deployments: {
                 Pool: {
-                    [baseSepolia.id]: '0x44432A98ea8dA37F844B89A324204ee6642b785A', // github commit: c3cf1a8
+                    [baseSepolia.id]: '0x5C22662210E48D0f5614cACA6f7a6a938716Ea26', // github commit: eda48eb
                 },
                 Droplet: {
                     [baseSepolia.id]: '0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b',
