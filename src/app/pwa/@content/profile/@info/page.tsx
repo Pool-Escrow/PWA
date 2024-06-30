@@ -6,7 +6,7 @@ import frog from '@/../public/images/frog.png'
 import { useUserStore } from '@/stores/profile.store'
 
 import SponsoredTxn from '@/components/sponsored-txn/sponsored-txn-CoinbaseSmartWallet'
-import { dropletAbi, dropletAddress } from '@/types/contracts'
+import { dropletAbi, dropletAddress } from '@/types/droplet'
 
 export default function ProfileHeader() {
     const account = useAccount()

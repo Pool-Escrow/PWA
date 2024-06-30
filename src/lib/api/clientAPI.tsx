@@ -1,5 +1,6 @@
 import { contractAddress, dropletIFace, poolIFace, provider, tokenAddress } from '@/lib/constants/constants'
-import { dropletAbi, poolAbi } from '@/types/contracts'
+import { poolAbi } from '@/types/contracts'
+import { dropletAbi } from '@/types/droplet'
 import { ConnectedWallet } from '@privy-io/react-auth'
 import { PostgrestSingleResponse } from '@supabase/supabase-js'
 import { ethers } from 'ethers'

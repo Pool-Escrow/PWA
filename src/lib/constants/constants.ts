@@ -1,4 +1,5 @@
-import { dropletAbi, poolAbi } from '@/types/contracts'
+import { dropletAbi } from '@/types/droplet'
+import { poolAbi } from '@/types/contracts'
 import { Interface, ethers } from 'ethers'
 import { defineChain } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
