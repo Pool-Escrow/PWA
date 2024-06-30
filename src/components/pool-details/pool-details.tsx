@@ -24,8 +24,9 @@ import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
 import PoolClaimRow from './pool-claim-row'
 import PoolImageRow from './pool-image-row'
-import { useAccount, useReadContract } from "wagmi";
-import { useCapabilities, useWriteContracts } from "wagmi/experimental";
+import { useAccount, useReadContract } from 'wagmi'
+import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
+import { Route } from 'next'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -85,32 +86,23 @@ const PoolDetails = (props: PoolDetailsProps) => {
         args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
     })
 
-
     /// Coinbase Paymaster hooks
-    const account = useAccount();
-    const { writeContracts } = useWriteContracts();
+    const account = useAccount()
+    const { writeContracts } = useWriteContracts()
     const { data: availableCapabilities } = useCapabilities({
         account: account.address,
-    });
+    })
 
     /// Coinbase Paymaster function
-    const sponsoredTxn = (args: {
-        targetAddress: `0x${string}`,
-        abi: any,
-        functionName: string,
-        args: any[],
-    }) => {
-        if (!availableCapabilities || !account.chainId) return {};
-        const capabilitiesForChain = availableCapabilities[account.chainId];
-        if (
-            capabilitiesForChain["paymasterService"] &&
-            capabilitiesForChain["paymasterService"].supported
-        ) {
+    const sponsoredTxn = (args: { targetAddress: `0x${string}`; abi: any; functionName: string; args: any[] }) => {
+        if (!availableCapabilities || !account.chainId) return {}
+        const capabilitiesForChain = availableCapabilities[account.chainId]
+        if (capabilitiesForChain['paymasterService'] && capabilitiesForChain['paymasterService'].supported) {
             const capabilities = {
                 paymasterService: {
                     url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
                 },
-            };
+            }
             writeContracts({
                 contracts: [
                     {
@@ -121,7 +113,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     },
                 ],
                 capabilities,
-            });
+            })
         }
     }
 
@@ -198,7 +190,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     abi: dropletAbi,
                     name: 'approve',
                 })
-    
+
                 await writeContract({
                     address: dropletAddress[wagmi.config.state.chainId as ChainId],
                     abi: [ApprovePoolFunction],
@@ -237,7 +229,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     abi: poolAbi,
                     name: 'deposit',
                 })
-    
+
                 await writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: [RegisterPoolFunction],
@@ -286,7 +278,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             onClick={() => onApproveButtonClicked()}
                             className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                             <span>Please approve to spend ${calculatedPoolSCDepositPerPerson} USDC</span>
-                        </Button>
+                        </Button>,
                     )
                 } else {
                     const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
@@ -302,7 +294,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 setContent(
                     <div className='flex w-full flex-row items-center space-x-2'>
                         <Link
-                            href={`/pool/${props.poolId}/ticket`}
+                            href={`/pool/${props.poolId}/ticket` as Route}
                             className='mb-3 h-[46px] flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                             <span>Ticket</span>
                         </Link>
@@ -405,7 +397,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     <div className='mb-4 flex'>Participants</div>
                     <div className='mb-4 flex items-center justify-between'>
                         <Avatars avatarUrls={avatarUrls} numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0} />
-                        <Link href={`/pool/${props.poolId}/participants`} className='flex items-center'>
+                        <Link href={`/pool/${props.poolId}/participants` as Route} className='flex items-center'>
                             <ChevronRight className='text-blue-500' />
                         </Link>
                     </div>
