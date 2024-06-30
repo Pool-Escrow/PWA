@@ -12,6 +12,8 @@ import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
 import { useEffect, useRef, useState } from 'react'
 
 import frog from '@/../public/images/frog.png'
+import { usePoolDetails } from '@/lib/hooks/use-pool-details'
+import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 import { wagmi } from '@/providers/configs'
 import { poolAbi, poolAddress } from '@/types/contracts'
 import { Address, getAbiItem } from 'viem'
@@ -19,7 +21,11 @@ import { useWriteContract } from 'wagmi'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': string } }) => {
     const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
+    const { poolDetails, isLoading, error } = usePoolDetails(BigInt(params?.['pool-id']))
 
+    const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+
+    const { tokenDecimals } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
 
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -30,6 +36,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     const onPayoutButtonClicked = (e: any) => {
+        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimals)))
         try {
             const SetWinnerFunction = getAbiItem({
                 abi: poolAbi,
@@ -40,7 +47,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 address: poolAddress[wagmi.config.state.chainId as ChainId],
                 abi: [SetWinnerFunction],
                 functionName: 'setWinner',
-                args: [BigInt(params['pool-id']), params['participant-id'] as Address, BigInt(inputValue)],
+                args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
             })
         } catch (error) {
             console.log('setWinner Error', error)
