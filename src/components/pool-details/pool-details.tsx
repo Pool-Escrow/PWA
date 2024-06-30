@@ -55,9 +55,10 @@ const PoolDetails = (props: PoolDetailsProps) => {
         BigInt(Math.pow(10, Number(18 ?? 18)))
     ).toString()
 
-    const cohostNames: string | undefined = poolDetailsDB?.cohostUserDisplayData
-        ?.map((data: any) => data.display_name)
-        .join(',')
+    const mockCohostData = 'Nouns Foundation, Supermoon, Halborne'
+    // const cohostNames: string | undefined = poolDetailsDB?.cohostUserDisplayData
+    //     ?.map((data: any) => data.display_name)
+    //     .join(',')
 
     const isRegisteredOnSC = poolDetails?.poolDetailFromSC?.[5]?.indexOf(wallets[0]?.address as HexString) !== -1
 
@@ -282,7 +283,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 </p>
 
                 <div className='mb-4 flex items-center'>
-                    <span className='mr-2 text-gray-700'>Hosted by {cohostNames}</span>
+                    <span className='mr-2 text-gray-700'>Hosted by {mockCohostData}</span>
                     {/* <div className='flex'>
                         <span className='mr-2 overflow-clip rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold text-gray-700'>
                             {poolDetails?.poolDetailFromSC?.[0].host}
@@ -306,7 +307,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             </span>
                             <span className='text-[#003073]'>
                                 Goal of $
-                                {Number(calculatedPoolSCDepositPerPerson) * (poolDetailsDB?.poolDBInfo?.soft_cap ?? 0)}{' '}
+                                {Number(calculatedPoolSCDepositPerPerson) * (poolDetailsDB?.poolDBInfo?.softCap ?? 0)}{' '}
                                 Prize
                                 {` `}
                                 Pool
@@ -316,7 +317,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             <div
                                 className='h-2.5 rounded-full bg-blue-500'
                                 style={{
-                                    width: `${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / poolDetailsDB?.poolDBInfo?.soft_cap}%`,
+                                    width: `${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / (poolDetailsDB?.poolDBInfo?.softCap ?? 100)}%`,
                                 }}></div>
                         </div>
                     </div>
