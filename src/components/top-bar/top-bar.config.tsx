@@ -48,6 +48,12 @@ const topBarConfig: TopBarConfig = {
     '/pool/[poolId]': {
         left: <TopBarBack />,
     },
+    '/pool/[poolId]/participants': {
+        left: <TopBarBack />,
+    },
+    '/pool/[poolId]/participants/[participantId]': {
+        left: <TopBarBack />,
+    },
 }
 
 const pathToRegex = (path: string | null) => {
