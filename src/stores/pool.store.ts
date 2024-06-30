@@ -18,7 +18,7 @@ export interface PoolDraft {
     description: string
     price: string
     softCap: string
-    rulesUrl: string
+    termsURL: string
 }
 
 interface PoolStoreState {
