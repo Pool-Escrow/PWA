@@ -4,7 +4,7 @@ import { fetchTokenDecimals } from '../contracts/fetch-token-decimals'
 
 export const useTokenDecimals = (tokenAddress: string) => {
     const {
-        data: tokenDecimals,
+        data: tokenDecimalsData,
         isLoading,
         error,
     } = useQuery({
@@ -12,5 +12,5 @@ export const useTokenDecimals = (tokenAddress: string) => {
         queryFn: fetchTokenDecimals,
     })
 
-    return { tokenDecimals, isLoading, error }
+    return { tokenDecimalsData, isLoading, error }
 }

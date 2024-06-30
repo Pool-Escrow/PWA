@@ -1,13 +1,7 @@
 'use client'
-import { Input } from '@/components/ui/input'
-// import {
-//     fetchUserDisplayForAddress,
-//     handleSavePayout,
-//     handleSetWinner,
-// } from '@/lib/api/clientAPI'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
 import { useEffect, useRef, useState } from 'react'
 
@@ -16,6 +10,7 @@ import { usePoolDetails } from '@/lib/hooks/use-pool-details'
 import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 import { wagmi } from '@/providers/configs'
 import { poolAbi, poolAddress } from '@/types/contracts'
+import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
 
@@ -25,7 +20,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
 
-    const { tokenDecimals } = useTokenDecimals(tokenAddress)
+    const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
 
     const inputRef = useRef<HTMLInputElement | null>(null)
@@ -36,7 +31,8 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     const onPayoutButtonClicked = (e: any) => {
-        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimals)))
+        console.log('tokenDecimals', tokenDecimalsData?.tokenDecimals)
+        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals)))
         try {
             const SetWinnerFunction = getAbiItem({
                 abi: poolAbi,
@@ -55,9 +51,8 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     useEffect(() => {
-        if (isPending) {
-        }
         if (isSuccess) {
+            toast.success('Payout Successful', { description: `Transaction: ${hash}` })
         }
     }, [isPending, hash, isSuccess])
 
