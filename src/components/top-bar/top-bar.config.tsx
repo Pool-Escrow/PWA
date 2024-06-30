@@ -50,6 +50,7 @@ const topBarConfig: TopBarConfig = {
     },
     '/pool/[poolId]/participants': {
         left: <TopBarBack />,
+        center: 'Manage Participants',
     },
     '/pool/[poolId]/participants/[participantId]': {
         left: <TopBarBack />,

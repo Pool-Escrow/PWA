@@ -1,16 +1,7 @@
-// export default function ParticipantRow() {
-// 	return (
-// 		<div>
-// 			<h1>Participant Row</h1>
-// 		</div>
-// 	)
-// }
-
 import frog from '@/../public/images/frog.png'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
 import { formatAddress } from '@/lib/utils/addresses'
-
-import Image from 'next/image'
 
 import Link from 'next/link'
 
@@ -26,18 +17,15 @@ const ParticipantRow: React.FC<ParticipantRowProps> = (props: ParticipantRowProp
         <Link
             className='bottomDivider flex flex-row space-x-4 py-4'
             href={`/pool/${props.poolId}/participants/${props.address}`}>
-            <Image
-                src={`${userDetailsDB?.userDetail?.avatar ?? frog.src}`}
-                className='flex h-14 w-14 rounded-full object-cover'
-                alt='avatar'
-                width={56}
-                height={56}
-            />
+            <Avatar className='size-[73px]' aria-label='User Avatar'>
+                <AvatarImage alt='User Avatar' src={userDetailsDB?.userDetail?.avatar ?? frog.src} />
+                <AvatarFallback className='bg-[#d9d9d9]' />
+            </Avatar>
             <div className='flex flex-1 flex-col'>
-                <h4 className='overflow-hidden text-lg font-medium'>
+                <h4 className='overflow-hidden text-lg font-medium text-black'>
                     {userDetailsDB?.userDetail?.displayName ?? formatAddress(props.address)}
                 </h4>
-                <p className={`fontRegistered`}>Registered</p>
+                <p className={`fontRegistered text-[#6993FF]`}>Registered</p>
             </div>
         </Link>
     )
