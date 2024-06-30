@@ -5,6 +5,8 @@ import { useAccount } from 'wagmi'
 import frog from '@/../public/images/frog.png'
 import { useUserStore } from '@/stores/profile.store'
 
+import SponsoredTxn from '@/components/sponsored-txn/sponsored-txn-CoinbaseSmartWallet'
+
 export default function ProfileHeader() {
     const account = useAccount()
     const { profile } = useUserStore()
@@ -23,6 +25,7 @@ export default function ProfileHeader() {
                 <AvatarFallback className='bg-[#d9d9d9]' />
             </Avatar>
             <div>{truncatedAddress}</div>
+            <SponsoredTxn />
         </header>
     )
 }
