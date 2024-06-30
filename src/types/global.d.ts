@@ -3,6 +3,8 @@ declare global {
         [K in T]: React.ReactNode
     }
 
+    type ChainId = keyof typeof poolAddress
+
     interface Pool {
         id: bigint
         name: string

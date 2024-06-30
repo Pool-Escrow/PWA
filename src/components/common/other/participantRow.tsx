@@ -1,74 +1,61 @@
-export default function ParticipantRow() {
-	return (
-		<div>
-			<h1>Participant Row</h1>
-		</div>
-	)
-}
-
-// import frogImage from '@/public/images/frog.png'
-// import Image from 'next/image'
-
-// import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
-// import { useQuery } from '@tanstack/react-query'
-// import * as _ from 'lodash'
-// import Link from 'next/link'
-
-// interface ParticipantRowProps {
-// 	name: string
-// 	imageUrl: string
-// 	participantStatus: number
-// 	address: string
-// 	routeUrl?: string
-// }
-
-// const ParticipantRow: React.FC<ParticipantRowProps> = ({
-// 	name,
-// 	imageUrl,
-// 	participantStatus,
-// 	address,
-// 	routeUrl,
-// }) => {
-// 	const { data: profileData } = useQuery({
-// 		queryKey: ['loadProfileImage', address],
-// 		queryFn: fetchUserDisplayForAddress,
-// 		enabled: !_.isEmpty(address),
-// 	})
-
+// export default function ParticipantRow() {
 // 	return (
-// 		<Link
-// 			className='flex flex-row space-x-4 bottomDivider py-4'
-// 			href={routeUrl ?? window.location.href}
-// 		>
-// 			<Image
-// 				src={`${profileData?.profileImageUrl ?? frogImage.src}`}
-// 				className=' flex rounded-full w-14 h-14 object-cover'
-// 				alt='avatar'
-// 				width={56}
-// 				height={56}
-// 			/>
-// 			<div className='flex flex-1 flex-col '>
-// 				<h4 className='font-medium text-lg'>{name}</h4>
-// 				<p
-// 					className={`${
-// 						participantStatus == ParticipantStatus.Registered
-// 							? 'fontRegistered'
-// 							: ' '
-// 					}
-// 					${participantStatus == ParticipantStatus['Checked In'] ? 'fontCheckedIn' : ' '}
-// 					`}
-// 				>
-// 					{ParticipantStatus[participantStatus]}
-// 				</p>
-// 			</div>
-// 		</Link>
+// 		<div>
+// 			<h1>Participant Row</h1>
+// 		</div>
 // 	)
 // }
 
-// export default ParticipantRow
+import frog from '@/../public/images/frog.png'
+import { fetchUserDetailsFromDB } from '@/lib/database/fetch-user-details-db'
+import { formatAddress } from '@/lib/utils/addresses'
+import { useQuery } from '@tanstack/react-query'
 
-// export enum ParticipantStatus {
-// 	Unregistered = 0,
-// 	Registered = 1,
-// 	'Checked In' = 2,
-// }
+import Image from 'next/image'
+
+import Link from 'next/link'
+import { useEffect } from 'react'
+
+interface ParticipantRowProps {
+    address: string
+    poolId: string
+}
+
+const ParticipantRow: React.FC<ParticipantRowProps> = (props: ParticipantRowProps) => {
+    const { data: userData } = useQuery({
+        queryKey: ['fetchUserDetailsFromDB', props.address],
+        queryFn: fetchUserDetailsFromDB,
+    })
+
+    useEffect(() => {
+        console.log('userData', userData)
+        console.log('participantRow', props.address)
+    }, [userData, props])
+    return (
+        <Link
+            className='bottomDivider flex flex-row space-x-4 py-4'
+            href={`/pool/${props.poolId}/participants/${props.address}`}>
+            <Image
+                src={`${userData?.userDetail?.avatar ?? frog.src}`}
+                className='flex h-14 w-14 rounded-full object-cover'
+                alt='avatar'
+                width={56}
+                height={56}
+            />
+            <div className='flex flex-1 flex-col'>
+                <h4 className='overflow-hidden text-lg font-medium'>
+                    {userData?.userDetail?.displayName ?? formatAddress(props.address)}
+                </h4>
+                <p className={`fontRegistered`}>Registered</p>
+            </div>
+        </Link>
+    )
+}
+
+export default ParticipantRow
+
+export enum ParticipantStatus {
+    Unregistered = 0,
+    Registered = 1,
+    'Checked In' = 2,
+}
