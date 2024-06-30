@@ -4,7 +4,7 @@ import { getWalletAddress, isAdmin } from './lib/server/auth'
 
 export const config = {
     // matcher: '/profile/:path*',
-    matcher: '/developer/:path*',
+    matcher: ['/developer/:path*', '/pool/:poolId/participants/:participantId'],
 }
 
 export async function middleware(request: NextRequest) {
