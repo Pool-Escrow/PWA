@@ -14,10 +14,10 @@ import ParticipantRow from '../common/other/participantRow'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
-interface PoolicipantsProps {
+interface PoolParticipantsProps {
     poolId: string
 }
-const Participants = (props: PoolicipantsProps) => {
+const Participants = (props: PoolParticipantsProps) => {
     const { poolDetails, isLoading, error } = usePoolDetails(BigInt(props.poolId))
     const {
         poolDetailsDB,
