@@ -18,6 +18,7 @@
         "tsBuildInfoFile": ".next/cache/.tsbuildinfo",
         "plugins": [{ "name": "next" }],
         "paths": { "@/*": ["./src/*"] },
+        "sourceMap": true,
         // allows Serwist to type `window.serwist`.
         "types": ["vitest/globals", "@serwist/next/typings"]
     },

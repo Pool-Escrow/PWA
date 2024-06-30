@@ -7,6 +7,7 @@
             "port": 9222,
             "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}",
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
             "skipFiles": ["<node_internals>/**", "${workspaceRoot}/node_modules/**"]
         },
         {
@@ -21,6 +22,7 @@
             "presentation": {
                 "hidden": true
             },
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
             "skipFiles": ["<node_internals>/**", "${workspaceRoot}/node_modules/**"]
         },
         {
@@ -35,6 +37,7 @@
             "presentation": {
                 "hidden": true
             },
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
             "skipFiles": ["<node_internals>/**", "${workspaceRoot}/node_modules/**"]
         },
         {
@@ -54,6 +57,7 @@
             "presentation": {
                 "hidden": true
             },
+            "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"],
             "skipFiles": ["<node_internals>/**", "${workspaceRoot}/node_modules/**"]
         }
     ],

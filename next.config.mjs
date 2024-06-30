@@ -87,6 +87,9 @@ export default withBundleAnalyzer(
             ]
         },
         webpack: (config, { dev, isServer }) => {
+            // if (dev) {
+            //     config.devtool = 'source-map'
+            // }
             // Exclude *.test.ts(x) files from being compiled by Next.js
             config.module.rules.push({
                 test: /\.test\.tsx?$/,
