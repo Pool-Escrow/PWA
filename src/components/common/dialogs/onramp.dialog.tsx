@@ -1,11 +1,8 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Dialog } from '@/components/ui/dialog'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
-import useMediaQuery from '@/lib/hooks/use-media-query'
 import Divider from '../other/divider'
-import ShareForm from './share.form'
 
 interface OnRampDialogProps {
     open: boolean
@@ -15,22 +12,22 @@ interface OnRampDialogProps {
 
 const OnRampDialog = ({ open, setOpen, balance }: OnRampDialogProps) => {
     // const [open, setOpen] = useState(false)
-    const isDesktop = useMediaQuery('(min-width: 768px)')
+    // const isDesktop = useMediaQuery('(min-width: 768px)')
 
-    if (isDesktop) {
-        return (
-            <Dialog open={open} onOpenChange={setOpen}>
-                <Dialog.Trigger asChild></Dialog.Trigger>
-                <Dialog.Content className='bg-white sm:max-w-[425px]'>
-                    <Dialog.Header>
-                        <Dialog.Title>You need to add USDC in order to register for this event.</Dialog.Title>
-                        <div></div>
-                    </Dialog.Header>
-                    <ShareForm />
-                </Dialog.Content>
-            </Dialog>
-        )
-    }
+    // if (isDesktop) {
+    //     return (
+    //         <Dialog open={open} onOpenChange={setOpen}>
+    //             <Dialog.Trigger asChild></Dialog.Trigger>
+    //             <Dialog.Content className='bg-white sm:max-w-[425px]'>
+    //                 <Dialog.Header>
+    //                     <Dialog.Title>You need to add USDC in order to register for this event.</Dialog.Title>
+    //                     <div></div>
+    //                 </Dialog.Header>
+    //                 <OnRampForm />
+    //             </Dialog.Content>
+    //         </Dialog>
+    //     )
+    // }
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
