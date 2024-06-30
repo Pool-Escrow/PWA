@@ -1,5 +1,7 @@
+'use client'
+
 import { Input } from '@/components/ui/input'
-import type { ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 
 export type DateTimeRangeValue = {
     start: string
@@ -11,88 +13,92 @@ interface DateTimeRangeProps {
     setValue: React.Dispatch<React.SetStateAction<DateTimeRangeValue>>
 }
 
+const getDefaultDateTimeValue = () => {
+    const now = new Date()
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    return {
+        start: now.toISOString().split('.')[0],
+        end: tomorrow.toISOString().split('.')[0],
+    }
+}
+
 export const DateTimeRange = ({ value, setValue }: DateTimeRangeProps) => {
     // eventDate sample: '2024-05-09T23:59/2024-05-10T23:59',
-    const { start, end } = value
-    const [startDate, startTime] = start.split('T')
-    const [endDate, endTime] = end.split('T')
+    const [localValue, setLocalValue] = useState<DateTimeRangeValue>(() => {
+        if (value && value.start && value.end) {
+            return value
+        }
+        return getDefaultDateTimeValue()
+    })
 
-    const updateStartDate = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue((previous: DateTimeRangeValue) => ({
-            ...previous,
-            start: `${e.target.value}T${startTime}`,
-        }))
-    }
+    useEffect(() => {
+        if (value && value.start && value.end) {
+            setLocalValue(value)
+        }
+    }, [value])
 
-    const updateStartTime = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue((previous: DateTimeRangeValue) => ({
-            ...previous,
-            start: `${startDate}T${e.target.value}`,
-        }))
-    }
+    const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
+        const [currentDate, currentTime] = localValue[field].split('T')
+        const updatedValue = type === 'date' ? `${newValue}T${currentTime}` : `${currentDate}T${newValue}`
 
-    const updateEndDate = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue((previous: DateTimeRangeValue) => ({
-            ...previous,
-            end: `${e.target.value}T${endTime}`,
-        }))
-    }
-
-    const updateEndTime = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue((previous: DateTimeRangeValue) => ({
-            ...previous,
-            end: `${endDate}T${e.target.value}`,
-        }))
+        const newLocalValue = {
+            ...localValue,
+            [field]: updatedValue,
+        }
+        setLocalValue(newLocalValue)
+        setValue(newLocalValue)
     }
 
     return (
         <>
-            <div className='flex flex-row items-center justify-between border-b border-[#ebebeb] pb-2'>
+            <div className='flex flex-row items-center justify-between border-b border-[#ebebeb] pb-2 text-black'>
                 {/* the div is required to set the width of the input */}
                 <span className='text-xs font-medium'>Starts</span>
                 <div className='inline-flex flex-row flex-nowrap gap-1'>
-                    <div>
+                    <div className='relative'>
                         <Input
-                            className='bg-transparent text-center text-xs font-medium'
+                            className='cursor-pointer bg-transparent pl-0 pr-0 text-center text-xs font-medium'
                             type='date'
-                            value={startDate}
-                            onChange={updateStartDate}
+                            value={localValue.start.split('T')[0]}
+                            onChange={e => updateValue('start', 'date', e.target.value)}
                             autoComplete='off'
                             prefix='date'
                         />
                     </div>
-                    <div>
+                    <div className='relative'>
                         <Input
-                            className='bg-white text-xs font-medium'
+                            className='cursor-pointer bg-white text-center text-xs font-medium'
                             type='time'
-                            value={startTime}
-                            onChange={updateStartTime}
+                            value={localValue.start.split('T')[1].substring(0, 5)}
+                            onChange={e => updateValue('start', 'time', e.target.value)}
                             autoComplete='off'
+                            step={60}
                         />
                     </div>
                 </div>
             </div>
-            <div className='flex flex-row items-center justify-between border-b border-[#ebebeb] py-2'>
+            <div className='flex flex-row items-center justify-between border-b border-[#ebebeb] py-2 text-black'>
                 {/* the div is required to set the width of the input */}
                 <span className='text-xs font-medium'>Ends</span>
                 <div className='inline-flex flex-row flex-nowrap gap-1'>
-                    <div>
+                    <div className='relative'>
                         <Input
-                            className='bg-transparent text-center text-xs font-medium'
+                            className='cursor-pointer bg-transparent pl-0 pr-0 text-center text-xs font-medium'
                             type='date'
-                            value={endDate}
-                            onChange={updateEndDate}
+                            value={localValue.end.split('T')[0]}
+                            onChange={e => updateValue('end', 'date', e.target.value)}
                             autoComplete='off'
                             prefix='date'
                         />
                     </div>
-                    <div>
+                    <div className='relative'>
                         <Input
-                            className='bg-white text-xs font-medium'
+                            className='cursor-pointer bg-white text-center text-xs font-medium'
                             type='time'
-                            value={endTime}
-                            onChange={updateEndTime}
+                            value={localValue.end.split('T')[1].substring(0, 5)}
+                            onChange={e => updateValue('end', 'time', e.target.value)}
                             autoComplete='off'
+                            step={60}
                         />
                     </div>
                 </div>
