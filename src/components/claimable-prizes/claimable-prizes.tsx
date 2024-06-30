@@ -5,7 +5,6 @@ import { useBottomBarStore } from '@/providers/bottom-bar.provider'
 import { wagmi } from '@/providers/configs'
 import { poolAbi, poolAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
-import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
@@ -23,11 +22,19 @@ const mockClaimablePrizes = [
 
 export default function ClaimablePrizesList() {
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
-    const queryClient = useQueryClient()
     const { wallets } = useWallets()
     const { writeContract } = useWriteContract()
     const walletAddress = wallets?.[0]?.address
     const { claimablePools, isLoading, error } = useClaimablePools(walletAddress)
+
+    const poolIdIndices = claimablePools?.[1].reduce((indices: any, element: any, index: any) => {
+        if (element === false) {
+            indices.push(index)
+        }
+        return indices
+    }, [])
+
+    const poolIdsToClaimFrom: string[] = poolIdIndices?.map((index: any) => claimablePools?.[0]?.[index])
 
     const onClaimFromPoolsButtonClicked = async (
         claimablePools: readonly [readonly bigint[], readonly boolean[]] | undefined,
@@ -82,9 +89,7 @@ export default function ClaimablePrizesList() {
         <Container>
             <SectionTitle />
             <SectionContent>
-                {mockClaimablePrizes.map((pool, index) => (
-                    <PoolCardRow key={index} {...pool} />
-                ))}
+                {poolIdsToClaimFrom?.map((pool, index) => <PoolCardRow key={index} poolId={pool} />)}
             </SectionContent>
         </Container>
     )
