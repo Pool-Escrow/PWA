@@ -6,7 +6,12 @@
  */
 export function getRelativeTimeString(date: Date | number, lang = navigator.language): string {
     // Allow dates or times to be passed
-    const timeMs = date instanceof Date ? date.getTime() : date
+    const timeMs = date instanceof Date ? date.getTime() : typeof date === 'string' ? new Date(date).getTime() : date
+
+    if (!Number.isFinite(timeMs)) {
+        console.error('Invalid date provided:', date)
+        return 'Invalid date'
+    }
 
     // Get the amount of seconds between the given date and now
     const deltaSeconds = Math.round((timeMs - Date.now()) / 1000)
@@ -47,7 +52,14 @@ export const getStatusString = ({
     }
 
     const { verb, reference } = definitions[status]
-    const relativeTime = getRelativeTimeString(reference)
 
-    return `${verb} ${relativeTime}`
+    try {
+        const relativeTime = getRelativeTimeString(new Date(reference))
+        // Ajusta el verbo para eventos pasados
+        const adjustedVerb = status === 'past' ? 'Ended' : verb
+        return `${adjustedVerb} ${relativeTime}`
+    } catch (error) {
+        console.error('Error parsing date:', error)
+        return 'Date information unavailable'
+    }
 }
