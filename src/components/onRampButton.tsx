@@ -4,7 +4,11 @@ import { handleOnRampByPaySDK } from '@/lib/api/clientAPI'
 import { useMutation } from '@tanstack/react-query'
 import { baseSepolia } from 'viem/chains'
 
-const OnRampButton = () => {
+interface OnRampButtonProps {
+    className?: string
+}
+
+const OnRampButton: React.FC<OnRampButtonProps> = ({ className }) => {
     const { currentJwt } = useCookie()
 
     const onRampMutation = useMutation({
@@ -25,7 +29,11 @@ const OnRampButton = () => {
         })
     }
 
-    return <Button onClick={onOnRampButtonClicked}>On Ramp</Button>
+    return (
+        <Button className={className} onClick={onOnRampButtonClicked}>
+            On Ramp
+        </Button>
+    )
 }
 
 export default OnRampButton
