@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { getPoolStatus } from '@/lib/utils/get-pool.status'
+import { Route } from 'next'
 
 type PoolCardProps = Pick<PoolFrontend, 'id' | 'name' | 'endDate' | 'startDate'>
 
@@ -13,7 +14,7 @@ export default function PoolCard({ id, name, endDate, startDate }: PoolCardProps
     const status = getPoolStatus({ startDate, endDate })
 
     return (
-        <Link href={`/pool/${id}`}>
+        <Link href={`/pool/${id}` as Route}>
             <motion.div
                 className='flex h-24 items-center gap-[14px] rounded-[2rem] bg-[#f4f4f4] p-3 pr-4'
                 whileHover={{ scale: 1.05 }}
