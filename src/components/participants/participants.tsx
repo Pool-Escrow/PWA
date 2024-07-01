@@ -60,9 +60,14 @@ const Participants = (props: PoolParticipantsProps) => {
                         className='mb-2 h-10 rounded-full px-10'
                     />
                 </div> */}
-                {participants?.map((participant, index) => {
-                    return <ParticipantRow poolId={props.poolId} key={participant} address={participant} />
-                })}
+
+                {(participants?.length ?? 0) > 0 ? (
+                    participants?.map((participant, index) => {
+                        return <ParticipantRow poolId={props.poolId} key={participant} address={participant} />
+                    })
+                ) : (
+                    <div>No participants found</div>
+                )}
             </div>
         </div>
     )

@@ -254,7 +254,7 @@ const PoolPage = () => {
     const participantPercent = (poolSCParticipants?.length / poolDbData?.soft_cap) * 100
 
     const viewTicketClicked = () => {
-        router.push(`/pool/${poolId}/ticket`)
+        router.push(`/pwa/pool/${poolId}/ticket`)
     }
 
     const redirectIfNotLoggedIn = () => {

@@ -1,9 +1,7 @@
-export default function ManageParticipantsPage() {
-	return (
-		<div>
-			<h1>Manage Participants Page</h1>
-		</div>
-	)
+import { Participants } from '@/components/participants'
+
+export default function ParticipantsPage({ params }: { params: { 'pool-id': string } }) {
+    return <Participants poolId={params['pool-id']} />
 }
 
 // import { Input } from '@/components/ui/input'
