@@ -35,7 +35,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                 <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
                     {props.admin && (
                         <Link
-                            href={`/pwa/pool/${props.poolId}/check-in`}
+                            href={`/pool/${props.poolId}/check-in`}
                             type='button'
                             title='Scan QR'
                             className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'>
@@ -45,7 +45,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                     <ShareDialog />
                     {props.admin && (
                         <Link
-                            href={`/pwa/pool/${props.poolId}/edit`}
+                            href={`/pool/${props.poolId}/edit`}
                             type='button'
                             title='Edit Pool'
                             className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'>

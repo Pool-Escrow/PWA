@@ -16,7 +16,7 @@ const ParticipantRow: React.FC<ParticipantRowProps> = (props: ParticipantRowProp
     return (
         <Link
             className='bottomDivider flex flex-row space-x-4 py-4'
-            href={`/pwa/pool/${props.poolId}/participants/${props.address}`}>
+            href={`/pool/${props.poolId}/participants/${props.address}`}>
             <Avatar className='size-[73px]' aria-label='User Avatar'>
                 <AvatarImage alt='User Avatar' src={userDetailsDB?.userDetail?.avatar ?? frog.src} />
                 <AvatarFallback className='bg-[#d9d9d9]' />

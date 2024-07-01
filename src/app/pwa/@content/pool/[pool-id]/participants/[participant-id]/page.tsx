@@ -13,6 +13,7 @@ import { poolAbi, poolAddress } from '@/types/contracts'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
+import { cn } from '@/lib/utils/tailwind'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': string } }) => {
     const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
@@ -57,7 +58,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }, [isPending, hash, isSuccess])
 
     return (
-        <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
+        <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white'>
             <div className='p-4'>
                 <div className={'flex w-full flex-row justify-center'}>
                     <div className='object-conta relative flex h-24 w-24 justify-center'>
@@ -78,7 +79,9 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 <div className='mt-2 flex h-16 flex-row justify-center'>
                     <div className='relative flex justify-center'>
                         <Input
-                            className='h-16 w-auto border-none px-4 text-center text-6xl font-bold focus:outline-none'
+                            className={cn(
+                                'h-24 w-auto border-none px-4 text-center text-6xl font-bold focus:outline-none',
+                            )}
                             placeholder='$'
                             autoFocus={true}
                             value={inputValue}
