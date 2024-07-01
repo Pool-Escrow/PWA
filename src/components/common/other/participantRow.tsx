@@ -1,74 +1,40 @@
-export default function ParticipantRow() {
-	return (
-		<div>
-			<h1>Participant Row</h1>
-		</div>
-	)
+import frog from '@/../public/images/frog.png'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
+import { formatAddress } from '@/lib/utils/addresses'
+
+import Link from 'next/link'
+
+interface ParticipantRowProps {
+    address: string
+    poolId: string
 }
 
-// import frogImage from '@/public/images/frog.png'
-// import Image from 'next/image'
+const ParticipantRow: React.FC<ParticipantRowProps> = (props: ParticipantRowProps) => {
+    const { userDetailsDB } = useUserDetailsDB(props.address)
 
-// import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
-// import { useQuery } from '@tanstack/react-query'
-// import * as _ from 'lodash'
-// import Link from 'next/link'
+    return (
+        <Link
+            className='bottomDivider flex flex-row space-x-4 py-4'
+            href={`/pwa/pool/${props.poolId}/participants/${props.address}`}>
+            <Avatar className='size-[73px]' aria-label='User Avatar'>
+                <AvatarImage alt='User Avatar' src={userDetailsDB?.userDetail?.avatar ?? frog.src} />
+                <AvatarFallback className='bg-[#d9d9d9]' />
+            </Avatar>
+            <div className='flex flex-1 flex-col'>
+                <h4 className='overflow-hidden text-lg font-medium text-black'>
+                    {userDetailsDB?.userDetail?.displayName ?? formatAddress(props.address)}
+                </h4>
+                <p className={`fontRegistered text-[#6993FF]`}>Registered</p>
+            </div>
+        </Link>
+    )
+}
 
-// interface ParticipantRowProps {
-// 	name: string
-// 	imageUrl: string
-// 	participantStatus: number
-// 	address: string
-// 	routeUrl?: string
-// }
+export default ParticipantRow
 
-// const ParticipantRow: React.FC<ParticipantRowProps> = ({
-// 	name,
-// 	imageUrl,
-// 	participantStatus,
-// 	address,
-// 	routeUrl,
-// }) => {
-// 	const { data: profileData } = useQuery({
-// 		queryKey: ['loadProfileImage', address],
-// 		queryFn: fetchUserDisplayForAddress,
-// 		enabled: !_.isEmpty(address),
-// 	})
-
-// 	return (
-// 		<Link
-// 			className='flex flex-row space-x-4 bottomDivider py-4'
-// 			href={routeUrl ?? window.location.href}
-// 		>
-// 			<Image
-// 				src={`${profileData?.profileImageUrl ?? frogImage.src}`}
-// 				className=' flex rounded-full w-14 h-14 object-cover'
-// 				alt='avatar'
-// 				width={56}
-// 				height={56}
-// 			/>
-// 			<div className='flex flex-1 flex-col '>
-// 				<h4 className='font-medium text-lg'>{name}</h4>
-// 				<p
-// 					className={`${
-// 						participantStatus == ParticipantStatus.Registered
-// 							? 'fontRegistered'
-// 							: ' '
-// 					}
-// 					${participantStatus == ParticipantStatus['Checked In'] ? 'fontCheckedIn' : ' '}
-// 					`}
-// 				>
-// 					{ParticipantStatus[participantStatus]}
-// 				</p>
-// 			</div>
-// 		</Link>
-// 	)
-// }
-
-// export default ParticipantRow
-
-// export enum ParticipantStatus {
-// 	Unregistered = 0,
-// 	Registered = 1,
-// 	'Checked In' = 2,
-// }
+export enum ParticipantStatus {
+    Unregistered = 0,
+    Registered = 1,
+    'Checked In' = 2,
+}

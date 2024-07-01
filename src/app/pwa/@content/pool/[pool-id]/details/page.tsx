@@ -341,7 +341,7 @@ const PoolPage = () => {
                                     <h2 className='text-lg font-semibold md:text-4xl'>{poolSCName}</h2>
                                     <p className='text-sm md:text-2xl'>{eventDate}</p>
                                     <div className='w-full overflow-ellipsis text-sm font-semibold md:text-2xl'>
-                                        Hosted by
+                                        Hosted by 2
                                         <ul className='mt-4 flex flex-col space-y-2'>
                                             <li className='flex flex-row items-center space-x-4 font-medium'>
                                                 <div className='relative h-12 w-12'>

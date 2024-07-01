@@ -1,213 +1,104 @@
-export default function ParticipantPage() {
-    return <div>Participant Page</div>
+'use client'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
+import { useEffect, useRef, useState } from 'react'
+
+import frog from '@/../public/images/frog.png'
+import { usePoolDetails } from '@/lib/hooks/use-pool-details'
+import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
+import { wagmi } from '@/providers/configs'
+import { poolAbi, poolAddress } from '@/types/contracts'
+import { toast } from 'sonner'
+import { Address, getAbiItem } from 'viem'
+import { useWriteContract } from 'wagmi'
+
+const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': string } }) => {
+    const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
+    const { poolDetails, isLoading, error } = usePoolDetails(BigInt(params?.['pool-id']))
+
+    const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
+
+    const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
+    const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
+
+    const inputRef = useRef<HTMLInputElement | null>(null)
+    const [inputValue, setInputValue] = useState<string>('0')
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(event.target.value)
+    }
+
+    const onPayoutButtonClicked = (e: any) => {
+        console.log('tokenDecimals', tokenDecimalsData?.tokenDecimals)
+        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals)))
+        try {
+            const SetWinnerFunction = getAbiItem({
+                abi: poolAbi,
+                name: 'setWinner',
+            })
+
+            writeContract({
+                address: poolAddress[wagmi.config.state.chainId as ChainId],
+                abi: [SetWinnerFunction],
+                functionName: 'setWinner',
+                args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
+            })
+        } catch (error) {
+            console.log('setWinner Error', error)
+        }
+    }
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success('Payout Successful', { description: `Transaction: ${hash}` })
+        }
+    }, [isPending, hash, isSuccess])
+
+    return (
+        <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
+            <div className='p-4'>
+                <div className={'flex w-full flex-row justify-center'}>
+                    <div className='object-conta relative flex h-24 w-24 justify-center'>
+                        <Avatar className='size-[73px]' aria-label='User Avatar'>
+                            <AvatarImage alt='User Avatar' src={userDetailsDB?.userDetail?.avatar ?? frog.src} />
+                            <AvatarFallback className='bg-[#d9d9d9]' />
+                        </Avatar>
+                    </div>
+                </div>
+                <div className='flex flex-row'>
+                    <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
+                        {userDetailsDB?.userDetail?.displayName ?? params['participant-id']}
+                    </h3>
+                </div>
+                <div className='mb-4 flex flex-row justify-center'>
+                    <p>Checked in</p>
+                </div>
+                <div className='mt-2 flex h-16 flex-row justify-center'>
+                    <div className='relative flex justify-center'>
+                        <Input
+                            className='h-16 w-auto border-none px-4 text-center text-6xl font-bold focus:outline-none'
+                            placeholder='$'
+                            autoFocus={true}
+                            value={inputValue}
+                            type='number'
+                            onChange={handleInputChange}
+                            ref={inputRef}
+                            inputMode='numeric'
+                        />
+                    </div>
+                </div>
+                <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2 px-4'>
+                    <Button
+                        onClick={onPayoutButtonClicked}
+                        className='mb-3 h-[46px] w-full flex-1 flex-grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        Payout
+                    </Button>
+                </div>
+            </div>
+        </div>
+    )
 }
 
-// 'use client'
-
-// import Appbar, { RightMenu } from '@/components/appbar'
-// import Section from '@/components/section'
-// import { Input } from '@/components/ui/input'
-// import { toast } from 'sonner'
-// import { useCookie } from '@/hooks/cookie'
-// import {
-// 	fetchUserDisplayForAddress,
-// 	handleSavePayout,
-// 	handleSetWinner,
-// } from '@/lib/api/clientAPI'
-// import frogImage from '@/public/images/frog.png'
-// import { usePrivy, useWallets } from '@privy-io/react-auth'
-// import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-// import { ethers } from 'ethers'
-// import Image from 'next/image'
-// import { useRouter } from 'next/router'
-// import { useEffect, useMemo, useRef, useState } from 'react'
-
-// const UserProfile = () => {
-// 	const router = useRouter()
-// 	const { ready, authenticated } = usePrivy()
-
-// 	const { wallets, ready: walletsReady } = useWallets()
-
-// 	const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(
-// 		`${frogImage.src}`,
-// 	)
-
-// 	const { currentJwt } = useCookie()
-// 	const { toast } = useToast()
-
-// 	const [displayName, setDisplayName] = useState<string>('')
-
-// 	const { data: profileData } = useQuery({
-// 		queryKey: ['loadProfileImage', wallets?.[0]?.address],
-// 		queryFn: fetchUserDisplayForAddress,
-// 		enabled: wallets.length > 0,
-// 	})
-// 	const inputRef = useRef<HTMLInputElement | null>(null)
-// 	const [inputValue, setInputValue] = useState<string>('0')
-
-// 	const parentRoute = useMemo(() => {
-// 		const paths = router.asPath.split('/')
-// 		paths.pop() // Remove the last sub-route
-// 		return paths.join('/')
-// 	}, [router.asPath])
-
-// 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-// 		setInputValue(event.target.value)
-// 	}
-
-// 	const poolId = router?.query?.poolId! ?? 0
-// 	const participantAddress = router?.query?.address! ?? '0x'
-
-// 	const queryClient = useQueryClient()
-
-// 	const setWinnerMutation = useMutation({
-// 		mutationFn: handleSetWinner,
-// 		onSuccess: () => {
-// 			console.log('setWinner Success')
-// 			queryClient.invalidateQueries({
-// 				queryKey: ['fetchAllPoolDataFromSC', poolId.toString()],
-// 			})
-// 		},
-// 		onError: () => {
-// 			console.log('setWinner Error')
-// 		},
-// 	})
-
-// 	const savePayoutMutation = useMutation({
-// 		mutationFn: handleSavePayout,
-// 		onSuccess: () => {
-// 			console.log('savePayout Success')
-// 			toast({
-// 				title: 'Success',
-// 				description: 'Saved Payout',
-// 			})
-// 			setInputValue('0')
-// 			queryClient.invalidateQueries({
-// 				queryKey: ['fetchAllPoolDataFromSC', poolId.toString()],
-// 			})
-// 		},
-// 		onError: () => {
-// 			console.log('setWinner Error')
-// 		},
-// 	})
-
-// 	const onPayoutButtonClicked = (e: any) => {
-// 		toast({
-// 			title: 'Requesting Transaction',
-// 			description: 'Set Winner',
-// 		})
-
-// 		setWinnerMutation.mutate({
-// 			params: [
-// 				poolId.toString(),
-// 				participantAddress.toString(),
-// 				inputValue,
-// 				wallets,
-// 			],
-// 		})
-// 	}
-
-// 	const onSavePayoutButtonClicked = (e: any) => {
-// 		toast({
-// 			title: 'Saving Payout',
-// 			description: 'Saving payout',
-// 		})
-
-// 		savePayoutMutation.mutate({
-// 			params: [
-// 				poolId.toString(),
-// 				ethers.parseEther(inputValue).toString(),
-// 				participantAddress.toString(),
-// 				currentJwt!,
-// 			],
-// 		})
-// 	}
-
-// 	useEffect(() => {
-// 		if (profileData?.profileImageUrl) {
-// 			setProfileImageUrl(profileData?.profileImageUrl)
-// 		}
-// 		setDisplayName(profileData?.userDisplayData.display_name ?? '')
-// 		console.log('displayName', profileData)
-// 		if (inputRef?.current) {
-// 			inputRef.current.focus()
-// 		}
-// 	}, [
-// 		profileData,
-// 		ready,
-// 		authenticated,
-// 		router,
-// 		inputRef,
-// 		inputValue,
-// 		wallets,
-// 		walletsReady,
-// 	])
-
-// 	return (
-// 		<>
-// 			<Appbar
-// 				backRoute={parentRoute}
-// 				pageTitle='User Profile'
-// 				rightMenu={RightMenu.RefundMenu}
-// 			/>
-// 			<Section>
-// 				<div
-// 					className={'flex justify-center w-full mt-20 min-h-screen font-body'}
-// 				>
-// 					<div className='flex flex-col w-96 pb-8'>
-// 						<div className='flex w-full justify-center'>
-// 							{profileImageUrl && (
-// 								<Image
-// 									className='rounded-full w-24 aspect-square center object-cover z-0'
-// 									src={profileImageUrl}
-// 									alt='profile'
-// 									width={96}
-// 									height={96}
-// 								/>
-// 							)}
-// 						</div>
-
-// 						<div className='flex flex-row'>
-// 							<h3 className='h-10 flex flex-row items-center justify-center flex-1 font-semibold'>
-// 								{displayName}
-// 							</h3>
-// 						</div>
-// 						<div className='flex flex-row justify-center'>
-// 							<p>Checked in</p>
-// 						</div>
-// 						<div className='flex flex-row justify-center h-16 mt-2 '>
-// 							<div className='flex relative justify-center '>
-// 								<Input
-// 									className='border-none text-center text-6xl font-bold h-16 w-auto'
-// 									placeholder=''
-// 									autoFocus={true}
-// 									value={inputValue}
-// 									type='number'
-// 									onChange={handleInputChange}
-// 									ref={inputRef}
-// 									inputMode='numeric'
-// 								/>
-// 							</div>
-// 						</div>
-// 						<div className='flex flex-col w-full items-center justify-center mt-8 space-y-2'>
-// 							<button
-// 								className='rounded-full bg-black text-white h-10 w-48 font-medium'
-// 								onClick={onSavePayoutButtonClicked}
-// 							>
-// 								Save
-// 							</button>
-// 							<button
-// 								className='rounded-full bg-black text-white h-10 w-48 font-medium'
-// 								onClick={onPayoutButtonClicked}
-// 							>
-// 								Payout
-// 							</button>
-// 						</div>
-// 					</div>
-// 				</div>
-// 			</Section>
-// 		</>
-// 	)
-// }
-
-// export default UserProfile
+export default ParticipantPayout

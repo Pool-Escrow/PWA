@@ -12,5 +12,6 @@ export const usePoolDetailsDB = (poolId: bigint) => {
         queryFn: fetchPoolDetailsFromDB,
     })
 
+    console.log('poolDetailsDB', poolDetailsDB)
     return { poolDetailsDB, isLoading, error }
 }

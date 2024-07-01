@@ -28,6 +28,7 @@ import PoolImageRow from './pool-image-row'
 import { useAccount, useReadContract } from 'wagmi'
 import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
 import { Route } from 'next'
+import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -55,21 +56,23 @@ const PoolDetails = (props: PoolDetailsProps) => {
         token: poolDetails?.poolDetailFromSC?.[4] as Address,
     })
 
+    const { tokenDecimalsData } = useTokenDecimals(poolDetails?.poolDetailFromSC?.[4] as Address)
     const calculatedPoolSCDepositPerPerson = (
         BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0) /
-        BigInt(Math.pow(10, Number(18 ?? 18)))
+        BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 18)))
     ).toString()
 
-    const cohostNames: string | undefined = poolDetailsDB?.cohostUserDisplayData
-        ?.map((data: any) => data.display_name)
-        .join(',')
-
+    // const cohostNames: string | undefined = poolDetailsDB?.poolDBInfo?.
+    //     ?.map((data: any) => data.display_name)
+    //     .join(',')
+    const cohostNames = 'Supermoon, Halborne'
     const isRegisteredOnSC = poolDetails?.poolDetailFromSC?.[5]?.indexOf(wallets[0]?.address as Address) !== -1
 
     const { showBar, hideBar, setContent } = useBottomBarStore(state => state)
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
 
     const { data: hash, isPending, writeContract, writeContractAsync } = useWriteContract()
+
     const {
         isLoading: isConfirming,
         isSuccess: isConfirmed,
@@ -346,7 +349,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 <PoolImageRow
                     poolStatus={poolSCStatus}
                     admin={adminData?.isAdmin}
-                    poolImage={poolDetailsDB?.poolImageUrl}
+                    poolImage={poolDetailsDB?.poolDBInfo?.bannerImage}
                     poolId={props.poolId}
                 />
 
@@ -380,7 +383,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             </span>
                             <span className='text-[#003073]'>
                                 Goal of $
-                                {Number(calculatedPoolSCDepositPerPerson) * (poolDetailsDB?.poolDBInfo?.soft_cap ?? 0)}{' '}
+                                {Number(calculatedPoolSCDepositPerPerson) * (poolDetailsDB?.poolDBInfo?.softCap ?? 0)}{' '}
                                 Prize
                                 {` `}
                                 Pool
@@ -391,7 +394,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             <div
                                 className={cn(
                                     'h-2.5 rounded-full bg-blue-500',
-                                    `w-[${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / poolDetailsDB?.poolDBInfo?.soft_cap}%]`,
+                                    `w-[${(poolDetails?.poolDetailFromSC?.[5]?.length ?? 0) / (poolDetailsDB?.poolDBInfo?.softCap ?? 100)}%]`,
                                 )}></div>
                         </div>
                     </div>
@@ -416,6 +419,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     open={openOnRampDialog}
                     setOpen={setOpenOnRampDialog}
                     balance={walletTokenBalance?.data?.value}
+                    decimalPlaces={BigInt(tokenDecimalsData?.tokenDecimals ?? 18)}
                 />
                 {/* <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button> */}
             </div>
