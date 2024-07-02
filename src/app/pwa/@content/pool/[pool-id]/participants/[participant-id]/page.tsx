@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { cn } from '@/lib/utils/tailwind'
+import { formatAddress } from '@/lib/utils/addresses'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': string } }) => {
     const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
@@ -70,7 +71,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 </div>
                 <div className='flex flex-row'>
                     <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
-                        {userDetailsDB?.userDetail?.displayName ?? params['participant-id']}
+                        {formatAddress(userDetailsDB?.userDetail?.displayName ?? params['participant-id'])}
                     </h3>
                 </div>
                 <div className='mb-4 flex flex-row justify-center'>
