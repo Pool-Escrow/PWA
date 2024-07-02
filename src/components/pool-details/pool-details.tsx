@@ -333,7 +333,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         if (isConfirmed && hash) {
             toast.dismiss(updatePoolToastId)
             queryClient.invalidateQueries({
-                queryKey: ['poolDetails', props.poolId, wagmi.config.state.chainId],
+                queryKey: ['poolDetails', BigInt(props.poolId), wagmi.config.state.chainId],
             })
         }
         if (isError || registerError) {
