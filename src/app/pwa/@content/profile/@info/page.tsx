@@ -10,6 +10,7 @@ import { dropletAbi, dropletAddress } from '@/types/droplet'
 import { wagmi } from '@/providers/configs'
 import { useRouter } from 'next/navigation'
 import { Route } from 'next'
+import OnrampStripe from '@/components/onramps/Stripe'
 
 export default function ProfileHeader() {
     const account = useAccount()
@@ -37,6 +38,7 @@ export default function ProfileHeader() {
                 functionName='mint'
                 args={[account.address, '1000000000000000000000']}
             />
+            <OnrampStripe />
         </header>
     )
 }

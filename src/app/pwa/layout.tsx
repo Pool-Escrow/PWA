@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 
 import { comfortaa, inter } from '@/lib/utils/fonts'
 import { Providers } from '@/providers'
+import Script from 'next/script'
 
 export { metadata, viewport } from '@/lib/utils/metadata'
 
@@ -11,6 +12,8 @@ export default function RootLayout({ top, content, bottom }: LayoutWithSlots<'to
     return (
         <html lang='en'>
             <head />
+            <Script src="https://js.stripe.com/v3/"></Script>
+            <Script src="https://crypto-js.stripe.com/crypto-onramp-outer.js"></Script>
             <body className={`${(inter.variable, comfortaa.variable)}`}>
                 <Providers>
                     {top}
