@@ -26,6 +26,9 @@ importers:
       '@coinbase/cbpay-js':
         specifier: 2.2.0
         version: 2.2.0(regenerator-runtime@0.13.11)
+      '@gatefi/js-sdk':
+        specifier: 0.18.0
+        version: 0.18.0
       '@privy-io/react-auth':
         specifier: 1.71.0
         version: 1.71.0(@babel/core@7.24.7)(@types/react@18.3.3)(bufferutil@4.0.8)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)(typescript@5.4.5)(utf-8-validate@5.0.10)
@@ -116,6 +119,9 @@ importers:
       date-fns-tz:
         specifier: 3.1.3
         version: 3.1.3(date-fns@3.6.0)
+      dotenv:
+        specifier: 16.4.5
+        version: 16.4.5
       ethers:
         specifier: 6.13.0
         version: 6.13.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
@@ -1457,6 +1463,9 @@ packages:
 
   '@floating-ui/utils@0.2.4':
     resolution: {integrity: sha512-dWO2pw8hhi+WrXq1YJy2yCuWoL20PddgGaqTgVe4cOS9Q6qklXCiA1tJEqX6BEwRNSCP84/afac9hd4MS+zEUA==}
+
+  '@gatefi/js-sdk@0.18.0':
+    resolution: {integrity: sha512-PUPB/jmiFF+ZXqN+HiipEY5+Wl4WwFsR9+EiEg5QdOH8wR2x4TRuawSXFgM+8YAHfz0ClQDuadfa6n3BaZaAfg==}
 
   '@hapi/hoek@9.3.0':
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
@@ -9333,6 +9342,8 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   '@floating-ui/utils@0.2.4': {}
+
+  '@gatefi/js-sdk@0.18.0': {}
 
   '@hapi/hoek@9.3.0': {}
 
