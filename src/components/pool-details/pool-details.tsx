@@ -29,6 +29,7 @@ import { useAccount, useReadContract } from 'wagmi'
 import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
 import { Route } from 'next'
 import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 
 const avatarUrls = new Array(4).fill(frog.src)
 
@@ -89,37 +90,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         functionName: 'allowance',
         args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
     })
-
-    /// Coinbase Paymaster hooks
-    const account = useAccount()
-    const { writeContracts } = useWriteContracts()
-    const { data: availableCapabilities } = useCapabilities({
-        account: account.address,
-    })
-
-    /// Coinbase Paymaster function
-    const sponsoredTxn = (args: { targetAddress: `0x${string}`; abi: any; functionName: string; args: any[] }) => {
-        if (!availableCapabilities || !account.chainId) return {}
-        const capabilitiesForChain = availableCapabilities[account.chainId]
-        if (capabilitiesForChain['paymasterService'] && capabilitiesForChain['paymasterService'].supported) {
-            const capabilities = {
-                paymasterService: {
-                    url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
-                },
-            }
-            writeContracts({
-                contracts: [
-                    {
-                        address: args.targetAddress,
-                        abi: args.abi,
-                        functionName: args.functionName,
-                        args: args.args,
-                    },
-                ],
-                capabilities,
-            })
-        }
-    }
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const onEnableDepositButtonClicked = () => {
         try {
@@ -127,13 +98,21 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'enableDeposit',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [EnableDepositFunction],
-                functionName: 'enableDeposit',
-                args: [BigInt(props.poolId)],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: poolAbi,
+                    functionName: 'enableDeposit',
+                    args: [BigInt(props.poolId)],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [EnableDepositFunction],
+                    functionName: 'enableDeposit',
+                    args: [BigInt(props.poolId)],
+                })
+            }
         } catch (error) {
             console.log('enableDeposit Error', error)
         }
@@ -145,57 +124,72 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'startPool',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [StartPoolFunction],
-                functionName: 'startPool',
-                args: [BigInt(props.poolId)],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: poolAbi,
+                    functionName: 'startPool',
+                    args: [BigInt(props.poolId)],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [StartPoolFunction],
+                    functionName: 'startPool',
+                    args: [BigInt(props.poolId)],
+                })
+            }
         } catch (error) {
             console.log('startPool Error', error)
         }
     }
     const onEndPoolButtonClicked = (e: any) => {
-        try {
+        try {   
             const EndPoolFunction = getAbiItem({
                 abi: poolAbi,
                 name: 'endPool',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [EndPoolFunction],
-                functionName: 'endPool',
-                args: [BigInt(props.poolId)],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({ 
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: poolAbi,
+                    functionName: 'endPool',
+                    args: [BigInt(props.poolId)],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [EndPoolFunction],
+                    functionName: 'endPool',
+                    args: [BigInt(props.poolId)],
+                })
+            }
         } catch (error) {
             console.log('endPool Error', error)
         }
     }
 
-    const onApproveButtonClicked = async () => {
+    const onApproveButtonClicked = () => {
         console.log('approve')
         console.log('deposit', poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson)
 
-        if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
-            sponsoredTxn({
-                targetAddress: dropletAddress[wagmi.config.state.chainId as ChainId],
+        try {
+            const ApprovePoolFunction = getAbiItem({
                 abi: dropletAbi,
-                functionName: 'approve',
-                args: [
-                    poolAddress[wagmi.config.state.chainId as ChainId],
-                    poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
-                ],
+                name: 'approve',
             })
-        } else {
-            try {
-                const ApprovePoolFunction = getAbiItem({
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: dropletAddress[wagmi.config.state.chainId as ChainId],
                     abi: dropletAbi,
-                    name: 'approve',
+                    functionName: 'approve',
+                    args: [
+                        poolAddress[wagmi.config.state.chainId as ChainId],
+                        poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                    ],
                 })
-
-                await writeContract({
+            } else {
+                writeContract({
                     address: dropletAddress[wagmi.config.state.chainId as ChainId],
                     abi: [ApprovePoolFunction],
                     functionName: 'approve',
@@ -204,13 +198,13 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
                     ],
                 })
-            } catch (error) {
-                console.log('approveSpend Error', error)
             }
+        } catch (error) {
+            console.log('approveSpend Error', error)
         }
     }
 
-    const onRegisterButtonClicked = async (deposit: bigint, balance: bigint, poolId: string) => {
+    const onRegisterButtonClicked = (deposit: bigint, balance: bigint, poolId: string) => {
         if (balance < deposit) {
             setOpenOnRampDialog(true)
             return
@@ -220,28 +214,27 @@ const PoolDetails = (props: PoolDetailsProps) => {
         console.log('registering pool')
         console.log(poolId)
 
-        if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
-            sponsoredTxn({
-                targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+        try {
+            const RegisterPoolFunction = getAbiItem({
                 abi: poolAbi,
-                functionName: 'deposit',
-                args: [BigInt(poolId), deposit],
+                name: 'deposit',
             })
-        } else {
-            try {
-                const RegisterPoolFunction = getAbiItem({
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
-                    name: 'deposit',
+                    functionName: 'deposit',
+                    args: [BigInt(poolId), deposit],
                 })
-
-                await writeContract({
+            } else {
+                writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: [RegisterPoolFunction],
                     functionName: 'deposit',
                     args: [BigInt(poolId), deposit],
                 })
-            } catch (error) {}
-        }
+            }
+        } catch (error) {}
     }
 
     useEffect(() => {

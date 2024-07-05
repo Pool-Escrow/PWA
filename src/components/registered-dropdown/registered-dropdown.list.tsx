@@ -7,7 +7,7 @@
 'use client'
 
 import { poolAbi, poolAddress } from '@/types/contracts'
-import { usePrivy } from '@privy-io/react-auth'
+import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 
 import { wagmi } from '@/providers/configs'
@@ -20,6 +20,7 @@ import { useDisconnect } from 'wagmi'
 import RegisteredDropdownItem from './registered-dropdown.item'
 import type { RegisteredDropdownItemConfig } from './registered-dropdown.list.config'
 import { dropdownItemsConfig } from './registered-dropdown.list.config'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 
 /**
  * Variants for the dropdown menu animation using framer-motion.
@@ -65,6 +66,8 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
     } = useWaitForTransactionReceipt({
         hash,
     })
+    const { wallets } = useWallets()
+    const { sponsoredTxn } = useSponsoredTxn()
     /**
      * Handles the click event on the 'Disconnect' dropdown item.
      */
@@ -83,13 +86,21 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
                 abi: poolAbi,
                 name: 'selfRefund',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [UnregisterPoolFunction],
-                functionName: 'selfRefund',
-                args: [BigInt(poolId)],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [UnregisterPoolFunction],
+                    functionName: 'selfRefund',
+                    args: [BigInt(poolId)],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [UnregisterPoolFunction],
+                    functionName: 'selfRefund',
+                    args: [BigInt(poolId)],
+                })
+            }
         } catch (error) {
             console.log('Unregister Error', error)
         }

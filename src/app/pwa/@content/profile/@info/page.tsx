@@ -11,6 +11,9 @@ import { wagmi } from '@/providers/configs'
 import { useRouter } from 'next/navigation'
 import { Route } from 'next'
 import OnrampStripe from '@/components/onramps/Stripe'
+import Unlimit from '@/components/onramps/unlimit'
+
+import { useEffect, useState } from 'react'
 
 export default function ProfileHeader() {
     const account = useAccount()
@@ -39,6 +42,7 @@ export default function ProfileHeader() {
                 args={[account.address, '1000000000000000000000']}
             />
             <OnrampStripe />
+            <Unlimit email='dev@poolpary.cc' amount='10' purchaseCurrency='ETH' />
         </header>
     )
 }

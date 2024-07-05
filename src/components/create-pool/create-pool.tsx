@@ -15,6 +15,8 @@ import { Database } from '@/types/db'
 import { usePrivy } from '@privy-io/react-auth'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useWallets } from '@privy-io/react-auth'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { createPoolAction, updatePoolStatus } from './action'
 import { toast } from 'sonner'
 import { decodeEventLog, getAbiItem, parseEther } from 'viem'
@@ -101,6 +103,8 @@ export default function CreatePool() {
     } = useWaitForTransactionReceipt({
         hash,
     })
+    const { wallets } = useWallets()
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const createPoolMutation = useMutation({
         mutationFn: async (
@@ -118,21 +122,37 @@ export default function CreatePool() {
                     abi: poolAbi,
                     name: 'createPool',
                 })
-
-                writeContract({
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: [CreatePoolFunction],
-                    functionName: 'createPool',
-                    args: [
-                        timeStart,
-                        timeEnd,
-                        createdPool.name,
-                        parseEther(createdPool.price.toString()),
-                        1000, // penaltyFeeRate, assuming 10% (1000 basis points), adjust as needed
-                        //TODO: change to usdc/ flexible token
-                        dropletAddress[wagmi.config.state.chainId as ChainId],
-                    ],
-                })
+                if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                    sponsoredTxn({
+                        targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: [CreatePoolFunction],
+                        functionName: 'createPool',
+                        args: [
+                            timeStart,
+                            timeEnd,
+                            createdPool.name,
+                            parseEther(createdPool.price.toString()),
+                            1000, // penaltyFeeRate, assuming 10% (1000 basis points), adjust as needed
+                            //TODO: change to usdc/ flexible token
+                            dropletAddress[wagmi.config.state.chainId as ChainId],
+                        ],
+                    })
+                } else {
+                    writeContract({
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: [CreatePoolFunction],
+                        functionName: 'createPool',
+                        args: [
+                            timeStart,
+                            timeEnd,
+                            createdPool.name,
+                            parseEther(createdPool.price.toString()),
+                            1000, // penaltyFeeRate, assuming 10% (1000 basis points), adjust as needed
+                            //TODO: change to usdc/ flexible token
+                            dropletAddress[wagmi.config.state.chainId as ChainId],
+                        ],
+                    })
+                }
             }
             queryClient.invalidateQueries(
                 {

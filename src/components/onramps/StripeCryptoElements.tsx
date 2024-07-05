@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button'
 
 // ReactContext to simplify access of StripeOnramp object
 const CryptoElementsContext = React.createContext({ onramp: null });
@@ -95,7 +95,7 @@ export const OnrampElement = ({
   return (
     <>
       {showButton && (
-          <Button onClick={createSession}>
+          <Button className='h-[30px] w-[46px] rounded-mini bg-cta px-[10px] py-[5px] text-[10px]' onClick={createSession}>
             Stripe
           </Button>
       )}

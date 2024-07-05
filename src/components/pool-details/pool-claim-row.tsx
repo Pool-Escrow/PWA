@@ -10,6 +10,7 @@ import { poolAbi, poolAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
@@ -43,6 +44,7 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
     } = useWaitForTransactionReceipt({
         hash,
     })
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const onClaimButtonClicked = async () => {
         console.log('onClaimButtonClicked')
@@ -51,13 +53,21 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'claimWinning',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [ClaimWinningFunction],
-                functionName: 'claimWinning',
-                args: [BigInt(props.poolId), wallets[0]?.address as Address],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [ClaimWinningFunction],
+                    functionName: 'claimWinning',
+                    args: [BigInt(props.poolId), wallets[0]?.address as Address],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [ClaimWinningFunction],
+                    functionName: 'claimWinning',
+                    args: [BigInt(props.poolId), wallets[0]?.address as Address],
+                })
+            }
         } catch (error) {
             console.log('claimWinning Error', error)
         }

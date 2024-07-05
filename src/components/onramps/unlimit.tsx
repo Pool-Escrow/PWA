@@ -3,11 +3,15 @@ import { Button } from '@/components/ui/button'
 import { GateFiSDK, GateFiDisplayModeEnum } from '@gatefi/js-sdk'
 import { useEffect, useRef, useState } from 'react'
 
-export default function Unlimit(props: {
-		email: string; 
-		amount: string; 
-		purchaseCurrency: string; 
-	}) {
+type fn = () => void
+
+interface UnlimitProps {
+    email: string
+    amount: string
+    purchaseCurrency: string
+}
+
+export default function Unlimit(props: UnlimitProps) {
 	const { email, amount, purchaseCurrency } = props;
     const [isOverlayVisible, setIsOverlayVisible] = useState(false);
     let overlayInstance = useRef<GateFiSDK | null>(null);
@@ -25,7 +29,7 @@ export default function Unlimit(props: {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [overlayInstance, isOverlayVisible]);
+    }, [isOverlayVisible]);
 
     const onClick = () => {
         if (overlayInstance.current) {
@@ -35,7 +39,7 @@ export default function Unlimit(props: {
             }
         } else {
             overlayInstance.current = new GateFiSDK({
-                merchantId: process.env.UNLIMIT_MERCHANT_ID || 'f41fc715-613e-4262-9ab0-456fbe25b583',
+                merchantId: process.env.NEXT_PUBLIC_UNLIMIT_MERCHANT_ID || '',
                 displayMode: GateFiDisplayModeEnum.Overlay,
                 nodeSelector: "#overlay-button",
                 isSandbox: true,	// ATTN: To change to false in production
