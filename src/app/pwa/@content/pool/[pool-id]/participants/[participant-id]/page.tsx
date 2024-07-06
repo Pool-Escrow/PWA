@@ -71,7 +71,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 </div>
                 <div className='flex flex-row'>
                     <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
-                        {formatAddress(userDetailsDB?.userDetail?.displayName ?? params['participant-id'])}
+                        {userDetailsDB?.userDetail?.displayName ?? formatAddress(params['participant-id'])}
                     </h3>
                 </div>
                 <div className='mb-4 flex flex-row justify-center'>
