@@ -12,7 +12,7 @@ import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { Button } from '../ui/button'
 import Container from '../common/other/container'
 import PoolCardRow from './pool-card-row'
-import SectionContent from './section-content'
+import SectionContent from '../common/other/section-content'
 import SectionTitle from './section-title'
 
 const mockClaimablePrizes = [
