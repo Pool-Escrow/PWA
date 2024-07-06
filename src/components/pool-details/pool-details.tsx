@@ -29,8 +29,8 @@ import { useAccount, useReadContract } from 'wagmi'
 import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
 import { Route } from 'next'
 import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
-
-const avatarUrls = new Array(4).fill(frog.src)
+import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
+import { useUsersDetailsDB } from '@/lib/hooks/use-users-details-db'
 
 interface PoolDetailsProps {
     poolId: string
@@ -42,6 +42,12 @@ const PoolDetails = (props: PoolDetailsProps) => {
         isLoading: isLoadingPoolDetailsDB,
         error: poolDetailsDBError,
     } = usePoolDetailsDB(BigInt(props.poolId))
+
+    const { usersDetailsDB, error: usersDetailsError } = useUsersDetailsDB(
+        poolDetails?.poolDetailFromSC?.[5].slice(0, 4) ?? [],
+    )
+    const avatarUrls = usersDetailsDB?.usersDetail?.map(user => user?.avatar ?? frog.src) ?? []
+    // const avatarUrls = [frog.src]
 
     const queryClient = useQueryClient()
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
@@ -245,7 +251,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     useEffect(() => {
-        console.log('isRegisteredOnSC', isRegisteredOnSC)
         if (adminData?.isAdmin) {
             if (poolSCStatus === 0) {
                 setContent(
