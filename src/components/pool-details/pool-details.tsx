@@ -52,7 +52,8 @@ const PoolDetails = (props: PoolDetailsProps) => {
     const queryClient = useQueryClient()
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
-    const { adminData } = useAdmin()
+
+    const isAdmin = poolDetails?.poolDetailFromSC?.[0].host === wallets[0]?.address
     const embeddedWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
     const walletNativeBalance = useBalance({
         address: wallets[0]?.address as Address,
@@ -251,7 +252,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     useEffect(() => {
-        if (adminData?.isAdmin) {
+        if (isAdmin) {
             if (poolSCStatus === 0) {
                 setContent(
                     <Button
@@ -325,7 +326,6 @@ const PoolDetails = (props: PoolDetailsProps) => {
         wallets,
         poolDetails,
         walletTokenBalance?.data?.value,
-        adminData,
     ])
 
     useEffect(() => {
@@ -353,7 +353,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
             <div className='p-4'>
                 <PoolImageRow
                     poolStatus={poolSCStatus}
-                    admin={adminData?.isAdmin}
+                    admin={isAdmin}
                     poolImage={poolDetailsDB?.poolDBInfo?.bannerImage}
                     poolId={props.poolId}
                 />
