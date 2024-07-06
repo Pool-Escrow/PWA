@@ -326,6 +326,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         wallets,
         poolDetails,
         walletTokenBalance?.data?.value,
+        isAdmin,
     ])
 
     useEffect(() => {
