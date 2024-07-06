@@ -84,7 +84,7 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
                                 <div className='font-semibold'>External Wallet</div>
                                 <div className='text-sm text-gray-500'>Receive from Coinbase, Rainbow or Metamask</div>
                             </div>
-                            <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' setOpen={setOpen}>
+                            <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 Receive
                             </Button>
                         </div>
