@@ -6,6 +6,7 @@ import { useBottomBarStore } from '@/providers/bottom-bar.provider'
 import { useWallets } from '@privy-io/react-auth'
 import { ChangeEvent, useEffect, useState } from 'react'
 import ParticipantRow from '../common/other/participantRow'
+import Divider from '../common/other/divider'
 
 interface PoolParticipantsProps {
     poolId: string
