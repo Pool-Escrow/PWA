@@ -25,8 +25,7 @@ import { RegisteredDropdown } from '../registered-dropdown'
 import { Button } from '../ui/button'
 import PoolClaimRow from './pool-claim-row'
 import PoolImageRow from './pool-image-row'
-import { useAccount, useReadContract } from 'wagmi'
-import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
+import { useReadContract } from 'wagmi'
 import { Route } from 'next'
 import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
@@ -98,7 +97,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'enableDeposit',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
@@ -124,7 +123,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'startPool',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
@@ -149,7 +148,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'endPool',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({ 
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
@@ -178,7 +177,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: dropletAbi,
                 name: 'approve',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({
                     targetAddress: dropletAddress[wagmi.config.state.chainId as ChainId],
                     abi: dropletAbi,
@@ -204,12 +203,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         }
     }
 
-    const onRegisterButtonClicked = (deposit: bigint, balance: bigint, poolId: string) => {
-        if (balance < deposit) {
-            setOpenOnRampDialog(true)
-            return
-        }
-
+    const onRegisterButtonClicked = (deposit: bigint, poolId: string) => {
         console.log('Approved')
         console.log('registering pool')
         console.log(poolId)
@@ -219,7 +213,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'deposit',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
@@ -234,7 +228,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     args: [BigInt(poolId), deposit],
                 })
             }
-        } catch (error) {}
+        } catch (error) {
+            console.log('registerPool Error', error)
+        }
     }
 
     useEffect(() => {
@@ -268,8 +264,18 @@ const PoolDetails = (props: PoolDetailsProps) => {
         } else {
             if (!isRegisteredOnSC) {
                 const deposit = BigInt(poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson.toString() ?? 0)
-                console.log(allowance, deposit)
-                if ((allowance ?? BigInt(0)) < deposit) {
+                const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
+
+                if (balance < deposit) {
+                    setContent(
+                        <Button
+                            onClick={() => setOpenOnRampDialog(true)}
+                            className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            <span>Buy ${calculatedPoolSCDepositPerPerson} USDC</span>
+                        </Button>,
+                    )
+                }
+                else if ((allowance ?? BigInt(0)) < deposit) {
                     setContent(
                         <Button
                             onClick={() => onApproveButtonClicked()}
@@ -278,10 +284,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         </Button>,
                     )
                 } else {
-                    const balance = BigInt(walletTokenBalance?.data?.value.toString() ?? 0)
                     setContent(
                         <Button
-                            onClick={() => onRegisterButtonClicked(deposit, balance, props.poolId)}
+                            onClick={() => onRegisterButtonClicked(deposit, props.poolId)}
                             className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                             <span>Register for ${calculatedPoolSCDepositPerPerson} USDC</span>
                         </Button>,
@@ -314,6 +319,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         poolDetails,
         walletTokenBalance?.data?.value,
         adminData,
+        isConfirmed,
     ])
 
     useEffect(() => {

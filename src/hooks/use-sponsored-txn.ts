@@ -1,10 +1,11 @@
-import { useAccount } from 'wagmi'
+import { useAccount, useWriteContract } from 'wagmi'
 import { useWriteContracts, useCapabilities } from 'wagmi/experimental'
 
 export const useSponsoredTxn = () => {
 	/// Coinbase Paymaster hooks
 	const account = useAccount()
 	const { writeContracts } = useWriteContracts()
+	const { writeContract } = useWriteContract()
 	const { data: availableCapabilities } = useCapabilities({
 		account: account.address,
 	})
@@ -29,6 +30,13 @@ export const useSponsoredTxn = () => {
 					},
 				],
 				capabilities,
+			})
+		} else {
+			writeContract({
+				address: args.targetAddress,
+				abi: args.abi,
+				functionName: args.functionName,
+				args: args.args,
 			})
 		}
 	}
