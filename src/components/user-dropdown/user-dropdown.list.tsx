@@ -80,6 +80,9 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
         }
     }
 
+    const handleDepositClick = async () => {
+        console.log('deposit')
+    }
     /**
      * Handles mouse entering a dropdown item to set the hovered state.
      *
@@ -93,8 +96,19 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
     const handleMouseLeave = () => setHoveredItemIndex(null)
 
     // Assign the handleLogoutClick to the corresponding dropdown item
-    const updatedDropdownItemsConfig: DropdownItemConfig[] = dropdownItemsConfig.map(item =>
-        item.label === 'Disconnect' ? { ...item, onClick: handleLogoutClick } : item,
+    const updatedDropdownItemsConfig: DropdownItemConfig[] = dropdownItemsConfig.map(
+        item => {
+            switch (item.label) {
+                case 'Disconnect':
+                    return { ...item, onClick: handleLogoutClick }
+                case 'Deposit':
+                    return { ...item, onClick: handleDepositClick }
+                default:
+                    return item
+            }
+        },
+
+        // item.label === 'Disconnect' ? { ...item, onClick: handleLogoutClick } : item,
     )
 
     return (
