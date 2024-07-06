@@ -60,7 +60,7 @@ const TicketPage = ({ params }: { params: { 'pool-id': string } }) => {
     return (
         <div>
             <div className='flex w-full flex-col'>
-                <h2 className='mb-8 text-center text-xl text-black'>{poolDetails?.poolDetailFromSC?.[1]?.poolName}</h2>
+                <h2 className='mb-8 text-center text-lg text-black'>{poolDetails?.poolDetailFromSC?.[1]?.poolName}</h2>
                 <div className='flex w-full flex-1 flex-col items-center justify-center'>
                     {hasJoined ? (
                         <div className='cardBackground flex w-full max-w-lg rounded-3xl bg-[#F6F6F6] p-12'>
