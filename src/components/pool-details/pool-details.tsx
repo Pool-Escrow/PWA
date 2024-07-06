@@ -419,6 +419,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     setOpen={setOpenOnRampDialog}
                     balance={walletTokenBalance?.data?.value}
                     decimalPlaces={BigInt(tokenDecimalsData?.tokenDecimals ?? 18)}
+                    amount={calculatedPoolSCDepositPerPerson.toString()}
                 />
                 {/* <Button onClick={() => setOpenOnRampDialog(true)}>OnRamp</Button> */}
             </div>
