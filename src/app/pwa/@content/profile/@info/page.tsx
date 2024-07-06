@@ -42,7 +42,6 @@ export default function ProfileHeader() {
                 args={[account.address, '1000000000000000000000']}
             />
             <OnrampStripe />
-            <Unlimit email='dev@poolpary.cc' amount='10' purchaseCurrency='ETH' />
         </header>
     )
 }

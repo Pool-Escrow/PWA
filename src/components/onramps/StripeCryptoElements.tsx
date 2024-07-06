@@ -1,5 +1,11 @@
 import React, { ReactNode } from 'react';
 import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerOverlay,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 
 // ReactContext to simplify access of StripeOnramp object
 const CryptoElementsContext = React.createContext({ onramp: null });
@@ -100,6 +106,11 @@ export const OnrampElement = ({
           </Button>
       )}
       <div {...props} ref={onrampElementRef}></div>
+      {/* <Drawer>
+        <DrawerOverlay />
+        <DrawerContent ref={onrampElementRef} {...props}>
+        </DrawerContent>
+      </Drawer> */}
     </>
   );
 };
