@@ -8,7 +8,7 @@
 
 import { usePrivy } from '@privy-io/react-auth'
 import { toast } from 'sonner'
-import { useDisconnect } from 'wagmi'
+import { useAccount, useBalance, useDisconnect } from 'wagmi'
 import type { Variants } from 'framer-motion'
 import { motion } from 'framer-motion'
 import { useRef, useState } from 'react'
@@ -17,6 +17,9 @@ import type { DropdownItemConfig } from './user-dropdown.list.config'
 import { dropdownItemsConfig } from './user-dropdown.list.config'
 import { useRouter } from 'next/navigation'
 import { Route } from 'next'
+import OnRampDialog from '../common/dialogs/onramp.dialog'
+import { dropletAddress } from '@/types/droplet'
+import { wagmi } from '@/providers/configs'
 
 /**
  * Variants for the dropdown menu animation using framer-motion.
@@ -49,6 +52,16 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
     const router = useRouter()
     const [hoveredItemIndex, setHoveredItemIndex] = useState<number | null>(null)
     const dropdownListRef = useRef<HTMLDivElement | null>(null)
+    const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
+
+    const account = useAccount()
+    const { data: tokenBalanceData } = useBalance({
+        address: account.address,
+        token: dropletAddress[wagmi.config.state.chainId as ChainId],
+    })
+
+    const decimals = BigInt(tokenBalanceData?.decimals ?? BigInt(18))
+    const tokenBalance = ((tokenBalanceData?.value ?? BigInt(0)) / BigInt(10) ** decimals).toString()
 
     /**
      * Handles the click event on the 'Disconnect' dropdown item.
@@ -81,7 +94,7 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
     }
 
     const handleDepositClick = async () => {
-        console.log('deposit')
+        setOpenOnRampDialog(true)
     }
     /**
      * Handles mouse entering a dropdown item to set the hovered state.
@@ -146,6 +159,12 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
                     <UserDropdownItem {...item} />
                 </motion.div>
             ))}
+            <OnRampDialog
+                open={openOnRampDialog}
+                setOpen={setOpenOnRampDialog}
+                balance={tokenBalanceData?.value}
+                decimalPlaces={decimals}
+            />
         </motion.div>
     )
 }

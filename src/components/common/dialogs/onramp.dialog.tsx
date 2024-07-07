@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import Divider from '../other/divider'
 import OnRampButton from '@/components/onRampButton'
+import OnRampForm from './onramp.form'
+import ReceiveDialog from './receive.dialog'
 
 interface OnRampDialogProps {
     open: boolean
@@ -68,9 +70,11 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces }: OnRampDialogPro
                                 <div className='font-semibold'>External Wallet</div>
                                 <div className='text-sm text-gray-500'>Receive from Coinbase, Rainbow or Metamask</div>
                             </div>
-                            <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 Receive
-                            </Button>
+                            </Button> */}
+                            {/* <OnRampForm decimalPlaces={BigInt(18)} balance={BigInt(100)} /> */}
+                            <ReceiveDialog />
                         </div>
                     </div>
                 </DrawerHeader>

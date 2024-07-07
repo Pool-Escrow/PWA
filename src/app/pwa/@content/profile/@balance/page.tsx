@@ -37,11 +37,11 @@ export default function ProfileBalanceSection() {
             <SectionContent>
                 <div className='mx-2 flex flex-col justify-center'>
                     <h3 className='text-[11pt] font-semibold text-black'>Total Balance</h3>
-                    <h3 className='mb-4 text-[36pt] font-bold text-[#2785EA]'>
+                    <h3 className='text-[36pt] font-bold text-[#2785EA]'>
                         <span>{'$' + tokenBalance + ` `}</span>
                         <span className='text-[14pt]'>USDC</span>
                     </h3>
-                    <div className='flex w-full flex-row gap-x-4'>
+                    {/* <div className='flex w-full flex-row gap-x-4'>
                         <Button
                             className='mb-3 h-[40px] w-full rounded-lg bg-cta px-6 py-[11px] text-center text-base text-sm font-medium leading-normal text-white shadow-button active:shadow-button-push'
                             onClick={(e: any) => {
@@ -52,14 +52,14 @@ export default function ProfileBalanceSection() {
                         <Button className='mb-3 h-[40px] w-full rounded-lg bg-cta px-6 py-[11px] text-center text-base text-sm font-medium leading-normal text-white shadow-button active:shadow-button-push'>
                             Withdraw
                         </Button>
-                    </div>
+                    </div> */}
 
-                    <OnRampDialog
+                    {/* <OnRampDialog
                         open={openOnRampDialog}
                         setOpen={setOpenOnRampDialog}
                         balance={tokenBalanceData?.value}
                         decimalPlaces={decimals}
-                    />
+                    /> */}
                 </div>
             </SectionContent>
         </Container>
