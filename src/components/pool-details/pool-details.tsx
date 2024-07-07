@@ -18,7 +18,7 @@ import Link from 'next/link'
 import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
-import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useAccount, useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
 import { RegisteredDropdown } from '../registered-dropdown'
@@ -29,8 +29,9 @@ import { useReadContract } from 'wagmi'
 import { Route } from 'next'
 import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
-
-const avatarUrls = new Array(4).fill(frog.src)
+import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
+import { useUsersDetailsDB } from '@/lib/hooks/use-users-details-db'
+import { useAllowance } from '@/lib/hooks/use-allowance'
 
 interface PoolDetailsProps {
     poolId: string
@@ -43,10 +44,17 @@ const PoolDetails = (props: PoolDetailsProps) => {
         error: poolDetailsDBError,
     } = usePoolDetailsDB(BigInt(props.poolId))
 
+    const { usersDetailsDB, error: usersDetailsError } = useUsersDetailsDB(
+        poolDetails?.poolDetailFromSC?.[5].slice(0, 4) ?? [],
+    )
+    const avatarUrls = usersDetailsDB?.usersDetail?.map(user => user?.avatar ?? frog.src) ?? []
+    // const avatarUrls = [frog.src]
+
     const queryClient = useQueryClient()
     const poolSCStatus = poolDetails?.poolDetailFromSC?.[3]
     const { wallets } = useWallets()
-    const { adminData } = useAdmin()
+
+    const isAdmin = poolDetails?.poolDetailFromSC?.[0].host === wallets[0]?.address
     const embeddedWallet = wallets.find(wallet => wallet.walletClientType === 'privy')
     const walletNativeBalance = useBalance({
         address: wallets[0]?.address as Address,
@@ -62,6 +70,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 18)))
     ).toString()
 
+    const participantAddresses = poolDetails?.poolDetailFromSC?.[5] ?? []
     // const cohostNames: string | undefined = poolDetailsDB?.poolDBInfo?.
     //     ?.map((data: any) => data.display_name)
     //     .join(',')
@@ -83,13 +92,16 @@ const PoolDetails = (props: PoolDetailsProps) => {
         hash,
     })
     /// Check allowance
-    const { data: allowance } = useReadContract({
-        address: dropletAddress[wagmi.config.state.chainId as ChainId],
-        abi: dropletAbi,
-        functionName: 'allowance',
-        args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
-    })
-    const { sponsoredTxn, callsStatus } = useSponsoredTxn()
+    // const { data: allowance } = useReadContract({
+    //     address: dropletAddress[wagmi.config.state.chainId as ChainId],
+    //     abi: dropletAbi,
+    //     functionName: 'allowance',
+    //     args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
+    // })
+    const account = useAccount()
+    const accountAddress = account?.address ?? '0x'
+    const { data: allowance, isLoading: allowanceIsLoading, error: allowanceError } = useAllowance(accountAddress)
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const onEnableDepositButtonClicked = () => {
         try {
@@ -97,13 +109,18 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'enableDeposit',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: poolAbi,
-                    functionName: 'enableDeposit',
-                    args: [BigInt(props.poolId)],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: poolAbi,
+                        functionName: 'enableDeposit',
+                        args: [BigInt(props.poolId)],
+                    },
+                ])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -123,13 +140,18 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'startPool',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: poolAbi,
-                    functionName: 'startPool',
-                    args: [BigInt(props.poolId)],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: poolAbi,
+                        functionName: 'startPool',
+                        args: [BigInt(props.poolId)],
+                    },
+                ])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -143,18 +165,23 @@ const PoolDetails = (props: PoolDetailsProps) => {
         }
     }
     const onEndPoolButtonClicked = (e: any) => {
-        try {   
+        try {
             const EndPoolFunction = getAbiItem({
                 abi: poolAbi,
                 name: 'endPool',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{ 
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: poolAbi,
-                    functionName: 'endPool',
-                    args: [BigInt(props.poolId)],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: poolAbi,
+                        functionName: 'endPool',
+                        args: [BigInt(props.poolId)],
+                    },
+                ])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -177,16 +204,21 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: dropletAbi,
                 name: 'approve',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{
-                    address: dropletAddress[wagmi.config.state.chainId as ChainId],
-                    abi: dropletAbi,
-                    functionName: 'approve',
-                    args: [
-                        poolAddress[wagmi.config.state.chainId as ChainId],
-                        poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
-                    ],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                        abi: dropletAbi,
+                        functionName: 'approve',
+                        args: [
+                            poolAddress[wagmi.config.state.chainId as ChainId],
+                            poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                        ],
+                    },
+                ])
             } else {
                 writeContract({
                     address: dropletAddress[wagmi.config.state.chainId as ChainId],
@@ -213,22 +245,27 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 abi: poolAbi,
                 name: 'deposit',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{
-                    address: dropletAddress[wagmi.config.state.chainId as ChainId],
-                    abi: dropletAbi,
-                    functionName: 'approve',
-                    args: [
-                        poolAddress[wagmi.config.state.chainId as ChainId],
-                        poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
-                    ],
-                },
-                {
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: poolAbi,
-                    functionName: 'deposit',
-                    args: [BigInt(poolId), deposit],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                        abi: dropletAbi,
+                        functionName: 'approve',
+                        args: [
+                            poolAddress[wagmi.config.state.chainId as ChainId],
+                            poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                        ],
+                    },
+                    {
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: poolAbi,
+                        functionName: 'deposit',
+                        args: [BigInt(poolId), deposit],
+                    },
+                ])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -243,9 +280,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
     }
 
     useEffect(() => {
-        console.log('isRegisteredOnSC', isRegisteredOnSC)
-        console.log("status", callsStatus)
-        if (adminData?.isAdmin) {
+        if (isAdmin) {
             if (poolSCStatus === 0) {
                 setContent(
                     <Button
@@ -284,8 +319,11 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             <span>Buy ${calculatedPoolSCDepositPerPerson} USDC</span>
                         </Button>,
                     )
-                }
-                else if ((allowance ?? BigInt(0)) < deposit && wallets[0].walletClientType !== 'coinbase_smart_wallet' && wallets[0].walletClientType !== 'coinbase_wallet') {
+                } else if (
+                    (allowance?.data ?? BigInt(0)) < deposit &&
+                    wallets[0].walletClientType !== 'coinbase_smart_wallet' &&
+                    wallets[0].walletClientType !== 'coinbase_wallet'
+                ) {
                     setContent(
                         <Button
                             onClick={() => onApproveButtonClicked()}
@@ -322,15 +360,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
         setContent,
         showBar,
         hideBar,
-        allowance,
+        allowance?.data,
         calculatedPoolSCDepositPerPerson,
         isRegisteredOnSC,
         wallets,
         poolDetails,
         walletTokenBalance?.data?.value,
-        adminData,
+        isAdmin,
         isConfirmed,
-        callsStatus,
     ])
 
     useEffect(() => {
@@ -345,6 +382,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
             queryClient.invalidateQueries({
                 queryKey: ['poolDetails', BigInt(props.poolId), wagmi.config.state.chainId],
             })
+            queryClient.invalidateQueries({
+                queryKey: ['allowance', accountAddress],
+            })
         }
         if (isError || registerError) {
             console.log('Error', registerError)
@@ -352,13 +392,13 @@ const PoolDetails = (props: PoolDetailsProps) => {
         if (txData) {
             console.log('txData', txData)
         }
-    }, [isConfirmed, isConfirming, hash, isError, registerError, txData])
+    }, [isConfirmed, isConfirming, hash, isError, registerError, txData, accountAddress])
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
                 <PoolImageRow
                     poolStatus={poolSCStatus}
-                    admin={adminData?.isAdmin}
+                    admin={isAdmin}
                     poolImage={poolDetailsDB?.poolDBInfo?.bannerImage}
                     poolId={props.poolId}
                 />
@@ -410,7 +450,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     </div>
                     <div className='mb-4 flex'>Participants</div>
                     <div className='mb-4 flex items-center justify-between'>
-                        <Avatars avatarUrls={avatarUrls} numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0} />
+                        {participantAddresses.length > 0 ? (
+                            <Avatars
+                                avatarUrls={avatarUrls}
+                                numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0}
+                            />
+                        ) : (
+                            <div>Be the first to join</div>
+                        )}
                         <Link href={`/pool/${props.poolId}/participants` as Route} className='flex items-center'>
                             <ChevronRight className='text-blue-500' />
                         </Link>

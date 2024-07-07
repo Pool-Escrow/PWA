@@ -8,7 +8,8 @@
 
 import { poolAbi, poolAddress } from '@/types/contracts'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
-import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { wagmi } from '@/providers/configs'
 import type { Variants } from 'framer-motion'
@@ -21,6 +22,7 @@ import RegisteredDropdownItem from './registered-dropdown.item'
 import type { RegisteredDropdownItemConfig } from './registered-dropdown.list.config'
 import { dropdownItemsConfig } from './registered-dropdown.list.config'
 import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
+import { toast } from 'sonner'
 
 /**
  * Variants for the dropdown menu animation using framer-motion.
@@ -66,8 +68,12 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
     } = useWaitForTransactionReceipt({
         hash,
     })
+    const queryClient = useQueryClient()
+
     const { wallets } = useWallets()
     const { sponsoredTxn } = useSponsoredTxn()
+    const account = useAccount()
+    const accountAddress = account?.address ?? '0x'
     /**
      * Handles the click event on the 'Disconnect' dropdown item.
      */
@@ -86,13 +92,18 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
                 abi: poolAbi,
                 name: 'selfRefund',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn([{
-                    address: poolAddress[wagmi.config.state.chainId as ChainId],
-                    abi: [UnregisterPoolFunction],
-                    functionName: 'selfRefund',
-                    args: [BigInt(poolId)],
-                }])
+            if (
+                wallets[0].walletClientType === 'coinbase_smart_wallet' ||
+                wallets[0].walletClientType === 'coinbase_wallet'
+            ) {
+                sponsoredTxn([
+                    {
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
+                        abi: [UnregisterPoolFunction],
+                        functionName: 'selfRefund',
+                        args: [BigInt(poolId)],
+                    },
+                ])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -129,6 +140,22 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
         console.log('isConfirming', isConfirming)
         console.log('hash', hash)
         console.log('txData', txData)
+        let toastId
+        if (isConfirming) {
+            toastId = toast.loading('Unregistering from Pool', {
+                description: 'Unjoining pool...',
+            })
+        }
+        if (hash && isConfirmed) {
+            toast.dismiss(toastId)
+
+            queryClient.invalidateQueries({
+                queryKey: ['poolDetails', BigInt(poolId), wagmi.config.state.chainId],
+            })
+            queryClient.invalidateQueries({
+                queryKey: ['allowance', accountAddress],
+            })
+        }
     }, [isError, isConfirmed, isConfirming, hash, txData])
 
     return (

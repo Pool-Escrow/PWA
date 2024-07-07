@@ -60,6 +60,10 @@ const topBarConfig: TopBarConfig = {
     '/pool/[poolId]/participants/[participantId]': {
         left: <TopBarBack />,
     },
+    '/pool/[poolId]/ticket': {
+        left: <TopBarBack />,
+        center: <h1 className='font-bold text-black'>My Ticket</h1>,
+    },
     '/send': {
         left: <TopBarBack />,
     },

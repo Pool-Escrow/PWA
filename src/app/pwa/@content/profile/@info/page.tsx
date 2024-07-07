@@ -51,7 +51,7 @@ export default function ProfileHeader() {
 
                     <div className='flex flex-row items-center justify-center'>
                         <a
-                            href={`https://etherscan.io/address/${account.address}`}
+                            href={`https://basescan.org/address/${account.address}`}
                             target='_blank'
                             rel='noopener noreferrer nofollow'>
                             <Image src={externalLinkIcon} alt='Link to etherscan' width={24} height={24} />
