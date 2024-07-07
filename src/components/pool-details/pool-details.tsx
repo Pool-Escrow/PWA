@@ -89,7 +89,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         functionName: 'allowance',
         args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
     })
-    const { sponsoredTxn } = useSponsoredTxn()
+    const { sponsoredTxn, callsStatus } = useSponsoredTxn()
 
     const onEnableDepositButtonClicked = () => {
         try {
@@ -244,6 +244,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
 
     useEffect(() => {
         console.log('isRegisteredOnSC', isRegisteredOnSC)
+        console.log("status", callsStatus)
         if (adminData?.isAdmin) {
             if (poolSCStatus === 0) {
                 setContent(
@@ -284,7 +285,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         </Button>,
                     )
                 }
-                else if ((allowance ?? BigInt(0)) < deposit && (wallets[0].walletClientType !== 'coinbase_smart_wallet' || wallets[0].walletClientType !== 'coinbase_wallet')) {
+                else if ((allowance ?? BigInt(0)) < deposit && wallets[0].walletClientType !== 'coinbase_smart_wallet' && wallets[0].walletClientType !== 'coinbase_wallet') {
                     setContent(
                         <Button
                             onClick={() => onApproveButtonClicked()}
@@ -329,6 +330,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         walletTokenBalance?.data?.value,
         adminData,
         isConfirmed,
+        callsStatus,
     ])
 
     useEffect(() => {

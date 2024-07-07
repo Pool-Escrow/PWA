@@ -1,5 +1,5 @@
 import { useAccount, useWriteContract } from 'wagmi'
-import { useWriteContracts, useCapabilities } from 'wagmi/experimental'
+import { useWriteContracts, useCapabilities, useCallsStatus } from 'wagmi/experimental'
 
 interface ContractCall {
 	address: `0x${string}`;
@@ -13,7 +13,16 @@ type ContractCalls = ContractCall[];
 export const useSponsoredTxn = () => {
 	/// Coinbase Paymaster hooks
 	const account = useAccount()
-	const { writeContracts } = useWriteContracts()
+	const { data: id, writeContracts } = useWriteContracts()
+	const { data: callsStatus } = useCallsStatus({ 
+		id: id as string, 
+		query: { 
+		enabled: !!id, 
+		// Poll every second until the calls are confirmed
+		refetchInterval: (data) =>
+			data.state.data?.status === "CONFIRMED" ? false : 1000, 
+		}, 
+	}); 
 	const { writeContract } = useWriteContract()
 	const { data: availableCapabilities } = useCapabilities({
 		account: account.address,
@@ -30,14 +39,14 @@ export const useSponsoredTxn = () => {
 				},
 			}
 			if (capabilitiesForChain['atomicBatch'] && capabilitiesForChain['atomicBatch'].supported) {
-				writeContracts({ contracts: args });
+				writeContracts({ contracts: args, capabilities });
 			} else {
-				writeContracts({ contracts: [args[0]] });
+				writeContracts({ contracts: [args[0]], capabilities });
 			}
 		} else {
 			writeContract(args[0])
 		}
 	}
 
-	return { sponsoredTxn }
+	return { sponsoredTxn, callsStatus }
 }
