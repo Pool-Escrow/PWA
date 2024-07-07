@@ -46,7 +46,7 @@ const OnRampForm = ({ className, balance, decimalPlaces }: OnRampFormProps) => {
                 <div className='flex flex-row justify-between text-sm'>
                     <span className='font-medium'>Current Pool balance:</span>
                     <span className='font-medium'>
-                        ${((balance ?? BigInt(0)) / BigInt(Math.pow(10, Number(decimalPlaces)))).toString()} USDC
+                        ${((balance ?? BigInt(0)) / BigInt(Math.pow(10, Number(decimalPlaces ?? 18)))).toString()} USDC
                     </span>
                 </div>
                 <Divider className='my-0 h-0 py-0' />

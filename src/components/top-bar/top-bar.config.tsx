@@ -60,6 +60,9 @@ const topBarConfig: TopBarConfig = {
     '/pool/[poolId]/participants/[participantId]': {
         left: <TopBarBack />,
     },
+    '/send': {
+        left: <TopBarBack />,
+    },
 }
 
 const pathToRegex = (path: string | null) => {
