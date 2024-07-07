@@ -18,7 +18,7 @@ import Link from 'next/link'
 import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
-import { useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useAccount, useBalance, useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import Avatars from '../avatars/avatars'
 import OnRampDialog from '../common/dialogs/onramp.dialog'
 import { RegisteredDropdown } from '../registered-dropdown'
@@ -31,6 +31,7 @@ import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
 import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { useUserDetailsDB } from '@/lib/hooks/use-user-details-db'
 import { useUsersDetailsDB } from '@/lib/hooks/use-users-details-db'
+import { useAllowance } from '@/lib/hooks/use-allowance'
 
 interface PoolDetailsProps {
     poolId: string
@@ -69,6 +70,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 18)))
     ).toString()
 
+    const participantAddresses = poolDetails?.poolDetailFromSC?.[5] ?? []
     // const cohostNames: string | undefined = poolDetailsDB?.poolDBInfo?.
     //     ?.map((data: any) => data.display_name)
     //     .join(',')
@@ -90,12 +92,15 @@ const PoolDetails = (props: PoolDetailsProps) => {
         hash,
     })
     /// Check allowance
-    const { data: allowance } = useReadContract({
-        address: dropletAddress[wagmi.config.state.chainId as ChainId],
-        abi: dropletAbi,
-        functionName: 'allowance',
-        args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
-    })
+    // const { data: allowance } = useReadContract({
+    //     address: dropletAddress[wagmi.config.state.chainId as ChainId],
+    //     abi: dropletAbi,
+    //     functionName: 'allowance',
+    //     args: [wallets[0]?.address as Address, poolAddress[wagmi.config.state.chainId as ChainId]],
+    // })
+    const account = useAccount()
+    const accountAddress = account?.address ?? '0x'
+    const { data: allowance, isLoading: allowanceIsLoading, error: allowanceError } = useAllowance(accountAddress)
     const { sponsoredTxn } = useSponsoredTxn()
 
     const onEnableDepositButtonClicked = () => {
@@ -295,7 +300,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                             <span>Buy ${calculatedPoolSCDepositPerPerson} USDC</span>
                         </Button>,
                     )
-                } else if ((allowance ?? BigInt(0)) < deposit) {
+                } else if ((allowance?.data ?? BigInt(0)) < deposit) {
                     setContent(
                         <Button
                             onClick={() => onApproveButtonClicked()}
@@ -332,7 +337,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         setContent,
         showBar,
         hideBar,
-        allowance,
+        allowance?.data,
         calculatedPoolSCDepositPerPerson,
         isRegisteredOnSC,
         wallets,
@@ -354,6 +359,9 @@ const PoolDetails = (props: PoolDetailsProps) => {
             queryClient.invalidateQueries({
                 queryKey: ['poolDetails', BigInt(props.poolId), wagmi.config.state.chainId],
             })
+            queryClient.invalidateQueries({
+                queryKey: ['allowance', accountAddress],
+            })
         }
         if (isError || registerError) {
             console.log('Error', registerError)
@@ -361,7 +369,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
         if (txData) {
             console.log('txData', txData)
         }
-    }, [isConfirmed, isConfirming, hash, isError, registerError, txData])
+    }, [isConfirmed, isConfirming, hash, isError, registerError, txData, accountAddress])
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white shadow-lg'>
             <div className='p-4'>
@@ -419,7 +427,14 @@ const PoolDetails = (props: PoolDetailsProps) => {
                     </div>
                     <div className='mb-4 flex'>Participants</div>
                     <div className='mb-4 flex items-center justify-between'>
-                        <Avatars avatarUrls={avatarUrls} numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0} />
+                        {participantAddresses.length > 0 ? (
+                            <Avatars
+                                avatarUrls={avatarUrls}
+                                numPeople={poolDetails?.poolDetailFromSC?.[5]?.length ?? 0}
+                            />
+                        ) : (
+                            <div>Be the first to join</div>
+                        )}
                         <Link href={`/pool/${props.poolId}/participants` as Route} className='flex items-center'>
                             <ChevronRight className='text-blue-500' />
                         </Link>
