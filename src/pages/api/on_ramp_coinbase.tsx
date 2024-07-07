@@ -10,25 +10,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const requestData = await req.body
-    const { chainName, jwtString } = requestData
-
-    let jwtAddress: string = '0x'
-    let user
-    try {
-        const claims = await verifyToken(jwtString)
-        if (claims === null) {
-            throw new Error('Invalid JWT')
-        }
-        user = await getUser(claims!.userId)
-        const walletWithMetadata = user?.linkedAccounts[0] as WalletWithMetadata
-        jwtAddress = walletWithMetadata?.address?.toLowerCase()
-        console.log('user', user)
-        console.log('walletWithMetadata', walletWithMetadata)
-    } catch (error) {
-        console.error(error)
-        res.status(500).json({ error: 'Failed to decode Jwt.' })
-        return
-    }
+    const { chainName, address } = requestData
 
     const key_name = process.env.COINBASE_KEY_NAME
     const key_secret = process.env.COINBASE_KEY_SECRET
@@ -66,15 +48,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const jwt = sign(payload, key_secret, signOptions)
 
-    // const reqBody = JSON.parse(req.body)
-    jwtAddress = user!.wallet!.address
-    console.log('jwtAddress', jwtAddress)
-
     const body = {
         destination_wallets: [
             {
-                address: jwtAddress,
-                blockchains: ['base', 'ethereum'],
+                address: address,
+                blockchains: ['base'],
             },
         ],
     }
@@ -94,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
                 const onRampUrl = generateOnRampURL({
                     sessionToken: json.token,
-                    destinationWallets: [{ address: jwtAddress, assets: [chainName] }],
+                    destinationWallets: [{ address: address, assets: [chainName] }],
                     theme: 'light',
                 })
 

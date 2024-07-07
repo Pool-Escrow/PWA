@@ -75,7 +75,10 @@ export default function SponsoredTxn() {
                     <p>✅ Transaction successfully sponsored!</p>
                     <p>
                         🔍 View on Etherscan:{' '}
-                        <a href={`https://sepolia.basescan.org/tx/${txHash}`} target='_blank' rel='noopener noreferrer'>
+                        <a
+                            href={`https://sepolia.basescan.org/tx/${txHash}`}
+                            target='_blank'
+                            rel='noopener noreferrer nofollow'>
                             Transaction Link
                         </a>
                     </p>

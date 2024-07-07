@@ -15,6 +15,8 @@ import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { cn } from '@/lib/utils/tailwind'
 import { formatAddress } from '@/lib/utils/addresses'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
+import { useWallets } from '@privy-io/react-auth' 
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': string } }) => {
     const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
@@ -28,6 +30,9 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [inputValue, setInputValue] = useState<string>('0')
 
+    const { wallets } = useWallets()
+    const { sponsoredTxn } = useSponsoredTxn()
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value)
     }
@@ -40,13 +45,21 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 abi: poolAbi,
                 name: 'setWinner',
             })
-
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [SetWinnerFunction],
-                functionName: 'setWinner',
-                args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: poolAbi,
+                    functionName: 'setWinner',
+                    args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [SetWinnerFunction],
+                    functionName: 'setWinner',
+                    args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
+                })
+            }
         } catch (error) {
             console.log('setWinner Error', error)
         }

@@ -64,6 +64,9 @@ const topBarConfig: TopBarConfig = {
         left: <TopBarBack />,
         center: <h1 className='font-bold text-black'>My Ticket</h1>,
     },
+    '/send': {
+        left: <TopBarBack />,
+    },
 }
 
 const pathToRegex = (path: string | null) => {

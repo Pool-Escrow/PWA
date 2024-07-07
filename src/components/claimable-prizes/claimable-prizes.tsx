@@ -8,10 +8,11 @@ import { useWallets } from '@privy-io/react-auth'
 import { useEffect } from 'react'
 import { Address, getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { Button } from '../ui/button'
-import Container from './container'
+import Container from '../common/other/container'
 import PoolCardRow from './pool-card-row'
-import SectionContent from './section-content'
+import SectionContent from '../common/other/section-content'
 import SectionTitle from './section-title'
 
 const mockClaimablePrizes = [
@@ -26,6 +27,7 @@ export default function ClaimablePrizesList() {
     const { writeContract } = useWriteContract()
     const walletAddress = wallets?.[0]?.address
     const { claimablePools, isLoading, error } = useClaimablePools(walletAddress)
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const poolIdIndices = claimablePools?.[1].reduce((indices: any, element: any, index: any) => {
         if (element === false) {
@@ -61,12 +63,21 @@ export default function ClaimablePrizesList() {
                 name: 'claimWinnings',
             })
 
-            writeContract({
-                address: poolAddress[wagmi.config.state.chainId as ChainId],
-                abi: [ClaimWinningsFunction],
-                functionName: 'claimWinnings',
-                args: [poolIdsToClaimFrom, walletAddresses],
-            })
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
+                sponsoredTxn({
+                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [ClaimWinningsFunction],
+                    functionName: 'claimWinnings',
+                    args: [poolIdsToClaimFrom, walletAddresses],
+                })
+            } else {
+                writeContract({
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+                    abi: [ClaimWinningsFunction],
+                    functionName: 'claimWinnings',
+                    args: [poolIdsToClaimFrom, walletAddresses],
+                })
+            }
         } catch (error) {
             console.log('claimWinnings Error', error)
         }

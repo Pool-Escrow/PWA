@@ -1,8 +1,8 @@
 'use client'
 
-import { useAccount } from 'wagmi'
-import { useCapabilities, useWriteContracts } from 'wagmi/experimental'
-import { useMemo } from 'react'
+import { useWriteContract } from 'wagmi'
+import { useWallets } from '@privy-io/react-auth'
+import { useSponsoredTxn } from '@/hooks/use-sponsored-txn'
 import { Button } from '../ui/button'
 
 export default function SponsoredTxn(prop: {
@@ -12,45 +12,29 @@ export default function SponsoredTxn(prop: {
     functionName: string
     args: any[]
 }) {
-    const account = useAccount()
-    const { writeContracts } = useWriteContracts({
-        mutation: { onSuccess: id => alert(`Transaction completed: ${id}`) },
-    })
-    const { data: availableCapabilities } = useCapabilities({
-        account: account.address,
-    })
-    const capabilities = useMemo(() => {
-        if (!availableCapabilities || !account.chainId) {
-            console.log('No capabilities or chainId')
-            return {}
-        }
-        const capabilitiesForChain = availableCapabilities[account.chainId]
-        if (capabilitiesForChain['paymasterService'] && capabilitiesForChain['paymasterService'].supported) {
-            return {
-                paymasterService: {
-                    url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
-                },
-            }
-        }
-        return {}
-    }, [availableCapabilities, account.chainId])
+    const { writeContract } = useWriteContract()
+    const { wallets } = useWallets()
+    const { sponsoredTxn } = useSponsoredTxn()
 
     const sendTransaction = () => {
         console.log('Sending transaction')
-        writeContracts({
-            contracts: [
-                {
-                    address: prop.targetAddress,
-                    abi: prop.abi,
-                    functionName: prop.functionName,
-                    args: prop.args,
-                },
-            ],
-            capabilities,
-        })
+        if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
+            sponsoredTxn({
+                targetAddress: prop.targetAddress,
+                abi: prop.abi,
+                functionName: prop.functionName,
+                args: prop.args,
+            })
+        } else {
+            writeContract({
+                address: prop.targetAddress,
+                abi: prop.abi,
+                functionName: prop.functionName,
+                args: prop.args,
+            })
+        }
     }
+    // if (!availableCapabilities || !account.chainId) return null
 
-    if (!availableCapabilities || !account.chainId) return null
-
-    return <Button onClick={sendTransaction}>{`${prop.text}`}</Button>
+    return <Button className='h-[30px] w-[100px] rounded-mini bg-cta px-[10px] py-[5px] text-[10px]' onClick={sendTransaction}>{`${prop.text}`}</Button>
 }

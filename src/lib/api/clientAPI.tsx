@@ -1054,9 +1054,9 @@ export const handleOnRamp = async ({ params }: { params: [string, string] }) => 
 }
 
 export const handleOnRampByPaySDK = async ({ params }: { params: [string, string] }) => {
-    const [chainName, jwt] = params
+    const [chainName, address] = params
 
-    let dataObj = { chainName, jwtString: jwt }
+    let dataObj = { chainName, address }
     try {
         const response = await fetch('/api/on_ramp', {
             method: 'POST',

@@ -20,7 +20,7 @@ import { formatAddress } from '@/lib/utils/addresses'
 import ClaimablePoolRow from '@/components/common/other/claimable-pool-row'
 import { Route } from 'next'
 
-const UserProfile = () => {
+const Send = () => {
     const router = useRouter()
     const { ready, authenticated } = usePrivy()
 
@@ -142,4 +142,4 @@ const UserProfile = () => {
     )
 }
 
-export default UserProfile
+export default Send
