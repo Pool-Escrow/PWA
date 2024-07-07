@@ -115,7 +115,8 @@ export default function AmountSection() {
                         </h3>
                         <p>
                             <span className='font-bold'>Important</span>: Only send to an ERC20 token wallet that
-                            accepts USDC. Failure to do this will result in a <span className='font-bold'>loss</span>
+                            accepts USDC. Failure to do this will result in a{' '}
+                            <span className='font-bold'>loss {` `}</span>
                             of your funds. This transaction is not refundable.
                         </p>
                     </div>
