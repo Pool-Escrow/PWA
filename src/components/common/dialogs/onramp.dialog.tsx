@@ -55,7 +55,7 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces }: OnRampDialogPro
                     <div className='flex w-full flex-col'>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
-                                <div className='font-semibold'>Buy USDC</div>
+                                <div className='font-semibold'>Buy USDC from Coinbase</div>
                                 <div className='text-sm text-gray-500'>
                                     Using cards, banks and international options
                                 </div>

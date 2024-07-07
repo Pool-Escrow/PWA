@@ -21,7 +21,7 @@ export const dropdownItemsConfig: DropdownItemConfig[] = [
         label: 'Deposit',
     },
     {
-        href: '/profile/send' as Route,
+        href: '/send' as Route,
         icon: <SendIcon />,
         label: 'Send',
     },
