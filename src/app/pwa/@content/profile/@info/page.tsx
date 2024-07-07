@@ -53,7 +53,7 @@ export default function ProfileHeader() {
                         <a
                             href={`https://etherscan.io/address/${account.address}`}
                             target='_blank'
-                            rel='noopener noreferrer'>
+                            rel='noopener noreferrer nofollow'>
                             <Image src={externalLinkIcon} alt='Link to etherscan' width={24} height={24} />
                         </a>
                     </div>

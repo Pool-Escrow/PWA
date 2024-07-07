@@ -12,7 +12,7 @@ const OnRampButton = ({ className }: React.ComponentProps<'form'>) => {
         onSuccess: (data: any) => {
             // Perform actions on the returned data
             console.log('onramp url', data)
-            window.open(data.onRampUrl, '_blank')
+            window.open(data.onRampUrl, '_blank', 'noopener,noreferrer')
         },
         onError: () => {
             console.log('claimMutation Error')
