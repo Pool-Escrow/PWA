@@ -1,17 +1,35 @@
 import { useAccount, useWriteContract } from 'wagmi'
-import { useWriteContracts, useCapabilities } from 'wagmi/experimental'
+import { useWriteContracts, useCapabilities, useCallsStatus } from 'wagmi/experimental'
+
+interface ContractCall {
+	address: `0x${string}`;
+	abi: any;
+	functionName: string;
+	args: any[];
+}
+
+type ContractCalls = ContractCall[]; 
 
 export const useSponsoredTxn = () => {
 	/// Coinbase Paymaster hooks
 	const account = useAccount()
-	const { writeContracts } = useWriteContracts()
+	const { data: id, writeContracts } = useWriteContracts()
+	const { data: callsStatus } = useCallsStatus({ 
+		id: id as string, 
+		query: { 
+		enabled: !!id, 
+		// Poll every second until the calls are confirmed
+		refetchInterval: (data) =>
+			data.state.data?.status === "CONFIRMED" ? false : 1000, 
+		}, 
+	}); 
 	const { writeContract } = useWriteContract()
 	const { data: availableCapabilities } = useCapabilities({
 		account: account.address,
 	})
 
 	/// Coinbase Paymaster function
-	const sponsoredTxn = (args: { targetAddress: `0x${string}`; abi: any; functionName: string; args: any[] }) => {
+	const sponsoredTxn = (args: ContractCalls) => {
 		if (!availableCapabilities || !account.chainId) return {}
 		const capabilitiesForChain = availableCapabilities[account.chainId]
 		if (capabilitiesForChain['paymasterService'] && capabilitiesForChain['paymasterService'].supported) {
@@ -20,26 +38,15 @@ export const useSponsoredTxn = () => {
 					url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
 				},
 			}
-			writeContracts({
-				contracts: [
-					{
-						address: args.targetAddress,
-						abi: args.abi,
-						functionName: args.functionName,
-						args: args.args,
-					},
-				],
-				capabilities,
-			})
+			if (capabilitiesForChain['atomicBatch'] && capabilitiesForChain['atomicBatch'].supported) {
+				writeContracts({ contracts: args, capabilities });
+			} else {
+				writeContracts({ contracts: [args[0]], capabilities });
+			}
 		} else {
-			writeContract({
-				address: args.targetAddress,
-				abi: args.abi,
-				functionName: args.functionName,
-				args: args.args,
-			})
+			writeContract(args[0])
 		}
 	}
 
-	return { sponsoredTxn }
+	return { sponsoredTxn, callsStatus }
 }

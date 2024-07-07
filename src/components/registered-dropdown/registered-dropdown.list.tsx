@@ -92,16 +92,22 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
                 abi: poolAbi,
                 name: 'selfRefund',
             })
+<<<<<<< HEAD
             if (
                 wallets[0].walletClientType === 'coinbase_smart_wallet' ||
                 wallets[0].walletClientType === 'coinbase_wallet'
             ) {
                 sponsoredTxn({
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+=======
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
+>>>>>>> main
                     abi: [UnregisterPoolFunction],
                     functionName: 'selfRefund',
                     args: [BigInt(poolId)],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
