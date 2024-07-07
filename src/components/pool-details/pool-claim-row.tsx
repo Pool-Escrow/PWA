@@ -54,12 +54,12 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
                 name: 'claimWinning',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: [ClaimWinningFunction],
                     functionName: 'claimWinning',
                     args: [BigInt(props.poolId), wallets[0]?.address as Address],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],

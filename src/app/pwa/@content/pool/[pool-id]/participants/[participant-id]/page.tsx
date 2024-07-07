@@ -46,12 +46,12 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                 name: 'setWinner',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
                     functionName: 'setWinner',
                     args: [BigInt(params['pool-id']), params['participant-id'] as Address, winnerAmount],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],

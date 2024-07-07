@@ -123,8 +123,8 @@ export default function CreatePool() {
                     name: 'createPool',
                 })
                 if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                    sponsoredTxn({
-                        targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                    sponsoredTxn([{
+                        address: poolAddress[wagmi.config.state.chainId as ChainId],
                         abi: [CreatePoolFunction],
                         functionName: 'createPool',
                         args: [
@@ -136,7 +136,7 @@ export default function CreatePool() {
                             //TODO: change to usdc/ flexible token
                             dropletAddress[wagmi.config.state.chainId as ChainId],
                         ],
-                    })
+                    }])
                 } else {
                     writeContract({
                         address: poolAddress[wagmi.config.state.chainId as ChainId],

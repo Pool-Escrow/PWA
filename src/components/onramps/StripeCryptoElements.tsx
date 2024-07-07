@@ -106,11 +106,11 @@ export const OnrampElement = ({
           </Button>
       )}
       <div {...props} ref={onrampElementRef}></div>
-      {/* <Drawer>
+      <Drawer>
         <DrawerOverlay />
         <DrawerContent ref={onrampElementRef} {...props}>
         </DrawerContent>
-      </Drawer> */}
+      </Drawer>
     </>
   );
 };

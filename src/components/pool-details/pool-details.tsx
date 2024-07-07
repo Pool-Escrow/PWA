@@ -98,12 +98,12 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 name: 'enableDeposit',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
                     functionName: 'enableDeposit',
                     args: [BigInt(props.poolId)],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -124,12 +124,12 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 name: 'startPool',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
                     functionName: 'startPool',
                     args: [BigInt(props.poolId)],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -149,12 +149,12 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 name: 'endPool',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({ 
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{ 
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
                     functionName: 'endPool',
                     args: [BigInt(props.poolId)],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -178,15 +178,15 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 name: 'approve',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: dropletAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: dropletAddress[wagmi.config.state.chainId as ChainId],
                     abi: dropletAbi,
                     functionName: 'approve',
                     args: [
                         poolAddress[wagmi.config.state.chainId as ChainId],
                         poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
                     ],
-                })
+                }])
             } else {
                 writeContract({
                     address: dropletAddress[wagmi.config.state.chainId as ChainId],
@@ -214,12 +214,21 @@ const PoolDetails = (props: PoolDetailsProps) => {
                 name: 'deposit',
             })
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: dropletAddress[wagmi.config.state.chainId as ChainId],
+                    abi: dropletAbi,
+                    functionName: 'approve',
+                    args: [
+                        poolAddress[wagmi.config.state.chainId as ChainId],
+                        poolDetails?.poolDetailFromSC?.[1]?.depositAmountPerPerson ?? BigInt(0),
+                    ],
+                },
+                {
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: poolAbi,
                     functionName: 'deposit',
                     args: [BigInt(poolId), deposit],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -275,7 +284,7 @@ const PoolDetails = (props: PoolDetailsProps) => {
                         </Button>,
                     )
                 }
-                else if ((allowance ?? BigInt(0)) < deposit) {
+                else if ((allowance ?? BigInt(0)) < deposit && (wallets[0].walletClientType !== 'coinbase_smart_wallet' || wallets[0].walletClientType !== 'coinbase_wallet')) {
                     setContent(
                         <Button
                             onClick={() => onApproveButtonClicked()}

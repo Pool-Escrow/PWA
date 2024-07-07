@@ -19,12 +19,12 @@ export default function SponsoredTxn(prop: {
     const sendTransaction = () => {
         console.log('Sending transaction')
         if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-            sponsoredTxn({
-                targetAddress: prop.targetAddress,
+            sponsoredTxn([{
+                address: prop.targetAddress,
                 abi: prop.abi,
                 functionName: prop.functionName,
                 args: prop.args,
-            })
+            }])
         } else {
             writeContract({
                 address: prop.targetAddress,

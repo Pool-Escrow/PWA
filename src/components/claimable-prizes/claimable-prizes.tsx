@@ -64,12 +64,12 @@ export default function ClaimablePrizesList() {
             })
 
             if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
-                sponsoredTxn({
-                    targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
+                sponsoredTxn([{
+                    address: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: [ClaimWinningsFunction],
                     functionName: 'claimWinnings',
                     args: [poolIdsToClaimFrom, walletAddresses],
-                })
+                }])
             } else {
                 writeContract({
                     address: poolAddress[wagmi.config.state.chainId as ChainId],
