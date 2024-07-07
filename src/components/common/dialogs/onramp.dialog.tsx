@@ -6,15 +6,17 @@ import Divider from '../other/divider'
 import OnRampButton from '@/components/onRampButton'
 import OnRampForm from './onramp.form'
 import ReceiveDialog from './receive.dialog'
+import Unlimit from '@/components/onramps/unlimit'
 
 interface OnRampDialogProps {
     open: boolean
     setOpen: (open: boolean) => void
     balance: bigint | undefined
     decimalPlaces: bigint
+    amount?: string
 }
 
-const OnRampDialog = ({ open, setOpen, balance, decimalPlaces }: OnRampDialogProps) => {
+const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampDialogProps) => {
     // const [open, setOpen] = useState(false)
     // const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -55,7 +57,7 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces }: OnRampDialogPro
                     <div className='flex w-full flex-col'>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
-                                <div className='font-semibold'>Buy USDC from Coinbase</div>
+                                <div className='font-semibold'>Buy with Coinbase Pay</div>
                                 <div className='text-sm text-gray-500'>
                                     Using cards, banks and international options
                                 </div>
@@ -64,6 +66,21 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces }: OnRampDialogPro
                                 Buy
                             </Button> */}
                             <OnRampButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' />
+                        </div>
+                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                            <div className='flex flex-col'>
+                                <div className='font-semibold'>Buy with Unlimit</div>
+                                <div className='text-sm text-gray-500'>
+                                    Using cards, banks and international options
+                                </div>
+                            </div>
+                            <Unlimit
+                                amount={amount}
+                                purchaseCurrency={'USDC-BASE'}
+                                setOpen={setOpen}
+                                className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                                On Ramp
+                            </Unlimit>
                         </div>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>

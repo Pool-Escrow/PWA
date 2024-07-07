@@ -86,7 +86,7 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
                 abi: poolAbi,
                 name: 'selfRefund',
             })
-            if (wallets[0].walletClientType === 'coinbase_smart_wallet') {
+            if (wallets[0].walletClientType === 'coinbase_smart_wallet' || wallets[0].walletClientType === 'coinbase_wallet') {
                 sponsoredTxn({
                     targetAddress: poolAddress[wagmi.config.state.chainId as ChainId],
                     abi: [UnregisterPoolFunction],

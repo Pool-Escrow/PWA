@@ -3,16 +3,17 @@ import { Button } from '@/components/ui/button'
 import { GateFiSDK, GateFiDisplayModeEnum } from '@gatefi/js-sdk'
 import { useEffect, useRef, useState } from 'react'
 
-type fn = () => void
-
 interface UnlimitProps {
-    email: string
-    amount: string
-    purchaseCurrency: string
+    email?: string
+    amount?: string
+    purchaseCurrency?: string
+    className?: string
+    children?: React.ReactNode
+    setOpen?: (open: boolean) => void
 }
 
 export default function Unlimit(props: UnlimitProps) {
-	const { email, amount, purchaseCurrency } = props;
+	const { email, amount, purchaseCurrency, className, children, setOpen } = props;
     const [isOverlayVisible, setIsOverlayVisible] = useState(false);
     let overlayInstance = useRef<GateFiSDK | null>(null);
     const account = useAccount();
@@ -20,7 +21,7 @@ export default function Unlimit(props: UnlimitProps) {
 	useEffect(() => {
         const handleClickOutside = () => {
             if (isOverlayVisible) {
-                overlayInstance.current?.hide();
+                overlayInstance.current?.destroy();
                 setIsOverlayVisible(false);
             }
         };
@@ -33,7 +34,9 @@ export default function Unlimit(props: UnlimitProps) {
 
     const onClick = () => {
         if (overlayInstance.current) {
+            overlayInstance.current?.destroy();
             if (!isOverlayVisible) {
+                setOpen && setOpen(false);
                 overlayInstance.current?.show();
                 setIsOverlayVisible(true);
             }
@@ -46,25 +49,24 @@ export default function Unlimit(props: UnlimitProps) {
                 walletAddress: account.address,
                 email,
                 defaultFiat: {
-                  currency: "EUR",
-                  amount,
+                currency: "EUR",
                 },
                 defaultCrypto: {
-                  currency: purchaseCurrency,
+                    currency: purchaseCurrency || '',
+                    amount: amount || '0',
                 },
             });
-
-			overlayInstance.current.show();
+            setOpen && setOpen(false);
+			overlayInstance.current?.show();
 			setIsOverlayVisible(true);
         }
     }
 
     return (
 		<>
-			<Button className='h-[30px] w-[46px] rounded-mini bg-cta px-[10px] py-[5px] text-[10px]' onClick={onClick}>
-				Unlimit
+			<Button id="overlay-button" className={className} onClick={onClick}>
+				{children}
 			</Button>
-			<div id="overlay-button"></div>
 		</>       
     )
 }
