@@ -10,7 +10,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import OnRampButton from '@/components/onRampButton'
+import OnRampCoinbaseButton from '@/components/onRampButton'
 import { useCookie } from '@/hooks/use-cookie'
 import { getAllIndicesMatching, getValuesFromIndices } from '@/lib/utils/database'
 import { toast } from 'sonner'
@@ -118,7 +118,7 @@ const Send = () => {
                             </Link>
                         </div>
                         <div className='flex justify-center'>
-                            <OnRampButton />
+                            <OnRampCoinbaseButton />
                         </div>
                         <div className={`cardBackground flex w-full flex-col rounded-3xl p-6 md:space-y-10 md:p-10`}>
                             <h2 className='font-medium'>Claimable</h2>

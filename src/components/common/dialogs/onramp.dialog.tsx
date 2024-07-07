@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import Divider from '../other/divider'
-import OnRampButton from '@/components/onRampButton'
+import OnRampCoinbaseButton from '@/components/onRampCoinbaseButton'
 import OnRampForm from './onramp.form'
 import ReceiveDialog from './receive.dialog'
 import Unlimit from '@/components/onramps/unlimit'
@@ -65,7 +65,7 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
                             {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 Buy
                             </Button> */}
-                            <OnRampButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' />
+                            <OnRampCoinbaseButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' />
                         </div>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
