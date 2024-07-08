@@ -41,10 +41,10 @@ export const useSponsoredTxn = () => {
 			if (capabilitiesForChain['atomicBatch'] && capabilitiesForChain['atomicBatch'].supported) {
 				writeContracts({ contracts: args, capabilities });
 			} else {
-				writeContracts({ contracts: [args[0]], capabilities });
+				writeContracts({ contracts: [args[args.length - 1]], capabilities });
 			}
 		} else {
-			writeContract(args[0])
+			writeContract(args[args.length - 1])
 		}
 	}
 
