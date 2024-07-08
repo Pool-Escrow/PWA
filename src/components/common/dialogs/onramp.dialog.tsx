@@ -7,6 +7,8 @@ import OnRampCoinbaseButton from '@/components/onRampCoinbaseButton'
 import OnRampForm from './onramp.form'
 import ReceiveDialog from './receive.dialog'
 import Unlimit from '@/components/onramps/unlimit'
+import OnrampStripe from '@/components/onramps/Stripe'
+import { MoonpayCurrencyCode, MoonpayPaymentMethod, useFundWallet, useWallets } from '@privy-io/react-auth'
 
 interface OnRampDialogProps {
     open: boolean
@@ -35,6 +37,18 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
     //     )
     // }
 
+    const { wallets } = useWallets()
+    const { fundWallet } = useFundWallet()
+    const fundWithMoonpay = async () => {
+        const fundWalletConfig = {
+            currencyCode: 'USDC_BASE' as MoonpayCurrencyCode, // Purchase ETH on Ethereum mainnet
+            quoteCurrencyAmount: Number(amount), // Purchase 0.05 ETH
+            paymentMethod: 'credit_debit_card' as MoonpayPaymentMethod, // Purchase with credit or debit card
+            uiConfig: { accentColor: '#696FFD' }, // Styling preferences for MoonPay's UIs
+        }
+        await fundWallet(wallets[0].address, { config: fundWalletConfig })
+    }
+
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild></DrawerTrigger>
@@ -57,6 +71,19 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
                     <div className='flex w-full flex-col'>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
+                                <div className='font-semibold'>Buy with Unlimit</div>
+                                <div className='text-sm text-gray-500'>Recommended Option</div>
+                            </div>
+                            <Unlimit
+                                amount={amount}
+                                purchaseCurrency={'USDC-BASE'}
+                                setOpen={setOpen}
+                                className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                                On Ramp
+                            </Unlimit>
+                        </div>
+                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                            <div className='flex flex-col'>
                                 <div className='font-semibold'>Buy with Coinbase Pay</div>
                                 <div className='text-sm text-gray-500'>
                                     Using cards, banks and international options
@@ -67,20 +94,30 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
                             </Button> */}
                             <OnRampCoinbaseButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' />
                         </div>
+
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
-                                <div className='font-semibold'>Buy with Unlimit</div>
+                                <div className='font-semibold'>Buy with Stripe</div>
                                 <div className='text-sm text-gray-500'>
                                     Using cards, banks and international options
                                 </div>
                             </div>
-                            <Unlimit
-                                amount={amount}
-                                purchaseCurrency={'USDC-BASE'}
-                                setOpen={setOpen}
+
+                            <OnrampStripe />
+                        </div>
+                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                            <div className='flex flex-col'>
+                                <div className='font-semibold'>Buy with Moonpay</div>
+                                <div className='text-sm text-gray-500'>
+                                    Using cards, banks and international options
+                                </div>
+                            </div>
+
+                            <Button
+                                onClick={fundWithMoonpay}
                                 className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                                On Ramp
-                            </Unlimit>
+                                Receive
+                            </Button>
                         </div>
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
