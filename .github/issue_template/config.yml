@@ -1,0 +1,22 @@
+blank_issues_enabled: false
+
+contact_links:
+    - name: 💬 Community Slack Channel
+      url: https://tinyurl.com/pool-escrow-slack
+      about: Join our Slack for quick help and community discussions! 🤝
+
+    - name: 🎮 Community Discord Server
+      url: https://discord.gg/pool-escrow
+      about: Join our Discord for real-time chat and support! 🎉
+
+    - name: 📚 Documentation
+      url: https://docs.pool-escrow.com
+      about: Check our documentation for guides and FAQs. 📖
+
+    - name: 🐦 Twitter Support
+      url: https://twitter.com/PoolEscrowHelp
+      about: Follow us on Twitter for updates and quick support! 🐤
+
+    - name: 📘 Contributing Guidelines
+      url: https://github.com/your-org/your-repo/blob/main/CONTRIBUTING.md
+      about: Please read our contributing guidelines before submitting an issue or PR.
