@@ -1,0 +1,80 @@
+name: 🚀 Feature Request
+description: Suggest an idea for this project
+title: 'feat: '
+labels: ['enhancement', 'triage']
+body:
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for taking the time to fill out this feature request! Your ideas help us improve! 💡
+
+              Before submitting, please ensure you've searched for existing feature requests to avoid duplication.
+
+    - type: textarea
+      id: user-story
+      attributes:
+          label: 👤 User Story
+          description: Describe the feature from a user's perspective.
+          placeholder: As a [type of user], I want [goal] so that [reason].
+      validations:
+          required: true
+
+    - type: textarea
+      id: problem
+      attributes:
+          label: 🔍 Problem Statement
+          description: Clearly describe the problem this feature would solve. Avoid prescribing a specific solution.
+          placeholder: Users are struggling with...
+      validations:
+          required: true
+
+    - type: textarea
+      id: proposed-solution
+      attributes:
+          label: 💡 Proposed Solution
+          description: If you have ideas on how to solve the problem, describe them here.
+
+    - type: textarea
+      id: alternatives
+      attributes:
+          label: 🔄 Alternative Solutions
+          description: Describe any alternative solutions or features you've considered.
+
+    - type: textarea
+      id: user-feedback
+      attributes:
+          label: 👥 User Feedback
+          description: If this feature request is based on user feedback or research, provide details here.
+          placeholder: In user testing, 7 out of 10 users expressed difficulty with...
+
+    - type: textarea
+      id: success-metrics
+      attributes:
+          label: 📊 Success Metrics
+          description: How would we measure the success of this feature if implemented?
+          placeholder: e.g., Increase in user engagement by X%, reduction in support tickets related to Y by Z%
+
+    - type: textarea
+      id: mockups
+      attributes:
+          label: 🎨 Mockups or Sketches
+          description: If you have any mockups or sketches of the feature, you can add them here. You can drag and drop images into this field.
+
+    - type: input
+      id: related-issues
+      attributes:
+          label: 🔗 Related Issues
+          description: Link any related issues here.
+          placeholder: '#123, #456'
+
+    - type: input
+      id: mention
+      attributes:
+          label: 👥 Mention
+          description: Tag anyone who should be alerted about this feature request.
+          placeholder: '@username1, @username2'
+
+    - type: markdown
+      attributes:
+          value: |
+              Thanks for completing this feature request! We'll review it and get back to you as soon as possible. 🙏
