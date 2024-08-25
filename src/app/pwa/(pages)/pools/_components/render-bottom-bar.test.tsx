@@ -2,12 +2,8 @@ import { getByTestId, render, screen, waitFor } from '@testing-library/react'
 import RenderBottomBar from './render-bottom-bar'
 import { Providers } from '@/app/pwa/_client/providers'
 import '@testing-library/jest-dom'
-import MainWrapper from '@/app/pwa/_components/main-wrapper'
 import MainContentWrapper from '@/app/pwa/_components/main-wrapper'
-import RootLayout from '@/app/landing/layout'
-import AuthenticatedContent from './authenticated-content'
-import NextUserPool from './next-user-pool'
-import BalanceInfo from './balance-info'
+
 import BottomBar from '@/app/pwa/@bottombar/default'
 
 describe('RenderBottomBar', () => {
