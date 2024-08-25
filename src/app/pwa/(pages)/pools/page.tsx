@@ -7,6 +7,7 @@ import { checkAuthStatusAction, getAllPoolsAction } from './actions'
 
 export default async function PoolsPage() {
     const [result] = await checkAuthStatusAction()
+    console.log('PoolsPage result', result)
     const isAdmin = result && 'isAdmin' in result && result?.isAdmin
 
     return (

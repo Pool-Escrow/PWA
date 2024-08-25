@@ -28,7 +28,7 @@ export const checkAuthStatusAction = authenticatedAction
             { isAdmin: boolean; authenticated: boolean; address: Address } | { needsRefresh: true } | null
         > => {
             const { session, needsRefresh } = await validateRequest()
-
+            console.log('session', session)
             if (needsRefresh) {
                 return { needsRefresh: true }
             }

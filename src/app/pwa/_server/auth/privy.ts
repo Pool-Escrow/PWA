@@ -41,7 +41,6 @@ export async function getWalletAddress(): Promise<Address | null> {
 // TODO: check admin role against smart contract instead, or both
 export async function isAdmin(address?: Address) {
     if (!address) return false
-
     try {
         const HasRoleFunction = getAbiItem({
             abi: poolAbi,
@@ -54,7 +53,7 @@ export async function isAdmin(address?: Address) {
             functionName: 'hasRole',
             args: [adminRole, address],
         })
-
+        console.log('isWhitelisted', isWhitelisted)
         return Boolean(isWhitelisted)
     } catch (error) {
         console.error('Error checking admin status:', error)

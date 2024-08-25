@@ -14,6 +14,7 @@ interface UserItem {
 }
 
 export async function createUserInDb({ privyId, info }: UserItem) {
+    console.log('[createUserInDb]')
     const { data: newUser, error } = await db
         .from('users')
         .insert({
@@ -25,6 +26,7 @@ export async function createUserInDb({ privyId, info }: UserItem) {
         .single()
 
     if (error) {
+        console.error('Error creating user in database:', error)
         throw new Error(`Error creating user in database: ${error.message}`)
     }
 

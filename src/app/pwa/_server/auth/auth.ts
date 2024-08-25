@@ -50,6 +50,7 @@ export const validateRequest = async (): Promise<{
     // if the user is not in the database, or they don't have username and avatar, create it and redirect to profile/new
     if (!user) {
         console.log('[auth] User not in DB')
+
         // create in database with empty random username and avatar
 
         const newUser = await createUserUseCase({
@@ -73,9 +74,17 @@ export const validateRequest = async (): Promise<{
 
         // redirect('/profile/new')
     }
-
+    console.log('auth revalidatePath: ', '/pools')
     revalidatePath('/pools')
-
+    console.log('auth return: ', {
+        user: privyUser,
+        session: {
+            id,
+            address,
+            isAdmin: adminStatus,
+        },
+        needsRefresh: false,
+    })
     return {
         user: privyUser,
         session: {
