@@ -1,24 +1,14 @@
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { useWriteContracts, useCapabilities, useCallsStatus } from 'wagmi/experimental'
-import { useState, useEffect } from 'react'
-import { Address, Hash, TransactionReceipt, decodeEventLog, keccak256, toHex } from 'viem'
-import { poolAbi } from '@/types/contracts'
-
 import { useWallets } from '@privy-io/react-auth'
-import { wagmi } from '../providers/configs'
+import { useEffect, useState } from 'react'
+import { Abi, Address, ContractFunctionArgs, Hash, TransactionReceipt } from 'viem'
+import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
+import { useCallsStatus, useWriteContracts } from 'wagmi/experimental'
 
-interface ContractCall {
+type ContractCall = {
     address: Address
-    abi: any
+    abi: Abi
     functionName: string
-    args: any[]
-}
-
-type ContractCalls = ContractCall[]
-
-interface PaymasterService {
-    url: string
-    execute: (calls: ContractCalls) => Promise<string>
+    args: unknown[] // ContractFunctionArgs[]
 }
 
 interface SmartTransactionResult {
@@ -29,9 +19,23 @@ interface SmartTransactionResult {
     error: Error | null
 }
 
-const useSmartTransaction = (paymasterService?: PaymasterService) => {
+export default function useTransactions() {
+    const {
+        data: id,
+        writeContractsAsync,
+        isPending: isPaymasterPending,
+    } = useWriteContracts({
+        mutation: {
+            onMutate(variables) {
+                console.log('Optimistic update here', variables)
+            },
+            onSuccess(data, variables, context) {},
+        },
+    })
+    const { data: hash, writeContractAsync } = useWriteContract()
+
     const { wallets, ready: walletsReady } = useWallets()
-    const chainId = wagmi.config.state.chainId
+    const walletType = walletsReady && wallets[0].walletClientType
 
     const [result, setResult] = useState<SmartTransactionResult>({
         hash: null,
@@ -41,11 +45,6 @@ const useSmartTransaction = (paymasterService?: PaymasterService) => {
         error: null,
     })
 
-    const { data: id, writeContracts } = useWriteContracts()
-    const { data: hash, writeContract } = useWriteContract()
-    const { data: availableCapabilities } = useCapabilities({
-        account: wallets[0]?.address as Address,
-    })
     const { data: callsStatus } = useCallsStatus({
         id: id as string,
         query: {
@@ -53,17 +52,18 @@ const useSmartTransaction = (paymasterService?: PaymasterService) => {
             refetchInterval: data => (data.state.data?.status === 'CONFIRMED' ? false : 1000),
         },
     })
+
     const { data: receipt, isLoading: isConfirming } = useWaitForTransactionReceipt({
         hash: result.hash as Hash | undefined,
     })
 
     useEffect(() => {
         if (callsStatus?.status === 'CONFIRMED' && callsStatus.receipts && callsStatus.receipts.length > 0) {
-            const receipt = callsStatus.receipts[0]
-            console.log('Transaction confirmed. Hash:', receipt.transactionHash)
-            console.log('Full receipt:', receipt)
-            console.log('Transaction logs:', receipt.logs)
-            setResult(prev => ({ ...prev, hash: receipt.transactionHash }))
+            const paymasterReceipt = callsStatus.receipts[0]
+            console.log('Transaction confirmed. Hash:', paymasterReceipt.transactionHash)
+            console.log('Full receipt:', paymasterReceipt)
+            console.log('Transaction logs:', paymasterReceipt.logs)
+            setResult(prev => ({ ...prev, hash: paymasterReceipt.transactionHash }))
         }
     }, [callsStatus])
 
@@ -74,101 +74,49 @@ const useSmartTransaction = (paymasterService?: PaymasterService) => {
         }
     }, [hash])
 
-    const executeCoinbaseTransaction = async (args: ContractCalls) => {
-        if (!availableCapabilities || !chainId) {
-            throw new Error('Capabilities or chain ID not available')
-        }
-
-        const capabilitiesForChain = availableCapabilities[chainId]
-
-        if (!capabilitiesForChain['paymasterService']?.supported) {
-            throw new Error('Paymaster service not supported')
-        }
-
-        const capabilities = {
-            paymasterService: paymasterService || {
-                url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+    async function executeCoinbaseTransactions(contractCalls: ContractCall[]) {
+        console.log('Executing smart transactions', contractCalls)
+        await writeContractsAsync(
+            {
+                contracts: contractCalls,
+                capabilities: {
+                    paymasterService: {
+                        url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+                    },
+                },
             },
-        }
-
-        if (capabilitiesForChain['atomicBatch']?.supported) {
-            console.log('Executing atomic batch transaction', args, capabilities, chainId)
-            writeContracts({ contracts: args, capabilities })
-        }
+            {
+                onSettled(data, error, variables, context) {
+                    console.log('Transaction settled', data, error, variables, context)
+                },
+            },
+        )
     }
 
-    const executeEOATransaction = (args: ContractCalls) => {
-        console.log('Executing EOA transaction')
-        writeContract(args[args.length - 1])
+    async function executeEoaTransactions(contractCalls: ContractCall[]) {
+        console.log('Executing EOA transactions', contractCalls)
+        await writeContractAsync(contractCalls[0])
     }
-
-    const executeTransaction = async (args: ContractCalls) => {
-        if (!walletsReady) {
-            console.error('Wallets not ready')
-            return
-        }
-
-        const walletType = wallets[0].walletClientType
-
-        setResult(prev => ({ ...prev, isLoading: true, isError: false, error: null }))
-
-        try {
-            if (walletType === 'coinbase_smart_wallet' || walletType === 'coinbase_wallet') {
-                executeCoinbaseTransaction(args)
-            } else {
-                executeEOATransaction(args)
-            }
-            setResult(prev => ({ ...prev, isLoading: false }))
-        } catch (error) {
-            console.error('Transaction execution error:', error)
-            setResult(prev => ({ ...prev, isLoading: false, isError: true, error: error as Error }))
-        }
-    }
-
-    useEffect(() => {
-        if (receipt) {
-            console.log('Transaction receipt received:', receipt)
-
-            // Calculate the hash of the PoolCreated event
-            const eventSignature = 'PoolCreated(uint256,address,string,uint256,uint16,address)'
-            const eventHash = keccak256(toHex(eventSignature))
-
-            // Search for the PoolCreated event in the logs
-            const poolCreatedLog = receipt.logs.find(log => log.topics[0] === eventHash)
-
-            if (poolCreatedLog) {
-                try {
-                    const decodedLog = decodeEventLog({
-                        abi: poolAbi, // Make sure poolAbi is available in this scope
-                        data: poolCreatedLog.data,
-                        topics: poolCreatedLog.topics,
-                        eventName: 'PoolCreated',
-                    })
-
-                    const latestPoolId = Number(decodedLog.args.poolId)
-                    console.log('Latest Pool ID:', latestPoolId)
-
-                    // Here you can trigger any necessary updates or state changes
-                    // based on the successful pool creation
-                } catch (error) {
-                    console.error('Error decoding PoolCreated event:', error)
-                }
-            } else {
-                console.log('PoolCreated event not found in transaction logs')
-            }
-        }
-    }, [receipt])
 
     return {
-        executeTransaction,
+        async executeTransactions(contractCalls: ContractCall[]) {
+            console.log('Executing transactions', contractCalls)
+            if (walletType === 'coinbase_wallet') {
+                console.log('Coinbase wallet detected', wallets[0].connectorType)
+                executeCoinbaseTransactions(contractCalls)
+            } else {
+                console.log('Non-Coinbase wallet detected')
+                executeEoaTransactions(contractCalls)
+            }
+        },
+        isConfirmed: callsStatus?.status === 'CONFIRMED',
+        isPending: isPaymasterPending,
+        isReady: walletsReady,
         result: {
             ...result,
             receipt,
             isConfirming,
             callsStatus,
         },
-        isReady: walletsReady,
     }
 }
-
-export default useSmartTransaction

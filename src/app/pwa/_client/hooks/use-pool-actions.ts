@@ -1,6 +1,6 @@
 import { currentPoolAddress } from '@/app/pwa/_server/blockchain/server-config'
 import { useAuth } from './use-auth'
-import useSmartTransaction from './use-smart-transaction'
+import useTransactions from './use-smart-transaction'
 import { poolAbi, useReadDropletBalanceOf } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import { Address, parseUnits } from 'viem'
@@ -8,8 +8,8 @@ import { toast } from 'sonner'
 
 export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals: number) {
     const { login, authenticated } = useAuth()
-    const { executeTransaction, isReady } = useSmartTransaction()
-    const { wallets, ready: walletsReady } = useWallets()
+    const { executeTransactions, isConfirmed, isPending, isReady } = useTransactions()
+    const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadDropletBalanceOf({
         args: [(wallets[0]?.address as Address) || '0x'],
     })
@@ -17,7 +17,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
     const handleEnableDeposits = async () => {
         toast('Enabling deposits...')
 
-        await executeTransaction([
+        executeTransactions([
             {
                 address: currentPoolAddress,
                 abi: poolAbi,
@@ -30,7 +30,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
     const handleStartPool = async () => {
         toast('Starting pool...')
 
-        await executeTransaction([
+        executeTransactions([
             {
                 address: currentPoolAddress,
                 abi: poolAbi,
@@ -43,7 +43,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
     const handleEndPool = async () => {
         toast('Ending pool...')
 
-        await executeTransaction([
+        executeTransactions([
             {
                 address: currentPoolAddress,
                 abi: poolAbi,
@@ -87,7 +87,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
             console.log('Join pool')
             toast('Joining pool...')
 
-            await executeTransaction([
+            executeTransactions([
                 {
                     address: currentPoolAddress,
                     abi: poolAbi,
@@ -98,7 +98,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
         }
     }
 
-    const ready = isReady && walletsReady
+    const ready = isReady
 
     return {
         handleEnableDeposits,
@@ -106,5 +106,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
         handleEndPool,
         handleJoinPool,
         ready,
+        isPending,
+        isConfirmed,
     }
 }

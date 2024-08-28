@@ -37,11 +37,8 @@ export default function BottomBarHandler({
         args: [walletAddress || '0x', poolId],
     })
 
-    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready } = usePoolActions(
-        poolId,
-        poolPrice,
-        tokenDecimals,
-    )
+    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed } =
+        usePoolActions(poolId, poolPrice, tokenDecimals)
 
     useEffect(() => {
         if (ready) {
@@ -49,7 +46,10 @@ export default function BottomBarHandler({
                 setBottomBarContent(
                     <Button
                         className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
-                        onClick={handleViewTicket}>
+                        onClick={handleViewTicket}
+                        disabled={isPending}
+                        // isLoading={isPending}
+                    >
                         View My Ticket
                     </Button>,
                 )
@@ -62,11 +62,21 @@ export default function BottomBarHandler({
         }
     }, [poolStatus, isAdmin, setBottomBarContent, ready, isParticipant])
 
+    useEffect(() => {
+        if (isConfirmed) {
+            console.log('Transaction confirmed')
+            handleBottomBarContent(poolStatus, isAdmin)
+        }
+    }, [isConfirmed])
+
     const handleViewTicket = () => {
         router.push(`/pool/${poolId}/ticket` as Route)
     }
 
     const handleBottomBarContent = (poolStatus: POOLSTATUS, isAdmin: boolean) => {
+        console.log('revalidating bottom bar content')
+        router.refresh()
+
         console.log('poolStatus', poolStatus)
         switch (poolStatus) {
             case POOLSTATUS.INACTIVE: {
@@ -74,8 +84,9 @@ export default function BottomBarHandler({
                     setBottomBarContent(
                         <Button
                             className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
-                            onClick={handleEnableDeposits}>
-                            Enable deposits
+                            onClick={handleEnableDeposits}
+                            disabled={isPending}>
+                            {isPending ? 'Confirming...' : 'Enable deposit'}
                         </Button>,
                     )
                 }
