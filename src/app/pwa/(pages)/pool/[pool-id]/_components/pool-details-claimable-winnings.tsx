@@ -26,7 +26,7 @@ export default function PoolDetailsClaimableWinnings({
 }: PoolDetailsClaimableWinningsProps) {
     const { address } = useAccount() as { address: Address }
 
-    const { executeTransaction } = useSmartTransaction()
+    const { executeTransactions } = useSmartTransaction()
 
     const handleClaimWinnings = async () => {
         toast('Claiming winnings...')
@@ -45,7 +45,7 @@ export default function PoolDetailsClaimableWinnings({
         ]
 
         try {
-            executeTransaction(args)
+            executeTransactions(args)
         } catch (error) {
             console.log('claimWinning Error', error)
         }
