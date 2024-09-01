@@ -35,7 +35,7 @@ export default function useTransactions() {
     const { data: hash, writeContractAsync } = useWriteContract()
 
     const { wallets, ready: walletsReady } = useWallets()
-    const walletType = walletsReady ? wallets[0].connectorType : null
+    const walletType = walletsReady ? wallets[0]?.connectorType : null
 
     const [result, setResult] = useState<SmartTransactionResult>({
         hash: null,
