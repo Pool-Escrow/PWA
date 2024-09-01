@@ -1,4 +1,4 @@
-import { poolAddress } from '@/types/contracts'
+import { dropletAddress, poolAddress } from '@/types/contracts'
 import { createConfig, getPublicClient, http } from '@wagmi/core'
 import type { Address } from 'viem'
 import { baseSepolia } from 'viem/chains'
@@ -14,5 +14,6 @@ export const serverConfig = createConfig({
 })
 
 export const currentPoolAddress: Address = poolAddress[serverConfig.state.chainId]
+export const currentTokenAddress: Address = dropletAddress[serverConfig.state.chainId]
 
 export const serverClient = getPublicClient(serverConfig)

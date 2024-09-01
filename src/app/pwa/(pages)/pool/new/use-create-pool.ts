@@ -28,7 +28,7 @@ const initialState = {
 export function useCreatePool() {
     const [state, formAction] = useFormState(createPoolAction, initialState)
     const router = useRouter()
-    const { executeTransaction, result } = useSmartTransaction()
+    const { executeTransactions, result } = useSmartTransaction()
     const { setStep, setOnChainPoolId, setError, showToast } = usePoolCreationStore(state => ({
         setStep: state.setStep,
         setOnChainPoolId: state.setOnChainPoolId,
@@ -76,7 +76,7 @@ export function useCreatePool() {
                 ],
             }
 
-            executeTransaction([contractCall])
+            executeTransactions([contractCall])
                 .then(() => {
                     console.log('Transaction executed, current result:', result)
                     setStep(Steps.UpdatingStatus)
@@ -96,7 +96,7 @@ export function useCreatePool() {
                 poolData: state.poolData,
             })
         }
-    }, [state.internalPoolId, state.poolData, executeTransaction, setStep, setError, showToast])
+    }, [state.internalPoolId, state.poolData, executeTransactions, setStep, setError, showToast])
 
     useEffect(() => {
         console.log('isConfirmed:', isConfirmed)

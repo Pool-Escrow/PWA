@@ -26,7 +26,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
 
     const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess } = useWriteContract()
-    const { executeTransaction } = useSmartTransaction()
+    const { executeTransactions } = useSmartTransaction()
 
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [inputValue, setInputValue] = useState<string>('0')
@@ -52,10 +52,10 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
             },
         ]
 
-        console.log('executeTransaction', args, params['pool-id'], params['participant-id'], winnerAmount)
+        console.log('executeTransactions', args, params['pool-id'], params['participant-id'], winnerAmount)
 
         try {
-            executeTransaction(args)
+            executeTransactions(args)
         } catch (error) {
             console.log('setWinner Error', error)
         }

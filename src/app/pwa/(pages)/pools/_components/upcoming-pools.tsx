@@ -7,10 +7,13 @@ export default async function UpcomingPools() {
 
     if (upcomingPools.length === 0) {
         return (
-            <div className='flex-center h-96 flex-col'>
-                <h1 className='mb-4 text-lg font-semibold'>No upcoming pools</h1>
-                <p className='text-sm'>Come back later</p>
-            </div>
+            <>
+                <h1 className='mb-4 text-lg font-semibold'>Upcoming Pools</h1>
+                <div className='flex-center h-80 flex-col'>
+                    <h1 className='mb-4 text-lg font-semibold'>No upcoming pools</h1>
+                    <p className='text-sm'>Come back later</p>
+                </div>
+            </>
         )
     }
 

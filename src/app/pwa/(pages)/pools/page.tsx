@@ -3,7 +3,7 @@ import BalanceInfo from './_components/balance-info'
 import NextUserPool from './_components/next-user-pool'
 import RenderBottomBar from './_components/render-bottom-bar'
 import UpcomingPools from './_components/upcoming-pools'
-import { checkAuthStatusAction, getAllPoolsAction } from './actions'
+import { checkAuthStatusAction } from './actions'
 
 export default async function PoolsPage() {
     const [result] = await checkAuthStatusAction()

@@ -9,7 +9,7 @@ interface PoolDetailsCardBannerProps {
 export default async function PoolDetailsBanner({ imageUrl, name, buttons, status }: PoolDetailsCardBannerProps) {
     return (
         <div className='detail_card_banner relative overflow-hidden'>
-            <Image src={imageUrl} alt={name} fill className='object-cover' />
+            <Image src={imageUrl} alt={name} fill className='object-cover' priority />
             {buttons}
             <div className='detail_card_banner_status'>{status}</div>
         </div>

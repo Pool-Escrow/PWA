@@ -1,6 +1,6 @@
 'use client'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
-import { Route } from 'next'
+import type { Route } from 'next'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -34,5 +34,5 @@ export function useAuth() {
 
     const { ready, authenticated } = usePrivy()
 
-    return { login, logout, authenticated: ready && authenticated }
+    return { login, logout, authenticated: ready && authenticated, ready }
 }

@@ -1,6 +1,5 @@
-import { PostgrestSingleResponse } from '@supabase/supabase-js'
-
-import { Database } from '@/types/db'
+import type { PostgrestSingleResponse } from '@supabase/supabase-js'
+import type { Database } from '@/types/db'
 import { getSupabaseBrowserClient } from './db-client'
 
 const supabaseBrowserClient = getSupabaseBrowserClient()
