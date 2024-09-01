@@ -1,4 +1,5 @@
 import type { PoolDetailsDTO } from '../_lib/definitions'
+import { POOLSTATUS } from '../_lib/definitions'
 import PoolDetailsHeading from './pool-details-heading'
 import PoolDetailsClaimableWinnings from './pool-details-claimable-winnings'
 import PoolDetailsProgress from './pool-details-progress'
@@ -41,7 +42,9 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                 />
 
                 <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
-                    <PoolDetailsProgress current={pool.poolBalance} goal={pool.goal} />
+                    {pool.status != POOLSTATUS.ENDED && (
+                        <PoolDetailsProgress current={pool.poolBalance} goal={pool.goal} />
+                    )}
                     <PoolDetailsParticipants
                         poolId={pool.contractId.toString()}
                         numParticipants={pool.numParticipants}
