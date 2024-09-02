@@ -43,7 +43,11 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
 
                 <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
                     {pool.status != POOLSTATUS.ENDED && (
-                        <PoolDetailsProgress current={pool.poolBalance} goal={pool.goal} />
+                        <PoolDetailsProgress
+                            data-testid='pool-details-progress'
+                            current={pool.poolBalance}
+                            goal={pool.goal}
+                        />
                     )}
                     <PoolDetailsParticipants
                         poolId={pool.contractId.toString()}
