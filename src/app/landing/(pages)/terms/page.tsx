@@ -1,18 +1,17 @@
 import Image from 'next/image'
-import Link from 'next/link'
-
 import Page from '@/components/page'
 import Section from '@/components/section'
-import route from '@/lib/utils/routes'
+import BackButton from '../../_components/back-button'
+import leftArrowIcon from '@/public/landing/icons/svg/left-arrow-icon.svg'
 
 const Terms = () => {
     return (
         <Page>
             <Section>
                 <div className='flex flex-row'>
-                    <Link href={route['/']}>
-                        <Image src='/landing/icons/svg/left-arrow-icon.svg' alt='Back' width={24} height={24} />
-                    </Link>
+                    <BackButton>
+                        <Image src={leftArrowIcon} alt='Back' width={24} height={24} />
+                    </BackButton>
                 </div>
                 <div className='flex w-full flex-col justify-center space-y-4 py-20 leading-loose'>
                     <h1 className='text-4xl font-bold'>Terms and Conditions</h1>
