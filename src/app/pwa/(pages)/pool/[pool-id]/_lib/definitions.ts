@@ -36,7 +36,7 @@ const PoolDetailsDTOSchema = z.object({
     participants: z.array(
         z.object({
             name: z.string(),
-            avatarUrl: z.string().url(),
+            avatarUrl: z.string().url().or(z.literal('')),
         }),
     ),
     // userDeposit: z.number().nonnegative(),
