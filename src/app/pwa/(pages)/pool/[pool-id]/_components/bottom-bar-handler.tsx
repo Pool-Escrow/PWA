@@ -47,7 +47,7 @@ export default function BottomBarHandler({
         args: [walletAddress || '0x', poolId],
     })
 
-    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed } =
+    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed, resetConfirmation } =
         usePoolActions(poolId, poolPrice, tokenDecimals)
 
     const handleViewTicket = useCallback(() => {
@@ -125,8 +125,9 @@ export default function BottomBarHandler({
             console.log('Transaction confirmed')
             router.refresh()
             updateBottomBarContent()
+            resetConfirmation() // Reset the isConfirmed state after executing the necessary logic
         }
-    }, [isConfirmed, updateBottomBarContent, router])
+    }, [isConfirmed, updateBottomBarContent, router, resetConfirmation])
 
     return null
 }

@@ -11,7 +11,7 @@ import { deposit } from '../../_lib/blockchain/functions/pool/deposit'
 
 export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals: number) {
     const { login, authenticated } = useAuth()
-    const { executeTransactions, isConfirmed, isPending, isReady } = useTransactions()
+    const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation } = useTransactions()
     const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadDropletBalanceOf({
         args: [(wallets[0]?.address as Address) || '0x'],
@@ -106,5 +106,6 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
         ready,
         isPending,
         isConfirmed,
+        resetConfirmation,
     }
 }

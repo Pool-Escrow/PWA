@@ -1,5 +1,5 @@
 import { useWallets } from '@privy-io/react-auth'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import type { Abi, Address, Hash, TransactionReceipt } from 'viem'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { useCallsStatus, useWriteContracts } from 'wagmi/experimental'
@@ -57,6 +57,8 @@ export default function useTransactions() {
         hash: result.hash as Hash | undefined,
     })
 
+    const [isConfirmed, setIsConfirmed] = useState(false)
+
     useEffect(() => {
         if (callsStatus?.status === 'CONFIRMED' && callsStatus.receipts && callsStatus.receipts.length > 0) {
             const paymasterReceipt = callsStatus.receipts[0]
@@ -64,8 +66,13 @@ export default function useTransactions() {
             console.log('Full receipt:', paymasterReceipt)
             console.log('Transaction logs:', paymasterReceipt.logs)
             setResult(prev => ({ ...prev, hash: paymasterReceipt.transactionHash }))
+            setIsConfirmed(true)
         }
     }, [callsStatus])
+
+    const resetConfirmation = useCallback(() => {
+        setIsConfirmed(false)
+    }, [])
 
     useEffect(() => {
         if (hash) {
@@ -109,7 +116,8 @@ export default function useTransactions() {
                 await executeEoaTransactions(contractCalls)
             }
         },
-        isConfirmed: callsStatus?.status === 'CONFIRMED',
+        isConfirmed,
+        resetConfirmation,
         isPending: isPaymasterPending,
         isReady: walletsReady,
         result: {
