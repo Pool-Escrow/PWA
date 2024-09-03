@@ -128,6 +128,9 @@ importers:
       react:
         specifier: 18.3.1
         version: 18.3.1
+      react-blockies:
+        specifier: 1.4.1
+        version: 1.4.1(react@18.3.1)
       react-dom:
         specifier: 18.3.1
         version: 18.3.1(react@18.3.1)
@@ -207,6 +210,9 @@ importers:
       '@types/react':
         specifier: 18.3.3
         version: 18.3.3
+      '@types/react-blockies':
+        specifier: 1.4.4
+        version: 1.4.4
       '@types/react-dom':
         specifier: 18.3.0
         version: 18.3.0
@@ -3160,6 +3166,9 @@ packages:
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
+
+  '@types/react-blockies@1.4.4':
+    resolution: {integrity: sha512-7QfFeT1y/izwP/Wxmnl9Ii73udFQIBsfI/IvG+841sPxqc7Pf79ZDZP3XQsmYzAjDXdoZXquLgI/Q/tmAZwB0w==}
 
   '@types/react-dom@18.3.0':
     resolution: {integrity: sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==}
@@ -6632,6 +6641,11 @@ packages:
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
     engines: {node: '>= 0.6'}
+
+  react-blockies@1.4.1:
+    resolution: {integrity: sha512-4N015X5oPNnD3xQPsiqolOFzPZSSWyc5mJhJUZShUCHtiGUxVN+1qsWTcglkHMNySux9hUofaispqcw9QkWP5Q==}
+    peerDependencies:
+      react: 18.3.1
 
   react-device-detect@2.2.3:
     resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
@@ -11572,6 +11586,10 @@ snapshots:
 
   '@types/prop-types@15.7.12': {}
 
+  '@types/react-blockies@1.4.4':
+    dependencies:
+      '@types/react': 18.3.3
+
   '@types/react-dom@18.3.0':
     dependencies:
       '@types/react': 18.3.3
@@ -15940,6 +15958,11 @@ snapshots:
       safe-buffer: 5.2.1
 
   range-parser@1.2.1: {}
+
+  react-blockies@1.4.1(react@18.3.1):
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.3.1
 
   react-device-detect@2.2.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
