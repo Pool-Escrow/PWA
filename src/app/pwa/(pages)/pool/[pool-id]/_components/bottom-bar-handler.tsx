@@ -62,11 +62,11 @@ export default function BottomBarHandler({
             },
             [POOLSTATUS.DEPOSIT_ENABLED]: {
                 admin: { label: 'Start Pool', action: handleStartPool },
-                user: { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                user: isParticipant ? { label: 'View My Ticket', action: handleViewTicket } : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
             },
             [POOLSTATUS.STARTED]: {
                 admin: { label: 'End pool', action: handleEndPool },
-                user: { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                user: isParticipant ? { label: 'View My Ticket', action: handleViewTicket } : null,
             },
             [POOLSTATUS.ENDED]: {
                 admin: null,
