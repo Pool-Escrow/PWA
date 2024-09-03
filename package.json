@@ -74,6 +74,7 @@
     },
     "devDependencies": {
         "@next/bundle-analyzer": "14.2.5",
+        "@playwright/test": "1.46.1",
         "@tanstack/eslint-plugin-query": "5.51.15",
         "@tanstack/react-query-devtools": "5.51.15",
         "@testing-library/jest-dom": "6.4.8",
