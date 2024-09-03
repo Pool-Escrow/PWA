@@ -19,14 +19,14 @@ interface PoolDetailsInfoProps {
     description: string
     price: number
     tokenSymbol: string
-    termsUrl: string
+    termsUrl?: string
 }
 
 export default function PoolDetailsInfo({ description, price, tokenSymbol, termsUrl }: PoolDetailsInfoProps) {
     const items = [
         { title: 'Description', value: description },
         { title: 'Buy-In', value: `$${price} ${tokenSymbol}` },
-        { title: 'Terms', value: <PoolDetailsTermsUrl termsUrl={termsUrl} /> },
+        { title: 'Terms', value: termsUrl ? <PoolDetailsTermsUrl termsUrl={termsUrl} /> : 'No terms provided' },
     ]
 
     return (

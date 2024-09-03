@@ -51,7 +51,6 @@ function processPoolDetails(
             poolBalance: Number(contractPool.poolBalance),
         }
     }
-    // console.info('[get-pool-details] terms:', poolInfo.terms)
     return {
         hostName: poolInfo.hostName,
         contractId: BigInt(contractPool.id),
