@@ -1,5 +1,5 @@
+import Balance from '../../_components/balance/balance'
 import AuthenticatedContent from './_components/authenticated-content'
-import BalanceInfo from './_components/balance-info'
 import NextUserPool from './_components/next-user-pool'
 import RenderBottomBar from './_components/render-bottom-bar'
 import UpcomingPools from './_components/upcoming-pools'
@@ -12,9 +12,9 @@ export default async function PoolsPage() {
 
     return (
         <div className='space-y-6'>
+            <Balance />
             <AuthenticatedContent
                 isAdmin={isAdmin}
-                balanceInfo={<BalanceInfo />}
                 nextUserPool={<NextUserPool />}
                 renderBottomBar={<RenderBottomBar isAdmin={isAdmin} />}
             />
