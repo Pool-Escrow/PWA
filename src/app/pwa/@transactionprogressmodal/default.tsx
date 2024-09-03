@@ -3,8 +3,11 @@
 import Lottie from 'react-lottie'
 import animationData from '@/public/app/animations/loading.json'
 import { DrawerContent, DrawerHeader, Drawer, DrawerTrigger, DrawerTitle } from '../_components/ui/drawer'
+import { useAppStore } from '../_client/providers/app-store.provider'
 
 export default function Default() {
+    const open = useAppStore(s => s.transactionInProgress)
+
     const defaultOptions = {
         loop: true,
         autoplay: true,
@@ -15,7 +18,7 @@ export default function Default() {
     }
 
     return (
-        <Drawer open={true}>
+        <Drawer open={open}>
             <DrawerTrigger asChild></DrawerTrigger>
             <DrawerContent className='bg-white'>
                 <DrawerHeader className='text-left'>
