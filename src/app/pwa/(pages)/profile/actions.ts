@@ -24,20 +24,19 @@ export const getAddressBalanceAction = authenticatedAction
         },
     )
 
-type UserItem = Pick<Tables<'users'>, 'avatar' | 'displayName'> | null
+type UserItem = Pick<Tables<'users'>, 'avatar' | 'displayName'>
 
-export const getUserInfoAction = authenticatedAction
-    .createServerAction()
-    .handler(async (): Promise<UserItem | { needsRefresh: true }> => {
-        const { session, needsRefresh } = await validateRequest()
+export const getUserInfoAction = async () => {
+    const { session, needsRefresh } = await validateRequest()
 
-        if (needsRefresh) {
-            return { needsRefresh: true }
-        }
+    if (needsRefresh) {
+        return { error: 'needsRefresh' }
+    }
 
-        if (!session || !session.address) {
-            throw new Error('User not authenticated or address not available')
-        }
+    if (!session || !session.address) {
+        return { error: 'User not authenticated or address not available' }
+    }
 
-        return getUserUseCase()
-    })
+    const user = await getUserUseCase()
+    return { data: user }
+}
