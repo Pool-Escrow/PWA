@@ -2,13 +2,14 @@
 
 import { Button } from '@/app/pwa/_components/ui/button'
 import { useReadPoolIsParticipant } from '@/types/contracts'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Address } from 'viem'
 import { useAppStore } from '@/app/pwa/_client/providers/app-store.provider'
 import { POOLSTATUS } from '../_lib/definitions'
 import { usePoolActions } from '@/app/pwa/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
 import type { Route } from 'next'
+import OnRampDialog from '../../../profile/_components/onramps/onramp.dialog'
 
 type ButtonConfig = {
     label: string
@@ -39,6 +40,8 @@ export default function BottomBarHandler({
     poolTokenSymbol,
     tokenDecimals,
 }: BottomBarHandlerProps) {
+    const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
+
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
 
@@ -48,7 +51,7 @@ export default function BottomBarHandler({
     })
 
     const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed, resetConfirmation } =
-        usePoolActions(poolId, poolPrice, tokenDecimals)
+        usePoolActions(poolId, poolPrice, tokenDecimals, () => setOpenOnRampDialog(true))
 
     const handleViewTicket = useCallback(() => {
         router.push(`/pool/${poolId}/ticket` as Route)
@@ -129,5 +132,5 @@ export default function BottomBarHandler({
         }
     }, [isConfirmed, updateBottomBarContent, router, resetConfirmation])
 
-    return null
+    return <OnRampDialog open={openOnRampDialog} setOpen={setOpenOnRampDialog} amount={poolPrice.toString()}/>
 }

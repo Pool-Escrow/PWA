@@ -138,8 +138,6 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
             <OnRampDialog
                 open={openOnRampDialog}
                 setOpen={setOpenOnRampDialog}
-                balance={tokenBalanceData?.value}
-                decimalPlaces={decimals}
             />
         </motion.div>
     )

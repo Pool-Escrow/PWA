@@ -9,12 +9,21 @@ import { toast } from 'sonner'
 import { approve } from '../../_lib/blockchain/functions/token/approve'
 import { deposit } from '../../_lib/blockchain/functions/pool/deposit'
 
-export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals: number) {
+export function usePoolActions(
+    poolId: bigint,
+    poolPrice: number,
+    tokenDecimals: number,
+    openOnRampDialog: () => void
+) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation } = useTransactions()
     const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadDropletBalanceOf({
         args: [(wallets[0]?.address as Address) || '0x'],
+        query: {
+            enabled: Boolean(wallets[0]?.address),
+            refetchInterval: 10_000, // 10 seconds
+        },
     })
 
     const handleEnableDeposits = () => {
@@ -83,6 +92,7 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
             if (Number(userBalance || 0) < bigIntPrice) {
                 console.log('Onramp funds if needed')
                 toast('Insufficient funds, please top up your account.')
+                openOnRampDialog() // Call the openOnRampDialog function
                 return
             }
 
