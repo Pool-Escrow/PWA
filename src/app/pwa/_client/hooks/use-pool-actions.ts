@@ -100,7 +100,7 @@ export function usePoolActions(
             toast('Joining pool...')
 
             void executeTransactions([
-                ...(bigIntPrice > 0 ? [approve({ spender: currentTokenAddress, amount: bigIntPrice })] : []),
+                ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice })] : []),
                 deposit({ poolId, amount: bigIntPrice }),
             ])
         }
