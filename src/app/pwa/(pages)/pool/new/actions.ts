@@ -57,18 +57,21 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     // TODO: implement token address
     // const tokenAddress = formData.get('tokenAddress') as Address
     const dateRangeString = formData.get('dateRange')
+    const userTimezone = formData.get('dateRange_timezone')
     let dateRange: { start: string; end: string } | null = null
 
     console.log('dateRangeString', dateRangeString)
+    console.log('userTimezone', userTimezone)
 
     if (dateRangeString && typeof dateRangeString === 'string') {
         try {
             const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
+            const timezoneOffset = parseInt(userTimezone as string, 10) || 0
 
-            // Truncate seconds from the date strings
+            // Convert local dates to UTC by adding the timezone offset
             dateRange = {
-                start: parsedDateRange.start.substring(0, 16), // YYYY-MM-DDTHH:MM
-                end: parsedDateRange.end.substring(0, 16), // YYYY-MM-DDTHH:MM
+                start: new Date(new Date(parsedDateRange.start).getTime() + timezoneOffset * 60000).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
+                end: new Date(new Date(parsedDateRange.end).getTime() + timezoneOffset * 60000).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
             }
         } catch (error) {
             console.error('Error parsing dateRange:', error)

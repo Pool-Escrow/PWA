@@ -117,6 +117,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     return (
         <div className="space-y-4">
             <input type='hidden' name={name} value={JSON.stringify(localValue)} />
+            <input type='hidden' name={`${name}_timezone`} value={JSON.stringify(userTimezone)} />
             <div className='flex flex-row items-center justify-between'>
                 <span className='text-xs font-medium text-black'>Timezone</span>
                 <Select value={userTimezone.offset.toString()} onValueChange={(value) => {
