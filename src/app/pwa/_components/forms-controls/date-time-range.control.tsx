@@ -71,17 +71,29 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
         setUserTimezone(detectedTimezone)
 
         // Update localValue with the detected timezone
-        setLocalValue(prevValue => ({
-            start: adjustTimeForTimezone(prevValue.start, detectedTimezone.offset),
-            end: adjustTimeForTimezone(prevValue.end, detectedTimezone.offset)
+        setLocalValue(() => ({
+            start: adjustTimeForTimezone(detectedTimezone.offset),
+            end: adjustTimeForTimezone(detectedTimezone.offset)
         }))
     }, [])
 
+
+    const getCurrentUTCTime = () => {
+        const now = new Date()
+        return new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate(),
+            now.getUTCHours(),
+            now.getUTCMinutes()
+        ))
+    }
+
     // Add this helper function to adjust time for the detected timezone
-    const adjustTimeForTimezone = (isoString: string, offsetMinutes: number) => {
-        const date = new Date(isoString)
-        date.setMinutes(date.getMinutes() + offsetMinutes)
-        return date.toISOString().split('.')[0]
+    const adjustTimeForTimezone = (offsetMinutes: number) => {
+        const utcDate = getCurrentUTCTime()
+        utcDate.setMinutes(utcDate.getMinutes() + offsetMinutes)
+        return utcDate.toISOString().split('.')[0]
     }
 
     const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
@@ -112,20 +124,10 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                     if (selectedTimezone) {
                         setUserTimezone(selectedTimezone)
                         // Update localValue when timezone changes
-                        setLocalValue(prevValue => ({
-                            start: adjustTimeForTimezone(prevValue.start, selectedTimezone.offset),
-                            end: adjustTimeForTimezone(prevValue.end, selectedTimezone.offset)
+                        setLocalValue(() => ({
+                            start: adjustTimeForTimezone(selectedTimezone.offset),
+                            end: adjustTimeForTimezone(selectedTimezone.offset)
                         }))
-                        
-                        // Console log the current selection
-                        console.log('Current timezone selection:', {
-                            label: selectedTimezone.label,
-                            offset: selectedTimezone.offset,
-                            localValue: {
-                                start: adjustTimeForTimezone(localValue.start, selectedTimezone.offset),
-                                end: adjustTimeForTimezone(localValue.end, selectedTimezone.offset)
-                            }
-                        })
                     }
                 }}>
                     <SelectTrigger className='w-[340px] text-xs flex justify-between items-center'>
