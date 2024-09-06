@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 
 export const viewport: Viewport = {
-    maximumScale: 5,
+    maximumScale: 1,
     minimumScale: 1,
     viewportFit: 'cover',
     themeColor: [
