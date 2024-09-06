@@ -23,35 +23,35 @@ const getDefaultDateTimeValue = () => {
 }
 
 const timezones = [
-    { value: 'Etc/GMT+12', label: '(GMT-12:00) International Date Line West', offset: -720 },
-    { value: 'Etc/GMT+11', label: '(GMT-11:00) Midway Island, Samoa', offset: -660 },
-    { value: 'Etc/GMT+10', label: '(GMT-10:00) Hawaii', offset: -600 },
-    { value: 'Etc/GMT+9', label: '(GMT-09:00) Alaska', offset: -540 },
-    { value: 'Etc/GMT+8', label: '(GMT-08:00) Pacific Time (US & Canada)', offset: -480 },
-    { value: 'Etc/GMT+7', label: '(GMT-07:00) Mountain Time (US & Canada)', offset: -420 },
-    { value: 'Etc/GMT+6', label: '(GMT-06:00) Central Time (US & Canada), Mexico City', offset: -360 },
-    { value: 'Etc/GMT+5', label: '(GMT-05:00) Eastern Time (US & Canada), Bogota, Lima', offset: -300 },
-    { value: 'Etc/GMT+4', label: '(GMT-04:00) Atlantic Time (Canada), Caracas, La Paz', offset: -240 },
-    { value: 'Etc/GMT+3', label: '(GMT-03:00) Brazil, Buenos Aires, Georgetown', offset: -180 },
-    { value: 'Etc/GMT+2', label: '(GMT-02:00) Mid-Atlantic', offset: -120 },
-    { value: 'Etc/GMT+1', label: '(GMT-01:00) Azores, Cape Verde Islands', offset: -60 },
-    { value: 'Etc/GMT+0', label: '(GMT) Western Europe Time, London, Lisbon, Casablanca', offset: 0 },
-    { value: 'Etc/GMT-1', label: '(GMT+01:00) Brussels, Copenhagen, Madrid, Paris', offset: 60 },
-    { value: 'Etc/GMT-2', label: '(GMT+02:00) Kaliningrad, South Africa', offset: 120 },
-    { value: 'Etc/GMT-3', label: '(GMT+03:00) Baghdad, Riyadh, Moscow, St. Petersburg', offset: 180 },
-    { value: 'Etc/GMT-4', label: '(GMT+04:00) Abu Dhabi, Muscat, Baku, Tbilisi', offset: 240 },
-    { value: 'Etc/GMT-5', label: '(GMT+05:00) Ekaterinburg, Islamabad, Karachi, Tashkent', offset: 300 },
-    { value: 'Etc/GMT-6', label: '(GMT+06:00) Almaty, Dhaka, Colombo', offset: 360 },
-    { value: 'Etc/GMT-7', label: '(GMT+07:00) Bangkok, Hanoi, Jakarta', offset: 420 },
-    { value: 'Etc/GMT-8', label: '(GMT+08:00) Beijing, Perth, Singapore, Hong Kong', offset: 480 },
-    { value: 'Etc/GMT-9', label: '(GMT+09:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk', offset: 540 },
-    { value: 'Etc/GMT-10', label: '(GMT+10:00) Eastern Australia, Guam, Vladivostok', offset: 600 },
-    { value: 'Etc/GMT-11', label: '(GMT+11:00) Magadan, Solomon Islands, New Caledonia', offset: 660 },
-    { value: 'Etc/GMT-12', label: '(GMT+12:00) Auckland, Wellington, Fiji, Kamchatka', offset: 720 },
+    { label: '(GMT-12:00) International Date Line West', offset: -720 },
+    { label: '(GMT-11:00) Midway Island, Samoa', offset: -660 },
+    { label: '(GMT-10:00) Hawaii', offset: -600 },
+    { label: '(GMT-09:00) Alaska', offset: -540 },
+    { label: '(GMT-08:00) Pacific Time (US & Canada)', offset: -480 },
+    { label: '(GMT-07:00) Mountain Time (US & Canada)', offset: -420 },
+    { label: '(GMT-06:00) Central Time (US & Canada), Mexico City', offset: -360 },
+    { label: '(GMT-05:00) Eastern Time (US & Canada), Bogota, Lima', offset: -300 },
+    { label: '(GMT-04:00) Atlantic Time (Canada), Caracas, La Paz', offset: -240 },
+    { label: '(GMT-03:00) Brazil, Buenos Aires, Georgetown', offset: -180 },
+    { label: '(GMT-02:00) Mid-Atlantic', offset: -120 },
+    { label: '(GMT-01:00) Azores, Cape Verde Islands', offset: -60 },
+    { label: '(GMT) Western Europe Time, London, Lisbon, Casablanca', offset: 0 },
+    { label: '(GMT+01:00) Brussels, Copenhagen, Madrid, Paris', offset: 60 },
+    { label: '(GMT+02:00) Kaliningrad, South Africa', offset: 120 },
+    { label: '(GMT+03:00) Baghdad, Riyadh, Moscow, St. Petersburg', offset: 180 },
+    { label: '(GMT+04:00) Abu Dhabi, Muscat, Baku, Tbilisi', offset: 240 },
+    { label: '(GMT+05:00) Ekaterinburg, Islamabad, Karachi, Tashkent', offset: 300 },
+    { label: '(GMT+06:00) Almaty, Dhaka, Colombo', offset: 360 },
+    { label: '(GMT+07:00) Bangkok, Hanoi, Jakarta', offset: 420 },
+    { label: '(GMT+08:00) Beijing, Perth, Singapore, Hong Kong', offset: 480 },
+    { label: '(GMT+09:00) Tokyo, Seoul, Osaka, Sapporo, Yakutsk', offset: 540 },
+    { label: '(GMT+10:00) Eastern Australia, Guam, Vladivostok', offset: 600 },
+    { label: '(GMT+11:00) Magadan, Solomon Islands, New Caledonia', offset: 660 },
+    { label: '(GMT+12:00) Auckland, Wellington, Fiji, Kamchatka', offset: 720 },
 ]
 
 export default function DateTimeRange({ name }: DateTimeRangeProps) {
-    const [userTimezone, setUserTimezone] = useState(timezones[0].value)
+    const [userTimezone, setUserTimezone] = useState(timezones[0])
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>(getDefaultDateTimeValue())
 
     useEffect(() => {
@@ -63,13 +63,26 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                 Math.abs(curr.offset - offsetMinutes) < Math.abs(prev.offset - offsetMinutes) ? curr : prev
             )
             
-            console.log(`Detected timezone: ${closestTimezone.value} (offset: ${offsetMinutes} minutes)`)
-            return closestTimezone.value
+            console.log(`Detected timezone: ${closestTimezone.label} (offset: ${offsetMinutes} minutes)`)
+            return closestTimezone
         }
 
         const detectedTimezone = detectUserTimezone()
         setUserTimezone(detectedTimezone)
+
+        // Update localValue with the detected timezone
+        setLocalValue(prevValue => ({
+            start: adjustTimeForTimezone(prevValue.start, detectedTimezone.offset),
+            end: adjustTimeForTimezone(prevValue.end, detectedTimezone.offset)
+        }))
     }, [])
+
+    // Add this helper function to adjust time for the detected timezone
+    const adjustTimeForTimezone = (isoString: string, offsetMinutes: number) => {
+        const date = new Date(isoString)
+        date.setMinutes(date.getMinutes() + offsetMinutes)
+        return date.toISOString().split('.')[0]
+    }
 
     const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
         const [currentDate, currentTime] = localValue[field].split('T')
@@ -81,20 +94,11 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
         }))
     }
 
-    const formatToLocalTime = (isoString: string) => {
+    const formatDateTimeForInput = (isoString: string) => {
         const date = new Date(isoString)
-        const userTimezoneOffset = timezones.find(tz => tz.value === userTimezone)?.offset || 0
-        const localDate = new Date(date.getTime() + userTimezoneOffset * 60000)
-        
-        const year = localDate.getUTCFullYear()
-        const month = String(localDate.getUTCMonth() + 1).padStart(2, '0')
-        const day = String(localDate.getUTCDate()).padStart(2, '0')
-        const hours = String(localDate.getUTCHours()).padStart(2, '0')
-        const minutes = String(localDate.getUTCMinutes()).padStart(2, '0')
-        
         return {
-            date: `${year}-${month}-${day}`,
-            time: `${hours}:${minutes}`
+            date: date.toISOString().split('T')[0],
+            time: date.toTimeString().slice(0, 5)
         }
     }
 
@@ -103,15 +107,35 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
             <input type='hidden' name={name} value={JSON.stringify(localValue)} />
             <div className='flex flex-row items-center justify-between'>
                 <span className='text-xs font-medium text-black'>Timezone</span>
-                <Select value={userTimezone} onValueChange={setUserTimezone}>
+                <Select value={userTimezone.offset.toString()} onValueChange={(value) => {
+                    const selectedTimezone = timezones.find(tz => tz.offset.toString() === value)
+                    if (selectedTimezone) {
+                        setUserTimezone(selectedTimezone)
+                        // Update localValue when timezone changes
+                        setLocalValue(prevValue => ({
+                            start: adjustTimeForTimezone(prevValue.start, selectedTimezone.offset),
+                            end: adjustTimeForTimezone(prevValue.end, selectedTimezone.offset)
+                        }))
+                        
+                        // Console log the current selection
+                        console.log('Current timezone selection:', {
+                            label: selectedTimezone.label,
+                            offset: selectedTimezone.offset,
+                            localValue: {
+                                start: adjustTimeForTimezone(localValue.start, selectedTimezone.offset),
+                                end: adjustTimeForTimezone(localValue.end, selectedTimezone.offset)
+                            }
+                        })
+                    }
+                }}>
                     <SelectTrigger className='w-[340px] text-xs flex justify-between items-center'>
                         <SelectValue placeholder='Select timezone' />
                     </SelectTrigger>
                     <SelectContent>
                         {timezones.map((tz) => (
                             <SelectItem 
-                                key={tz.value} 
-                                value={tz.value} 
+                                key={tz.offset} 
+                                value={tz.offset.toString()} 
                                 className='text-xs flex items-center'
                             >
                                 <div className="truncate text-left w-full">
@@ -129,7 +153,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                         <Input
                             className='cursor-pointer bg-transparent px-0 text-center text-xs font-medium'
                             type='date'
-                            value={formatToLocalTime(localValue.start).date}
+                            value={formatDateTimeForInput(localValue.start).date}
                             onChange={e => updateValue('start', 'date', e.target.value)}
                             autoComplete='off'
                             prefix='date'
@@ -139,7 +163,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                         <Input
                             className='cursor-pointer bg-white text-center text-xs font-medium'
                             type='time'
-                            value={formatToLocalTime(localValue.start).time}
+                            value={formatDateTimeForInput(localValue.start).time}
                             onChange={e => updateValue('start', 'time', e.target.value)}
                             autoComplete='off'
                             step={60}
@@ -154,7 +178,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                         <Input
                             className='cursor-pointer bg-transparent px-0 text-center text-xs font-medium'
                             type='date'
-                            value={formatToLocalTime(localValue.end).date}
+                            value={formatDateTimeForInput(localValue.end).date}
                             onChange={e => updateValue('end', 'date', e.target.value)}
                             autoComplete='off'
                             prefix='date'
@@ -164,7 +188,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                         <Input
                             className='cursor-pointer bg-white text-center text-xs font-medium'
                             type='time'
-                            value={formatToLocalTime(localValue.end).time}
+                            value={formatDateTimeForInput(localValue.end).time}
                             onChange={e => updateValue('end', 'time', e.target.value)}
                             autoComplete='off'
                             step={60}
