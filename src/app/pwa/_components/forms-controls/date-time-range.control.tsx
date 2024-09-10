@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { toZonedTime } from 'date-fns-tz';
 
 export type DateTimeRangeValue = {
     start: string
@@ -55,16 +56,25 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>(getDefaultDateTimeValue())
 
     useEffect(() => {
+        // Function to get the user's timezone offset in minutes
+        const getUserTimezoneOffset = () => {
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const now = new Date();
+            const zonedTime = toZonedTime(now, timeZone);
+            const offset = zonedTime.getTimezoneOffset();
+            return -offset; // Convert to positive offset in minutes
+        };
+
+        // Function to find the matching timezone from the list
+        const findMatchingTimezone = () => {
+            const userOffset = getUserTimezoneOffset();
+            return timezones.find(tz => tz.offset === userOffset);
+        };
+
         const detectUserTimezone = () => {
-            const timezoneOffset = new Date().getTimezoneOffset()
-            const offsetMinutes = -timezoneOffset // Negate to match our timezones array format
-            
-            const closestTimezone = timezones.reduce((prev, curr) => 
-                Math.abs(curr.offset - offsetMinutes) < Math.abs(prev.offset - offsetMinutes) ? curr : prev
-            )
-            
-            console.log(`Detected timezone: ${closestTimezone.label} (offset: ${offsetMinutes} minutes)`)
-            return closestTimezone
+            const timezone = findMatchingTimezone() || timezones[12] // Default to GMT if not found
+            console.log(`Detected timezone: ${timezone.label} (offset: ${timezone.offset} minutes)`)
+            return timezone
         }
 
         const detectedTimezone = detectUserTimezone()

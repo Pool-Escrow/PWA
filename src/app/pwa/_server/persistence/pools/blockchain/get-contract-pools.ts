@@ -4,6 +4,7 @@ import { poolAbi } from '@/types/contracts'
 import { getPublicClient, multicall } from '@wagmi/core'
 import { getAbiItem } from 'viem'
 import { currentPoolAddress, serverConfig } from '../../../blockchain/server-config'
+import { toZonedTime } from 'date-fns-tz'
 
 const LatestPoolId = getAbiItem({
     abi: poolAbi,
@@ -44,6 +45,9 @@ export async function getContractPools(): Promise<PoolItem[]> {
         })),
     })
 
+    // Get the user's timezone
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     return results
         .map((result, index) => {
             if (result.status === 'success') {
@@ -52,8 +56,8 @@ export async function getContractPools(): Promise<PoolItem[]> {
                     id: poolIds[index].toString(),
                     name: poolDetail.poolName,
                     status: ['INACTIVE', 'DEPOSIT_ENABLED', 'STARTED', 'ENDED', 'DELETED'][poolStatus],
-                    startDate: new Date(Number(poolDetail.timeStart) * 1000),
-                    endDate: new Date(Number(poolDetail.timeEnd) * 1000),
+                    startDate: toZonedTime(new Date(Number(poolDetail.timeStart) * 1000), userTimeZone),
+                    endDate: toZonedTime(new Date(Number(poolDetail.timeEnd) * 1000), userTimeZone),
                     numParticipants: participants.length,
                 }
             }
