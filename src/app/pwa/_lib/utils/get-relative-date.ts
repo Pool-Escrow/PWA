@@ -4,6 +4,8 @@
  * using Intl.RelativeTimeFormat
  * source: https://www.builder.io/blog/relative-time
  */
+import { toZonedTime } from "date-fns-tz"
+
 export function getRelativeTimeString(date: Date | number, lang = navigator.language): string {
     // Allow dates or times to be passed
     const timeMs = date instanceof Date ? date.getTime() : typeof date === 'string' ? new Date(date).getTime() : date
@@ -70,9 +72,10 @@ export const getStatusString = ({
 }
 
 export const getFormattedEventTime = (startDate: Date | string, endDate: Date | string): string => {
-    const now = new Date()
-    const start = new Date(startDate)
-    const end = new Date(endDate)
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const now = toZonedTime(new Date(), userTimeZone)
+    const start = toZonedTime(new Date(startDate), userTimeZone)
+    const end = toZonedTime(new Date(endDate), userTimeZone)
 
     if (now > end) {
         return 'Ended'

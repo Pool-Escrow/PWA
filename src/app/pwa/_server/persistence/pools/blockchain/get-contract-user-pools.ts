@@ -69,18 +69,14 @@ export async function getUserPools(userAddress: Address) {
         })),
     })
 
-    // Get the offset in minutes for the user's timezone
-    const now = new Date();
-    const offsetInMinutes = now.getTimezoneOffset();
-
     return poolDetailsResults
         .map((result, index) => {
             if (result.status === 'success') {
                 const [, poolDetail, , poolStatus, , participants] = result.result
                 return {
                     id: allUserPools[index].toString(),
-                    timeStart: Number(poolDetail.timeStart) - offsetInMinutes * 60,
-                    timeEnd: Number(poolDetail.timeEnd) - offsetInMinutes * 60,
+                    timeStart: Number(poolDetail.timeStart),
+                    timeEnd: Number(poolDetail.timeEnd),
                     status: poolStatus,
                     name: poolDetail.poolName,
                     numParticipants: participants.length,
