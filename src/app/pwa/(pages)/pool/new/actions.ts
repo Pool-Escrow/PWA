@@ -66,14 +66,11 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     if (dateRangeString && typeof dateRangeString === 'string' && userTimezoneString && typeof userTimezoneString === 'string') {
         try {
             const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
-            const userTimezone = JSON.parse(userTimezoneString) as { label: string; offset: number };
-
-            const timezoneOffsetMs = userTimezone.offset * 60000;
 
             // Convert local dates to UTC by subtracting the timezone offset
             dateRange = {
-                start: new Date(new Date(parsedDateRange.start).getTime() - timezoneOffsetMs).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
-                end: new Date(new Date(parsedDateRange.end).getTime() - timezoneOffsetMs).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
+                start: new Date(parsedDateRange.start).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
+                end: new Date(parsedDateRange.end).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
             };
         } catch (error) {
             console.error('Error parsing dateRange:', error)

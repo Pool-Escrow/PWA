@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+import { format, fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export type DateTimeRangeValue = {
     start: string
@@ -74,27 +74,22 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
         const [currentDate, currentTime] = localValue[field].split('T')
         const updatedValue = type === 'date' ? `${newValue}T${currentTime}` : `${currentDate}T${newValue}`
-
-        console.log('userTimezone', userTimezone)
-
         const updatedUtcTime = {
             ...utcTime,
             [field]: fromZonedTime(updatedValue, userTimezone.timeZone),
         }
 
-        console.log('updatedUtcTime', updatedUtcTime)
-
         setLocalValue(prevValue => ({
-            ...prevValue,
-            [field]: updatedValue,
-        }))
+                ...prevValue,
+                [field]: updatedValue,
+            }))
         setUtcTime(updatedUtcTime)
     }
 
     const formatDateTimeForInput = (isoString: string) => {
-        const date = new Date(isoString)
+        const date = toZonedTime(fromZonedTime(isoString, userTimezone.timeZone), userTimezone.timeZone)  
         return {
-            date: date.toISOString().split('T')[0],
+            date: format(date, 'yyyy-MM-dd'),
             time: date.toTimeString().slice(0, 5)
         }
     }
@@ -106,9 +101,21 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
             <div className='flex flex-row items-center justify-between'>
                 <span className='text-xs font-medium text-black'>Timezone</span>
                 <Select value={userTimezone.timeZone} onValueChange={(value) => {
+                    const prevTimezone = userTimezone
                     const selectedTimezone = timezones.find(tz => tz.timeZone === value)
                     if (selectedTimezone) {
+                        const utcStart = fromZonedTime(localValue.start, prevTimezone.timeZone)
+                        const utcEnd = fromZonedTime(localValue.end, prevTimezone.timeZone)
+
                         setUserTimezone(selectedTimezone)
+                        setLocalValue(() => ({
+                            start: toZonedTime(utcStart, selectedTimezone.timeZone).toISOString(),
+                            end: toZonedTime(utcEnd, selectedTimezone.timeZone).toISOString(),
+                        }))
+                        setUtcTime({
+                            start: utcStart,
+                            end: utcEnd,
+                        })
                     }
                 }}>
                     <SelectTrigger className='w-[340px] text-xs flex justify-between items-center'>
