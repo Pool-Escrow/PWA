@@ -1,14 +1,15 @@
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useAuth } from './use-auth'
-import useTransactions from './use-smart-transaction'
+import useTransactions from '@/app/_client/hooks/use-smart-transaction'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
-import type { Address } from 'viem'
+import type { Address, Hash } from 'viem'
 import { parseUnits } from 'viem'
 import { toast } from 'sonner'
 import { approve } from '@/app/_lib/blockchain/functions/token/approve'
 import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
 import { useReadContract } from 'wagmi'
+import { useWaitForTransactionReceipt } from 'wagmi'
 
 export function usePoolActions(
     poolId: bigint,
@@ -18,7 +19,8 @@ export function usePoolActions(
     onSuccessfulJoin: () => void,
 ) {
     const { login, authenticated } = useAuth()
-    const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation, result } = useTransactions()
+    const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
+
     const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadContract({
         address: currentTokenAddress,
@@ -29,6 +31,14 @@ export function usePoolActions(
             enabled: Boolean(wallets[0]?.address),
             refetchInterval: 20_000, // 10 seconds
         },
+    })
+
+    const {
+        data: receipt,
+        isLoading: isConfirming,
+        isSuccess: isConfirmed,
+    } = useWaitForTransactionReceipt({
+        hash: result.hash as Hash | undefined,
     })
 
     const handleEnableDeposits = () => {
@@ -133,5 +143,6 @@ export function usePoolActions(
         isPending: result.isLoading,
         isConfirmed,
         resetConfirmation,
+        isConfirming,
     }
 }

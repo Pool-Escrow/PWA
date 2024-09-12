@@ -48,8 +48,16 @@ export default function BottomBarHandler({
         args: [walletAddress || '0x', poolId],
     })
 
-    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed } =
-        usePoolActions(poolId, poolPrice, tokenDecimals)
+    const {
+        handleEnableDeposits,
+        handleEndPool,
+        handleJoinPool,
+        handleStartPool,
+        ready,
+        isPending,
+        isConfirmed,
+        isConfirming,
+    } = usePoolActions(poolId, poolPrice, tokenDecimals)
 
     const handleViewTicket = useCallback(() => {
         router.push(`/pool/${poolId}/ticket` as Route)
@@ -88,12 +96,12 @@ export default function BottomBarHandler({
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
                     onClick={config.action}
-                    disabled={isPending}>
-                    {isPending ? 'Confirming...' : config.label}
+                    disabled={isPending || isConfirming}>
+                    {isPending || isConfirming ? 'Confirming...' : config.label}
                 </Button>
             )
         },
-        [isPending],
+        [isPending, isConfirming],
     )
 
     const updateBottomBarContent = useCallback(() => {
@@ -130,8 +138,8 @@ export default function BottomBarHandler({
     }, [isConfirmed, updateBottomBarContent, router])
 
     useEffect(() => {
-        setTransactionInProgress(isPending)
-        console.log('BottomBarHandler isPending', isPending)
-    }, [setTransactionInProgress, isPending])
+        setTransactionInProgress(isPending || isConfirming)
+        console.log('BottomBarHandler isPending', isPending || isConfirming)
+    }, [setTransactionInProgress, isPending, isConfirming])
     return null
 }
