@@ -57,22 +57,24 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     // TODO: implement token address
     // const tokenAddress = formData.get('tokenAddress') as Address
     const dateRangeString = formData.get('dateRange')
-    const userTimezone = formData.get('dateRange_timezone')
+    const userTimezoneString = formData.get('dateRange_timezone') 
     let dateRange: { start: string; end: string } | null = null
 
     console.log('dateRangeString', dateRangeString)
-    console.log('userTimezone', userTimezone)
+    console.log('userTimezone', userTimezoneString)
 
-    if (dateRangeString && typeof dateRangeString === 'string') {
+    if (dateRangeString && typeof dateRangeString === 'string' && userTimezoneString && typeof userTimezoneString === 'string') {
         try {
             const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
-            const timezoneOffset = parseInt(userTimezone as string, 10) || 0
+            const userTimezone = JSON.parse(userTimezoneString) as { label: string; offset: number };
 
-            // Convert local dates to UTC by adding the timezone offset
+            const timezoneOffsetMs = userTimezone.offset * 60000;
+
+            // Convert local dates to UTC by subtracting the timezone offset
             dateRange = {
-                start: new Date(new Date(parsedDateRange.start).getTime() + timezoneOffset * 60000).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
-                end: new Date(new Date(parsedDateRange.end).getTime() + timezoneOffset * 60000).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
-            }
+                start: new Date(new Date(parsedDateRange.start).getTime() - timezoneOffsetMs).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
+                end: new Date(new Date(parsedDateRange.end).getTime() - timezoneOffsetMs).toISOString().substring(0, 16), // YYYY-MM-DDTHH:MM
+            };
         } catch (error) {
             console.error('Error parsing dateRange:', error)
         }
