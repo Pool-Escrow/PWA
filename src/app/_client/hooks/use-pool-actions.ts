@@ -18,7 +18,7 @@ export function usePoolActions(
     onSuccessfulJoin: () => void,
 ) {
     const { login, authenticated } = useAuth()
-    const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation } = useTransactions()
+    const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation, result } = useTransactions()
     const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadContract({
         address: currentTokenAddress,
@@ -130,7 +130,7 @@ export function usePoolActions(
         handleJoinPool,
         resetJoinPoolProcess,
         ready,
-        isPending,
+        isPending: result.isLoading,
         isConfirmed,
         resetConfirmation,
     }
