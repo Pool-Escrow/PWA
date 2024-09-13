@@ -2,6 +2,8 @@ import { Button } from '@/app/pwa/_components/ui/button'
 import { GateFiDisplayModeEnum, GateFiSDK } from '@gatefi/js-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
+import { inProduction } from '@/app/pwa/_lib/utils/environment.mjs'
+import { inDevelopment } from '@/app/pwa/_lib/utils/environment.mjs'
 
 interface UnlimitProps {
     email?: string
@@ -45,7 +47,7 @@ export default function Unlimit(props: UnlimitProps) {
                 merchantId: process.env.NEXT_PUBLIC_UNLIMIT_MERCHANT_ID || '',
                 displayMode: GateFiDisplayModeEnum.Overlay,
                 nodeSelector: '#overlay-button',
-                isSandbox: true, // ATTN: To change to false in production
+                isSandbox: !inProduction, // ATTN: To change to false in production
                 walletAddress: account.address,
                 email,
                 defaultFiat: {
