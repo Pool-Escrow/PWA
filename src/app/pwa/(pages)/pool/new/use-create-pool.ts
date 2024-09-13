@@ -63,17 +63,18 @@ export function useCreatePool() {
 
             console.log('Pool data:', poolData)
             console.log("startDate", Math.floor(fromZonedTime(poolData.startDate, 'UTC').getTime() / 1000))
+            console.log("endDate", Math.floor(fromZonedTime(poolData.endDate, 'UTC').getTime() / 1000))
 
             const contractCall = {
                 address: poolAddress[wagmi.config.state.chainId as ChainId],
                 abi: poolAbi,
                 functionName: 'createPool',
                 args: [
-                    Math.floor(new Date(poolData.startDate).getTime() / 1000),
-                    Math.floor(new Date(poolData.endDate).getTime() / 1000),
+                    Math.floor(fromZonedTime(poolData.startDate, 'UTC').getTime() / 1000),
+                    Math.floor(fromZonedTime(poolData.endDate, 'UTC').getTime() / 1000),
                     poolData.name,
                     parseEther(poolData.price.toString()),
-                    1000,
+                    0,
                     dropletAddress[wagmi.config.state.chainId as ChainId],
                 ],
             }
