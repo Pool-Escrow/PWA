@@ -9,6 +9,7 @@ import useSmartTransaction from '@/app/pwa/_client/hooks/use-smart-transaction'
 import { Steps, usePoolCreationStore } from '@/app/pwa/_client/stores/pool-creation-store'
 import { Route } from 'next'
 import { useWaitForTransactionReceipt } from 'wagmi'
+import { fromZonedTime } from 'date-fns-tz'
 
 const initialState = {
     message: '',
@@ -61,6 +62,7 @@ export function useCreatePool() {
             const { poolData } = state
 
             console.log('Pool data:', poolData)
+            console.log("startDate", Math.floor(fromZonedTime(poolData.startDate, 'UTC').getTime() / 1000))
 
             const contractCall = {
                 address: poolAddress[wagmi.config.state.chainId as ChainId],
@@ -75,6 +77,7 @@ export function useCreatePool() {
                     dropletAddress[wagmi.config.state.chainId as ChainId],
                 ],
             }
+            console.log('Contract call:', contractCall)
 
             executeTransactions([contractCall])
                 .then(() => {

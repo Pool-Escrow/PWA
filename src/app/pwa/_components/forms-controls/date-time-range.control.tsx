@@ -52,7 +52,7 @@ const timezones = [
 ];
 
 export default function DateTimeRange({ name }: DateTimeRangeProps) {
-    const [userTimezone, setUserTimezone] = useState(timezones[0])
+    const [userTimezone, setUserTimezone] = useState(timezones[12])
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>(getDefaultDateTimeValue())
     const [utcTime, setUtcTime] = useState({
         start: new Date(),
@@ -72,12 +72,36 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     }, [])
 
     const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
-        const [currentDate, currentTime] = localValue[field].split('T')
-        const updatedValue = type === 'date' ? `${newValue}T${currentTime}` : `${currentDate}T${newValue}`
+        // const [currentDate, currentTime] = localValue[field].split('T')
+        // const updatedValue = type === 'date' ? `${newValue}T${currentTime}` : `${currentDate}T${newValue}`
+        // const updatedUtcTime = {
+        //     ...utcTime,
+        //     [field]: fromZonedTime(updatedValue, userTimezone.timeZone),
+        // }
+        // console.log('Updated value:', updatedValue)
+        // console.log('Updated UTC time:', updatedUtcTime)
+        let updatedValue: string;
+
+        if (type === 'date') {
+            const [year, month, day] = newValue.split('-').map(Number);
+            const date = toZonedTime(fromZonedTime(localValue[field], userTimezone.timeZone), userTimezone.timeZone);
+            date.setFullYear(year);
+            date.setMonth(month - 1); // Months are 0-based in JavaScript
+            date.setDate(day);
+            updatedValue = format(date, "yyyy-MM-dd'T'HH:mm");
+        } else {
+            const [hours, minutes] = newValue.split(':').map(Number);
+            const date = toZonedTime(fromZonedTime(localValue[field], userTimezone.timeZone), userTimezone.timeZone);
+            date.setHours(hours);
+            date.setMinutes(minutes);
+            updatedValue = format(date, "yyyy-MM-dd'T'HH:mm");
+        }
         const updatedUtcTime = {
             ...utcTime,
             [field]: fromZonedTime(updatedValue, userTimezone.timeZone),
         }
+        console.log('Updated value:', updatedValue)
+        console.log('Updated UTC time:', updatedUtcTime)
 
         setLocalValue(prevValue => ({
                 ...prevValue,

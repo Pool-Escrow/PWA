@@ -57,13 +57,11 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     // TODO: implement token address
     // const tokenAddress = formData.get('tokenAddress') as Address
     const dateRangeString = formData.get('dateRange')
-    const userTimezoneString = formData.get('dateRange_timezone') 
     let dateRange: { start: string; end: string } | null = null
 
     console.log('dateRangeString', dateRangeString)
-    console.log('userTimezone', userTimezoneString)
 
-    if (dateRangeString && typeof dateRangeString === 'string' && userTimezoneString && typeof userTimezoneString === 'string') {
+    if (dateRangeString && typeof dateRangeString === 'string') {
         try {
             const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
 
