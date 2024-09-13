@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     }
 
     const jwt = sign(payload, key_secret, signOptions)
-
+    // Have to hardcode base because it doesn't support base sepolia
     const body = {
         destination_wallets: [
             {
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
             // eslint-disable-next-line
             sessionToken: data.token,
             // eslint-disable-next-line
-            destinationWallets: [{ address: address, assets: [chainName] }],
+            destinationWallets: [{ address: address, assets: ['USDC'], blockchains: ['base'] }],
             theme: 'light',
         })
 
