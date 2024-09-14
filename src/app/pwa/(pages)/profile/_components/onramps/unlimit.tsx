@@ -55,7 +55,7 @@ export default function Unlimit(props: UnlimitProps) {
                 },
                 defaultCrypto: {
                     currency: purchaseCurrency || '',
-                    amount: amount || '0',
+                    amount: amount || '20',
                 },
             })
             setOpen && setOpen(false)

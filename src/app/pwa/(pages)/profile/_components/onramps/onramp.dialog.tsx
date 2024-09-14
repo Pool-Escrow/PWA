@@ -20,13 +20,13 @@ interface OnRampDialogProps {
 
 const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
     const { address } = useAccount()
-    const {data: balance } = useBalance({
+    const { data: balance } = useBalance({
         token: currentTokenAddress,
         address,
         query: {
             enabled: Boolean(address),
             refetchInterval: 10_000, // 10 seconds
-        }
+        },
     })
 
     const formattedBalance = Number(balance?.value) / Math.pow(10, Number(balance?.decimals))
@@ -88,7 +88,7 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                             </div>
                             <Unlimit
                                 amount={amount}
-                                purchaseCurrency={'USDC-BASE'}
+                                purchaseCurrency={'USDC_BASE'}
                                 setOpen={setOpen}
                                 className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 On Ramp
