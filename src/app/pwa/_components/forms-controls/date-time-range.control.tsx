@@ -54,10 +54,7 @@ const timezones = [
 export default function DateTimeRange({ name }: DateTimeRangeProps) {
     const [userTimezone, setUserTimezone] = useState(timezones[12])
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>(getDefaultDateTimeValue())
-    const [utcTime, setUtcTime] = useState({
-        start: new Date(),
-        end: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
-    })
+    const [utcTime, setUtcTime] = useState<DateTimeRangeValue>(getDefaultDateTimeValue())
 
     useEffect(() => {
         // Function to find the matching timezone from the list
@@ -96,10 +93,10 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
             date.setMinutes(minutes);
             updatedValue = format(date, "yyyy-MM-dd'T'HH:mm");
         }
-        const updatedUtcTime = {
+        const updatedUtcTime = () => ({
             ...utcTime,
-            [field]: fromZonedTime(updatedValue, userTimezone.timeZone),
-        }
+            [field]: fromZonedTime(updatedValue, userTimezone.timeZone).toISOString(),
+        })
         console.log('Updated value:', updatedValue)
         console.log('Updated UTC time:', updatedUtcTime)
 
@@ -128,18 +125,18 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                     const prevTimezone = userTimezone
                     const selectedTimezone = timezones.find(tz => tz.timeZone === value)
                     if (selectedTimezone) {
-                        const utcStart = fromZonedTime(localValue.start, prevTimezone.timeZone)
-                        const utcEnd = fromZonedTime(localValue.end, prevTimezone.timeZone)
+                        const utcStart = fromZonedTime(localValue.start, prevTimezone.timeZone).toISOString()
+                        const utcEnd = fromZonedTime(localValue.end, prevTimezone.timeZone).toISOString()
 
                         setUserTimezone(selectedTimezone)
                         setLocalValue(() => ({
                             start: toZonedTime(utcStart, selectedTimezone.timeZone).toISOString(),
                             end: toZonedTime(utcEnd, selectedTimezone.timeZone).toISOString(),
                         }))
-                        setUtcTime({
+                        setUtcTime(() => ({
                             start: utcStart,
                             end: utcEnd,
-                        })
+                        }))
                     }
                 }}>
                     <SelectTrigger className='w-[340px] text-xs flex justify-between items-center'>
