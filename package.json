@@ -7,7 +7,7 @@
     "scripts": {
         "build": "next build",
         "check-types": "tsc --noemit",
-        "dev": "next dev",
+        "dev": "next dev --experimental-https",
         "dev:turbo": "TURBO=true next dev --turbo",
         "gen": "node scripts/generate-types.mjs",
         "gen:contracts": "pnpm gen contracts",
@@ -21,7 +21,7 @@
     "dependencies": {
         "@coinbase/cbpay-js": "2.2.0",
         "@gatefi/js-sdk": "0.18.0",
-        "@privy-io/react-auth": "1.76.4",
+        "@privy-io/react-auth": "1.83.1",
         "@privy-io/server-auth": "1.9.5",
         "@privy-io/wagmi": "0.2.12",
         "@radix-ui/react-alert-dialog": "1.1.1",

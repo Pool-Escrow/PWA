@@ -1,12 +1,15 @@
 'use client'
 
+import { inProduction } from '@/app/pwa/_lib/utils/environment.mjs'
 import logo from '@/public/app/images/pool-logo-horizontal.png'
 import type { PrivyProviderProps } from '@privy-io/react-auth'
-import { baseSepolia } from 'viem/chains'
+import { baseSepolia, base } from 'viem/chains'
 
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID) {
     throw new Error('Missing NEXT_PUBLIC_PRIVY_APP_ID')
 }
+
+const chain = inProduction ? base : baseSepolia
 
 export default {
     appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID,
@@ -26,12 +29,13 @@ export default {
                 connectionOptions: 'smartWalletOnly',
             },
         },
-        supportedChains: [baseSepolia],
-        defaultChain: baseSepolia,
+        supportedChains: [chain],
+        defaultChain: chain,
         legal: {
             privacyPolicyUrl: '/privacy-policy',
             termsAndConditionsUrl: '/terms',
         },
+
         // walletConnectCloudProjectId: '',
         // captchaEnabled: false,
         // customAuth: {
