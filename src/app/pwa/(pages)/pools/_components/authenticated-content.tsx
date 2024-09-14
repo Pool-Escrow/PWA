@@ -2,15 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
-import { getUserInfoAction } from '../../profile/actions'
 
 export default function AuthenticatedContent({
-    balanceInfo,
     nextUserPool,
     renderBottomBar,
 }: {
     isAdmin: boolean | null
-    balanceInfo: React.ReactNode
     nextUserPool: React.ReactNode
     renderBottomBar: React.ReactNode
 }) {
@@ -27,7 +24,6 @@ export default function AuthenticatedContent({
 
     return (
         <>
-            {balanceInfo}
             {nextUserPool}
             {renderBottomBar}
         </>

@@ -8,25 +8,19 @@ import { getDbUser } from '../../persistence/users/db/get-db-user'
 type UserItem = Pick<Tables<'users'>, 'avatar' | 'displayName'>
 
 export const getUserUseCase = cache(async (privyId?: string): Promise<UserItem | null> => {
-    let id: string | undefined = privyId
+    const privyUser = await getPrivyUser()
+
+    const id = privyId || privyUser?.id
 
     if (!id) {
-        const privyUser = await getPrivyUser()
-        id = privyUser?.id
-    }
-
-    if (!id) {
+        console.log('[getUserUseCase] User not authenticated or address not available')
         return null
     }
 
     const user = await getDbUser(id)
 
-    if (!user) {
-        return null
-    }
-
     return {
-        avatar: user.avatar,
-        displayName: user.displayName,
+        avatar: user?.avatar || null,
+        displayName: user?.displayName || null,
     }
 })

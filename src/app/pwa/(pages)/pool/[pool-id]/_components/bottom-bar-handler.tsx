@@ -2,13 +2,14 @@
 
 import { Button } from '@/app/pwa/_components/ui/button'
 import { useReadPoolIsParticipant } from '@/types/contracts'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Address } from 'viem'
 import { useAppStore } from '@/app/pwa/_client/providers/app-store.provider'
 import { POOLSTATUS } from '../_lib/definitions'
 import { usePoolActions } from '@/app/pwa/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
 import type { Route } from 'next'
+import OnRampDialog from '../../../profile/_components/onramps/onramp.dialog'
 
 type ButtonConfig = {
     label: string
@@ -39,6 +40,8 @@ export default function BottomBarHandler({
     poolTokenSymbol,
     tokenDecimals,
 }: BottomBarHandlerProps) {
+    const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
+
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
 
@@ -47,8 +50,8 @@ export default function BottomBarHandler({
         args: [walletAddress || '0x', poolId],
     })
 
-    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed } =
-        usePoolActions(poolId, poolPrice, tokenDecimals)
+    const { handleEnableDeposits, handleEndPool, handleJoinPool, handleStartPool, ready, isPending, isConfirmed, resetConfirmation } =
+        usePoolActions(poolId, poolPrice, tokenDecimals, () => setOpenOnRampDialog(true))
 
     const handleViewTicket = useCallback(() => {
         router.push(`/pool/${poolId}/ticket` as Route)
@@ -62,11 +65,11 @@ export default function BottomBarHandler({
             },
             [POOLSTATUS.DEPOSIT_ENABLED]: {
                 admin: { label: 'Start Pool', action: handleStartPool },
-                user: { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                user: isParticipant ? { label: 'View My Ticket', action: handleViewTicket } : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
             },
             [POOLSTATUS.STARTED]: {
                 admin: { label: 'End pool', action: handleEndPool },
-                user: { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                user: isParticipant ? { label: 'View My Ticket', action: handleViewTicket } : null,
             },
             [POOLSTATUS.ENDED]: {
                 admin: null,
@@ -125,8 +128,9 @@ export default function BottomBarHandler({
             console.log('Transaction confirmed')
             router.refresh()
             updateBottomBarContent()
+            resetConfirmation() // Reset the isConfirmed state after executing the necessary logic
         }
-    }, [isConfirmed, updateBottomBarContent, router])
+    }, [isConfirmed, updateBottomBarContent, router, resetConfirmation])
 
-    return null
+    return <OnRampDialog open={openOnRampDialog} setOpen={setOpenOnRampDialog} amount={poolPrice.toString()}/>
 }

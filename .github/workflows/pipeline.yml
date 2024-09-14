@@ -1,99 +1,102 @@
 name: Unified CI/CD Pipeline
 
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
+    push:
+        branches: ['main']
+    pull_request:
+        types: [opened, synchronize, reopened]
+    workflow_dispatch:
 
 permissions:
-  contents: read
-  pull-requests: write
+    contents: read
+    pull-requests: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  build-and-deploy:
-    if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
-    runs-on: ubuntu-22.04
-    environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
-      url: ${{ steps.deploy.outputs.url }}
-    steps:
-      - name: Notify about starting this deployment
-        uses: hasura/comment-progress@v2.3.0
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.COMMENTER_TOKEN }}
-          repository: ${{ github.repository }}
-          number: ${{ github.event.pull_request.number}}
-          id: deploying-comment
-          message: |
-            🚀 **Deployment Started!** 🚧
-            | Details | Link |
-            | --- | --- |
-            | **Follow Progress** | [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
+    build-and-deploy:
+        if: github.repository == 'Pool-Escrow/PWA' && (github.ref == 'refs/heads/main' || github.event_name == 'pull_request')
+        runs-on: ubuntu-22.04
+        environment:
+            name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+            url: ${{ steps.deploy.outputs.url }}
+        steps:
+            - name: Notify about starting this deployment
+              uses: hasura/comment-progress@v2.3.0
+              if: github.event_name == 'pull_request'
+              with:
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  repository: ${{ github.repository }}
+                  number: ${{ github.event.pull_request.number }}
+                  id: deploying-comment
+                  message: |
+                      🚀 **Deployment Started!** 🚧
+                      | Details | Link |
+                      | --- | --- |
+                      | **Follow Progress** | [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) |
 
-      - name: Checkout code
-        uses: actions/checkout@v4
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: '9'
+                  run_install: |
+                      args: [--global, vercel]
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: '9'
-          run_install: |
-            args: [--global, vercel]
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+                  cache: 'pnpm'
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
 
-      - name: Pull environment variables
-        run: vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token ${{ secrets.VERCEL_TOKEN }}
+            - name: Create pnpm store directory if needed
+              run: mkdir -p ~/.pnpm-store
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+            - name: Cache pnpm store
+              uses: actions/cache@v4
+              with:
+                  path: ~/.pnpm-store
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-
 
-      - name: Build the project
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
-        run: |
-          echo "building the project"
-          vercel build --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
+            - name: Pull environment variables
+              run: vercel pull --yes --environment=${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }} --token ${{ secrets.VERCEL_TOKEN }}
 
-      - name: Deploy the project
-        id: deploy
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_TEAM_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          echo "deploying the project"
-          echo "url=$(vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod'  || '' }})" >> $GITHUB_OUTPUT
+            - name: Build the project
+              env:
+                  NEXT_TELEMETRY_DISABLED: 1
+              run: |
+                  echo "building the project"
+                  vercel build --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}
 
-      - name: Notify about the result of this deployment
-        uses: hasura/comment-progress@v2.3.0
-        if: github.event_name == 'pull_request'
-        with:
-          github-token: ${{ secrets.COMMENTER_TOKEN }}
-          repository: ${{ github.repository }}
-          number: ${{ github.event.pull_request.number }}
-          id: deploying-comment
-          recreate: true
-          message: |
-            ✅ **Deployment Complete!** 🌐
-            | Details | Link |
-            | --- | --- |
-            | **View Deployment** | [Visit Site](${{ steps.deploy.outputs.url }}) |
+            - name: Deploy the project
+              id: deploy
+              env:
+                  VERCEL_ORG_ID: ${{ secrets.VERCEL_TEAM_ID }}
+                  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+              run: |
+                  echo "deploying the project"
+                  echo "url=$(vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod'  || '' }})" >> $GITHUB_OUTPUT
+
+            - name: Notify about the result of this deployment
+              uses: hasura/comment-progress@v2.3.0
+              if: github.event_name == 'pull_request'
+              with:
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  repository: ${{ github.repository }}
+                  number: ${{ github.event.pull_request.number }}
+                  id: deploying-comment
+                  recreate: true
+                  message: |
+                      ✅ **Deployment Complete!** 🌐
+                      | Details | Link |
+                      | --- | --- |
+                      | **View Deployment** | [Visit Site](${{ steps.deploy.outputs.url }}) |

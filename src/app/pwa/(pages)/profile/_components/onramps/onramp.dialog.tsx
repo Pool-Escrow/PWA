@@ -9,16 +9,27 @@ import ReceiveDialog from '@/app/pwa/(pages)/profile/_components/receive/receive
 import Unlimit from '@/app/pwa/(pages)/profile/_components/onramps/unlimit'
 import { OnrampWithStripe } from '@/app/pwa/(pages)/profile/_components/onramps/onramp-stripe'
 import { MoonpayCurrencyCode, MoonpayPaymentMethod, useFundWallet, useWallets } from '@privy-io/react-auth'
+import { currentTokenAddress } from '@/app/pwa/_server/blockchain/server-config'
+import { useAccount, useBalance } from 'wagmi'
 
 interface OnRampDialogProps {
     open: boolean
     setOpen: (open: boolean) => void
-    balance: bigint | undefined
-    decimalPlaces: bigint
     amount?: string
 }
 
-const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampDialogProps) => {
+const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
+    const { address } = useAccount()
+    const {data: balance } = useBalance({
+        token: currentTokenAddress,
+        address,
+        query: {
+            enabled: Boolean(address),
+            refetchInterval: 10_000, // 10 seconds
+        }
+    })
+
+    const formattedBalance = Number(balance?.value) / Math.pow(10, Number(balance?.decimals))
     // const [open, setOpen] = useState(false)
     // const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -59,10 +70,9 @@ const OnRampDialog = ({ open, setOpen, balance, decimalPlaces, amount }: OnRampD
                     </DrawerTitle>
                     <div>
                         <div className='flex flex-row justify-between text-sm'>
-                            <span className='font-medium'>Current Pool balance:</span>
+                            <span className='font-medium'>Your current balance:</span>
                             <span className='font-medium'>
-                                ${((balance ?? BigInt(0)) / BigInt(Math.pow(10, Number(decimalPlaces)))).toString()}{' '}
-                                USDC
+                                ${formattedBalance} {balance?.symbol}
                             </span>
                         </div>
                         <Divider className='my-0 h-0 py-0' />

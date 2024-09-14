@@ -11,14 +11,12 @@ export default function EditProfileModal() {
 
     useEffect(() => {
         async function fetchUserData() {
-            const [data, err] = await getUserInfoAction()
-            if (err) {
-                console.error(err)
+            const { data: userData, error } = await getUserInfoAction()
+            if (error) {
+                console.error(error)
                 setError('Error loading user data')
-            } else if (data && 'needsRefresh' in data) {
-                setError('Loading...')
             } else {
-                setUserData(data)
+                setUserData(userData)
             }
         }
         fetchUserData()

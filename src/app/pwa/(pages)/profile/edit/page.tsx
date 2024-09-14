@@ -2,7 +2,7 @@ import { getUserInfoAction } from '../actions'
 import ProfileForm from '../new/_components/profile-form'
 
 export default async function NewProfilePage() {
-    const [userData, error] = await getUserInfoAction()
+    const { data: userData, error } = await getUserInfoAction()
 
     if (error) {
         console.error(error)

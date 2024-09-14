@@ -50,7 +50,19 @@ export default function AvatarUploader({ name, onChange, defaultValue }: AvatarU
             {avatarPreview ? (
                 <div className='relative size-[109px]'>
                     <Image src={avatarPreview} alt='Avatar preview' className='rounded-full object-cover' fill />
-                    {/* ... rest of the code ... */}
+                    <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100'>
+                        <div className='absolute inset-0 rounded-full bg-black opacity-50'></div>
+                        <Button
+                            size='icon'
+                            variant='outline'
+                            className='z-10 m-1 bg-white'
+                            onClick={() => document.getElementById(name)?.click()}>
+                            <CameraIcon />
+                        </Button>
+                        <Button size='icon' variant='destructive' className='z-10 m-1' onClick={handleRemove}>
+                            <Trash2Icon />
+                        </Button>
+                    </div>
                 </div>
             ) : (
                 <label

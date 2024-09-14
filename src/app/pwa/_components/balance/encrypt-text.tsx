@@ -75,7 +75,7 @@ const EncryptText: React.FC<EncryptTextProps> = ({
         () =>
             isEncoded
                 ? {
-                      integer: generateChars(formattedInteger.length),
+                      integer: generateChars(4),
                       fractional: generateChars(2),
                       symbol: generateChars(3),
                   }
