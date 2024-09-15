@@ -1,6 +1,6 @@
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useAuth } from './use-auth'
-import useTransactions from '@/app/_client/hooks/use-smart-transaction'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import type { Address, Hash } from 'viem'
@@ -20,7 +20,6 @@ export function usePoolActions(
 ) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
-
     const { wallets } = useWallets()
     const { data: userBalance, error: balanceError } = useReadContract({
         address: currentTokenAddress,
