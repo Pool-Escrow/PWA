@@ -74,7 +74,13 @@ export default function BottomBarHandler({
         isPending,
         isConfirmed,
         resetConfirmation,
-    } = usePoolActions(poolId, poolPrice, tokenDecimals, () => setOpenOnRampDialog(true))
+    } = usePoolActions(
+        poolId,
+        poolPrice,
+        tokenDecimals,
+        () => setOpenOnRampDialog(true),
+        () => router.refresh(),
+    )
 
     const handleViewTicket = useCallback(() => {
         router.push(`/pool/${poolId}/ticket`)
