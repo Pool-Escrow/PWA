@@ -10,7 +10,6 @@ import PoolDetailsBannerStatus from './pool-details-banner-status'
 import PoolDetailsInfo from './pool-details-info'
 import BottomBarHandler from './bottom-bar-handler'
 import { getAdminStatusAction } from '../../../pools/actions'
-import { Address } from 'viem'
 
 export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
     const avatarUrls = pool.participants.map(participant => participant.avatarUrl)

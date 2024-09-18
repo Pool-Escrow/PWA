@@ -58,7 +58,7 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
 
     return (
         <section className='flex flex-col gap-4 pb-4'>
-            {pools?.map(pool => <PoolListCard key={pool.id} {...pool} />)}
+            {pools?.length ? pools.map(pool => <PoolListCard key={pool.id} {...pool} />) : null}
         </section>
     )
 }
