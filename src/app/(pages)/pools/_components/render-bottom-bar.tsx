@@ -2,7 +2,6 @@
 
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { Button } from '@/app/_components/ui/button'
-import type { Route } from 'next'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { usePrivy } from '@privy-io/react-auth'
@@ -38,7 +37,7 @@ export default function RenderBottomBar() {
                     data-testid='create-pool-button'
                     asChild
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                    <Link href={'/pool/new' as Route}>Create Pool</Link>
+                    <Link href='/pool/new'>Create Pool</Link>
                 </Button>,
             )
         }

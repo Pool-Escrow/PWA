@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from 'react'
 import ParticipantCard from './participantRow'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { Route } from 'next'
 import Link from 'next/link'
 import { QrCodeIcon, SearchIcon } from 'lucide-react'
 import { Input } from '@/app/_components/ui/input'
@@ -62,7 +61,7 @@ const Participants = ({ poolId }: PoolParticipantsProps) => {
                         <SearchIcon size={16} />
                     </div>
                     <Link
-                        href={`/pool/${poolId}/participants/` as Route}
+                        href={`/pool/${poolId}/participants/`}
                         className='absolute right-2 top-[1px] z-10 flex h-10 w-6 items-center'>
                         <QrCodeIcon size={16} />
                     </Link>

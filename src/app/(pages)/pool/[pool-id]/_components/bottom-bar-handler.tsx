@@ -3,12 +3,10 @@
 import { Button } from '@/app/_components/ui/button'
 import { useReadPoolIsParticipant } from '@/types/contracts'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { Address } from 'viem'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '../_lib/definitions'
 import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
-import type { Route } from 'next'
 import OnRampDialog from '../../../profile/_components/onramps/onramp.dialog'
 import { Loader2 } from 'lucide-react'
 import { useAccount } from 'wagmi'
@@ -68,7 +66,7 @@ export default function BottomBarHandler({
     } = usePoolActions(poolId, poolPrice, tokenDecimals, () => setOpenOnRampDialog(true))
 
     const handleViewTicket = useCallback(() => {
-        router.push(`/pool/${poolId}/ticket` as Route)
+        router.push(`/pool/${poolId}/ticket`)
     }, [router, poolId])
 
     const buttonConfig = useMemo<Record<POOLSTATUS, PoolStatusConfig>>(

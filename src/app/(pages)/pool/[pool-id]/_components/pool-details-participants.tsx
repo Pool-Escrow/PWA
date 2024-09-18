@@ -1,7 +1,6 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Avatars from './avatars'
 import Link from 'next/link'
-import { Route } from 'next'
 
 interface PoolDetailsParticipantsProps {
     numParticipants: number
@@ -18,7 +17,7 @@ export default function PoolDetailsParticipants({
         <div className='space-y-2'>
             {numParticipants > 0 ? (
                 <>
-                    <Link href={`/pool/${poolId}/participants` as Route}>
+                    <Link href={`/pool/${poolId}/participants`}>
                         <div className='text-xs'>Participants</div>
                         <div className='inline-flex w-full items-center justify-between'>
                             <Avatars avatarUrls={avatarUrls} numPeople={numParticipants} />

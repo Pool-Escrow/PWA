@@ -10,7 +10,6 @@ export default function ProfileHeader() {
     const account = useAccount()
 
     if (!account.address) {
-        // router.push('/' as Route)
         console.log('No account address found in the profile!')
     }
 

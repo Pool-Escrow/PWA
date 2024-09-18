@@ -1,9 +1,8 @@
 'use client'
 
-import { QrCode, ShareIcon, EditIcon } from 'lucide-react'
+import { QrCode, EditIcon } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
 import ShareDialog from './share.dialog'
-import { Route } from 'next'
 
 interface PoolDetailsBannerButtonProps {
     isAdmin?: boolean | null
@@ -14,9 +13,9 @@ export default function PoolDetailsBannerButtons({ isAdmin }: PoolDetailsBannerB
     const router = useRouter()
 
     const buttons = [
-        { element: QrCode, adminOnly: true, onClick: () => router.push(`${pathname}/check-in` as Route) },
+        { element: QrCode, adminOnly: true, onClick: () => router.push(`${pathname}/check-in`) },
         { element: ShareDialog, adminOnly: false, onClick: () => console.log('Share Dialog') },
-        { element: EditIcon, adminOnly: true, onClick: () => router.push(`${pathname}/edit` as Route) },
+        { element: EditIcon, adminOnly: true, onClick: () => router.push(`${pathname}/edit`) },
     ]
 
     // Filter buttons based on admin status

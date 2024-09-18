@@ -7,7 +7,6 @@ import Section from '@/components/section'
 import { inter } from '@/lib/utils/fonts'
 import { useWallets } from '@privy-io/react-auth'
 import _ from 'lodash'
-import type { Route } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import OnRampCoinbaseButton from '../../_components/onramps/onramp-coinbase'
@@ -46,7 +45,7 @@ const Send = () => {
                         <div className='flex justify-center'>
                             <Link
                                 className='barForeground w-full rounded-full bg-black px-8 py-2 text-center text-white'
-                                href={'/edit-user-profile' as Route}>
+                                href='/edit-user-profile'>
                                 Edit Profile
                             </Link>
                         </div>

@@ -4,7 +4,6 @@ import { getPoolStatus } from '@/app/_lib/utils/get-pool.status'
 import { getStatusString } from '@/app/_lib/utils/get-relative-date'
 import { cn } from '@/lib/utils/tailwind'
 import { motion } from 'framer-motion'
-import type { Route } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import frog from '@/public/app/images/frog.png'
@@ -57,7 +56,7 @@ export default function PoolListCard({
     if (!id) return <PoolCardSkeleton />
 
     return (
-        <Link href={`/pool/${id}` as Route}>
+        <Link href={`/pool/${id}`}>
             <motion.div
                 className='flex h-24 items-center gap-[14px] rounded-[2rem] bg-[#f4f4f4] p-3 pr-4'
                 whileHover={{ scale: 1.05 }}

@@ -6,7 +6,6 @@ import { createPoolAction, updatePoolStatus } from './actions'
 import { dropletAddress, poolAbi, poolAddress } from '@/types/contracts'
 import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import { Route } from 'next'
 import { useWaitForTransactionReceipt } from 'wagmi'
 import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { useQueryClient } from '@tanstack/react-query'
@@ -132,7 +131,7 @@ export function useCreatePool() {
                         setStep(Steps.Completed)
                         showToast()
                         queryClient.invalidateQueries({ queryKey: ['upcoming-pools'] })
-                        router.push(`/pool/${latestPoolId}` as Route)
+                        router.push(`/pool/${latestPoolId}`)
                     })
                     .catch(error => {
                         console.error('Error updating pool:', error)

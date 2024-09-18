@@ -1,10 +1,9 @@
 import { ExternalLinkIcon } from 'lucide-react'
-import { Route } from 'next'
 import Link from 'next/link'
 
 function PoolDetailsTermsUrl({ termsUrl }: { termsUrl: string }) {
     return (
-        <Link href={termsUrl as Route} passHref legacyBehavior>
+        <Link href={termsUrl} passHref legacyBehavior>
             <a target='_blank' rel='external noopener noreferrer nofollow' className='self-center'>
                 <div className='mt-4 inline-flex w-full justify-between'>
                     {termsUrl}

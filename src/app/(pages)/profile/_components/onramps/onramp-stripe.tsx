@@ -1,7 +1,6 @@
 'use client'
 
 import { Button } from '@/app/_components/ui/button'
-import { Drawer, DrawerContent, DrawerOverlay } from '@/app/_components/ui/drawer'
 import { loadStripeOnramp } from '@stripe/crypto'
 import { useEffect, useRef, useState } from 'react'
 import { getSession } from './get-session'

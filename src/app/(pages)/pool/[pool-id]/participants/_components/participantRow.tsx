@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar
 import { cn } from '@/lib/utils/tailwind'
 import Link from 'next/link'
 import type { Address } from 'viem'
-import { Route } from 'next'
 
 interface ParticipantCardProps {
     address: Address
@@ -22,7 +21,7 @@ export default function ParticipantCard({
     return (
         <Link
             className={cn('bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4')}
-            href={`/pool/${poolId}/participants/${address}` as Route}>
+            href={`/pool/${poolId}/participants/${address}`}>
             <Avatar className='size-[48px]' aria-label='User Avatar'>
                 <AvatarImage alt='User Avatar' src={avatar} />
                 <AvatarFallback className='bg-[#d9d9d9]' />
