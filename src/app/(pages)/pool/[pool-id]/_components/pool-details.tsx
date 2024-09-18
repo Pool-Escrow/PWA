@@ -13,7 +13,7 @@ import { getAdminStatusAction } from '../../../pools/actions'
 
 export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
     const avatarUrls = pool.participants.map(participant => participant.avatarUrl)
-    const [isAdmin] = (await getAdminStatusAction()) ? [true] : [false]
+    const isAdmin = await getAdminStatusAction()
 
     return (
         <div className='space-y-3 bg-white p-2'>
@@ -30,12 +30,11 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                     endDate={pool.endDate}
                     hostName={pool.hostName}
                 />
-                <PoolDetailsClaimableWinnings
+                <PoolDetailsClaimableWinnings // <--- TANSTACK QUERY ERROR
                     claimableAmount={pool.claimableAmount}
                     tokenSymbol={pool.tokenSymbol}
                     poolId={pool.contractId}
                 />
-
                 <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
                     {pool.status != POOLSTATUS.ENDED && (
                         <PoolDetailsProgress

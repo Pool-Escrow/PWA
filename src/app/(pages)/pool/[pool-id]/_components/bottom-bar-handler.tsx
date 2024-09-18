@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/app/_components/ui/button'
-import { useReadPoolIsParticipant } from '@/types/contracts'
+import { poolAbi } from '@/types/contracts'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '../_lib/definitions'
@@ -9,7 +9,9 @@ import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
 import OnRampDialog from '../../../profile/_components/onramps/onramp.dialog'
 import { Loader2 } from 'lucide-react'
-import { useAccount } from 'wagmi'
+import { useAccount, useReadContract } from 'wagmi'
+import { getAbiItem } from 'viem'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 
 type ButtonConfig = {
     label: string
@@ -43,15 +45,24 @@ export default function BottomBarHandler({
 
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
-    const { address: walletAddress } = useAccount()
 
-    // @ts-expect-error ts(2589) FIXME: Type instantiation is excessively deep and possibly infinite.
-    const { data: isParticipant } = useReadPoolIsParticipant({
-        args: walletAddress ? [walletAddress, poolId] : undefined,
+    const { address } = useAccount()
+    const { data: isParticipant, isLoading: isParticipantLoading } = useReadContract({
+        abi: [
+            getAbiItem({
+                abi: poolAbi,
+                name: 'isParticipant',
+            }),
+        ],
+        address: currentPoolAddress,
+        functionName: 'isParticipant',
+        args: [address || '0x', poolId],
         query: {
-            enabled: Boolean(walletAddress),
+            enabled: Boolean(address && poolId),
         },
     })
+
+    console.log('isParticipant:', isParticipant, 'address:', address, 'poolId:', poolId)
 
     const {
         handleEnableDeposits,
@@ -134,7 +145,9 @@ export default function BottomBarHandler({
     const updateBottomBarContent = useCallback(() => {
         let content: React.ReactNode = null
 
-        if (isParticipant && !isAdmin && poolStatus !== POOLSTATUS.ENDED) {
+        if (isParticipantLoading) {
+            content = <Button disabled>Loading...</Button>
+        } else if (isParticipant && !isAdmin && poolStatus !== POOLSTATUS.ENDED) {
             content = renderButton({ label: 'View My Ticket', action: handleViewTicket })
         } else {
             const statusConfig = buttonConfig[poolStatus]
@@ -147,14 +160,25 @@ export default function BottomBarHandler({
         }
 
         setBottomBarContent(content)
-    }, [isParticipant, isAdmin, poolStatus, buttonConfig, renderButton, handleViewTicket, setBottomBarContent])
+    }, [
+        isParticipant,
+        isParticipantLoading,
+        isAdmin,
+        poolStatus,
+        buttonConfig,
+        renderButton,
+        handleViewTicket,
+        setBottomBarContent,
+    ])
 
     useEffect(() => {
-        if (ready) {
+        console.log('Effect triggered. Ready:', ready, 'isParticipantLoading:', isParticipantLoading)
+        if (ready && !isParticipantLoading) {
+            console.log('Updating bottom bar content')
             updateBottomBarContent()
         }
         return () => setBottomBarContent(null)
-    }, [ready, updateBottomBarContent, setBottomBarContent])
+    }, [ready, isParticipantLoading, updateBottomBarContent, setBottomBarContent])
 
     useEffect(() => {
         if (isConfirmed) {
