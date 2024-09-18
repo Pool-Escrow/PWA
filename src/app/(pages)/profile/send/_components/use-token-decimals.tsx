@@ -12,5 +12,8 @@ export const useTokenDecimals = (tokenAddress: string) => {
         queryFn: fetchTokenDecimals,
     })
 
-    return { tokenDecimalsData, isLoading, error }
+    // Provide a default value of 18 if the query fails
+    const decimals = tokenDecimalsData?.tokenDecimals ?? 18
+
+    return { tokenDecimalsData: { tokenDecimals: decimals }, isLoading, error }
 }

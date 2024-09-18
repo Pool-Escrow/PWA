@@ -13,13 +13,13 @@ import { getAbiItem } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
-import { useUserDetailsDB } from '../_components/use-user-details'
 import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
+import { useUserDetails } from '../_components/use-user-details'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) => {
-    const { userDetailsDB } = useUserDetailsDB(params['participant-id'])
+    const { data: userDetails } = useUserDetails(params['participant-id'])
     const { poolDetails } = usePoolDetails(BigInt(params?.['pool-id']))
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'
@@ -67,8 +67,8 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
         }
     }, [isPending, hash, isSuccess])
 
-    const avatar = userDetailsDB?.userDetail?.avatar ?? frog.src
-    const displayName = userDetailsDB?.userDetail?.displayName ?? formatAddress(params['participant-id'])
+    const avatar = userDetails?.avatar ?? frog.src
+    const displayName = userDetails?.displayName ?? formatAddress(params['participant-id'])
 
     return (
         <div className='max-w-md overflow-hidden rounded-lg bg-white'>

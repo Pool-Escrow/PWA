@@ -9,7 +9,13 @@ import { toast } from 'sonner'
 import { approve } from '@/app/_lib/blockchain/functions/token/approve'
 import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
 
-export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals: number, openOnRampDialog: () => void) {
+export function usePoolActions(
+    poolId: bigint,
+    poolPrice: number,
+    tokenDecimals: number,
+    openOnRampDialog: () => void,
+    onSuccessfulJoin: () => void,
+) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isConfirmed, isPending, isReady, resetConfirmation } = useTransactions()
     const { wallets } = useWallets()
@@ -101,7 +107,9 @@ export function usePoolActions(poolId: bigint, poolPrice: number, tokenDecimals:
             void executeTransactions([
                 ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice })] : []),
                 deposit({ poolId, amount: bigIntPrice }),
-            ])
+            ]).then(() => {
+                onSuccessfulJoin()
+            })
         }
     }
 

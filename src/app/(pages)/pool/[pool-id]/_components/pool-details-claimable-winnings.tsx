@@ -8,6 +8,7 @@ import { CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Address, getAbiItem } from 'viem'
 import { useAccount } from 'wagmi'
+import { useConfetti } from '@/hooks/use-confetti'
 
 interface PoolDetailsClaimableWinningsProps {
     claimableAmount: number
@@ -24,8 +25,8 @@ export default function PoolDetailsClaimableWinnings({
     poolId,
 }: PoolDetailsClaimableWinningsProps) {
     const { address } = useAccount() as { address: Address }
-
     const { executeTransactions } = useSmartTransaction()
+    const { startConfetti, ConfettiComponent } = useConfetti()
 
     const handleClaimWinnings = async () => {
         toast('Claiming winnings...')
@@ -44,28 +45,34 @@ export default function PoolDetailsClaimableWinnings({
         ]
 
         try {
-            executeTransactions(args)
+            await executeTransactions(args)
+            toast.success('Successfully claimed winnings')
+            startConfetti()
         } catch (error) {
             console.log('claimWinning Error', error)
+            toast.error('Failed to claim winnings')
         }
     }
 
     if (claimableAmount <= 0) return null
 
     return (
-        <div className='mb-[1.12rem] flex flex-col gap-[0.38rem]'>
-            <div className='inline-flex w-full justify-between'>
-                <div className='inline-flex items-center gap-1'>
-                    <CheckCircleIcon className='size-3 scale-95' />
-                    <span className='text-xs font-semibold'>{title}</span>
+        <>
+            <ConfettiComponent />
+            <div className='mb-[1.12rem] flex flex-col gap-[0.38rem]'>
+                <div className='inline-flex w-full justify-between'>
+                    <div className='inline-flex items-center gap-1'>
+                        <CheckCircleIcon className='size-3 scale-95' />
+                        <span className='text-xs font-semibold'>{title}</span>
+                    </div>
+                    <div className='text-xs'>{`${description} $${claimableAmount} ${tokenSymbol}`}</div>
                 </div>
-                <div className='text-xs'>{`${description} $${claimableAmount} ${tokenSymbol}`}</div>
+                <Button
+                    onClick={() => void handleClaimWinnings()}
+                    className='detail_card_claim_button h-9 w-full text-[0.625rem] text-white'>
+                    Claim winnings
+                </Button>
             </div>
-            <Button
-                onClick={() => void handleClaimWinnings()}
-                className='detail_card_claim_button h-9 w-full text-[0.625rem] text-white'>
-                Claim winnings
-            </Button>
-        </div>
+        </>
     )
 }
