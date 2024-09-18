@@ -1,4 +1,3 @@
-import route from '@/lib/utils/routes'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Skeleton } from '../../_components/ui/skeleton'
@@ -42,7 +41,7 @@ const topBarConfig: TopBarConfig = {
     '/profile/new': {
         center: null, // Hide logo
         right: (
-            <Link href={route['/']} className='text-[#2989EC]'>
+            <Link href='/' className='text-[#2989EC]'>
                 Skip
             </Link>
         ),
