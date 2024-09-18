@@ -2,16 +2,7 @@ import useMediaQuery from '@/app/_client/hooks/use-media-query'
 import Divider from '@/app/_components/divider'
 import { Button } from '@/app/_components/ui/button'
 import { Dialog } from '@/app/_components/ui/dialog'
-import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerDescription,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger,
-} from '@/app/_components/ui/drawer'
+import { Drawer } from '@/app/_components/ui/drawer'
 import { Input } from '@/app/_components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
 import _ from 'lodash'
@@ -54,26 +45,28 @@ const ShareDialog = ({ open, setOpen }: shareDialogProps) => {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger asChild>
+            <Drawer.Trigger asChild>
                 <button
                     title='Share with Friends'
                     type='button'
                     className='relative size-8 rounded-full bg-black/40 p-2 md:size-14 md:p-3'>
                     <ShareIcon className='size-8' />
                 </button>
-            </DrawerTrigger>
-            <DrawerContent>
-                <DrawerHeader className='text-left'>
-                    <DrawerTitle>Share with Friends</DrawerTitle>
-                    <DrawerDescription>Invites are best attended with friends. The more the merrier.</DrawerDescription>
-                </DrawerHeader>
+            </Drawer.Trigger>
+            <Drawer.Content>
+                <Drawer.Header className='text-left'>
+                    <Drawer.Title>Share with Friends</Drawer.Title>
+                    <Drawer.Description>
+                        Invites are best attended with friends. The more the merrier.
+                    </Drawer.Description>
+                </Drawer.Header>
                 <ShareForm className='px-4' />
-                <DrawerFooter className='pt-2'>
-                    <DrawerClose asChild>
+                <Drawer.Footer className='pt-2'>
+                    <Drawer.Close asChild>
                         <Button variant='outline'>Cancel</Button>
-                    </DrawerClose>
-                </DrawerFooter>
-            </DrawerContent>
+                    </Drawer.Close>
+                </Drawer.Footer>
+            </Drawer.Content>
         </Drawer>
     )
 }
