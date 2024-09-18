@@ -10,7 +10,7 @@ export const fetchUserDetailsFromDB = async ({ queryKey }: { queryKey: [string, 
     const [_, walletAddress] = queryKey
 
     const { data, error }: PostgrestSingleResponse<UserRow> = await supabaseBrowserClient
-        .from('users') // Replace 'your_table_name' with your actual table name
+        .from('users')
         .select()
         .like('walletAddress', `%${walletAddress}%`)
         .single()

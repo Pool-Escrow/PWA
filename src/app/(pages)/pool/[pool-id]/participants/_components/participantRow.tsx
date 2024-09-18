@@ -9,6 +9,8 @@ interface ParticipantCardProps {
     displayName: string
     poolId: string
     status?: string
+    isLoading?: boolean
+    error?: boolean
 }
 
 export default function ParticipantCard({
@@ -17,7 +19,17 @@ export default function ParticipantCard({
     displayName,
     poolId,
     status = 'Registered',
+    isLoading,
+    error,
 }: ParticipantCardProps) {
+    if (isLoading) {
+        return <div>Loading participant details...</div>
+    }
+
+    if (error) {
+        return <div>Error loading participant details. Please try again.</div>
+    }
+
     return (
         <Link
             className={cn('bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4')}
