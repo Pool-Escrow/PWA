@@ -40,7 +40,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white'>
             <div className='p-4'>
-                <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
+                <SearchBar query={query} onChange={handleChange} poolId={poolId} />
                 <ParticipantList participants={filteredParticipants} poolId={poolId} isAdmin={isAdmin} />
             </div>
         </div>

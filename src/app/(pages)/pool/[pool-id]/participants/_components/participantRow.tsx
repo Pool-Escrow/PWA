@@ -48,12 +48,12 @@ export default function ParticipantCard({
     if (isAdmin) {
         return (
             <Link
-                className={'bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4'}
+                className={cn('bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4')}
                 href={`/pool/${poolId}/participants/${address}`}>
                 {Content}
             </Link>
         )
     }
 
-    return <div className={'bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4'}>{Content}</div>
+    return <div className={cn('bottom-2 flex flex-row space-x-4 border-b-[1px] border-[#E9F1F5] py-4')}>{Content}</div>
 }
