@@ -40,7 +40,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     return (
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white'>
             <div className='p-4'>
-                <SearchBar query={query} onChange={handleChange} poolId={poolId} />
+                <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
                 <ParticipantList participants={filteredParticipants} poolId={poolId} isAdmin={isAdmin} />
             </div>
         </div>
@@ -51,20 +51,24 @@ const SearchBar = ({
     query,
     onChange,
     poolId,
+    isAdmin,
 }: {
     query: string
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     poolId: string
+    isAdmin: boolean
 }) => (
     <div className='relative mb-2 h-10'>
         <div className='absolute left-4 top-[1px] z-10 flex h-full w-4 items-center'>
             <SearchIcon size={16} />
         </div>
-        <Link
-            href={`/pool/${poolId}/participants/`}
-            className='absolute right-2 top-[1px] z-10 flex h-10 w-6 items-center'>
-            <QrCodeIcon size={16} />
-        </Link>
+        {isAdmin && (
+            <Link
+                href={`/pool/${poolId}/participants/`}
+                className='absolute right-2 top-[1px] z-10 flex h-10 w-6 items-center'>
+                <QrCodeIcon size={16} />
+            </Link>
+        )}
         <Input
             type='text'
             value={query}
