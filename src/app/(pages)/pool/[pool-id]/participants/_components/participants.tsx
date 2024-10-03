@@ -10,9 +10,10 @@ import { useParticipants } from '@/hooks/use-participants'
 
 interface PoolParticipantsProps {
     poolId: string
+    isAdmin: boolean
 }
 
-const Participants = ({ poolId }: PoolParticipantsProps) => {
+const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     const setTopBarTitle = useAppStore(state => state.setTopBarTitle)
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
@@ -40,7 +41,7 @@ const Participants = ({ poolId }: PoolParticipantsProps) => {
         <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white'>
             <div className='p-4'>
                 <SearchBar query={query} onChange={handleChange} poolId={poolId} />
-                <ParticipantList participants={filteredParticipants} poolId={poolId} />
+                <ParticipantList participants={filteredParticipants} poolId={poolId} isAdmin={isAdmin} />
             </div>
         </div>
     )
@@ -77,9 +78,11 @@ const SearchBar = ({
 const ParticipantList = ({
     participants,
     poolId,
+    isAdmin,
 }: {
     participants: ReturnType<typeof useParticipants>['data']
     poolId: string
+    isAdmin: boolean
 }) => (
     <>
         {participants && participants.length > 0 ? (
@@ -91,6 +94,7 @@ const ParticipantList = ({
                     displayName={participant.displayName}
                     poolId={poolId}
                     status='Registered'
+                    isAdmin={isAdmin}
                 />
             ))
         ) : (
