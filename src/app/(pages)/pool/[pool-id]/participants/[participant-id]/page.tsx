@@ -18,6 +18,7 @@ import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { useUserDetails } from '../_components/use-user-details'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
+import { getAdminStatusAction } from '@/app/(pages)/pools/actions'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) => {
     const { data: userDetails } = useUserDetails(params['participant-id'])
@@ -31,6 +32,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
 
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [inputValue, setInputValue] = useState<string>('0')
+    const [isAdmin, setIsAdmin] = useState<boolean>(false)
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value)
@@ -63,6 +65,12 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     useEffect(() => {
+        getAdminStatusAction().then(isUserAdmin => {
+            setIsAdmin(isUserAdmin)
+        })
+    }, [getAdminStatusAction])
+
+    useEffect(() => {
         if (isSuccess) {
             toast.success('Payout Successful', { description: `Transaction: ${hash}` })
         }
@@ -70,6 +78,10 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
 
     const avatar = userDetails?.avatar ?? frog.src
     const displayName = userDetails?.displayName ?? formatAddress(params['participant-id'])
+
+    if (!isAdmin) {
+        return <div className={'mt-4 w-full text-center'}>You are not authorized to create a payout.</div>
+    }
 
     return (
         <div className='max-w-md overflow-hidden rounded-lg bg-white'>
