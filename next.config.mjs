@@ -80,10 +80,11 @@ export default withBundleAnalyzer(
                 {
                     source: '/(.*)',
                     headers: [
-                        {
-                            key: 'Content-Security-Policy',
-                            value: cspHeader.replace(/\s{2,}/g, ' ').trim(),
-                        },
+                        // TODO: Enable CSP for production.
+                        // {
+                        //     key: 'Content-Security-Policy',
+                        //     value: cspHeader.replace(/\s{2,}/g, ' ').trim(),
+                        // },
                         {
                             key: 'X-Frame-Options',
                             value: 'DENY',
