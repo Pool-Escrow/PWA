@@ -4,7 +4,7 @@ import type { Hash, TransactionReceipt } from 'viem'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { useCallsStatus, useWriteContracts } from 'wagmi/experimental'
 import { ContractCall } from '@/app/_lib/entities/models/contract-call'
-import { base } from 'viem/chains'
+import { base, baseSepolia } from 'viem/chains'
 
 interface SmartTransactionResult {
     hash: Hash | null
@@ -97,7 +97,7 @@ export default function useTransactions() {
                         url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
                     },
                 },
-                chainId: base.id,
+                chainId: baseSepolia.id,
             },
             {
                 onSettled(data, error, variables, context) {
