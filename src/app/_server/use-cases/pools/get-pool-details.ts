@@ -17,12 +17,16 @@ function processPoolDetails(
     poolInfo: PoolItem | null,
     participantsInfo: ParticipantsInfo,
     claimableAmount: bigint,
+    wonAmount: bigint,
+    claimedAmount: bigint,
 ): PoolDetailsDTO {
     if (!poolInfo) {
         return {
             hostName: '',
             contractId: BigInt(contractPool.id),
             claimableAmount: Number(claimableAmount),
+            wonAmount: Number(wonAmount),
+            claimedAmount: Number(claimedAmount),
             participants: participantsInfo.participants.map((user: { name: string; avatarUrl: string }) => ({
                 name: user.name,
                 avatarUrl: user.avatarUrl,
@@ -49,6 +53,8 @@ function processPoolDetails(
         hostName: poolInfo.hostName,
         contractId: BigInt(contractPool.id),
         claimableAmount: Number(claimableAmount) / 10 ** contractPool.tokenDecimals,
+        wonAmount: Number(wonAmount) / 10 ** contractPool.tokenDecimals,
+        claimedAmount: Number(claimedAmount) / 10 ** contractPool.tokenDecimals,
         participants: participantsInfo.participants.map((user: { name: string; avatarUrl: string }) => ({
             name: user.name,
             avatarUrl: user.avatarUrl,
@@ -90,6 +96,8 @@ export async function getPoolDetailsUseCase(poolId: string, userAddress?: string
     }
 
     let claimableAmount: bigint = BigInt(0)
+    let wonAmount: bigint = BigInt(0)
+    let claimedAmount: bigint = BigInt(0)
 
     if (userAddress && contractPool.participantAddresses.includes(userAddress)) {
         if (contractPool.status === POOLSTATUS.ENDED) {
@@ -99,8 +107,10 @@ export async function getPoolDetailsUseCase(poolId: string, userAddress?: string
                 forfeited: false,
             }
             claimableAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountWon - winnerDetail?.amountClaimed
+            wonAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountWon
+            claimedAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountClaimed
         }
     }
 
-    return processPoolDetails(contractPool, poolInfo, usersInfo, claimableAmount)
+    return processPoolDetails(contractPool, poolInfo, usersInfo, claimableAmount, wonAmount, claimedAmount)
 }

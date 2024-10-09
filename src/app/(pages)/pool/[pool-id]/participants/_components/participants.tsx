@@ -6,10 +6,12 @@ import ParticipantCard from './participantRow'
 import { useParticipants } from '@/hooks/use-participants'
 import SearchBar from './searchBar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
+import { PoolDetailsDTO } from '../../_lib/definitions'
 
 interface PoolParticipantsProps {
     poolId: string
     isAdmin: boolean
+    poolData: PoolDetailsDTO
 }
 
 enum ParticipantStatus {
@@ -18,7 +20,7 @@ enum ParticipantStatus {
     Winners = 'winners',
 }
 
-const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
+const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const setTopBarTitle = useAppStore(state => state.setTopBarTitle)
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
@@ -70,6 +72,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                         poolId={poolId}
                         isAdmin={isAdmin}
                         tabValue={currentTab}
+                        poolData={poolData}
                     />
                 </Tabs>
             </div>
@@ -82,11 +85,13 @@ const ParticipantList = ({
     poolId,
     isAdmin,
     tabValue,
+    poolData,
 }: {
     participants: ReturnType<typeof useParticipants>['data']
     poolId: string
     isAdmin: boolean
     tabValue: ParticipantStatus
+    poolData: PoolDetailsDTO
 }) => (
     <>
         {participants && participants.length > 0 ? (
@@ -99,6 +104,8 @@ const ParticipantList = ({
                     poolId={poolId}
                     status='Registered'
                     isAdmin={isAdmin}
+                    wonAmount={poolData.wonAmount}
+                    claimedAmount={poolData.claimedAmount}
                 />
             ))
         ) : (
