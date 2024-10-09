@@ -1,13 +1,17 @@
 import { getAdminStatusAction } from '@/app/(pages)/pools/actions'
 import Participants from './_components/participants'
+import { getPoolDetailsAction } from '../actions'
 
 export default async function ManageParticipantsPage({ params }: { params: { 'pool-id': string } }) {
     const isAdmin = await getAdminStatusAction()
+    const [data] = await getPoolDetailsAction({ poolId: params['pool-id'] })
 
     return (
-        <div>
-            <Participants poolId={params['pool-id']} isAdmin={isAdmin} />
-        </div>
+        data?.pool && (
+            <div>
+                <Participants poolId={params['pool-id']} isAdmin={isAdmin} poolData={data.pool} />
+            </div>
+        )
     )
 }
 

@@ -15,6 +15,8 @@ const PoolDetailsDTOSchema = z.object({
     startDate: z.string().datetime(),
     endDate: z.string().datetime(),
     claimableAmount: z.number().nonnegative().default(0),
+    wonAmount: z.number().nonnegative().default(0),
+    claimedAmount: z.number().nonnegative().default(0),
     numParticipants: z.number().int().nonnegative(),
     poolBalance: z.number().nonnegative(),
     price: z.number().nonnegative().multipleOf(0.01),
