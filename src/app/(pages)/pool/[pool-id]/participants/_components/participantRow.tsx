@@ -5,6 +5,7 @@ import type { Address } from 'viem'
 import { PoolDetailsDTO } from '../../_lib/definitions'
 import Image from 'next/image'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import { formatAddress } from '@/app/_lib/utils/addresses'
 
 interface ParticipantCardProps {
     address: Address
@@ -48,14 +49,32 @@ export default function ParticipantCard({
                 </Avatar>
 
                 <div className='flex flex-1 flex-col'>
-                    <h4 className='overflow-hidden text-[12pt] font-medium text-black'>{displayName}</h4>
-                    <p className={`fontRegistered text-[10pt] text-[#6993FF]`}>{status}</p>
+                    <h4 className='overflow-hidden text-[12pt] font-medium text-black'>
+                        {displayName} - <span className='italic'>{formatAddress(address)}</span>
+                    </h4>
+                    <p
+                        className={cn(
+                            `fontRegistered text-[10pt] ${status === 'Registered' ? 'font-medium text-[#B2B2B2]' : 'font-semibold text-[#6993FF]'} `,
+                        )}>
+                        {status}
+                    </p>
                 </div>
             </div>
-            <div className='flex flex-row items-center'>
-                <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
-                <div className='flex h-[30px] w-[61px] items-center rounded-[9px] bg-[#6993FF40] px-[10px] py-[5px] text-[10px] font-medium text-[#6993FF]'>{`${wonAmount} USDC`}</div>
-            </div>
+
+            {
+                // TODO: Using wonAmount as placeholder first. Replace this with the saved amount
+                wonAmount == 0 && (
+                    <div className='flex flex-row items-center'>
+                        <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>{`${wonAmount} USD`}</div>
+                    </div>
+                )
+            }
+            {wonAmount > 0 && (
+                <div className='flex flex-row items-center'>
+                    <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
+                    <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>{`${wonAmount} USD`}</div>
+                </div>
+            )}
         </div>
     )
 
