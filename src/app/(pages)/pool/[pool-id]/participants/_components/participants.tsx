@@ -99,6 +99,8 @@ const ParticipantList = ({
                 return true
             case TabValue.CheckedIn:
                 return participant.checkedInAt != null
+            case TabValue.Winners:
+                return participant.wonAmount > 0
             default:
                 return true
         }
@@ -118,7 +120,7 @@ const ParticipantList = ({
                         tabValue={tabValue}
                         checkInAt={participant.checkedInAt}
                         isAdmin={isAdmin}
-                        wonAmount={poolData.wonAmount}
+                        wonAmount={participant.wonAmount}
                         claimedAmount={poolData.claimedAmount}
                     />
                 ))

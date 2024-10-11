@@ -4,12 +4,14 @@ import frog from '@/public/app/images/frog.png'
 import type { Address } from 'viem'
 import { usePoolDetails } from '@/app/(pages)/pool/[pool-id]/ticket/_components/use-pool-details'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
+import { fetchWinnerDetail } from '@/app/(pages)/pool/[pool-id]/participants/_components/fetch-winner-detail'
 
 interface Participant {
     address: Address
     avatar: string
     displayName: string
     checkedInAt: string | undefined | null
+    wonAmount: number
 }
 
 const fetchUserDetails = async (address: Address) => {
@@ -49,6 +51,9 @@ export const useParticipants = (poolId: string) => {
             const participantDetails: Participant[] = await Promise.all(
                 participants.map(async (address: Address) => {
                     const userDetails = await fetchUserDetails(address)
+                    const winnerDetails = await fetchWinnerDetail({ queryKey: ['asdf', BigInt(poolId), address] })
+
+                    let wonAmount = winnerDetails.winnerDetailFromSC.amountWon
                     console.log('userDetails', userDetails)
                     let checkedInAt = undefined
                     if (userDetails && userDetails.id) {
@@ -61,9 +66,12 @@ export const useParticipants = (poolId: string) => {
                         avatar: userDetails?.avatar || frog.src,
                         displayName: userDetails?.displayName ?? formatAddress(userDetails?.walletAddress || '0x'),
                         checkedInAt: checkedInAt,
+                        wonAmount: Number(wonAmount),
                     }
                 }),
             )
+            const wonAmount = poolDetails?.poolDetailFromSC?.[6] || []
+
             return participantDetails
         },
         enabled: Boolean(poolDetails),
