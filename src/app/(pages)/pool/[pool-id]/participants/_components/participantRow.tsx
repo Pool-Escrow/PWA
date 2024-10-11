@@ -6,18 +6,21 @@ import { PoolDetailsDTO } from '../../_lib/definitions'
 import Image from 'next/image'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { formatAddress } from '@/app/_lib/utils/addresses'
+import { TabValue } from './participants'
 
 interface ParticipantCardProps {
     address: Address
     avatar: string
     displayName: string
     poolId: string
-    status?: string
+    status?: string | null
     isLoading?: boolean
     error?: boolean
     isAdmin: boolean
     wonAmount: number
     claimedAmount: number
+    checkInAt?: string | null
+    tabValue: TabValue
 }
 
 export default function ParticipantCard({
@@ -31,6 +34,7 @@ export default function ParticipantCard({
     isAdmin,
     wonAmount,
     claimedAmount,
+    checkInAt,
 }: ParticipantCardProps) {
     if (isLoading) {
         return <div>Loading participant details...</div>
@@ -39,6 +43,8 @@ export default function ParticipantCard({
     if (error) {
         return <div>Error loading participant details. Please try again.</div>
     }
+
+    const participantStatus = checkInAt ? 'Checked In' : 'Registered'
 
     const Content = (
         <div className='flex w-full flex-row items-center justify-between'>
@@ -54,9 +60,9 @@ export default function ParticipantCard({
                     </h4>
                     <p
                         className={cn(
-                            `fontRegistered text-[10pt] ${status === 'Registered' ? 'font-medium text-[#B2B2B2]' : 'font-semibold text-[#6993FF]'} `,
+                            `fontRegistered text-[10pt] ${participantStatus === 'Registered' ? 'font-medium text-[#B2B2B2]' : 'font-semibold text-[#6993FF]'} `,
                         )}>
-                        {status}
+                        {wonAmount > 0 ? 'Checked In - Paid' : participantStatus}
                     </p>
                 </div>
             </div>
