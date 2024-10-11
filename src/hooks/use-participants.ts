@@ -9,15 +9,33 @@ interface Participant {
     address: Address
     avatar: string
     displayName: string
+    checkedInAt: string | undefined | null
 }
 
 const fetchUserDetails = async (address: Address) => {
     const supabase = getSupabaseBrowserClient()
     const { data } = await supabase
         .from('users')
-        .select('avatar, displayName, walletAddress')
+        .select('id, avatar, displayName, walletAddress')
         .eq('walletAddress', address)
         .single()
+    return data
+}
+
+const fetchPoolParticipants = async (userId: number, poolId: string) => {
+    const supabase = getSupabaseBrowserClient()
+    console.log('poolId', poolId)
+    console.log('userId', userId)
+    const { data, error } = await supabase
+        .from('pool_participants')
+        .select('user_id, pool_id, checked_in_at')
+        .eq('user_id', userId)
+        .eq('pool_id', poolId)
+        .single()
+    // console.log('fetchPoolParticipants', data)
+    if (error) {
+        console.error('fetchPoolParticipants', error)
+    }
     return data
 }
 
@@ -31,10 +49,18 @@ export const useParticipants = (poolId: string) => {
             const participantDetails: Participant[] = await Promise.all(
                 participants.map(async (address: Address) => {
                     const userDetails = await fetchUserDetails(address)
+                    console.log('userDetails', userDetails)
+                    let checkedInAt = undefined
+                    if (userDetails && userDetails.id) {
+                        const poolParticipants = await fetchPoolParticipants(userDetails.id, poolId)
+                        checkedInAt = poolParticipants?.['checked_in_at']
+                    }
+
                     return {
                         address,
                         avatar: userDetails?.avatar || frog.src,
                         displayName: userDetails?.displayName ?? formatAddress(userDetails?.walletAddress || '0x'),
+                        checkedInAt: checkedInAt,
                     }
                 }),
             )
