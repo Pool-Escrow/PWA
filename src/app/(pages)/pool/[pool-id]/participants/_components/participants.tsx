@@ -44,8 +44,11 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
 
     const filteredParticipants = useMemo(() => {
         return (
-            participants?.filter(participant => participant.displayName.toLowerCase().includes(query.toLowerCase())) ||
-            []
+            participants?.filter(
+                participant =>
+                    participant.displayName.toLowerCase().includes(query.toLowerCase()) ||
+                    participant.address.toLowerCase().includes(query.toLowerCase()),
+            ) || []
         )
     }, [participants, query])
 
