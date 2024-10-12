@@ -1,80 +1,79 @@
-export default function CheckInPage() {
+'use client'
+
+import { useState } from 'react'
+import { QrReader } from 'react-qr-reader'
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { useParams } from 'next/navigation'
+import { checkInAction } from './actions'
+import { Button } from '@/app/_components/ui/button'
+import { Address } from 'viem'
+
+const CheckInPage = () => {
+    const [qrData, setQrData] = useState<string>('')
+    const params = useParams<{ 'pool-id': string }>()
+
+    const checkInMutation = useMutation({
+        mutationFn: (data: { address: Address }) => checkInAction(params['pool-id'], data.address),
+        onSuccess: data => {
+            if (data.success) {
+                toast.success(data.message, {
+                    richColors: true,
+                })
+            } else {
+                toast.error(data.message, {
+                    richColors: true,
+                })
+            }
+        },
+        onError: error => {
+            toast.error('An error occurred during check-in', {
+                richColors: true,
+            })
+            console.error('Check-in error:', error)
+        },
+    })
+
+    const handleScan = (data: string | null) => {
+        if (data) {
+            setQrData(data)
+            try {
+                const parsedData = JSON.parse(data)
+                console.log('parsedData', parsedData)
+                checkInMutation.mutate({ address: parsedData.address })
+            } catch (error) {
+                console.error('Error parsing QR data:', error)
+                toast.error('Invalid QR code')
+            }
+        }
+    }
+
     return (
-        <div>
-            <h1>Check In Page</h1>
+        <div className='relative flex h-full w-full flex-col'>
+            <h1 className='mb-4 text-2xl font-bold'>Check In</h1>
+            <QrReader
+                className='h-1/2 w-full bg-blue-200'
+                scanDelay={1000}
+                onResult={(result, error) => {
+                    if (result) {
+                        handleScan(result.getText())
+                    }
+                    if (error) {
+                        console.info(error)
+                    }
+                }}
+                constraints={{ facingMode: 'environment' }}
+            />
+            <Button
+                onClick={() => {
+                    console.log('check-in qrscan simulation')
+                    handleScan('{"address": "0x113D848A30b5eEf4B6Ec0461E846EFf33656e976", "poolId": 90}')
+                }}>
+                Check In
+            </Button>
+            <p className='mt-4 break-words'>Scanned Data: {qrData}</p>
         </div>
     )
 }
 
-// import Appbar from '@/components/appbar'
-// import Page from '@/components/page'
-// import Section from '@/components/section'
-// import { toast } from 'sonner'
-// import { useCookie } from '@/hooks/cookie'
-// import { handleCheckIn } from '@/lib/api/clientAPI'
-// import { usePrivy, useWallets } from '@privy-io/react-auth'
-// import React, { useState } from 'react'
-// import { QrReader } from 'react-qr-reader'
-
-// const ScanQR: React.FC = () => {
-// 	const [qrData, setQRData] = useState<string>('')
-
-// 	const [parentRoute, setParentRoute] = useState<string>('')
-// 	const { currentJwt } = useCookie()
-// 	const { toast } = useToast()
-
-// 	const { ready, authenticated, user, signMessage, sendTransaction, logout } =
-// 		usePrivy()
-
-// 	const { wallets, ready: walletsReady } = useWallets()
-
-// 	const handleScan = async (data: string | null) => {
-// 		if (data) {
-// 			setQRData(data)
-// 			const dataObj = JSON.parse(data)
-// 			// Send data to server for updating database
-// 			const result = await handleCheckIn({ data: data, jwt: currentJwt ?? '' })
-// 			console.log('checkin result', result)
-// 			if (result.message == 'Success') {
-// 				toast({
-// 					title: 'Success',
-// 					description: `Checked In ${dataObj?.address}`,
-// 				})
-// 			} else {
-// 				toast({
-// 					title: 'Failure',
-// 					description: `Something went wrong. Please try again later.`,
-// 				})
-// 			}
-// 		}
-// 	}
-
-// 	return (
-// 		<Page>
-// 			<Appbar backRoute={`${parentRoute}`} pageTitle='Check In' />
-// 			<Section>
-// 				<div className='h-full w-full relative flex flex-col'>
-// 					<QrReader
-// 						className='w-full h-full'
-// 						scanDelay={1000}
-// 						onResult={(result, error) => {
-// 							if (result) {
-// 								setQRData(result?.getText())
-// 								handleScan(result?.getText())
-// 							}
-
-// 							if (error) {
-// 								console.info(error)
-// 							}
-// 						}}
-// 						constraints={{ facingMode: 'environment' }}
-// 					></QrReader>
-
-// 					{/* <p>Scanned Data: {qrData}</p> */}
-// 				</div>
-// 			</Section>
-// 		</Page>
-// 	)
-// }
-
-// export default ScanQR
+export default CheckInPage
