@@ -1,13 +1,14 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { cn } from '@/lib/utils/tailwind'
 import Link from 'next/link'
-import type { Address } from 'viem'
+import { formatUnits, type Address } from 'viem'
 import { PoolDetailsDTO } from '../../_lib/definitions'
 import Image from 'next/image'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { formatAddress } from '@/app/_lib/utils/addresses'
 import { TabValue } from './participants'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 
 interface ParticipantCardProps {
     address: Address
@@ -22,6 +23,7 @@ interface ParticipantCardProps {
     claimedAmount: number
     checkInAt?: string | null
     tabValue: TabValue
+    tokenDecimals: number
 }
 
 export default function ParticipantCard({
@@ -37,6 +39,7 @@ export default function ParticipantCard({
     claimedAmount,
     checkInAt,
     tabValue,
+    tokenDecimals,
 }: ParticipantCardProps) {
     if (isLoading) {
         return <div>Loading participant details...</div>
@@ -74,7 +77,7 @@ export default function ParticipantCard({
             {wonAmount === 0 && isAdmin && tabValue === TabValue.Winners && (
                 <div className='flex flex-row items-center'>
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>
-                        {`${savedPayoutAmount?.amount ?? 0} USD`}
+                        {`${formatUnits(BigInt(savedPayoutAmount?.amount ?? 0), tokenDecimals)} USD`}
                     </div>
                 </div>
             )}

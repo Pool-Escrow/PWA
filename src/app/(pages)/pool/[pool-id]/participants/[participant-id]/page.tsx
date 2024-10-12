@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils/tailwind'
 import frog from '@/public/app/images/frog.png'
 import { toast } from 'sonner'
 import type { Address } from 'viem'
-import { getAbiItem } from 'viem'
+import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
@@ -41,11 +41,12 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     const onSaveButtonClicked = () => {
-        const amount = inputValue // Store as string
+        const amount = parseUnits(inputValue, tokenDecimalsData?.tokenDecimals)
+
         const poolId = params['pool-id']
         const participantAddress = params['participant-id']
 
-        addPayout(poolId.toString(), { amount, participantAddress })
+        addPayout(poolId.toString(), { amount: amount.toString(), participantAddress })
         toast.success('Payout saved successfully')
     }
 
@@ -54,8 +55,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
             abi: poolAbi,
             name: 'setWinner',
         })
-        console.log('tokenDecimals', tokenDecimalsData?.tokenDecimals)
-        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals)))
+        const winnerAmount = parseUnits(inputValue, tokenDecimalsData?.tokenDecimals)
 
         const args = [
             {
@@ -80,7 +80,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
         const participantAddress = params['participant-id']
         const savedPayout = getPayoutForParticipant(poolId.toString(), participantAddress)
         if (savedPayout) {
-            setInputValue(savedPayout.amount)
+            setInputValue(formatUnits(BigInt(savedPayout.amount), tokenDecimalsData?.tokenDecimals).toString())
         }
     }, [params, getPayoutForParticipant])
 
