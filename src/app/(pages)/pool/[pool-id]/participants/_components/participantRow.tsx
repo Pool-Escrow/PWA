@@ -2,13 +2,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar
 import { cn } from '@/lib/utils/tailwind'
 import Link from 'next/link'
 import { formatUnits, type Address } from 'viem'
-import { PoolDetailsDTO } from '../../_lib/definitions'
 import Image from 'next/image'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { formatAddress } from '@/app/_lib/utils/addresses'
 import { TabValue } from './participants'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
-import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 
 interface ParticipantCardProps {
     address: Address
