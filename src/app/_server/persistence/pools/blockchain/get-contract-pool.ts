@@ -27,6 +27,7 @@ export interface ContractPoolData {
     mainHost: Address
     participantAddresses: readonly string[]
     poolBalance: bigint
+    totalDeposits: bigint
 }
 
 export async function getContractPool(poolId: string): Promise<ContractPoolData | null> {
@@ -60,6 +61,7 @@ export async function getContractPool(poolId: string): Promise<ContractPoolData 
             mainHost: poolAdmin.host,
             participantAddresses: participants,
             poolBalance: poolBalance.balance,
+            totalDeposits: poolBalance.totalDeposits,
         }
     } catch (error) {
         console.error('Error fetching pool from contract:', error)

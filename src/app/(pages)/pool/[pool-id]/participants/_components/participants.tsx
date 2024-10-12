@@ -7,6 +7,7 @@ import { useParticipants } from '@/hooks/use-participants'
 import SearchBar from './searchBar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
 import { PoolDetailsDTO } from '../../_lib/definitions'
+import PoolDetailsProgress from '../../_components/pool-details-progress'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -67,6 +68,14 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                     <TabsContent value='checkedIn'></TabsContent>
                     <TabsContent value='winners'></TabsContent>
                     {/* <TabsContent value='refunded'>Refunded</TabsContent> */}
+                    {currentTab === TabValue.Winners && (
+                        <div className='my-4'>
+                            <PoolDetailsProgress
+                                current={poolData.poolBalance / 10 ** poolData.tokenDecimals}
+                                goal={poolData.totalDeposits / 10 ** poolData.tokenDecimals}
+                                description={`${(poolData.poolBalance / poolData.totalDeposits) * 100}% Remaining of $ ${poolData.totalDeposits / 10 ** poolData.tokenDecimals} Prize Pool`}></PoolDetailsProgress>
+                        </div>
+                    )}
                     <ParticipantList
                         participants={filteredParticipants}
                         poolId={poolId}

@@ -47,6 +47,7 @@ function processPoolDetails(
             description: '',
             termsUrl: undefined,
             poolBalance: Number(contractPool.poolBalance),
+            totalDeposits: Number(contractPool.totalDeposits),
         }
     }
     return {
@@ -60,7 +61,8 @@ function processPoolDetails(
             avatarUrl: user.avatarUrl,
         })),
         // userDeposit: Number(userInfo?.deposit) ?? 0,
-        goal: poolInfo.softCap * contractPool.price || Number(contractPool.poolBalance),
+        // goal: poolInfo.softCap * contractPool.price || Number(contractPool.poolBalance),
+        goal: poolInfo.softCap * Number(contractPool.price) * 10 ** Number(contractPool.tokenDecimals),
         progress: Number(contractPool.poolBalance) / 10 ** contractPool.tokenDecimals,
         name: contractPool.name,
         startDate: contractPool.startDate,
@@ -76,6 +78,7 @@ function processPoolDetails(
         description: poolInfo.description,
         termsUrl: poolInfo.terms || undefined,
         poolBalance: Number(contractPool.poolBalance),
+        totalDeposits: Number(contractPool.totalDeposits),
     }
 }
 
