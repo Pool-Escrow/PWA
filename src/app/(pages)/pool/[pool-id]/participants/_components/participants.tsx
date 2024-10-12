@@ -11,6 +11,10 @@ import PoolDetailsProgress from '../../_components/pool-details-progress'
 import { Button } from '@/app/_components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import useTransactions from '@/app/_client/hooks/use-smart-transaction'
+import { getAbiItem } from 'viem'
+import { poolAbi } from '@/types/contracts'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -32,6 +36,9 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
     const [currentTab, setCurrentTab] = useState(TabValue.Registered)
+    const { executeTransactions } = useTransactions()
+    const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
+    const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
 
     const filteredParticipants = useMemo(() => {
         return (
@@ -40,7 +47,21 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
         )
     }, [participants, query])
 
-    const OnPayoutButtonClicked = () => {}
+    const OnPayoutButtonClicked = (addresses: string[], amounts: string[]) => {
+        const SetWinnersFunction = getAbiItem({
+            abi: poolAbi,
+            name: 'setWinners',
+        })
+
+        executeTransactions([
+            {
+                address: currentPoolAddress,
+                abi: [SetWinnersFunction],
+                functionName: SetWinnersFunction.name,
+                args: [poolId, addresses, amounts],
+            },
+        ])
+    }
 
     useEffect(() => {
         setTopBarTitle('Manage Participants')
@@ -48,20 +69,26 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     }, [setTopBarTitle])
 
     useEffect(() => {
+        const allPayouts = usePayoutStore.getState().payouts[poolId] || []
+        const addresses = allPayouts.map(payout => payout.participantAddress)
+        const amounts = allPayouts.map(payout => payout.amount)
+
+        setPayoutAddresses(addresses)
+        setPayoutAmounts(amounts)
+    }, [poolId])
+
+    useEffect(() => {
         if (isAdmin && currentTab === TabValue.Winners) {
             setBottomBarContent(
                 <Button
-                    type='submit'
-                    form='pool-form'
-                    // disabled={pending || isPending || isConfirming}
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
-                    onClick={OnPayoutButtonClicked}>
+                    onClick={() => OnPayoutButtonClicked(payoutAddresses, payoutAmounts)}>
                     Payout
                 </Button>,
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab])
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
