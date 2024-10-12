@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/t
 import { PoolDetailsDTO } from '../../_lib/definitions'
 import PoolDetailsProgress from '../../_components/pool-details-progress'
 import { Button } from '@/app/_components/ui/button'
-import { Loader2 } from 'lucide-react'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import useTransactions from '@/app/_client/hooks/use-smart-transaction'
 import { formatUnits, getAbiItem } from 'viem'

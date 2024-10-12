@@ -16,7 +16,6 @@ import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-tok
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
 import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { useUserDetails } from '../_components/use-user-details'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
