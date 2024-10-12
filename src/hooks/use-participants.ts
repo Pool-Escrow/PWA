@@ -51,7 +51,9 @@ export const useParticipants = (poolId: string) => {
             const participantDetails: Participant[] = await Promise.all(
                 participants.map(async (address: Address) => {
                     const userDetails = await fetchUserDetails(address)
-                    const winnerDetails = await fetchWinnerDetail({ queryKey: ['asdf', BigInt(poolId), address] })
+                    const winnerDetails = await fetchWinnerDetail({
+                        queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
+                    })
 
                     let wonAmount = winnerDetails.winnerDetailFromSC.amountWon
                     console.log('userDetails', userDetails)
