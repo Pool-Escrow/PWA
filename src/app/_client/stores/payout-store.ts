@@ -10,6 +10,7 @@ type PayoutStore = {
     payouts: Record<string, PayoutData[]>
     addPayout: (poolId: string, payoutData: PayoutData) => void
     getPayoutForParticipant: (poolId: string, participantAddress: string) => PayoutData | undefined
+    clearPoolPayouts: (poolId: string) => void // New function
 }
 
 export const usePayoutStore = create<PayoutStore>()(
@@ -39,6 +40,12 @@ export const usePayoutStore = create<PayoutStore>()(
                 const poolPayouts = state.payouts[poolIdString] || []
                 return poolPayouts.find(p => p.participantAddress === participantAddress)
             },
+            clearPoolPayouts: poolId =>
+                set(state => {
+                    const poolIdString = poolId.toString()
+                    const { [poolIdString]: _, ...restPayouts } = state.payouts
+                    return { payouts: restPayouts }
+                }),
         }),
         {
             name: 'payout-storage',

@@ -10,6 +10,7 @@ import PoolDetailsBannerStatus from './pool-details-banner-status'
 import PoolDetailsInfo from './pool-details-info'
 import BottomBarHandler from './bottom-bar-handler'
 import { getAdminStatusAction } from '../../../pools/actions'
+import { formatUnits } from 'viem'
 
 export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
     const avatarUrls = pool.participants.map(participant => participant.avatarUrl)
@@ -39,8 +40,8 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                     {pool.status != POOLSTATUS.ENDED && (
                         <PoolDetailsProgress
                             data-testid='pool-details-progress'
-                            current={pool.poolBalance / 10 ** pool.tokenDecimals}
-                            goal={pool.goal / 10 ** pool.tokenDecimals}
+                            current={Number(formatUnits(BigInt(pool.poolBalance), pool.tokenDecimals))}
+                            goal={Number(formatUnits(BigInt(pool.goal), pool.tokenDecimals))}
                         />
                     )}
                     <PoolDetailsParticipants

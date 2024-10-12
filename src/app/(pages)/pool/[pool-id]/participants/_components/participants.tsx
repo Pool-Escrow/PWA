@@ -12,9 +12,10 @@ import { Button } from '@/app/_components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import useTransactions from '@/app/_client/hooks/use-smart-transaction'
-import { getAbiItem } from 'viem'
+import { formatUnits, getAbiItem } from 'viem'
 import { poolAbi } from '@/types/contracts'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { toast } from 'sonner'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -39,6 +40,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const { executeTransactions } = useTransactions()
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
+    const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
 
     const filteredParticipants = useMemo(() => {
         return (
@@ -47,20 +49,27 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
         )
     }, [participants, query])
 
-    const OnPayoutButtonClicked = (addresses: string[], amounts: string[]) => {
+    const OnPayoutButtonClicked = async (addresses: string[], amounts: string[]) => {
         const SetWinnersFunction = getAbiItem({
             abi: poolAbi,
             name: 'setWinners',
         })
 
-        executeTransactions([
-            {
-                address: currentPoolAddress,
-                abi: [SetWinnersFunction],
-                functionName: SetWinnersFunction.name,
-                args: [poolId, addresses, amounts],
-            },
-        ])
+        try {
+            await executeTransactions([
+                {
+                    address: currentPoolAddress,
+                    abi: [SetWinnersFunction],
+                    functionName: SetWinnersFunction.name,
+                    args: [poolId, addresses, amounts],
+                },
+            ])
+            toast.success('Successfully set payouts')
+            clearPoolPayouts(poolId)
+        } catch (error) {
+            console.log('Set Winner Error', error)
+            toast.error('Failed to set payouts')
+        }
     }
 
     useEffect(() => {
@@ -122,9 +131,9 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
                             <PoolDetailsProgress
-                                current={poolData.poolBalance / 10 ** poolData.tokenDecimals}
-                                goal={poolData.totalDeposits / 10 ** poolData.tokenDecimals}
-                                description={`${(poolData.poolBalance / poolData.totalDeposits) * 100}% Remaining of $ ${poolData.totalDeposits / 10 ** poolData.tokenDecimals} Prize Pool`}></PoolDetailsProgress>
+                                current={Number(formatUnits(BigInt(poolData.poolBalance), poolData.tokenDecimals))}
+                                goal={Number(formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals))}
+                                description={`${(poolData.poolBalance / poolData.totalDeposits) * 100}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
                         </div>
                     )}
                     <ParticipantList
@@ -186,6 +195,7 @@ const ParticipantList = ({
                         isAdmin={isAdmin}
                         wonAmount={participant.wonAmount}
                         claimedAmount={poolData.claimedAmount}
+                        tokenDecimals={poolData.tokenDecimals}
                     />
                 ))
             ) : (
