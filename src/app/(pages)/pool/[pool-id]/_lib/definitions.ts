@@ -19,6 +19,7 @@ const PoolDetailsDTOSchema = z.object({
     claimedAmount: z.number().nonnegative().default(0),
     numParticipants: z.number().int().nonnegative(),
     poolBalance: z.number().nonnegative(),
+    totalDeposits: z.number().nonnegative(),
     price: z.number().nonnegative().multipleOf(0.01),
     tokenSymbol: z.string(),
     tokenDecimals: z.number().int().nonnegative(),

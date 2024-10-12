@@ -39,8 +39,8 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                     {pool.status != POOLSTATUS.ENDED && (
                         <PoolDetailsProgress
                             data-testid='pool-details-progress'
-                            current={pool.poolBalance}
-                            goal={pool.goal}
+                            current={pool.poolBalance / 10 ** pool.tokenDecimals}
+                            goal={pool.goal / 10 ** pool.tokenDecimals}
                         />
                     )}
                     <PoolDetailsParticipants
