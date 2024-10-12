@@ -8,6 +8,9 @@ import SearchBar from './searchBar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
 import { PoolDetailsDTO } from '../../_lib/definitions'
 import PoolDetailsProgress from '../../_components/pool-details-progress'
+import { Button } from '@/app/_components/ui/button'
+import { Loader2 } from 'lucide-react'
+import { usePayoutStore } from '@/app/_client/stores/payout-store'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -22,7 +25,10 @@ export enum TabValue {
 }
 
 const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
-    const setTopBarTitle = useAppStore(state => state.setTopBarTitle)
+    const { setBottomBarContent, setTopBarTitle } = useAppStore(s => ({
+        setBottomBarContent: s.setBottomBarContent,
+        setTopBarTitle: s.setTopBarTitle,
+    }))
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
     const [currentTab, setCurrentTab] = useState(TabValue.Registered)
@@ -34,10 +40,28 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
         )
     }, [participants, query])
 
+    const OnPayoutButtonClicked = () => {}
+
     useEffect(() => {
         setTopBarTitle('Manage Participants')
         return () => setTopBarTitle(null)
     }, [setTopBarTitle])
+
+    useEffect(() => {
+        if (isAdmin && currentTab === TabValue.Winners) {
+            setBottomBarContent(
+                <Button
+                    type='submit'
+                    form='pool-form'
+                    // disabled={pending || isPending || isConfirming}
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    onClick={OnPayoutButtonClicked}>
+                    Payout
+                </Button>,
+            )
+        }
+        return () => setBottomBarContent(null)
+    }, [setBottomBarContent, isAdmin, currentTab])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
@@ -102,6 +126,7 @@ const ParticipantList = ({
     tabValue: TabValue
     poolData: PoolDetailsDTO
 }) => {
+    const { payouts } = usePayoutStore()
     const tabParticipants = participants?.filter(participant => {
         switch (tabValue) {
             case TabValue.Registered:
@@ -109,7 +134,10 @@ const ParticipantList = ({
             case TabValue.CheckedIn:
                 return participant.checkedInAt != null
             case TabValue.Winners:
-                return participant.wonAmount > 0
+                return (
+                    participant.wonAmount > 0 ||
+                    (payouts[poolId] && payouts[poolId].some(p => p.participantAddress === participant.address))
+                )
             default:
                 return true
         }

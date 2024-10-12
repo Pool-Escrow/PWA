@@ -36,6 +36,7 @@ export default function ParticipantCard({
     wonAmount,
     claimedAmount,
     checkInAt,
+    tabValue,
 }: ParticipantCardProps) {
     if (isLoading) {
         return <div>Loading participant details...</div>
@@ -70,16 +71,18 @@ export default function ParticipantCard({
                 </div>
             </div>
 
-            {wonAmount === 0 && isAdmin && (
+            {wonAmount === 0 && isAdmin && tabValue === TabValue.Winners && (
                 <div className='flex flex-row items-center'>
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>
                         {`${savedPayoutAmount?.amount ?? 0} USD`}
                     </div>
                 </div>
             )}
-            {wonAmount > 0 && isAdmin && (
+            {wonAmount > 0 && isAdmin && tabValue === TabValue.Winners && (
                 <div className='flex flex-row items-center'>
-                    <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
+                    {claimedAmount === wonAmount && (
+                        <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
+                    )}
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>{`${wonAmount} USD`}</div>
                 </div>
             )}
