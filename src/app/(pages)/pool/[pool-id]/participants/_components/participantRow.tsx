@@ -7,6 +7,7 @@ import Image from 'next/image'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { formatAddress } from '@/app/_lib/utils/addresses'
 import { TabValue } from './participants'
+import { usePayoutStore } from '@/app/_client/stores/payout-store'
 
 interface ParticipantCardProps {
     address: Address
@@ -46,6 +47,8 @@ export default function ParticipantCard({
 
     const participantStatus = checkInAt ? 'Checked In' : 'Registered'
 
+    const savedPayoutAmount = usePayoutStore(state => state.getPayoutForParticipant(poolId, address))
+
     const Content = (
         <div className='flex w-full flex-row items-center justify-between'>
             <div className='flex flex-row space-x-4'>
@@ -67,15 +70,14 @@ export default function ParticipantCard({
                 </div>
             </div>
 
-            {
-                // TODO: Using wonAmount as placeholder first. Replace this with the saved amount
-                wonAmount == 0 && (
-                    <div className='flex flex-row items-center'>
-                        <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>{`${wonAmount} USD`}</div>
+            {wonAmount === 0 && isAdmin && (
+                <div className='flex flex-row items-center'>
+                    <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>
+                        {`${savedPayoutAmount?.amount ?? 0} USD`}
                     </div>
-                )
-            }
-            {wonAmount > 0 && (
+                </div>
+            )}
+            {wonAmount > 0 && isAdmin && (
                 <div className='flex flex-row items-center'>
                     <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>{`${wonAmount} USD`}</div>
