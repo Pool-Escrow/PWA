@@ -26,15 +26,12 @@ const fetchUserDetails = async (address: Address) => {
 
 const fetchPoolParticipants = async (userId: number, poolId: string) => {
     const supabase = getSupabaseBrowserClient()
-    console.log('poolId', poolId)
-    console.log('userId', userId)
     const { data, error } = await supabase
         .from('pool_participants')
         .select('user_id, pool_id, checked_in_at')
         .eq('user_id', userId)
         .eq('pool_id', poolId)
         .single()
-    // console.log('fetchPoolParticipants', data)
     if (error) {
         console.error('fetchPoolParticipants', error)
     }
@@ -72,7 +69,6 @@ export const useParticipants = (poolId: string) => {
                     }
                 }),
             )
-            const wonAmount = poolDetails?.poolDetailFromSC?.[6] || []
 
             return participantDetails
         },
