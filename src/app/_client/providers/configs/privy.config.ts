@@ -28,7 +28,11 @@ export default {
             landingHeader: 'Log in or sign up to continue',
             loginMessage: 'Pooling funds made simple.',
             showWalletLoginFirst: true,
-            walletList: ['coinbase_wallet', 'detected_wallets', 'metamask', 'rainbow', 'wallet_connect'],
+            walletList: [
+                'coinbase_wallet',
+                'detected_wallets',
+                // 'metamask', 'rainbow', 'wallet_connect'
+            ],
         },
         externalWallets: {
             coinbaseWallet: {
@@ -57,8 +61,14 @@ export default {
         //     },
         // },
         loginMethodsAndOrder: {
-            primary: ['coinbase_wallet', 'detected_wallets', 'metamask'],
-            overflow: ['rainbow', 'wallet_connect'],
+            primary: [
+                'coinbase_wallet',
+                'detected_wallets',
+                // , 'metamask'
+            ],
+            overflow: [
+                // 'rainbow', 'wallet_connect'
+            ],
         },
         // fiatOnRamp: { useSandbox: true },
         // loginMethods: []
