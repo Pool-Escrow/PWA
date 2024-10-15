@@ -56,7 +56,6 @@ export const useParticipants = (poolId: string) => {
                     let amountWon = winnerDetails.winnerDetailFromSC.amountWon
                     let amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
 
-                    console.log('userDetails', userDetails)
                     let checkedInAt = undefined
                     if (userDetails && userDetails.id) {
                         const poolParticipants = await fetchPoolParticipants(userDetails.id, poolId)
