@@ -7,6 +7,7 @@ import { poolAbi } from '@/types/contracts'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import useTransactions from '@/app/_client/hooks/use-smart-transaction'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 
 export function useSetWinners(poolId: string) {
     const { executeTransactions, result } = useTransactions()
@@ -51,6 +52,7 @@ export function useSetWinners(poolId: string) {
             toast.success('Successfully set payouts')
             clearPoolPayouts(poolId)
             queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
+            queryClient.invalidateQueries({ queryKey: ['poolDetails', poolId, getConfig().state.chainId] })
             setLastConfirmedHash(result.hash)
         }
 
