@@ -42,6 +42,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
     const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
     const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
+    const [totalSavedPayout, setTotalSavedPayout] = useState<string>('0')
 
     const filteredParticipants = useMemo(() => {
         return (
@@ -65,6 +66,8 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
 
         setPayoutAddresses(addresses)
         setPayoutAmounts(amounts)
+        const total = allPayouts.reduce((sum, payout) => sum + BigInt(payout.amount), BigInt(0))
+        setTotalSavedPayout(total.toString())
     }, [poolId])
 
     useEffect(() => {
@@ -113,9 +116,14 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
                             <PoolDetailsProgress
-                                current={Number(formatUnits(BigInt(poolData.poolBalance), poolData.tokenDecimals))}
+                                current={Number(
+                                    formatUnits(
+                                        BigInt(poolData.poolBalance) - BigInt(totalSavedPayout),
+                                        poolData.tokenDecimals,
+                                    ),
+                                )}
                                 goal={Number(formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals))}
-                                description={`${(poolData.poolBalance / poolData.totalDeposits) * 100}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
+                                description={`${((poolData.poolBalance - Number(totalSavedPayout)) / poolData.totalDeposits) * 100}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
                         </div>
                     )}
                     <ParticipantList
