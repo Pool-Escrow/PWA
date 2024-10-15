@@ -36,17 +36,39 @@ const ParticipantList = ({
     }, [poolId])
 
     const tabParticipants = useMemo(() => {
-        return participants?.filter(participant => {
-            switch (tabValue) {
-                case TabValue.Registered:
-                    return true
-                case TabValue.CheckedIn:
-                    return participant.checkedInAt != null
-                case TabValue.Winners:
-                    return participant.amountWon > 0 || savedPayouts[participant.address]
-                default:
-                    return true
+        const filteredParticipants =
+            participants?.filter(participant => {
+                switch (tabValue) {
+                    case TabValue.Registered:
+                        return true
+                    case TabValue.CheckedIn:
+                        return participant.checkedInAt != null
+                    case TabValue.Winners:
+                        return participant.amountWon > 0 || savedPayouts[participant.address]
+                    default:
+                        return true
+                }
+            }) || []
+        return filteredParticipants.sort((a, b) => {
+            // Helper function to determine participant category
+            const getCategory = (p: typeof a) => {
+                if (p.amountClaimed > 0) return 5
+                if (p.amountWon > 0) return 4
+                if (savedPayouts[p.address]) return 3
+                if (p.checkedInAt) return 2
+                return 1
             }
+
+            const categoryA = getCategory(a)
+            const categoryB = getCategory(b)
+
+            // Sort by category first
+            if (categoryA !== categoryB) {
+                return categoryA - categoryB
+            }
+
+            // If in the same category, sort alphabetically by displayName
+            return a.displayName.localeCompare(b.displayName)
         })
     }, [participants, tabValue, savedPayouts])
 
