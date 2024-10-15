@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import ParticipantCard from './participantRow'
 import { useParticipants } from '@/hooks/use-participants'
 import SearchBar from './searchBar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
@@ -15,6 +14,7 @@ import { formatUnits, getAbiItem } from 'viem'
 import { poolAbi } from '@/types/contracts'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { toast } from 'sonner'
+import ParticipantList from './participantsList'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -148,62 +148,6 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                 </Tabs>
             </div>
         </div>
-    )
-}
-
-const ParticipantList = ({
-    participants,
-    poolId,
-    isAdmin,
-    tabValue,
-    poolData,
-}: {
-    participants: ReturnType<typeof useParticipants>['data']
-    poolId: string
-    isAdmin: boolean
-    tabValue: TabValue
-    poolData: PoolDetailsDTO
-}) => {
-    const { payouts } = usePayoutStore()
-    const tabParticipants = participants?.filter(participant => {
-        switch (tabValue) {
-            case TabValue.Registered:
-                return true
-            case TabValue.CheckedIn:
-                return participant.checkedInAt != null
-            case TabValue.Winners:
-                return (
-                    participant.wonAmount > 0 ||
-                    (payouts[poolId] && payouts[poolId].some(p => p.participantAddress === participant.address))
-                )
-            default:
-                return true
-        }
-    })
-
-    return (
-        <>
-            {tabParticipants && tabParticipants.length > 0 ? (
-                tabParticipants.map(participant => (
-                    <ParticipantCard
-                        key={participant.address}
-                        address={participant.address}
-                        avatar={participant.avatar}
-                        displayName={participant.displayName}
-                        poolId={poolId}
-                        status={'Registered'}
-                        tabValue={tabValue}
-                        checkInAt={participant.checkedInAt}
-                        isAdmin={isAdmin}
-                        wonAmount={participant.wonAmount}
-                        claimedAmount={poolData.claimedAmount}
-                        tokenDecimals={poolData.tokenDecimals}
-                    />
-                ))
-            ) : (
-                <p>No participants found.</p>
-            )}
-        </>
     )
 }
 
