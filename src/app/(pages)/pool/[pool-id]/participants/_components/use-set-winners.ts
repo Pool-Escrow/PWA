@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { getAbiItem, Hash } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
@@ -12,6 +12,7 @@ export function useSetWinners(poolId: string) {
     const { executeTransactions, result } = useTransactions()
     const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
     const queryClient = useQueryClient()
+    const [lastConfirmedHash, setLastConfirmedHash] = useState<Hash | null>(null)
 
     const {
         isLoading: isConfirming,
@@ -45,17 +46,18 @@ export function useSetWinners(poolId: string) {
         [poolId, executeTransactions],
     )
 
-    // Handle successful confirmation
-    if (isConfirmed) {
-        toast.success('Successfully set payouts')
-        clearPoolPayouts(poolId)
-        queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
-    }
+    useEffect(() => {
+        if (isConfirmed && result.hash && result.hash !== lastConfirmedHash) {
+            toast.success('Successfully set payouts')
+            clearPoolPayouts(poolId)
+            queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
+            setLastConfirmedHash(result.hash)
+        }
 
-    // Handle confirmation error
-    if (isConfirmationError) {
-        toast.error('Failed to confirm payout transaction')
-    }
+        if (isConfirmationError) {
+            toast.error('Failed to confirm payout transaction')
+        }
+    }, [isConfirmed, isConfirmationError, result.hash, lastConfirmedHash, clearPoolPayouts, poolId, queryClient])
 
     return {
         setWinners,
