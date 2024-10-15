@@ -9,10 +9,10 @@ import { PoolDetailsDTO } from '../../_lib/definitions'
 import PoolDetailsProgress from '../../_components/pool-details-progress'
 import { Button } from '@/app/_components/ui/button'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
-import useTransactions from '@/app/_client/hooks/use-smart-transaction'
 import { formatUnits } from 'viem'
 import ParticipantList from './participantsList'
 import { useSetWinners } from './use-set-winners'
+import { toast } from 'sonner'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -34,10 +34,9 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
     const [currentTab, setCurrentTab] = useState(TabValue.Registered)
-    const { executeTransactions } = useTransactions()
+
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
-    const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
     const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
     const [totalSavedPayout, setTotalSavedPayout] = useState<string>('0')
 
@@ -72,7 +71,13 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
-                    onClick={() => setWinners(payoutAddresses, payoutAmounts)}
+                    onClick={() => {
+                        if (payoutAddresses.length === 0) {
+                            toast('No payout saved.')
+                        } else {
+                            setWinners(payoutAddresses, payoutAmounts)
+                        }
+                    }}
                     disabled={isPending || isConfirming}>
                     {isPending || isConfirming ? 'Processing...' : 'Payout'}
                 </Button>,
