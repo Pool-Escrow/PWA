@@ -84,7 +84,9 @@ export default function ParticipantCard({
                     {claimedAmount === wonAmount && (
                         <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
                     )}
-                    <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>{`${wonAmount} USD`}</div>
+                    <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>
+                        {`${formatUnits(BigInt(wonAmount ?? 0), tokenDecimals)} USD`}
+                    </div>
                 </div>
             )}
         </div>
