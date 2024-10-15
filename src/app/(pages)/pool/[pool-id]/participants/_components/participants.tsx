@@ -123,7 +123,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                                     ),
                                 )}
                                 goal={Number(formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals))}
-                                description={`${((poolData.poolBalance - Number(totalSavedPayout)) / poolData.totalDeposits) * 100}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
+                                description={`${(((poolData.poolBalance - Number(totalSavedPayout)) / poolData.totalDeposits) * 100).toFixed(0)}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
                         </div>
                     )}
                     <ParticipantList
