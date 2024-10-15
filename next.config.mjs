@@ -29,7 +29,7 @@ const cspHeader = `
     form-action 'self';
     frame-ancestors 'none';
     frame-src 'self' https://app.privy.io https://auth.privy.io https://js.stripe.com;
-    connect-src 'self' https://api.privy.io https://auth.privy.io wss://auth.privy.io https://mainnet.base.org https://explorer-api.walletconnect.com https://*.supabase.co https://*.stripe.com https://*.coinbase.com;
+    connect-src 'self' https://api.privy.io https://auth.privy.io wss://auth.privy.io https://mainnet.base.org https://explorer-api.walletconnect.com https://*.supabase.co https://*.stripe.com https://*.coinbase.com https://sepolia.base.org;
     upgrade-insecure-requests;
 `
 

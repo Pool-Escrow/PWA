@@ -45,7 +45,6 @@ export async function getContractPool(poolId: string): Promise<ContractPoolData 
 
         const [poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
 
-        // Aquí deberías obtener tokenSymbol y tokenDecimals del contrato del token
         const tokenSymbol = await getTokenSymbol(poolToken)
         const tokenDecimals = await getTokenDecimals(poolToken)
 
