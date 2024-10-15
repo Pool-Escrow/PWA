@@ -11,7 +11,8 @@ interface Participant {
     avatar: string
     displayName: string
     checkedInAt: string | undefined | null
-    wonAmount: number
+    amountWon: number
+    amountClaimed: number
 }
 
 const fetchUserDetails = async (address: Address) => {
@@ -52,7 +53,9 @@ export const useParticipants = (poolId: string) => {
                         queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
                     })
 
-                    let wonAmount = winnerDetails.winnerDetailFromSC.amountWon
+                    let amountWon = winnerDetails.winnerDetailFromSC.amountWon
+                    let amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
+
                     console.log('userDetails', userDetails)
                     let checkedInAt = undefined
                     if (userDetails && userDetails.id) {
@@ -65,7 +68,8 @@ export const useParticipants = (poolId: string) => {
                         avatar: userDetails?.avatar || frog.src,
                         displayName: userDetails?.displayName ?? formatAddress(userDetails?.walletAddress || '0x'),
                         checkedInAt: checkedInAt,
-                        wonAmount: Number(wonAmount),
+                        amountWon: Number(amountWon),
+                        amountClaimed: Number(amountClaimed),
                     }
                 }),
             )
