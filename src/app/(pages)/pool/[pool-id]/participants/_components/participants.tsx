@@ -15,6 +15,7 @@ import { poolAbi } from '@/types/contracts'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { toast } from 'sonner'
 import ParticipantList from './participantsList'
+import { useSetWinners } from './use-set-winners'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -40,6 +41,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
     const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
+    const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
 
     const filteredParticipants = useMemo(() => {
         return (
@@ -50,29 +52,6 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
             ) || []
         )
     }, [participants, query])
-
-    const OnPayoutButtonClicked = async (addresses: string[], amounts: string[]) => {
-        const SetWinnersFunction = getAbiItem({
-            abi: poolAbi,
-            name: 'setWinners',
-        })
-
-        try {
-            await executeTransactions([
-                {
-                    address: currentPoolAddress,
-                    abi: [SetWinnersFunction],
-                    functionName: SetWinnersFunction.name,
-                    args: [poolId, addresses, amounts],
-                },
-            ])
-            toast.success('Successfully set payouts')
-            clearPoolPayouts(poolId)
-        } catch (error) {
-            console.log('Set Winner Error', error)
-            toast.error('Failed to set payouts')
-        }
-    }
 
     useEffect(() => {
         setTopBarTitle('Manage Participants')
@@ -93,8 +72,9 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
-                    onClick={() => OnPayoutButtonClicked(payoutAddresses, payoutAmounts)}>
-                    Payout
+                    onClick={() => setWinners(payoutAddresses, payoutAmounts)}
+                    disabled={isPending || isConfirming}>
+                    {isPending || isConfirming ? 'Processing...' : 'Payout'}
                 </Button>,
             )
         }
