@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { usePayoutStore } from '@/app/_client/stores/payout-store'
+
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { formatAddress } from '@/app/_lib/utils/addresses'
@@ -8,13 +10,12 @@ import { cn } from '@/lib/utils/tailwind'
 import frog from '@/public/app/images/frog.png'
 import { toast } from 'sonner'
 import type { Address } from 'viem'
-import { getAbiItem } from 'viem'
+import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
 import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { useUserDetails } from '../_components/use-user-details'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
@@ -30,6 +31,8 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     const { data: hash, isPending, isSuccess } = useWriteContract()
     const { executeTransactions } = useSmartTransaction()
 
+    const { addPayout, getPayoutForParticipant } = usePayoutStore()
+
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [inputValue, setInputValue] = useState<string>('0')
     const [isAdmin, setIsAdmin] = useState<boolean>(false)
@@ -38,13 +41,22 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
         setInputValue(event.target.value)
     }
 
+    const onSaveButtonClicked = () => {
+        const amount = parseUnits(inputValue, tokenDecimalsData?.tokenDecimals)
+
+        const poolId = params['pool-id']
+        const participantAddress = params['participant-id']
+
+        addPayout(poolId.toString(), { amount: amount.toString(), participantAddress })
+        toast.success('Payout saved successfully')
+    }
+
     const onPayoutButtonClicked = () => {
         const SetWinnerFunction = getAbiItem({
             abi: poolAbi,
             name: 'setWinner',
         })
-        console.log('tokenDecimals', tokenDecimalsData?.tokenDecimals)
-        const winnerAmount = BigInt(inputValue) * BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals)))
+        const winnerAmount = parseUnits(inputValue, tokenDecimalsData?.tokenDecimals)
 
         const args = [
             {
@@ -63,6 +75,15 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
             console.log('setWinner Error', error)
         }
     }
+
+    useEffect(() => {
+        const poolId = BigInt(params['pool-id'])
+        const participantAddress = params['participant-id']
+        const savedPayout = getPayoutForParticipant(poolId.toString(), participantAddress)
+        if (savedPayout) {
+            setInputValue(formatUnits(BigInt(savedPayout.amount), tokenDecimalsData?.tokenDecimals).toString())
+        }
+    }, [params, getPayoutForParticipant])
 
     useEffect(() => {
         getAdminStatusAction().then(isUserAdmin => {
@@ -117,6 +138,11 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
                         onClick={onPayoutButtonClicked}
                         className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         Payout
+                    </Button>
+                    <Button
+                        onClick={onSaveButtonClicked}
+                        className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        Save
                     </Button>
                 </div>
             </div>

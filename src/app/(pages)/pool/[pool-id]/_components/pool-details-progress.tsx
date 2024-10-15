@@ -4,9 +4,14 @@ import { Progress } from '@/app/_components/ui/progress'
 interface PoolDetailsProgressProps {
     current: number
     goal: number
+    description?: string
 }
 
-export default function PoolDetailsProgress({ current, goal }: PoolDetailsProgressProps) {
+export default function PoolDetailsProgress({
+    current,
+    goal,
+    description = `Goal of $${goal || '🎁'} Prize Pool`,
+}: PoolDetailsProgressProps) {
     const isComplete = current >= goal && current > 0
 
     return (
@@ -16,7 +21,7 @@ export default function PoolDetailsProgress({ current, goal }: PoolDetailsProgre
                     <span className='font-bold'>{`$${current}`}</span>
                     <span>USDC</span>
                 </div>
-                <div className='text-xs'>{`Goal of $${goal || '🎁'} Prize Pool`}</div>
+                <div className='text-xs'>{description}</div>
             </div>
             {isComplete ? (
                 <ShineBorder className='overflow-hidden' color={['#5472E9', '#5D7AF2', '#5A77EE']} borderWidth={2}>
