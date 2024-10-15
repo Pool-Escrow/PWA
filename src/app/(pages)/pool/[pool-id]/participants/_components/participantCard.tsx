@@ -7,6 +7,7 @@ import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { formatAddress } from '@/app/_lib/utils/addresses'
 import { TabValue } from './participants'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { useEffect, useState } from 'react'
 
 interface ParticipantCardProps {
     address: Address
@@ -39,6 +40,13 @@ export default function ParticipantCard({
     tabValue,
     tokenDecimals,
 }: ParticipantCardProps) {
+    const [savedPayoutAmount, setSavedPayoutAmount] = useState<string | undefined>()
+
+    useEffect(() => {
+        const payout = usePayoutStore.getState().getPayoutForParticipant(poolId, address)
+        setSavedPayoutAmount(payout?.amount)
+    }, [poolId, address])
+
     if (isLoading) {
         return <div>Loading participant details...</div>
     }
@@ -48,8 +56,6 @@ export default function ParticipantCard({
     }
 
     const participantStatus = checkInAt ? 'Checked In' : 'Registered'
-
-    const savedPayoutAmount = usePayoutStore(state => state.getPayoutForParticipant(poolId, address))
 
     const Content = (
         <div className='flex w-full flex-row items-center justify-between'>
@@ -75,7 +81,7 @@ export default function ParticipantCard({
             {wonAmount === 0 && isAdmin && tabValue === TabValue.Winners && (
                 <div className='flex flex-row items-center'>
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#8F919033] text-center text-[10px] font-medium text-[#848484]'>
-                        {`${formatUnits(BigInt(savedPayoutAmount?.amount ?? 0), tokenDecimals)} USD`}
+                        {`${formatUnits(BigInt(savedPayoutAmount ?? 0), tokenDecimals)} USD`}
                     </div>
                 </div>
             )}
