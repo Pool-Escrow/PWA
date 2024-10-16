@@ -55,31 +55,30 @@ export type Database = {
             }
             pool_participants: {
                 Row: {
+                    checked_in_at: string | null
                     createdAt: string | null
                     pool_id: number
                     poolRole: Database['public']['Enums']['poolRoles']
+                    status: string
                     user_id: number
                 }
                 Insert: {
+                    checked_in_at?: string | null
                     createdAt?: string | null
                     pool_id: number
                     poolRole: Database['public']['Enums']['poolRoles']
+                    status?: string
                     user_id: number
                 }
                 Update: {
+                    checked_in_at?: string | null
                     createdAt?: string | null
                     pool_id?: number
                     poolRole?: Database['public']['Enums']['poolRoles']
+                    status?: string
                     user_id?: number
                 }
                 Relationships: [
-                    {
-                        foreignKeyName: 'pool_participants_pool_id_fkey'
-                        columns: ['pool_id']
-                        isOneToOne: false
-                        referencedRelation: 'pools'
-                        referencedColumns: ['internal_id']
-                    },
                     {
                         foreignKeyName: 'pool_participants_user_id_fkey'
                         columns: ['user_id']
