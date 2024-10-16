@@ -12,9 +12,10 @@ import { Loader2 } from 'lucide-react'
 
 export default function CreatePoolForm() {
     const { formAction, state, createPoolOnChain, isPending, isConfirming } = useCreatePool()
-    const { setBottomBarContent, setTopBarTitle } = useAppStore(s => ({
+    const { setBottomBarContent, setTopBarTitle, setTransactionInProgress } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
         setTopBarTitle: s.setTopBarTitle,
+        setTransactionInProgress: s.setTransactionInProgress,
     }))
     const hasCreatedPool = useRef(false)
 
@@ -49,11 +50,14 @@ export default function CreatePoolForm() {
                         : 'Create Pool'}
             </Button>,
         )
+
+        setTransactionInProgress(isPending || isConfirming)
+
         return () => {
             setTopBarTitle(null)
             setBottomBarContent(null)
         }
-    }, [setBottomBarContent, setTopBarTitle, isPending, isConfirming, handleSubmit, pending])
+    }, [setBottomBarContent, setTopBarTitle, setTransactionInProgress, isPending, isConfirming, handleSubmit, pending])
 
     useEffect(() => {
         console.log(

@@ -4,7 +4,7 @@ import { useAccount } from 'wagmi'
 import { useClaimablePools } from '../../claim-winning/_components/use-claimable-pools'
 import PoolCardRow from '../../claim-winning/_components/pool-card-row'
 import { Button } from '@/app/_components/ui/button'
-import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { toast } from 'sonner'
 import { getAbiItem } from 'viem'
@@ -15,7 +15,7 @@ import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 export default function ClaimablePrizes() {
     const { address } = useAccount()
     const { claimablePools, isLoading } = useClaimablePools(address as string)
-    const { executeTransactions } = useSmartTransaction()
+    const { executeTransactions } = useTransactions()
     const { startConfetti, ConfettiComponent } = useConfetti()
 
     const handleClaimAll = async () => {

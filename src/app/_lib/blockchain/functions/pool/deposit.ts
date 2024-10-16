@@ -1,7 +1,7 @@
+import type { ContractCall } from '@/app/_lib/entities/models/contract-call'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getAbiItem } from 'viem'
-import { ContractCall } from '@/app/_lib/entities/models/contract-call'
 
 const DepositFunction = getAbiItem({
     abi: poolAbi,

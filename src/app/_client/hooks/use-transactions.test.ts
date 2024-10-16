@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-hooks'
 import { useAccount } from 'wagmi'
 import { useWriteContracts, useCapabilities } from 'wagmi/experimental'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import useSmartTransaction from './use-smart-transaction'
+import useTransactions from './use-transactions'
 
 // Mock the dependencies
 vi.mock('wagmi')
@@ -27,16 +27,13 @@ describe('useSmartTransaction', () => {
         // vi.mocked(useWriteContracts).mockReturnValue({
         //     writeContracts: vi.fn().mockResolvedValue({ hash: '0xabc' }),
         // } as any)
-
         // const { result } = renderHook(() => useSmartTransaction())
-
         // await act(async () => {
         //     await result.current.executeTransaction(
         //         [{ address: '0x456', abi: [], functionName: 'test', args: [] }],
         //         'coinbase_smart_wallet',
         //     )
         // })
-
         // expect(result.current.result.hash).toBe('0xabc')
         // expect(result.current.result.isLoading).toBe(false)
         // expect(result.current.result.isError).toBe(false)

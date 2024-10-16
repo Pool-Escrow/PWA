@@ -1,4 +1,4 @@
-import { ContractCall } from '@/app/_lib/entities/models/contract-call'
+import type { ContractCall } from '@/app/_lib/entities/models/contract-call'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { tokenAbi } from '@/types/contracts'
 import type { Address } from 'viem'

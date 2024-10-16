@@ -14,6 +14,7 @@ export const initAppStore = (): AppState => ({
     topBarTitle: null,
     bottomBarContent: null,
     myPoolsTab: 'upcoming',
+    transactionInProgress: false,
 })
 
 export const defaultInitState: AppState = initAppStore()

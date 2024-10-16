@@ -3,11 +3,12 @@
 import { Button } from '@/app/_components/ui/button'
 import { poolAbi } from '@/types/contracts'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { Address } from 'viem'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { POOLSTATUS } from '../_lib/definitions'
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
-import OnRampDialog from '../../../profile/_components/onramps/onramp.dialog'
+import OnRampDialog from '@/app/(pages)/profile/_components/onramps/onramp.dialog'
 import { Loader2 } from 'lucide-react'
 import { useAccount, useReadContract } from 'wagmi'
 import { getAbiItem } from 'viem'
@@ -42,9 +43,9 @@ export default function BottomBarHandler({
 }: BottomBarHandlerProps) {
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
-
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
+    const setTransactionInProgress = useAppStore(state => state.setTransactionInProgress)
 
     const { address } = useAccount()
     const { data: isParticipant, isLoading: isParticipantLoading } = useReadContract({
@@ -73,6 +74,7 @@ export default function BottomBarHandler({
         ready,
         isPending,
         isConfirmed,
+        isConfirming,
         resetConfirmation,
     } = usePoolActions(
         poolId,
@@ -133,8 +135,8 @@ export default function BottomBarHandler({
                         setIsLoading(true)
                         config.action()
                     }}
-                    disabled={isPending || isLoading}>
-                    {isPending || isLoading ? (
+                    disabled={isPending || isLoading || isConfirming}>
+                    {isPending || isLoading || isConfirming ? (
                         <>
                             <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                             Processing...
@@ -145,7 +147,7 @@ export default function BottomBarHandler({
                 </Button>
             )
         },
-        [isPending, isLoading],
+        [isPending, isConfirming, isLoading],
     )
 
     const updateBottomBarContent = useCallback(() => {
@@ -195,6 +197,11 @@ export default function BottomBarHandler({
             setIsLoading(false)
         }
     }, [isConfirmed, updateBottomBarContent, router, resetConfirmation])
+
+    useEffect(() => {
+        setTransactionInProgress(isPending || isConfirming)
+        console.log('BottomBarHandler isPending', isPending || isConfirming)
+    }, [setTransactionInProgress, isPending, isConfirming])
 
     useEffect(() => {
         if (!isPending && !isConfirmed) {

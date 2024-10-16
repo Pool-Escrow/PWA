@@ -3,12 +3,11 @@ import { useFormState } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { parseEther, Hash, parseEventLogs } from 'viem'
 import { createPoolAction, updatePoolStatus } from './actions'
-import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { useWaitForTransactionReceipt } from 'wagmi'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { useQueryClient } from '@tanstack/react-query'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 import { poolAbi } from '@/types/contracts'
 
 const initialState = {
@@ -29,7 +28,7 @@ const initialState = {
 export function useCreatePool() {
     const [state, formAction] = useFormState(createPoolAction, initialState)
     const router = useRouter()
-    const { executeTransactions, result } = useSmartTransaction()
+    const { executeTransactions, result } = useTransactions()
     const { setStep, setOnChainPoolId, setError, showToast } = usePoolCreationStore(state => ({
         setStep: state.setStep,
         setOnChainPoolId: state.setOnChainPoolId,
