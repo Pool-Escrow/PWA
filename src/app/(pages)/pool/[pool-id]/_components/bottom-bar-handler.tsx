@@ -2,7 +2,7 @@
 
 import { Button } from '@/app/_components/ui/button'
 import { poolAbi } from '@/types/contracts'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import type { Address } from 'viem'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
@@ -43,6 +43,8 @@ export default function BottomBarHandler({
 }: BottomBarHandlerProps) {
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [transactionProcessed, setTransactionProcessed] = useState(false)
+    const updateBottomBarContentRef = useRef<NodeJS.Timeout | null>(null)
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
     const setTransactionInProgress = useAppStore(state => state.setTransactionInProgress)
@@ -62,8 +64,6 @@ export default function BottomBarHandler({
             enabled: Boolean(address && poolId),
         },
     })
-
-    console.log('isParticipant:', isParticipant, 'address:', address, 'poolId:', poolId)
 
     const {
         handleEnableDeposits,
@@ -126,10 +126,11 @@ export default function BottomBarHandler({
     )
 
     const renderButton = useCallback(
-        (config: { label: string; action: () => void } | null) => {
+        (config: ButtonConfig | null, key: string) => {
             if (!config) return null
             return (
                 <Button
+                    key={key}
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
                     onClick={() => {
                         setIsLoading(true)
@@ -156,14 +157,14 @@ export default function BottomBarHandler({
         if (isParticipantLoading) {
             content = <Button disabled>Loading...</Button>
         } else if (isParticipant && !isAdmin && poolStatus !== POOLSTATUS.ENDED) {
-            content = renderButton({ label: 'View My Ticket', action: handleViewTicket })
+            content = renderButton({ label: 'View My Ticket', action: handleViewTicket }, 'view-ticket')
         } else {
             const statusConfig = buttonConfig[poolStatus]
             const role = isAdmin ? 'admin' : 'user'
             const config = statusConfig[role]
 
             if (config && (!isParticipant || isAdmin)) {
-                content = renderButton(config)
+                content = renderButton(config, `${role}-${poolStatus}`)
             }
         }
 
@@ -180,27 +181,35 @@ export default function BottomBarHandler({
     ])
 
     useEffect(() => {
-        console.log('Effect triggered. Ready:', ready, 'isParticipantLoading:', isParticipantLoading)
-        if (ready && !isParticipantLoading) {
-            console.log('Updating bottom bar content')
-            updateBottomBarContent()
+        if (ready && !isParticipantLoading && !transactionProcessed) {
+            if (updateBottomBarContentRef.current) {
+                clearTimeout(updateBottomBarContentRef.current)
+            }
+            updateBottomBarContentRef.current = setTimeout(() => {
+                updateBottomBarContent()
+                updateBottomBarContentRef.current = null
+            }, 100)
         }
-        return () => setBottomBarContent(null)
-    }, [ready, isParticipantLoading, updateBottomBarContent, setBottomBarContent])
+        return () => {
+            if (updateBottomBarContentRef.current) {
+                clearTimeout(updateBottomBarContentRef.current)
+            }
+            setBottomBarContent(null)
+        }
+    }, [ready, isParticipantLoading, updateBottomBarContent, setBottomBarContent, transactionProcessed])
 
     useEffect(() => {
-        if (isConfirmed) {
-            console.log('Transaction confirmed')
+        if (isConfirmed && !transactionProcessed) {
             router.refresh()
             updateBottomBarContent()
             resetConfirmation()
             setIsLoading(false)
+            setTransactionProcessed(true)
         }
-    }, [isConfirmed, updateBottomBarContent, router, resetConfirmation])
+    }, [isConfirmed, updateBottomBarContent, router, resetConfirmation, transactionProcessed])
 
     useEffect(() => {
         setTransactionInProgress(isPending || isConfirming)
-        console.log('BottomBarHandler isPending', isPending || isConfirming)
     }, [setTransactionInProgress, isPending, isConfirming])
 
     useEffect(() => {
@@ -209,13 +218,19 @@ export default function BottomBarHandler({
         }
     }, [isPending, isConfirmed])
 
-    const handleOnRampDialogClose = () => {
+    useEffect(() => {
+        if (!isPending && !isConfirming) {
+            setTransactionProcessed(false)
+        }
+    }, [isPending, isConfirming])
+
+    const handleOnRampDialogClose = useCallback(() => {
         setOpenOnRampDialog(false)
         resetJoinPoolProcess()
         setIsLoading(false)
         updateBottomBarContent()
         router.refresh()
-    }
+    }, [resetJoinPoolProcess, updateBottomBarContent, router])
 
     return <OnRampDialog open={openOnRampDialog} setOpen={handleOnRampDialogClose} amount={poolPrice.toString()} />
 }

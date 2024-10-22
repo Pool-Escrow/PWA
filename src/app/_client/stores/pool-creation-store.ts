@@ -9,6 +9,21 @@ export enum Steps {
     UpdatingStatus = 'updating-status',
     Completed = 'completed',
     Error = 'error',
+    UserRejected = 'user-rejected',
+}
+
+interface ToastOptions {
+    type: 'info' | 'success' | 'warning' | 'error'
+    message: string
+    description?: string
+    action?: {
+        label: string
+        onClick: () => void
+    }
+    alternativeAction?: {
+        label: string
+        onClick: () => void
+    }
 }
 
 interface PoolCreationState {
@@ -21,7 +36,7 @@ interface PoolCreationState {
     setOnChainPoolId: (id: number) => void
     setError: (error: string) => void
     reset: () => void
-    showToast: () => void
+    showToast: (options: ToastOptions) => void
 }
 
 export const usePoolCreationStore = create<PoolCreationState>((set, get) => ({
@@ -40,34 +55,45 @@ export const usePoolCreationStore = create<PoolCreationState>((set, get) => ({
             onChainPoolId: null,
             error: null,
         }),
-    showToast: () => {
-        const { step, error } = get()
+    showToast: (options: ToastOptions) => {
         toast.dismiss()
-        if (step === Steps.Error) {
-            toast.error('Failed to create Pool', {
-                description: error || 'Please try again',
-                richColors: true,
-            })
-            return
+        const { type, message, description, action, alternativeAction } = options
+
+        const toastOptions = {
+            description,
+            action: action
+                ? {
+                      label: action.label,
+                      onClick: () => {
+                          toast.dismiss()
+                          action.onClick()
+                      },
+                  }
+                : undefined,
+            cancel: alternativeAction
+                ? {
+                      label: alternativeAction.label,
+                      onClick: () => {
+                          toast.dismiss()
+                          alternativeAction.onClick()
+                      },
+                  }
+                : undefined,
+            duration: action || alternativeAction ? Infinity : 5000,
         }
-        switch (step) {
-            case Steps.CreatingDB:
-                toast.loading('Creating Pool', { description: 'Please wait...', richColors: true })
+
+        switch (type) {
+            case 'info':
+                toast.info(message, toastOptions)
                 break
-            case Steps.CreatingChain:
-                toast.loading('Creating Pool on-chain', {
-                    description: 'Initiating blockchain transaction...',
-                    richColors: true,
-                })
+            case 'success':
+                toast.success(message, toastOptions)
                 break
-            case Steps.UpdatingStatus:
-                toast.loading('Updating Pool', { description: 'Finalizing pool creation...', richColors: true })
+            case 'warning':
+                toast.warning(message, toastOptions)
                 break
-            case Steps.Completed:
-                toast.success('Pool Created Successfully', {
-                    description: 'Redirecting to pool details...',
-                    richColors: true,
-                })
+            case 'error':
+                toast.error(message, toastOptions)
                 break
         }
     },
