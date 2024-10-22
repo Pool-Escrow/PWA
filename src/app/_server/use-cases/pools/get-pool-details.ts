@@ -20,14 +20,14 @@ function processPoolDetails(
 ): PoolDetailsDTO {
     if (!poolInfo) {
         return {
-            hostName: 'Unknown',
+            hostName: '',
             contractId: BigInt(contractPool.id),
             claimableAmount: Number(claimableAmount),
             participants: participantsInfo.participants.map((user: { name: string; avatarUrl: string }) => ({
                 name: user.name,
                 avatarUrl: user.avatarUrl,
             })),
-            goal: 0,
+            goal: Number(contractPool.poolBalance),
             progress: Number(contractPool.poolBalance),
             name: contractPool.name,
             startDate: contractPool.startDate,
@@ -37,11 +37,11 @@ function processPoolDetails(
             tokenSymbol: contractPool.tokenSymbol,
             tokenDecimals: contractPool.tokenDecimals,
             status: contractPool.status,
-            imageUrl: 'Unknown',
+            imageUrl: '/app/images/frog.png',
             winnerTitle: contractPool.status === POOLSTATUS.ENDED ? 'Winner' : undefined,
             softCap: 0,
-            description: 'Unknown',
-            termsUrl: 'Unknown',
+            description: '',
+            termsUrl: undefined,
             poolBalance: Number(contractPool.poolBalance),
         }
     }
