@@ -15,17 +15,6 @@ const dateTimeSchema = z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Invalid date-time format. Expected format: YYYY-MM-DDTHH:MM')
 
-const futureDateTimeSchema = dateTimeSchema.refine(
-    dateTime => {
-        const date = new Date(dateTime)
-        const now = new Date()
-        return date > now
-    },
-    {
-        message: 'Date and time must be in the future',
-    },
-)
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ethereumAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Token address format')
 
@@ -54,20 +43,28 @@ export const CreatePoolFormSchema = z
             .optional(),
         softCap: z.number().int().min(1, 'The soft cap must be a positive number'),
         dateRange: z.object({
-            start: futureDateTimeSchema,
-            end: futureDateTimeSchema,
+            start: z.coerce.date(),
+            end: z.coerce.date(),
         }),
         price: z.number().int().min(0, 'The price must be a positive number or zero'),
         // tokenAddress: ethereumAddressSchema,
     })
     .refine(
         data => {
-            const startDate = new Date(data.dateRange.start)
-            const endDate = new Date(data.dateRange.end)
-            return endDate > startDate
+            const now = new Date()
+            return data.dateRange.start > now
         },
         {
-            message: 'endDate must be after startDate',
+            message: 'Start date must be in the future',
+            path: ['dateRange', 'start'],
+        },
+    )
+    .refine(
+        data => {
+            return data.dateRange.end > data.dateRange.start
+        },
+        {
+            message: 'End date must be after start date',
             path: ['dateRange'],
         },
     )

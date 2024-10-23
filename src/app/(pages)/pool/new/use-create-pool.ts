@@ -67,8 +67,8 @@ export function useCreatePool() {
             abi: poolAbi,
             functionName: 'createPool',
             args: [
-                BigInt(startDate),
-                BigInt(endDate),
+                BigInt(startDate / 1000), // is important to convert to seconds
+                BigInt(endDate / 1000),
                 name,
                 parseEther(price),
                 1000, // TODO: implement max participants

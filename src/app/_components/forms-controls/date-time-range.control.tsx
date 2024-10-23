@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Input } from '../ui/input'
 import { format, addHours } from 'date-fns'
-import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz'
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
 import locationTimezone from 'node-location-timezone'
 import { ComboboxCities } from '@/components/combobox-cities'
 import { parseISO } from 'date-fns'
@@ -21,7 +21,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     const [selectedCity, setSelectedCity] = useState('')
     const [timezone, setTimezone] = useState('')
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>({ start: '', end: '' })
-    const [utcTime, setUtcTime] = useState<DateTimeRangeValue>({ start: '', end: '' })
+    const [, setUtcTime] = useState<DateTimeRangeValue>({ start: '', end: '' })
 
     useEffect(() => {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -123,7 +123,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
 
     return (
         <div className='space-y-4'>
-            <input type='hidden' name={name} value={JSON.stringify(utcTime)} />
+            <input type='hidden' name={name} value={JSON.stringify(localValue)} />
             <input type='hidden' name={`${name}_timezone`} value={timezone} />
             <div className='flex flex-row items-center justify-between'>
                 <span className='mr-6 text-xs font-medium text-black'>City</span>

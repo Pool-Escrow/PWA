@@ -9,8 +9,8 @@ interface PoolItem {
     bannerImage: File
     termsURL: string
     softCap: number
-    startDate: string
-    endDate: string
+    startDate: number
+    endDate: number
     price: number
     tokenAddress: Address
 }
