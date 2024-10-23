@@ -1,4 +1,4 @@
-// src/app/pwa/_client/stores/settings.slice.ts
+// src/app/_client/stores/settings.slice.ts
 
 import { MyPoolsTab } from '@/app/(pages)/my-pools/_components/my-pools.tabs.config'
 import { StateCreator } from 'zustand'

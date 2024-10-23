@@ -1,5 +1,6 @@
 'use client'
 
+import { inProduction } from '@/app/_lib/utils/environment.mjs'
 import logo from '@/public/app/images/pool-logo-horizontal.png'
 import type { PrivyProviderProps } from '@privy-io/react-auth'
 import { base, baseSepolia } from 'viem/chains'
@@ -46,6 +47,7 @@ export default {
             privacyPolicyUrl: '/privacy-policy',
             termsAndConditionsUrl: '/terms',
         },
+
         // walletConnectCloudProjectId: '',
         // captchaEnabled: false,
         // customAuth: {

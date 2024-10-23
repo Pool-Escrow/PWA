@@ -1,4 +1,4 @@
-// src/app/pwa/_client/stores/pool-creation-store.ts
+// src/app/_client/stores/pool-creation-store.ts
 import { create } from 'zustand'
 import { toast } from 'sonner'
 

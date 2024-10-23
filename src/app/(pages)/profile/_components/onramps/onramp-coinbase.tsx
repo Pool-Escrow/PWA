@@ -1,7 +1,8 @@
 import { Button } from '@/app/_components/ui/button'
 import { useMutation } from '@tanstack/react-query'
-import { baseSepolia } from 'viem/chains'
+import { baseSepolia, base } from 'viem/chains'
 import { useAccount } from 'wagmi'
+import { inProduction } from '@/app/_lib/utils/environment.mjs'
 
 const OnRampCoinbaseButton = ({ className }: React.ComponentProps<'form'>) => {
     const account = useAccount()
@@ -46,8 +47,9 @@ const OnRampCoinbaseButton = ({ className }: React.ComponentProps<'form'>) => {
 
     const onOnRampButtonClicked = () => {
         if (account?.address) {
+            let chainName = inProduction ? base.name : baseSepolia.name
             onRampMutation.mutate({
-                params: [baseSepolia.name, account.address],
+                params: [chainName, account.address],
             })
         }
     }

@@ -1,4 +1,4 @@
-// src/app/pwa/_client/stores/app.store.ts
+// src/app/_client/stores/app.store.ts
 
 import { createStore } from 'zustand/vanilla'
 import { createSettingsSlice, SettingsSlice, SettingsState } from './settings.slice'

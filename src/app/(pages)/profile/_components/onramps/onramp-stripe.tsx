@@ -25,8 +25,8 @@ interface OrampWithStripeProps extends React.HTMLAttributes<HTMLDivElement> {
     appearance?: StripeOnrampAppearance
 }
 
-if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST) {
-    throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST not set')
+if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY not set')
 }
 
 export const OnrampWithStripe: React.FC<OrampWithStripeProps> = ({ appearance, ...props }) => {
@@ -37,9 +37,7 @@ export const OnrampWithStripe: React.FC<OrampWithStripeProps> = ({ appearance, .
     const [open, setOpen] = useState(false)
 
     useEffect(() => {
-        loadStripeOnramp(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_TEST!)
-            .then(setStripeOnramp)
-            .catch(console.error)
+        loadStripeOnramp(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!).then(setStripeOnramp).catch(console.error)
     }, [])
 
     const createSession = async () => {

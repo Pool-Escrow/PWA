@@ -10,8 +10,7 @@
     "scripts": {
         "build": "next build",
         "check-types": "tsc --noemit",
-        "dev": "next dev",
-        "dev:https": "next dev --experimental-https",
+        "dev": "next dev --experimental-https",
         "dev:turbo": "TURBO=true next dev --turbo",
         "gen": "node scripts/generate-types.mjs",
         "gen:contracts": "pnpm gen contracts",

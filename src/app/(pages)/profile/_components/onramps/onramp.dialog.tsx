@@ -88,7 +88,7 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                             </div>
                             <Unlimit
                                 amount={amount}
-                                purchaseCurrency={'USDC-BASE'}
+                                purchaseCurrency={'USDC_BASE'}
                                 setOpen={setOpen}
                                 className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 On Ramp
