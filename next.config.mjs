@@ -20,7 +20,8 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.privy.io https://js.stripe.com https://*.stripe.com;
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.privy.io https://js.stripe.com https://*.stripe.com blob:;
+    worker-src 'self' blob:;
     style-src 'self' 'unsafe-inline' https://cdn.privy.io;
     img-src 'self' blob: data: https://*.supabase.co https://explorer-api.walletconnect.com https://*.poolparty.cc;
     font-src 'self';
@@ -98,7 +99,7 @@ export default withBundleAnalyzer(
                         },
                         {
                             key: 'Permissions-Policy',
-                            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+                            value: 'camera=self',
                         },
                     ],
                 },
