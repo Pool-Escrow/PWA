@@ -33,12 +33,11 @@ const ShareDialog = ({ open, setOpen }: shareDialogProps) => {
         return (
             <Dialog open={open} onOpenChange={setOpen}>
                 <Dialog.Trigger asChild>
-                    <button
-                        type='button'
-                        title='Share with Friends'
-                        className='relative flex size-8 items-center justify-center rounded-full p-2 text-white md:size-14 md:p-3'>
-                        <ShareIcon className='size-8' />
-                    </button>
+                    <Button
+                        size='icon'
+                        className='rounded-full bg-black/40 transition-colors duration-200 hover:bg-black/60 focus:ring-2 focus:ring-white/50 active:bg-black/80'>
+                        <ShareIcon className='size-5 text-white' />
+                    </Button>
                 </Dialog.Trigger>
                 <Dialog.Content className='bg-white sm:max-w-[425px]'>
                     <Dialog.Header>
@@ -56,12 +55,11 @@ const ShareDialog = ({ open, setOpen }: shareDialogProps) => {
     return (
         <Drawer open={open} onOpenChange={setOpen}>
             <DrawerTrigger asChild>
-                <button
-                    title='Share with Friends'
-                    type='button'
-                    className='relative flex size-8 items-center justify-center rounded-full p-2 md:size-14 md:p-3'>
-                    <ShareIcon className='size-8 text-white' />
-                </button>
+                <Button
+                    size='icon'
+                    className='rounded-full bg-black/40 transition-colors duration-200 hover:bg-black/60 focus:ring-2 focus:ring-white/50 active:bg-black/80'>
+                    <ShareIcon className='size-5 text-white' />
+                </Button>
             </DrawerTrigger>
             <DrawerContent className='bg-white'>
                 <DrawerHeader className='text-left'>
