@@ -1,79 +1,278 @@
 'use client'
 
-import { useState } from 'react'
-import { QrReader } from 'react-qr-reader'
-import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { useParams } from 'next/navigation'
-import { checkInAction } from './actions'
+import * as React from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { motion } from 'framer-motion'
+import QrScannerPrimitive from 'qr-scanner'
+import { cn } from '@/lib/utils/tailwind'
 import { Button } from '@/app/_components/ui/button'
-import { Address } from 'viem'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/app/_components/ui/label'
+import { Input } from '@/app/_components/ui/input'
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_components/ui/card'
+import { AlertCircle, CheckCircle2 } from 'lucide-react'
 
-const CheckInPage = () => {
-    const [qrData, setQrData] = useState<string>('')
-    const params = useParams<{ 'pool-id': string }>()
+// Hook useQrScanner
+interface UseQrScannerProps {
+    onDecode?: (result: string) => void
+    onError?: (error: Error) => void
+    scannerOptions?: QrScannerOptions
+}
 
-    const checkInMutation = useMutation({
-        mutationFn: (data: { address: Address }) => checkInAction(params['pool-id'], data.address),
-        onSuccess: data => {
-            if (data.success) {
-                toast.success(data.message, {
-                    richColors: true,
-                })
-            } else {
-                toast.error(data.message, {
-                    richColors: true,
-                })
-            }
-        },
-        onError: error => {
-            toast.error('An error occurred during check-in', {
-                richColors: true,
+function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps = {}) {
+    const [result, setResult] = useState<string | null>(null)
+    const [error, setError] = useState<Error | null>(null)
+    const [isScanning, setIsScanning] = useState(false)
+    const scannerRef = useRef<QrScannerPrimitive | null>(null)
+    const videoRef = useRef<HTMLVideoElement | null>(null)
+    const isMountedRef = useRef(true)
+
+    const startScanner = useCallback(() => {
+        if (videoRef.current && !scannerRef.current) {
+            scannerRef.current = new QrScannerPrimitive(
+                videoRef.current,
+                result => {
+                    if (isMountedRef.current) {
+                        setResult(result.data)
+                        onDecode?.(result.data)
+                    }
+                },
+                {
+                    onDecodeError: (error: Error | string) => {
+                        console.log('onDecodeError', error)
+                        if (isMountedRef?.current) {
+                            setError(error instanceof Error ? error : new Error(error))
+                            onError?.(error instanceof Error ? error : new Error(error))
+                        }
+                    },
+                    ...scannerOptions,
+                    returnDetailedScanResult: true,
+                },
+            )
+            scannerRef.current.start().catch((err: Error) => {
+                if (isMountedRef.current) {
+                    setError(err)
+                    onError?.(err)
+                }
             })
-            console.error('Check-in error:', error)
-        },
-    })
-
-    const handleScan = (data: string | null) => {
-        if (data) {
-            setQrData(data)
-            try {
-                const parsedData = JSON.parse(data)
-                console.log('parsedData', parsedData)
-                checkInMutation.mutate({ address: parsedData.address })
-            } catch (error) {
-                console.error('Error parsing QR data:', error)
-                toast.error('Invalid QR code')
-            }
+            setIsScanning(true)
         }
+    }, [onDecode, onError, scannerOptions])
+
+    const stopScanner = useCallback(() => {
+        if (scannerRef.current) {
+            scannerRef.current.stop()
+            scannerRef.current.destroy()
+            scannerRef.current = null
+            setIsScanning(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false
+            stopScanner()
+        }
+    }, [stopScanner])
+
+    return {
+        result,
+        error,
+        isScanning,
+        videoRef,
+        startScanner,
+        stopScanner,
+    }
+}
+
+const useCanvasContextOverride = () => {
+    useEffect(() => {
+        const originalGetContext = HTMLCanvasElement.prototype.getContext
+
+        const customGetContext = function (
+            this: HTMLCanvasElement,
+            contextId: string,
+            options?: any,
+        ): RenderingContext | null {
+            if (contextId === '2d') {
+                options = options || {}
+                options.willReadFrequently = true
+            }
+            return originalGetContext.call(this, contextId, options)
+        }
+
+        // @ts-expect-error ts(2322) - This is a temporary fix to enable willReadFrequently for 2d context
+        HTMLCanvasElement.prototype.getContext = customGetContext
+
+        // Cleanup when unmounting the component
+        return () => {
+            HTMLCanvasElement.prototype.getContext = originalGetContext
+        }
+    }, [])
+}
+
+// Componente QrScanner
+type QrScannerOptions = {
+    onDecodeError?: (error: Error | string) => void
+    calculateScanRegion?: (video: HTMLVideoElement) => QrScannerPrimitive.ScanRegion
+    preferredCamera?: QrScannerPrimitive.FacingMode | QrScannerPrimitive.DeviceId
+    maxScansPerSecond?: number
+    highlightScanRegion?: boolean
+    highlightCodeOutline?: boolean
+    overlay?: HTMLDivElement
+    /** just a temporary flag until we switch entirely to the new api */
+    returnDetailedScanResult?: true
+}
+
+interface QrScannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onError'> {
+    onDecode?: (result: string) => void
+    onError?: (error: Error | string) => void
+    scannerOptions?: QrScannerOptions
+    startButtonText?: string
+    stopButtonText?: string
+}
+
+const QrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
+    (
+        {
+            className,
+            onDecode,
+            onError,
+            scannerOptions,
+            startButtonText = 'Start Scanning',
+            stopButtonText = 'Stop Scanning',
+            ...props
+        },
+        ref,
+    ) => {
+        const { result, error, isScanning, videoRef, startScanner, stopScanner } = useQrScanner({
+            onDecode,
+            onError,
+            scannerOptions,
+        })
+
+        return (
+            <Card ref={ref} className={cn('mx-auto w-full max-w-sm overflow-hidden', className)} {...props}>
+                <div className='relative aspect-square'>
+                    <video ref={videoRef} className='h-full w-full object-cover' />
+                    <motion.div
+                        className='pointer-events-none absolute inset-0 border-4 border-blue-500'
+                        animate={{
+                            scale: [1, 1.05, 1],
+                            opacity: [0.5, 1, 0.5],
+                        }}
+                        transition={{
+                            duration: 2,
+                            ease: 'easeInOut',
+                            times: [0, 0.5, 1],
+                            repeat: Infinity,
+                        }}
+                    />
+                </div>
+                <div className='p-4'>
+                    <Button onClick={isScanning ? stopScanner : startScanner} className='w-full'>
+                        {isScanning ? stopButtonText : startButtonText}
+                    </Button>
+                    {result && <p className='mt-2 text-sm text-gray-600'>Result: {result}</p>}
+                    {error && <p className='mt-2 text-sm text-red-600'>Error: {error.message}</p>}
+                </div>
+            </Card>
+        )
+    },
+)
+
+QrScanner.displayName = 'QrScanner'
+
+// Vista previa del componente QrScanner
+export default function QrScannerPreview() {
+    const [result, setResult] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [isScanning, setIsScanning] = useState(true)
+    const [timeLeft, setTimeLeft] = useState(20)
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    useCanvasContextOverride()
+
+    const handleDecode = (decodedResult: string) => {
+        setResult(decodedResult)
+        setError(null)
+        stopScanning()
     }
 
+    const handleError = (err: Error | string) => {
+        setError(typeof err === 'string' ? err : err.message)
+        setResult(null)
+    }
+
+    const startScanning = useCallback(() => {
+        setIsScanning(true)
+        setTimeLeft(20)
+    }, [])
+
+    const stopScanning = useCallback(() => {
+        setIsScanning(false)
+        if (timerRef.current) {
+            clearInterval(timerRef.current)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (isScanning) {
+            timerRef.current = setInterval(() => {
+                setTimeLeft(prevTime => {
+                    if (prevTime <= 1) {
+                        stopScanning()
+                        return 0
+                    }
+                    return prevTime - 1
+                })
+            }, 1000)
+        }
+
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current)
+            }
+        }
+    }, [isScanning, stopScanning])
+
     return (
-        <div className='relative flex h-full w-full flex-col'>
-            <h1 className='mb-4 text-2xl font-bold'>Check In</h1>
-            <QrReader
-                className='h-1/2 w-full bg-blue-200'
-                scanDelay={1000}
-                onResult={(result, error) => {
-                    if (result) {
-                        handleScan(result.getText())
-                    }
-                    if (error) {
-                        console.info(error)
-                    }
-                }}
-                constraints={{ facingMode: 'environment' }}
-            />
-            <Button
-                onClick={() => {
-                    console.log('check-in qrscan simulation')
-                    handleScan('{"address": "0x113D848A30b5eEf4B6Ec0461E846EFf33656e976", "poolId": 90}')
-                }}>
-                Check In
-            </Button>
-            <p className='mt-4 break-words'>Scanned Data: {qrData}</p>
+        <div className='container mx-auto max-w-2xl p-4'>
+            <h1 className='mb-6 text-center text-3xl font-bold'>Vista Previa del Escáner QR</h1>
+
+            <Card className='mb-6'>
+                <CardHeader>
+                    <CardTitle>Escáner QR</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <QrScanner
+                        onDecode={handleDecode}
+                        onError={handleError}
+                        startButtonText={isScanning ? 'Escaneando...' : 'Iniciar escaneo'}
+                        stopButtonText='Detener'
+                    />
+                    {isScanning ? (
+                        <p className='mt-2 text-center'>Tiempo restante: {timeLeft} segundos</p>
+                    ) : (
+                        <Button onClick={startScanning} className='mt-2 w-full'>
+                            Reanudar escaneo
+                        </Button>
+                    )}
+                </CardContent>
+                <CardFooter>
+                    {result && (
+                        <div className='flex items-center text-green-600'>
+                            <CheckCircle2 className='mr-2 h-5 w-5' />
+                            <span>Resultado: {result}</span>
+                        </div>
+                    )}
+                    {error && (
+                        <div className='flex items-center text-red-600'>
+                            <AlertCircle className='mr-2 h-5 w-5' />
+                            <span>Error: {error}</span>
+                        </div>
+                    )}
+                </CardFooter>
+            </Card>
         </div>
     )
 }
-
-export default CheckInPage
