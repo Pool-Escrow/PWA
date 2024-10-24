@@ -5,7 +5,7 @@ import { useWaitForTransactionReceipt } from 'wagmi'
 import { toast } from 'sonner'
 import { poolAbi } from '@/types/contracts'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import useTransactions from '@/app/_client/hooks/use-smart-transaction'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 
