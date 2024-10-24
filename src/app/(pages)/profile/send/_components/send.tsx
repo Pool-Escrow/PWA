@@ -45,7 +45,7 @@ const Send = () => {
                         <div className='flex justify-center'>
                             <Link
                                 className='barForeground w-full rounded-full bg-black px-8 py-2 text-center text-white'
-                                href='/edit-user-profile'>
+                                href='/profile/edit'>
                                 Edit Profile
                             </Link>
                         </div>

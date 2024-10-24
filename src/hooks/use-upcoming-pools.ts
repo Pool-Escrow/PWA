@@ -9,12 +9,12 @@ const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
     // Fetch pools from the smart contract
     const contractPools = await getContractPools()
 
-    console.log('contract pools', contractPools)
+    console.log('contract pools length:', contractPools.length)
 
     // Fetch pool data from Supabase
     const { data: dbPools } = await supabase.from('pools').select('*')
 
-    console.log('db pools', dbPools)
+    console.log('db pools length', dbPools?.length)
 
     const upcomingPools = contractPools
         .map(contractPool => {

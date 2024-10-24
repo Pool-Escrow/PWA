@@ -129,6 +129,7 @@ export default function CreatePool() {
                 disabled={pending}
                 className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
                 onClick={() => {
+                    // TODO: disable button here immediately after click
                     setToastId(
                         toast.loading('Creating Pool', {
                             description: 'Please wait...',

@@ -6,6 +6,7 @@ import { CreatePoolFormSchema } from './_lib/definitions'
 import { verifyToken } from '@/app/_server/auth/privy'
 import { getAdminStatusAction, getUserAddressAction } from '../../pools/actions'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { fromZonedTime } from 'date-fns-tz'
 
 type FormState = {
     message?: string
@@ -21,8 +22,8 @@ type FormState = {
     internalPoolId?: string
     poolData?: {
         name: string
-        startDate: string
-        endDate: string
+        startDate: number
+        endDate: number
         price: string
     }
 }
@@ -40,7 +41,6 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     }
 
     const bannerImage = formData.get('bannerImage') as File
-
     const name = formData.get('name') as string
     const description = formData.get('description') as string
     const termsURL = formData.get('termsURL') as string
@@ -48,32 +48,19 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     const price = formData.get('price') as string
     // TODO: implement token address
     // const tokenAddress = formData.get('tokenAddress') as Address
-    const dateRangeString = formData.get('dateRange')
-    let dateRange: { start: string; end: string } | null = null
+    const dateRangeString = formData.get('dateRange') as string
+    const timezone = formData.get('dateRange_timezone') as string
 
     console.log('dateRangeString', dateRangeString)
+    console.log('timezone', timezone)
 
-    if (dateRangeString && typeof dateRangeString === 'string') {
-        try {
-            const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
-
-            // Truncate seconds from the date strings
-            dateRange = {
-                start: parsedDateRange.start.substring(0, 16), // YYYY-MM-DDTHH:MM
-                end: parsedDateRange.end.substring(0, 16), // YYYY-MM-DDTHH:MM
-            }
-        } catch (error) {
-            console.error('Error parsing dateRange:', error)
-        }
+    const parsedDateRange = JSON.parse(dateRangeString) as { start: string; end: string }
+    const utcDateRange = {
+        start: fromZonedTime(parsedDateRange.start, timezone),
+        end: fromZonedTime(parsedDateRange.end, timezone),
     }
 
-    console.log('dateRange', dateRange)
-
-    if (!dateRange || !dateRange.start || !dateRange.end) {
-        return {
-            message: 'Invalid date range',
-        }
-    }
+    console.log('utcDateRange', utcDateRange)
 
     // Validate fields
     const validationResult = CreatePoolFormSchema.safeParse({
@@ -81,7 +68,7 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
         bannerImage,
         description,
         termsURL: termsURL || undefined,
-        dateRange,
+        dateRange: utcDateRange,
         softCap: Number(softCap),
         price: Number(price),
         // tokenAddress,
@@ -115,8 +102,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
             description,
             termsURL,
             softCap: Number(softCap),
-            startDate: dateRange.start,
-            endDate: dateRange.end,
+            startDate: utcDateRange.start.getTime(),
+            endDate: utcDateRange.end.getTime(),
             price: Number(price),
             tokenAddress: currentTokenAddress,
         })
@@ -128,8 +115,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
             internalPoolId,
             poolData: {
                 name,
-                startDate: dateRange.start,
-                endDate: dateRange.end,
+                startDate: utcDateRange.start.getTime(),
+                endDate: utcDateRange.end.getTime(),
                 price,
             },
         }
@@ -144,32 +131,79 @@ export async function updatePoolStatus(
     status: 'draft' | 'unconfirmed' | 'inactive' | 'depositsEnabled' | 'started' | 'paused' | 'ended' | 'deleted',
     contract_id: number,
 ) {
-    const user = await verifyToken()
-    if (!user) {
+    const privyUser = await verifyToken()
+    if (!privyUser) {
         throw new Error('User not found trying to add as mainhost')
+    }
+
+    const isAdmin = await getAdminStatusAction()
+    if (!isAdmin) {
+        throw new Error('User is not authorized to delete pools')
     }
 
     const { error } = await db.from('pools').update({ status, contract_id }).eq('internal_id', poolId)
 
+    if (error) throw error
+
     // TODO: move this to persistence layer
-    const { data: userId, error: userError } = await db.from('users').select('id').eq('privyId', user?.id).single()
+    const { data: user, error: userError } = await db.from('users').select('id').eq('privyId', privyUser?.id).single()
 
     if (userError) {
         console.error('Error finding user:', userError)
         throw userError
     }
 
-    // Now insert into pool_participants using the found user ID
-    const { error: participantError } = await db.from('pool_participants').insert({
-        user_id: userId.id,
-        pool_id: contract_id,
-        poolRole: 'mainHost',
-    })
+    // Check if the user is already a participant
+    const { data: existingParticipant, error: participantCheckError } = await db
+        .from('pool_participants')
+        .select('*')
+        .eq('pool_id', contract_id)
+        .eq('user_id', user.id)
+        .single()
 
-    if (participantError) {
-        console.error('Error adding participant:', participantError)
-        throw participantError
+    if (participantCheckError && participantCheckError.code !== 'PGRST116') {
+        console.error('Error checking existing participant:', participantCheckError)
+        throw participantCheckError
     }
 
-    if (error) throw error
+    if (!existingParticipant) {
+        // Only insert if the user is not already a participant
+        const { error: participantError } = await db.from('pool_participants').insert({
+            user_id: user.id,
+            pool_id: contract_id,
+            poolRole: 'mainHost',
+        })
+
+        if (participantError) {
+            console.error('Error adding participant:', participantError)
+            throw participantError
+        }
+    }
+}
+
+export async function deletePool(poolId: string) {
+    const user = await verifyToken()
+    if (!user) {
+        throw new Error('User not authenticated')
+    }
+
+    const isAdmin = await getAdminStatusAction()
+    if (!isAdmin) {
+        throw new Error('User is not authorized to delete pools')
+    }
+
+    const { error: deleteError } = await db.from('pools').delete().eq('internal_id', poolId)
+
+    if (deleteError) {
+        console.error('Error deleting pool:', deleteError)
+        throw new Error('Failed to delete pool')
+    }
+
+    const { error: participantDeleteError } = await db.from('pool_participants').delete().eq('pool_id', poolId)
+
+    if (participantDeleteError) {
+        console.error('Error deleting pool participants:', participantDeleteError)
+    }
+
+    console.log('Pool with id', poolId, 'and related data deleted successfully')
 }

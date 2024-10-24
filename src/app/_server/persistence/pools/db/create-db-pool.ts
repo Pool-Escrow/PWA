@@ -11,8 +11,8 @@ interface PoolItem {
     bannerImage: File
     termsURL: string
     softCap: number
-    startDate: string
-    endDate: string
+    startDate: number
+    endDate: number
     price: number
     tokenAddress: Address
 }
@@ -26,8 +26,8 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
             description: data.description,
             termsURL: data.termsURL,
             softCap: data.softCap,
-            startDate: data.startDate,
-            endDate: data.endDate,
+            startDate: new Date(data.startDate).toISOString(),
+            endDate: new Date(data.endDate).toISOString(),
             price: data.price,
             tokenAddress: data.tokenAddress,
             status: 'draft',

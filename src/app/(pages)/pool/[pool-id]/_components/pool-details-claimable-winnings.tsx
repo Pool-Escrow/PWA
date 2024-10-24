@@ -1,7 +1,6 @@
 'use client'
 
-import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 import { Button } from '@/app/_components/ui/button'
 import { CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -26,7 +25,7 @@ export default function PoolDetailsClaimableWinnings({
     poolId,
 }: PoolDetailsClaimableWinningsProps) {
     const { address } = useAccount() as { address: Address }
-    const { executeTransactions } = useSmartTransaction()
+    const { executeTransactions } = useTransactions()
     const { startConfetti, ConfettiComponent } = useConfetti()
 
     const handleClaimWinnings = async () => {

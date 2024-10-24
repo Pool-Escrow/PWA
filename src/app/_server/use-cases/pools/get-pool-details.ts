@@ -22,7 +22,7 @@ function processPoolDetails(
 ): PoolDetailsDTO {
     if (!poolInfo) {
         return {
-            hostName: 'Unknown',
+            hostName: '',
             contractId: BigInt(contractPool.id),
             claimableAmount: Number(claimableAmount),
             wonAmount: Number(wonAmount),
@@ -31,7 +31,7 @@ function processPoolDetails(
                 name: user.name,
                 avatarUrl: user.avatarUrl,
             })),
-            goal: 0,
+            goal: Number(contractPool.poolBalance),
             progress: Number(contractPool.poolBalance),
             name: contractPool.name,
             startDate: contractPool.startDate,
@@ -41,11 +41,11 @@ function processPoolDetails(
             tokenSymbol: contractPool.tokenSymbol,
             tokenDecimals: contractPool.tokenDecimals,
             status: contractPool.status,
-            imageUrl: 'Unknown',
+            imageUrl: '/app/images/frog.png',
             winnerTitle: contractPool.status === POOLSTATUS.ENDED ? 'Winner' : undefined,
             softCap: 0,
-            description: 'Unknown',
-            termsUrl: 'Unknown',
+            description: '',
+            termsUrl: undefined,
             poolBalance: Number(contractPool.poolBalance),
             totalDeposits: Number(contractPool.totalDeposits),
         }

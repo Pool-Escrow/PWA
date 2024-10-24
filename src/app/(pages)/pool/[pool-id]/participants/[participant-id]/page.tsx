@@ -14,12 +14,12 @@ import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
-import useSmartTransaction from '@/app/_client/hooks/use-smart-transaction'
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { useUserDetails } from '../_components/use-user-details'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getAdminStatusAction } from '@/app/(pages)/pools/actions'
+import useTransactions from '@/app/_client/hooks/use-transactions'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) => {
     const { data: userDetails } = useUserDetails(params['participant-id'])
@@ -29,7 +29,7 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
 
     const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess } = useWriteContract()
-    const { executeTransactions } = useSmartTransaction()
+    const { executeTransactions } = useTransactions()
 
     const { addPayout, getPayoutForParticipant } = usePayoutStore()
 
