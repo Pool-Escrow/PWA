@@ -183,8 +183,8 @@ const QrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
 
 QrScanner.displayName = 'QrScanner'
 
-// Vista previa del componente QrScanner
-export default function QrScannerPreview() {
+// Participant Check-in Preview
+export default function ParticipantCheckInPreview() {
     const [result, setResult] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
@@ -237,24 +237,24 @@ export default function QrScannerPreview() {
 
     return (
         <div className='container mx-auto max-w-2xl p-4'>
-            <h1 className='mb-6 text-center text-3xl font-bold'>Vista Previa del Escáner QR</h1>
+            <h1 className='mb-6 text-center text-3xl font-bold'>Participant Check-in Preview</h1>
 
             <Card className='mb-6'>
                 <CardHeader>
-                    <CardTitle>Escáner QR</CardTitle>
+                    <CardTitle>QR Scanner</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <QrScanner
                         onDecode={handleDecode}
                         onError={handleError}
-                        startButtonText={isScanning ? 'Escaneando...' : 'Iniciar escaneo'}
-                        stopButtonText='Detener'
+                        startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                        stopButtonText='Stop'
                     />
                     {isScanning ? (
-                        <p className='mt-2 text-center'>Tiempo restante: {timeLeft} segundos</p>
+                        <p className='mt-2 text-center'>Time left: {timeLeft} seconds</p>
                     ) : (
                         <Button onClick={startScanning} className='mt-2 w-full'>
-                            Reanudar escaneo
+                            Resume Scanning
                         </Button>
                     )}
                 </CardContent>
@@ -262,7 +262,7 @@ export default function QrScannerPreview() {
                     {result && (
                         <div className='flex items-center text-green-600'>
                             <CheckCircle2 className='mr-2 h-5 w-5' />
-                            <span>Resultado: {result}</span>
+                            <span>Result: {result}</span>
                         </div>
                     )}
                     {error && (
