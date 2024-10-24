@@ -108,9 +108,15 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                     onValueChange={(value: string) => handleTabChange(value as TabValue)}>
                     {isAdmin && (
                         <TabsList className='z-10 flex w-full justify-start space-x-0 rounded-none bg-white p-0 md:space-x-8'>
-                            <TabsTrigger value={TabValue.Registered}>Registered</TabsTrigger>
-                            <TabsTrigger value={TabValue.CheckedIn}>Checked in</TabsTrigger>
-                            <TabsTrigger value={TabValue.Winners}>Winners</TabsTrigger>
+                            <TabsTrigger className='font-semibold' value={TabValue.Registered}>
+                                Registered
+                            </TabsTrigger>
+                            <TabsTrigger className='font-semibold' value={TabValue.CheckedIn}>
+                                Checked in
+                            </TabsTrigger>
+                            <TabsTrigger className='font-semibold' value={TabValue.Winners}>
+                                Winners
+                            </TabsTrigger>
                             {/* <TabsTrigger value='refunded'>Refunded</TabsTrigger> */}
                         </TabsList>
                     )}

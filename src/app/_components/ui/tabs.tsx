@@ -8,7 +8,7 @@ const TabsList = withForwardRef(TabsPrimitive.List, {
 })
 const TabsTrigger = withForwardRef(TabsPrimitive.Trigger, {
     className:
-        'inline-flex items-center justify-center h-full text-sm font-medium transition-all data-[state=active]:text-black text-[#B2B2B2] hover:text-zinc-600/70 data-[state=active]:shadow-sm w-1/2 transparent-tap bg-transparent border-b-2 data-[state=active]:border-black relative -mb-[4px]',
+        'inline-flex items-center justify-center h-full text-sm font-medium transition-all data-[state=active]:text-black text-[#B2B2B2] hover:text-zinc-600/70 w-1/2 transparent-tap bg-transparent border-b-2 data-[state=active]:border-black relative -mb-[4px]',
 })
 const TabsContent = withForwardRef(TabsPrimitive.Content, {
     className:
