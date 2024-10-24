@@ -13,6 +13,7 @@ import { formatUnits } from 'viem'
 import ParticipantList from './participantsList'
 import { useSetWinners } from './use-set-winners'
 import { toast } from 'sonner'
+import PoolBalanceProgress from './pool-balance-progress'
 
 interface PoolParticipantsProps {
     poolId: string
@@ -119,15 +120,16 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                     {/* <TabsContent value='refunded'>Refunded</TabsContent> */}
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
-                            <PoolDetailsProgress
+                            <PoolBalanceProgress
                                 current={Number(
                                     formatUnits(
                                         BigInt(poolData.poolBalance) - BigInt(totalSavedPayout),
                                         poolData.tokenDecimals,
                                     ),
                                 )}
-                                goal={Number(formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals))}
-                                description={`${(((poolData.poolBalance - Number(totalSavedPayout)) / poolData.totalDeposits) * 100).toFixed(0)}% Remaining of $ ${formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals)} Prize Pool`}></PoolDetailsProgress>
+                                deposits={Number(
+                                    formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals),
+                                )}></PoolBalanceProgress>
                         </div>
                     )}
                     <ParticipantList

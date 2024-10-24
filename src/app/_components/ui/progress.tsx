@@ -6,8 +6,8 @@ import { forwardRef } from 'react'
 
 const Progress = forwardRef<
     React.ElementRef<typeof ProgressPrimitive.Root>,
-    React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
->(({ className, value, ...props }, ref) => (
+    React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { indicatorClassName?: string }
+>(({ className, value, indicatorClassName, ...props }, ref) => (
     <ProgressPrimitive.Root
         ref={ref}
         className={cn(
@@ -16,7 +16,7 @@ const Progress = forwardRef<
         )}
         {...props}>
         <ProgressPrimitive.Indicator
-            className='detail_card_progress size-full flex-1 rounded-full transition-all'
+            className={cn('size-full flex-1 rounded-full transition-all', indicatorClassName)}
             style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
         />
     </ProgressPrimitive.Root>
