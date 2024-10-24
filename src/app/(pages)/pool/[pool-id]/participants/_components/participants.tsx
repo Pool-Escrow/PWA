@@ -52,9 +52,13 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     }, [participants, query])
 
     useEffect(() => {
-        setTopBarTitle('Manage Participants')
+        if (isAdmin) {
+            setTopBarTitle('Manage Participants')
+        } else {
+            setTopBarTitle('Participants')
+        }
         return () => setTopBarTitle(null)
-    }, [setTopBarTitle])
+    }, [setTopBarTitle, isAdmin])
 
     useEffect(() => {
         const allPayouts = usePayoutStore.getState().payouts[poolId] || []
