@@ -15,15 +15,15 @@ const SearchBar = ({
     poolId: string
     isAdmin: boolean
 }) => (
-    <div className='relative mb-2 h-10'>
-        <div className='absolute left-4 top-[1px] z-10 flex h-full w-4 items-center'>
-            <SearchIcon size={16} />
+    <div className='relative mb-2 h-[38px]'>
+        <div className='absolute left-4 z-10 flex h-full items-center'>
+            <SearchIcon size={14} />
         </div>
         {isAdmin && (
             <Link
                 href={`/pool/${poolId}/participants/`}
-                className='absolute right-2 top-[1px] z-10 flex h-10 w-6 items-center'>
-                <QrCodeIcon size={16} />
+                className='absolute right-[10px] z-10 flex h-10 w-6 items-center'>
+                <QrCodeIcon size={18} />
             </Link>
         )}
         <Input
@@ -31,7 +31,7 @@ const SearchBar = ({
             value={query}
             onChange={onChange}
             placeholder='Search'
-            className='mb-2 h-10 rounded-full px-10'
+            className='mb-2 h-[38px] rounded-full px-[37px] placeholder:text-sm placeholder:font-medium placeholder:text-[#B2B2B2] focus:outline-none'
         />
     </div>
 )
