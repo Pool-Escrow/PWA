@@ -32,7 +32,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
     const { addPayout, getPayoutForParticipant } = usePayoutStore()
 
     const inputRef = useRef<HTMLInputElement | null>(null)
-    const [inputValue, setInputValue] = useState<string>('0')
+    const [inputValue, setInputValue] = useState<string>('')
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value)
@@ -102,11 +102,13 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
             </div>
             <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2 px-4 md:px-0'>
                 <Button
+                    disabled={inputValue === ''}
                     onClick={onPayoutButtonClicked}
                     className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Payout
                 </Button>
                 <Button
+                    disabled={inputValue === ''}
                     onClick={onSaveButtonClicked}
                     className='main_gradient mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Save
