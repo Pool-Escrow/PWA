@@ -32,9 +32,10 @@ const fetchPoolParticipants = async (userId: number, poolId: string) => {
         .select('user_id, pool_id, checked_in_at')
         .eq('user_id', userId)
         .eq('pool_id', poolId)
-        .single()
+        .maybeSingle()
+
     if (error) {
-        console.error('fetchPoolParticipants', error)
+        console.error(error)
     }
     return data
 }
