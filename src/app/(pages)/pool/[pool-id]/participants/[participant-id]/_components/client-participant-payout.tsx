@@ -18,7 +18,7 @@ function ClientParticipantPayout({ params }: { params: { 'pool-id': string; 'par
     const displayName = userDetails?.displayName ?? formatAddress(params['participant-id'])
 
     return (
-        <div className='max-w-md overflow-hidden rounded-lg bg-white'>
+        <div className='max-w-md self-center overflow-hidden rounded-lg bg-white'>
             <div className='mt-6 flex flex-col items-center'>
                 <Avatar className='size-[73px]' aria-label='User Avatar'>
                     <AvatarImage alt='User Avatar' src={avatar} />
