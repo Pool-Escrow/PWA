@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { useParticipants } from '@/hooks/use-participants'
-import SearchBar from './searchBar'
+import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
 import { PoolDetailsDTO } from '../../_lib/definitions'
 import PoolDetailsProgress from '../../_components/pool-details-progress'
@@ -59,6 +59,37 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
         }
         return () => setTopBarTitle(null)
     }, [setTopBarTitle, isAdmin])
+
+    useEffect(() => {
+        const allPayouts = usePayoutStore.getState().payouts[poolId] || []
+        const addresses = allPayouts.map(payout => payout.participantAddress)
+        const amounts = allPayouts.map(payout => payout.amount)
+
+        setPayoutAddresses(addresses)
+        setPayoutAmounts(amounts)
+        const total = allPayouts.reduce((sum, payout) => sum + BigInt(payout.amount), BigInt(0))
+        setTotalSavedPayout(total.toString())
+    }, [poolId])
+
+    useEffect(() => {
+        if (isAdmin && currentTab === TabValue.Winners) {
+            setBottomBarContent(
+                <Button
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    onClick={() => {
+                        if (payoutAddresses.length === 0) {
+                            toast('No payout saved.')
+                        } else {
+                            setWinners(payoutAddresses, payoutAmounts)
+                        }
+                    }}
+                    disabled={isPending || isConfirming}>
+                    {isPending || isConfirming ? 'Processing...' : 'Payout'}
+                </Button>,
+            )
+        }
+        return () => setBottomBarContent(null)
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts])
 
     useEffect(() => {
         const allPayouts = usePayoutStore.getState().payouts[poolId] || []
