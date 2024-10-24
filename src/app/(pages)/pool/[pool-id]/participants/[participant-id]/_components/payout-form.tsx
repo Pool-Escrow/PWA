@@ -14,6 +14,7 @@ import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-tok
 import { poolAbi } from '@/types/contracts'
 import useTransactions from '@/app/_client/hooks/use-transactions'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { useAppStore } from '@/app/_client/providers/app-store.provider'
 
 interface PayoutFormProps {
     poolId: string
@@ -22,6 +23,9 @@ interface PayoutFormProps {
 }
 
 const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAddress }) => {
+    const { setTopBarTitle } = useAppStore(s => ({
+        setTopBarTitle: s.setTopBarTitle,
+    }))
     const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess } = useWriteContract()
     const { executeTransactions } = useTransactions()
@@ -62,6 +66,10 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
             console.log('setWinner Error', error)
         }
     }
+    useEffect(() => {
+        setTopBarTitle('User Profile')
+        return () => setTopBarTitle(null)
+    }, [setTopBarTitle])
 
     useEffect(() => {
         const savedPayout = getPayoutForParticipant(poolId.toString(), participantId)
@@ -92,7 +100,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
                     />
                 </div>
             </div>
-            <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2'>
+            <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2 px-4 md:px-0'>
                 <Button
                     onClick={onPayoutButtonClicked}
                     className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
@@ -100,7 +108,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
                 </Button>
                 <Button
                     onClick={onSaveButtonClicked}
-                    className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    className='main_gradient mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Save
                 </Button>
             </div>
