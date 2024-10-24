@@ -4,7 +4,7 @@ import type { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'
-import { erc20Abi, getAbiItem } from 'viem'
+import { erc20Abi, formatUnits, getAbiItem } from 'viem'
 import { currentPoolAddress, serverConfig } from '../../../blockchain/server-config'
 
 const publicClient = getPublicClient(serverConfig)
@@ -26,7 +26,7 @@ export interface ContractPoolData {
     tokenDecimals: number
     mainHost: Address
     participantAddresses: readonly string[]
-    poolBalance: bigint
+    poolBalance: string
 }
 
 export async function getContractPool(poolId: string): Promise<ContractPoolData | null> {
@@ -59,7 +59,7 @@ export async function getContractPool(poolId: string): Promise<ContractPoolData 
             tokenDecimals,
             mainHost: poolAdmin.host,
             participantAddresses: participants,
-            poolBalance: poolBalance.balance,
+            poolBalance: formatUnits(poolBalance.balance, tokenDecimals),
         }
     } catch (error) {
         console.error('Error fetching pool from contract:', error)
