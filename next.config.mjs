@@ -32,6 +32,7 @@ const cspHeader = `
     frame-src 'self' https://app.privy.io https://auth.privy.io https://js.stripe.com;
     connect-src 'self' https://api.privy.io https://auth.privy.io wss://auth.privy.io https://mainnet.base.org https://explorer-api.walletconnect.com https://*.supabase.co https://*.stripe.com https://*.coinbase.com https://sepolia.base.org https://pulse.walletconnect.org https://chain-proxy.wallet.coinbase.com;
     upgrade-insecure-requests;
+    script-src-elem 'self' 'unsafe-inline' https://cdn.privy.io https://js.stripe.com https://*.stripe.com;
 `
 
 /** @type {import('next').NextConfig} */
