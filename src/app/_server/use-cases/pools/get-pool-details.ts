@@ -17,12 +17,16 @@ function processPoolDetails(
     poolInfo: PoolItem | null,
     participantsInfo: ParticipantsInfo,
     claimableAmount: bigint,
+    wonAmount: bigint,
+    claimedAmount: bigint,
 ): PoolDetailsDTO {
     if (!poolInfo) {
         return {
             hostName: '',
             contractId: BigInt(contractPool.id),
             claimableAmount: Number(claimableAmount),
+            wonAmount: Number(wonAmount),
+            claimedAmount: Number(claimedAmount),
             participants: participantsInfo.participants.map((user: { name: string; avatarUrl: string }) => ({
                 name: user.name,
                 avatarUrl: user.avatarUrl,
@@ -43,18 +47,22 @@ function processPoolDetails(
             description: '',
             termsUrl: undefined,
             poolBalance: Number(contractPool.poolBalance),
+            totalDeposits: Number(contractPool.totalDeposits),
         }
     }
     return {
         hostName: poolInfo.hostName,
         contractId: BigInt(contractPool.id),
         claimableAmount: Number(claimableAmount) / 10 ** contractPool.tokenDecimals,
+        wonAmount: Number(wonAmount) / 10 ** contractPool.tokenDecimals,
+        claimedAmount: Number(claimedAmount) / 10 ** contractPool.tokenDecimals,
         participants: participantsInfo.participants.map((user: { name: string; avatarUrl: string }) => ({
             name: user.name,
             avatarUrl: user.avatarUrl,
         })),
         // userDeposit: Number(userInfo?.deposit) ?? 0,
-        goal: poolInfo.softCap * contractPool.price || Number(contractPool.poolBalance),
+        // goal: poolInfo.softCap * contractPool.price || Number(contractPool.poolBalance),
+        goal: poolInfo.softCap * Number(contractPool.price) * 10 ** Number(contractPool.tokenDecimals),
         progress: Number(contractPool.poolBalance) / 10 ** contractPool.tokenDecimals,
         name: contractPool.name,
         startDate: contractPool.startDate,
@@ -70,6 +78,7 @@ function processPoolDetails(
         description: poolInfo.description,
         termsUrl: poolInfo.terms || undefined,
         poolBalance: Number(contractPool.poolBalance),
+        totalDeposits: Number(contractPool.totalDeposits),
     }
 }
 
@@ -90,6 +99,8 @@ export async function getPoolDetailsUseCase(poolId: string, userAddress?: string
     }
 
     let claimableAmount: bigint = BigInt(0)
+    let wonAmount: bigint = BigInt(0)
+    let claimedAmount: bigint = BigInt(0)
 
     if (userAddress && contractPool.participantAddresses.includes(userAddress)) {
         if (contractPool.status === POOLSTATUS.ENDED) {
@@ -99,8 +110,10 @@ export async function getPoolDetailsUseCase(poolId: string, userAddress?: string
                 forfeited: false,
             }
             claimableAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountWon - winnerDetail?.amountClaimed
+            wonAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountWon
+            claimedAmount = winnerDetail?.forfeited ? 0n : winnerDetail?.amountClaimed
         }
     }
 
-    return processPoolDetails(contractPool, poolInfo, usersInfo, claimableAmount)
+    return processPoolDetails(contractPool, poolInfo, usersInfo, claimableAmount, wonAmount, claimedAmount)
 }

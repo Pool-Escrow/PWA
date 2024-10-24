@@ -80,6 +80,7 @@ export default withBundleAnalyzer(
                 {
                     source: '/(.*)',
                     headers: [
+                        // TODO: Enable CSP for production.
                         {
                             key: 'Content-Security-Policy',
                             value: cspHeader.replace(/\s{2,}/g, ' ').trim(),

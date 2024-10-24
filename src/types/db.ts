@@ -1,6 +1,31 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
+    graphql_public: {
+        Tables: {
+            [_ in never]: never
+        }
+        Views: {
+            [_ in never]: never
+        }
+        Functions: {
+            graphql: {
+                Args: {
+                    operationName?: string
+                    query?: string
+                    variables?: Json
+                    extensions?: Json
+                }
+                Returns: Json
+            }
+        }
+        Enums: {
+            [_ in never]: never
+        }
+        CompositeTypes: {
+            [_ in never]: never
+        }
+    }
     public: {
         Tables: {
             accounts: {
@@ -55,31 +80,30 @@ export type Database = {
             }
             pool_participants: {
                 Row: {
+                    checked_in_at: string | null
                     createdAt: string | null
                     pool_id: number
                     poolRole: Database['public']['Enums']['poolRoles']
+                    status: string
                     user_id: number
                 }
                 Insert: {
+                    checked_in_at?: string | null
                     createdAt?: string | null
                     pool_id: number
                     poolRole: Database['public']['Enums']['poolRoles']
+                    status?: string
                     user_id: number
                 }
                 Update: {
+                    checked_in_at?: string | null
                     createdAt?: string | null
                     pool_id?: number
                     poolRole?: Database['public']['Enums']['poolRoles']
+                    status?: string
                     user_id?: number
                 }
                 Relationships: [
-                    {
-                        foreignKeyName: 'pool_participants_pool_id_fkey'
-                        columns: ['pool_id']
-                        isOneToOne: false
-                        referencedRelation: 'pools'
-                        referencedColumns: ['internal_id']
-                    },
                     {
                         foreignKeyName: 'pool_participants_user_id_fkey'
                         columns: ['user_id']
@@ -303,4 +327,17 @@ export type Enums<
     ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
     : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
       ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+      : never
+
+export type CompositeTypes<
+    PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes'] | { schema: keyof Database },
+    CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+        schema: keyof Database
+    }
+        ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+        : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+    ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+    : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
+      ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
       : never
