@@ -67,7 +67,7 @@ export default function ParticipantCard({
 
                 <div className='flex flex-1 flex-col'>
                     <h4 className='overflow-hidden text-[12pt] font-medium text-black'>
-                        {displayName} - <span className='italic'>{formatAddress(address)}</span>
+                        {displayName} - <span className='italic'>{formatAddress(address, 6).toLowerCase()}</span>
                     </h4>
                     <p
                         className={cn(
