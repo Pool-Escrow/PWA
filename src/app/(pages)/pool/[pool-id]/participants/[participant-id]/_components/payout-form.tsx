@@ -86,7 +86,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
 
     return (
         <>
-            <div className='mt-2 flex h-16 flex-row justify-center'>
+            <div className='flex h-16 flex-row justify-center'>
                 <div className='relative flex justify-center'>
                     <Input
                         className={cn('h-24 w-auto border-none text-center text-6xl font-bold focus:outline-none')}

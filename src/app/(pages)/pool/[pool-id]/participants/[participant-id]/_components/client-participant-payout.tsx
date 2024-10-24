@@ -8,14 +8,19 @@ import { useUserDetails } from '../../_components/use-user-details'
 import { usePoolDetails } from '../../../ticket/_components/use-pool-details'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import PayoutForm from './payout-form'
+import { useParticipants } from '@/hooks/use-participants'
 
 function ClientParticipantPayout({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) {
     const { data: userDetails } = useUserDetails(params['participant-id'])
     const { poolDetails } = usePoolDetails(BigInt(params?.['pool-id']))
+    const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? currentTokenAddress
     const avatar = userDetails?.avatar ?? frog.src
     const displayName = userDetails?.displayName ?? formatAddress(params['participant-id'])
+
+    const currentParticipant = participants?.find(participant => participant.address === params['participant-id'])
+    const isCheckedIn = currentParticipant?.checkedInAt != null
 
     return (
         <div className='max-w-md self-center overflow-hidden rounded-lg bg-white'>
@@ -29,8 +34,12 @@ function ClientParticipantPayout({ params }: { params: { 'pool-id': string; 'par
                         {displayName}
                     </h3>
                 </div>
-                <div className='mb-4 flex flex-row justify-center'>
-                    <p>Checked in</p>
+                <div className='flex flex-row justify-center'>
+                    {isCheckedIn ? (
+                        <p className='font-medium text-[#6993FF]'>Checked in</p>
+                    ) : (
+                        <p className='text-[#B2B2B2]'>Registered</p>
+                    )}
                 </div>
                 <PayoutForm
                     poolId={params['pool-id']}
