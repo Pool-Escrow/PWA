@@ -11,7 +11,7 @@ export default async function PoolDetailsBanner({ imageUrl, name, buttons, statu
         <div className='detail_card_banner relative overflow-hidden'>
             <Image src={imageUrl} alt={name} fill className='object-cover' priority />
             {buttons}
-            <div className='detail_card_banner_status'>{status}</div>
+            {/* <div className='detail_card_banner_status'>{status}</div> */}
         </div>
     )
 }

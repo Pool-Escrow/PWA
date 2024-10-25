@@ -22,7 +22,7 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                     name={pool.name}
                     imageUrl={pool.imageUrl}
                     buttons={<PoolDetailsBannerButtons isAdmin={isAdmin} />}
-                    status={<PoolDetailsBannerStatus />}
+                    // status={<PoolDetailsBannerStatus />}
                 />
                 <PoolDetailsHeading
                     name={pool.name}
