@@ -33,6 +33,7 @@ interface BottomBarHandlerProps {
     poolTokenSymbol: string
     tokenDecimals: number
     requiredAcceptance: boolean
+    termsUrl: string
 }
 
 export default function BottomBarHandler({
@@ -43,6 +44,7 @@ export default function BottomBarHandler({
     poolTokenSymbol,
     tokenDecimals,
     requiredAcceptance,
+    termsUrl,
 }: BottomBarHandlerProps) {
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -263,6 +265,7 @@ export default function BottomBarHandler({
                     open={showTermsDialog}
                     onOpenChange={setShowTermsDialog}
                     onAccept={handleJoinPool}
+                    termsUrl={termsUrl}
                 />
             )}
         </>

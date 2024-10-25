@@ -61,15 +61,8 @@ export const formFields = [
     {
         key: 'termsURL',
         name: 'termsURL',
-        label: 'Link To Rules, Terms, and Conditions',
-        description: 'Paste a link to your rules',
-        component: Text,
-    },
-    {
-        key: 'codeOfConductURL',
-        name: 'codeOfConductURL',
-        label: 'Link To Code of Conduct',
-        description: 'Paste a link to your code of conduct',
+        label: 'Link to T&C, rules, or Code of Conduct',
+        description: 'Paste a link to the pool terms document',
         component: Text,
     },
     {

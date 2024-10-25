@@ -42,7 +42,6 @@ function processPoolDetails(
             softCap: 0,
             description: '',
             termsUrl: undefined,
-            codeOfConductUrl: undefined,
             requiredAcceptance: false,
             poolBalance: Number(contractPool.poolBalance),
         }
@@ -71,7 +70,6 @@ function processPoolDetails(
         softCap: poolInfo.softCap,
         description: poolInfo.description,
         termsUrl: poolInfo.terms || undefined,
-        codeOfConductUrl: poolInfo.codeOfConductUrl || undefined,
         requiredAcceptance: poolInfo.requiredAcceptance,
         poolBalance: Number(contractPool.poolBalance),
     }

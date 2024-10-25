@@ -29,7 +29,6 @@ const PoolDetailsDTOSchema = z.object({
     softCap: z.number().int().positive(),
     description: z.string(),
     termsUrl: z.string().optional().or(z.literal('')).optional(),
-    codeOfConductUrl: z.string().optional().or(z.literal('')).optional(),
     hostName: z.string(),
     //TODO: enforce string().url() for terms
 

@@ -13,7 +13,6 @@ interface PoolItem {
     endDate: number
     price: number
     tokenAddress: Address
-    codeOfConductURL: string
     requiredAcceptance: boolean
 }
 

@@ -47,12 +47,6 @@ export const CreatePoolFormSchema = z
             end: z.coerce.date(),
         }),
         price: z.number().int().min(0, 'The price must be a positive number or zero'),
-        codeOfConductURL: z
-            .string()
-            .url(
-                'Invalid URL format, it needs to start with https://. If you want to omit, just leave the field empty.',
-            )
-            .optional(),
         requiredAcceptance: z.boolean(),
         // tokenAddress: ethereumAddressSchema,
     })

@@ -67,6 +67,7 @@ export default async function PoolDetails({ pool }: { pool: PoolDetailsDTO }) {
                 poolTokenSymbol={pool.tokenSymbol}
                 tokenDecimals={pool.tokenDecimals}
                 requiredAcceptance={pool.requiredAcceptance}
+                termsUrl={pool.termsUrl || ''}
             />
         </div>
     )

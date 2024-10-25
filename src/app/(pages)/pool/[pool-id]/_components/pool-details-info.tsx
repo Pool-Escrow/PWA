@@ -6,7 +6,7 @@ function PoolDetailsTermsUrl({ termsUrl }: { termsUrl: string }) {
         <Link href={termsUrl} passHref legacyBehavior>
             <a target='_blank' rel='external noopener noreferrer nofollow' className='self-center'>
                 <div className='mt-4 inline-flex w-full justify-between'>
-                    {termsUrl}
+                    Terms, Conditions, and Code of Conduct
                     <ExternalLinkIcon className='size-4' />
                 </div>
             </a>

@@ -13,7 +13,6 @@ import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
 
 type CheckboxState = {
     terms: boolean
-    code: boolean
 }
 
 const useMediaQuery = (query: string): boolean => {
@@ -35,9 +34,10 @@ type ContentProps = {
     handleCheckboxChange: (id: keyof CheckboxState) => void
     handleSubmit: () => Promise<void>
     isButtonEnabled: boolean
+    termsUrl: string
 }
 
-const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabled }: ContentProps) => (
+const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabled, termsUrl }: ContentProps) => (
     <div className='space-y-4 p-4'>
         <h2 className='text-lg font-semibold' id='registration-title'>
             Registration
@@ -48,26 +48,24 @@ const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabl
                 handleSubmit()
             }}
             className='space-y-4'>
-            {(Object.keys(checkboxes) as Array<keyof CheckboxState>).map(key => (
-                <div key={key} className='flex items-center space-x-2'>
-                    <Checkbox
-                        id={key}
-                        checked={checkboxes[key]}
-                        onCheckedChange={() => handleCheckboxChange(key)}
-                        aria-describedby={`${key}-label`}
-                    />
-                    <Label htmlFor={key} id={`${key}-label`} className='text-sm'>
-                        I accept the{' '}
-                        <Link
-                            href={key === 'terms' ? '/terms-and-conditions' : '/code-of-conduct'}
-                            className='text-primary hover:underline'
-                            target='_blank'
-                            rel='noopener noreferrer'>
-                            {key === 'terms' ? 'Terms and Conditions' : 'Code of Conduct'}
-                        </Link>
-                    </Label>
-                </div>
-            ))}
+            <div className='flex items-center space-x-2'>
+                <Checkbox
+                    id='terms'
+                    checked={checkboxes.terms}
+                    onCheckedChange={() => handleCheckboxChange('terms')}
+                    aria-describedby='terms-label'
+                />
+                <Label htmlFor='terms' id='terms-label' className='text-sm'>
+                    I accept the{' '}
+                    <Link
+                        href={termsUrl}
+                        className='text-primary hover:underline'
+                        target='_blank'
+                        rel='external noopener noreferrer nofollow'>
+                        Terms and Conditions
+                    </Link>
+                </Label>
+            </div>
             <Button
                 type='submit'
                 className={cn(
@@ -82,8 +80,7 @@ const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabl
             </Button>
             <p id='submit-description' className='sr-only'>
                 This button is {isButtonEnabled ? 'enabled' : 'disabled'}.
-                {!isButtonEnabled &&
-                    ' You must accept both the Terms and Conditions and the Code of Conduct to register.'}
+                {!isButtonEnabled && ' You must accept the Terms and Conditions to register.'}
             </p>
         </form>
     </div>
@@ -93,12 +90,12 @@ interface HybridRegistrationProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onAccept: () => void
+    termsUrl: string
 }
 
-export default function HybridRegistration({ open, onOpenChange, onAccept }: HybridRegistrationProps) {
+export default function HybridRegistration({ open, onOpenChange, onAccept, termsUrl }: HybridRegistrationProps) {
     const [checkboxes, setCheckboxes] = useState<CheckboxState>({
         terms: false,
-        code: false,
     })
     const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -106,7 +103,7 @@ export default function HybridRegistration({ open, onOpenChange, onAccept }: Hyb
         setCheckboxes(prev => ({ ...prev, [id]: !prev[id] }))
     }, [])
 
-    const isButtonEnabled = Object.values(checkboxes).every(Boolean)
+    const isButtonEnabled = checkboxes.terms
 
     const handleSubmit = useCallback(async () => {
         if (!isButtonEnabled) return
@@ -117,8 +114,8 @@ export default function HybridRegistration({ open, onOpenChange, onAccept }: Hyb
             console.log('Terms accepted')
             onAccept()
             onOpenChange(false)
-            // Reset checkboxes after successful submission
-            setCheckboxes({ terms: false, code: false })
+            // Reset checkbox after successful submission
+            setCheckboxes({ terms: false })
         } catch (error) {
             console.error('Terms acceptance failed:', error)
             // Handle error (e.g., show an error message to the user)
@@ -138,6 +135,7 @@ export default function HybridRegistration({ open, onOpenChange, onAccept }: Hyb
             handleCheckboxChange={handleCheckboxChange}
             handleSubmit={handleSubmit}
             isButtonEnabled={isButtonEnabled}
+            termsUrl={termsUrl}
         />
     )
 
