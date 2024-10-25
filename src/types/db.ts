@@ -91,6 +91,7 @@ export type Database = {
             pools: {
                 Row: {
                     bannerImage: string
+                    code_of_conduct_url: string | null
                     contract_id: number | null
                     createdAt: string
                     description: string
@@ -98,6 +99,7 @@ export type Database = {
                     internal_id: number
                     name: string
                     price: number
+                    required_acceptance: boolean
                     softCap: number
                     startDate: string
                     status: Database['public']['Enums']['poolStatus']
@@ -107,6 +109,7 @@ export type Database = {
                 }
                 Insert: {
                     bannerImage: string
+                    code_of_conduct_url?: string | null
                     contract_id?: number | null
                     createdAt?: string
                     description: string
@@ -114,6 +117,7 @@ export type Database = {
                     internal_id?: never
                     name: string
                     price: number
+                    required_acceptance?: boolean
                     softCap: number
                     startDate: string
                     status?: Database['public']['Enums']['poolStatus']
@@ -123,6 +127,7 @@ export type Database = {
                 }
                 Update: {
                     bannerImage?: string
+                    code_of_conduct_url?: string | null
                     contract_id?: number | null
                     createdAt?: string
                     description?: string
@@ -130,6 +135,7 @@ export type Database = {
                     internal_id?: never
                     name?: string
                     price?: number
+                    required_acceptance?: boolean
                     softCap?: number
                     startDate?: string
                     status?: Database['public']['Enums']['poolStatus']
@@ -302,4 +308,17 @@ export type Enums<
     ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
     : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
       ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+      : never
+
+export type CompositeTypes<
+    PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes'] | { schema: keyof Database },
+    CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+        schema: keyof Database
+    }
+        ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+        : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+    ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+    : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
+      ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
       : never

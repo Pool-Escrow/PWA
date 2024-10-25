@@ -21,6 +21,8 @@ const initialState = {
         price: [],
         softCap: [],
         termsURL: [],
+        codeOfConductURL: [],
+        requiredAcceptance: [],
     },
     internalPoolId: undefined,
     poolData: undefined,

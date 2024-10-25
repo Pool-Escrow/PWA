@@ -53,7 +53,7 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     const dateRangeString = formData.get('dateRange') as string
     const timezone = formData.get('dateRange_timezone') as string
     const codeOfConductURL = formData.get('codeOfConductURL') as string
-    const requiredAcceptance = formData.get('requiredAcceptance') === 'true'
+    const requiredAcceptance = formData.get('requiredAcceptance') === 'on'
 
     console.log('dateRangeString', dateRangeString)
     console.log('timezone', timezone)
