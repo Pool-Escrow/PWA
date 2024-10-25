@@ -18,6 +18,8 @@ type FormState = {
         price: string[]
         softCap: string[]
         termsURL: string[]
+        codeOfConductURL: string[]
+        requiredAcceptance: string[]
     }
     internalPoolId?: string
     poolData?: {
@@ -50,6 +52,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
     // const tokenAddress = formData.get('tokenAddress') as Address
     const dateRangeString = formData.get('dateRange') as string
     const timezone = formData.get('dateRange_timezone') as string
+    const codeOfConductURL = formData.get('codeOfConductURL') as string
+    const requiredAcceptance = formData.get('requiredAcceptance') === 'true'
 
     console.log('dateRangeString', dateRangeString)
     console.log('timezone', timezone)
@@ -72,6 +76,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
         softCap: Number(softCap),
         price: Number(price),
         // tokenAddress,
+        codeOfConductURL: codeOfConductURL || undefined,
+        requiredAcceptance,
     })
 
     function transformErrors(zodErrors: Record<string, string[]>): FormState['errors'] {
@@ -83,6 +89,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
             price: zodErrors.price || [],
             softCap: zodErrors.softCap || [],
             termsURL: zodErrors.termsURL || [],
+            codeOfConductURL: zodErrors.codeOfConductURL || [],
+            requiredAcceptance: zodErrors.requiredAcceptance || [],
         }
     }
 
@@ -106,6 +114,8 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
             endDate: utcDateRange.end.getTime(),
             price: Number(price),
             tokenAddress: currentTokenAddress,
+            codeOfConductURL,
+            requiredAcceptance,
         })
 
         console.log('Pool created successfully, internalPoolId:', internalPoolId)

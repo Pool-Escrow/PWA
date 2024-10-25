@@ -13,6 +13,8 @@ interface PoolItem {
     endDate: number
     price: number
     tokenAddress: Address
+    codeOfConductURL: string
+    requiredAcceptance: boolean
 }
 
 export async function createPoolUseCase(creatorAddress: Address, info: PoolItem) {

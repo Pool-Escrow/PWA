@@ -15,6 +15,8 @@ interface PoolItem {
     endDate: number
     price: number
     tokenAddress: Address
+    codeOfConductURL: string
+    requiredAcceptance: boolean
 }
 
 export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
@@ -33,6 +35,8 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
             status: 'draft',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            codeOfConductURL: data.codeOfConductURL,
+            requiredAcceptance: data.requiredAcceptance,
         })
         .select('*')
         .single()
