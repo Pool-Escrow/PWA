@@ -1,10 +1,10 @@
 -- migration_name: add_conduct_and_acceptance_to_pool
 ALTER TABLE pools
-ADD COLUMN code_of_conduct_url TEXT,
-ADD COLUMN required_acceptance BOOLEAN NOT NULL DEFAULT false;
+ADD COLUMN IF NOT EXISTS code_of_conduct_url TEXT,
+ADD COLUMN IF NOT EXISTS required_acceptance BOOLEAN NOT NULL DEFAULT false;
 
 -- Create an index to improve the performance of queries that filter by required_acceptance
-CREATE INDEX idx_pools_required_acceptance ON pools(required_acceptance);
+CREATE INDEX IF NOT EXISTS idx_pools_required_acceptance ON pools(required_acceptance);
 
 -- Comment: This migration adds two new fields to the pools table:
 -- 1. code_of_conduct_url: An optional text field to store the URL of the code of conduct.

@@ -147,6 +147,8 @@ CREATE TABLE IF NOT EXISTS "public"."pools" (
     "price" numeric NOT NULL,
     "tokenAddress" character varying(42) NOT NULL,
     "status" "public"."poolStatus" DEFAULT 'draft'::"public"."poolStatus" NOT NULL,
+    "code_of_conduct_url" "text",
+    "required_acceptance" boolean DEFAULT false NOT NULL,
     CONSTRAINT "check_dates" CHECK (("startDate" < "endDate")),
     CONSTRAINT "check_start_date" CHECK (("startDate" > "now"())),
     CONSTRAINT "pools_price_check" CHECK (("price" >= (0)::numeric)),
@@ -262,12 +264,21 @@ CREATE INDEX "idx_pool_status" ON "public"."pools" USING "btree" ("status");
 
 
 
+CREATE INDEX "idx_pools_required_acceptance" ON "public"."pools" USING "btree" ("required_acceptance");
+
+
+
 CREATE INDEX "idx_pools_tokenaddress" ON "public"."pools" USING "btree" ("tokenAddress");
 
 
 
 ALTER TABLE ONLY "public"."accounts"
     ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."pool_participants"
+    ADD CONSTRAINT "pool_participants_pool_id_fkey" FOREIGN KEY ("pool_id") REFERENCES "public"."pools"("contract_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 
@@ -324,16 +335,7 @@ CREATE POLICY "Allow users to view pools" ON "public"."pools" FOR SELECT USING (
 ALTER TABLE "public"."accounts" ENABLE ROW LEVEL SECURITY;
 
 
-ALTER TABLE "public"."pool_participants" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."pools" ENABLE ROW LEVEL SECURITY;
-
-
 ALTER TABLE "public"."sessions" ENABLE ROW LEVEL SECURITY;
-
-
-ALTER TABLE "public"."users" ENABLE ROW LEVEL SECURITY;
 
 
 
@@ -345,6 +347,21 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
