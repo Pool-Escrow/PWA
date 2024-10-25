@@ -34,7 +34,7 @@ export const CreatePoolFormSchema = z
         description: z
             .string()
             .min(5, 'The description must have at least 5 characters')
-            .max(200, 'The description cannot have more than 200 characters'),
+            .max(500, 'The description cannot have more than 500 characters'),
         termsURL: z
             .string()
             .url(

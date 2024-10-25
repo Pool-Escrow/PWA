@@ -9,7 +9,7 @@ interface TextAreaProps {
 
 export default function TextArea({ name }: TextAreaProps) {
     const [value, setValue] = useState('')
-    const maxLength = 200
+    const maxLength = 500
 
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setValue(e.target.value)
