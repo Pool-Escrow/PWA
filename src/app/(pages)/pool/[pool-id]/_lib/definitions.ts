@@ -29,6 +29,7 @@ const PoolDetailsDTOSchema = z.object({
     softCap: z.number().int().positive(),
     description: z.string(),
     termsUrl: z.string().optional().or(z.literal('')).optional(),
+    codeOfConductUrl: z.string().optional().or(z.literal('')).optional(),
     hostName: z.string(),
     //TODO: enforce string().url() for terms
 
@@ -44,6 +45,7 @@ const PoolDetailsDTOSchema = z.object({
     // Calculated fields
     goal: z.number().nonnegative(),
     progress: z.number().nonnegative(),
+    requiredAcceptance: z.boolean(),
 })
 
 // Derived type from Zod schema

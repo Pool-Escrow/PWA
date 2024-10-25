@@ -17,7 +17,16 @@ interface PoolItem {
     requiredAcceptance: boolean
 }
 
+const createdPools = new Set<string>()
+
 export async function createPoolUseCase(creatorAddress: Address, info: PoolItem) {
+    const poolKey = `${creatorAddress}-${info.name}-${info.startDate}`
+    if (createdPools.has(poolKey)) {
+        console.log('Pool already created, skipping')
+        return null
+    }
+
     const createdPool = await createPoolInDb(creatorAddress, info)
+    createdPools.add(poolKey)
     return createdPool.internal_id.toString()
 }

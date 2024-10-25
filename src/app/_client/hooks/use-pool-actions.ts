@@ -10,6 +10,7 @@ import { approve } from '@/app/_lib/blockchain/functions/token/approve'
 import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
 import { useReadContract } from 'wagmi'
 import { useWaitForTransactionReceipt } from 'wagmi'
+import { useState, useEffect } from 'react'
 
 export function usePoolActions(
     poolId: bigint,
@@ -39,6 +40,8 @@ export function usePoolActions(
     } = useWaitForTransactionReceipt({
         hash: result.hash as Hash | undefined,
     })
+
+    const [isCancelled, setIsCancelled] = useState(false)
 
     const handleEnableDeposits = () => {
         toast('Enabling deposits...')
@@ -78,6 +81,17 @@ export function usePoolActions(
             },
         ])
     }
+
+    useEffect(() => {
+        if (result.error) {
+            // Check if the error is due to user rejection
+            if (result.error.message.includes('user rejected transaction')) {
+                setIsCancelled(true)
+            }
+        } else {
+            setIsCancelled(false)
+        }
+    }, [result.error])
 
     const handleJoinPool = () => {
         console.log('Join pool button clicked')
@@ -120,14 +134,20 @@ export function usePoolActions(
             void executeTransactions([
                 ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice })] : []),
                 deposit({ poolId, amount: bigIntPrice }),
-            ]).then(() => {
-                onSuccessfulJoin()
-            })
+            ])
+                .then(() => {
+                    onSuccessfulJoin()
+                })
+                .catch(error => {
+                    console.error('Transaction failed:', error)
+                    // You might want to handle other types of errors here
+                })
         }
     }
 
     const resetJoinPoolProcess = () => {
         resetConfirmation()
+        setIsCancelled(false)
     }
 
     const ready = isReady
@@ -143,5 +163,6 @@ export function usePoolActions(
         isConfirmed,
         resetConfirmation,
         isConfirming,
+        isCancelled,
     }
 }

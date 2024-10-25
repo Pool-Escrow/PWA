@@ -22,6 +22,8 @@ export default function CreatePoolForm() {
         handleRetry,
         handleRetryDialogClose,
         isDesktop,
+        poolUpdated,
+        hasAttemptedChainCreation,
     } = useCreatePool()
     const { setBottomBarContent, setTopBarTitle, setTransactionInProgress } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
@@ -116,8 +118,16 @@ export default function CreatePoolForm() {
         console.log('Effect: Checking pool creation status', {
             message: state.message,
             internalPoolId: state.internalPoolId,
+            poolUpdated,
+            hasAttemptedChainCreation,
         })
-        if (state.message === 'Pool created successfully' && state.internalPoolId && !hasCreatedPool.current) {
+        if (
+            state.message === 'Pool created successfully' &&
+            state.internalPoolId &&
+            !hasCreatedPool.current &&
+            !poolUpdated &&
+            !hasAttemptedChainCreation
+        ) {
             console.log('Pool created successfully, calling createPoolOnChain')
             hasCreatedPool.current = true
             createPoolOnChain()
@@ -125,8 +135,9 @@ export default function CreatePoolForm() {
         if (state.message?.includes('Error')) {
             console.log('Pool creation failed:', state.message)
             setIsSubmitting(false)
+            hasCreatedPool.current = false // Reset this here
         }
-    }, [state.message, state.internalPoolId, createPoolOnChain])
+    }, [state.message, state.internalPoolId, createPoolOnChain, poolUpdated, hasAttemptedChainCreation])
 
     return (
         <>

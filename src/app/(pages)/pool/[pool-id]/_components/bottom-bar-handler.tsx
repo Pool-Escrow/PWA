@@ -13,6 +13,7 @@ import { Loader2 } from 'lucide-react'
 import { useAccount, useReadContract } from 'wagmi'
 import { getAbiItem } from 'viem'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import HybridRegistration from './terms-acceptance-dialog'
 
 type ButtonConfig = {
     label: string
@@ -31,6 +32,7 @@ interface BottomBarHandlerProps {
     poolPrice: number
     poolTokenSymbol: string
     tokenDecimals: number
+    requiredAcceptance: boolean
 }
 
 export default function BottomBarHandler({
@@ -40,6 +42,7 @@ export default function BottomBarHandler({
     poolPrice,
     poolTokenSymbol,
     tokenDecimals,
+    requiredAcceptance,
 }: BottomBarHandlerProps) {
     const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -76,6 +79,7 @@ export default function BottomBarHandler({
         isConfirmed,
         isConfirming,
         resetConfirmation,
+        isCancelled,
     } = usePoolActions(
         poolId,
         poolPrice,
@@ -88,6 +92,16 @@ export default function BottomBarHandler({
         router.push(`/pool/${poolId}/ticket`)
     }, [router, poolId])
 
+    const [showTermsDialog, setShowTermsDialog] = useState(false)
+
+    const handleJoinPoolWithTerms = useCallback(() => {
+        if (requiredAcceptance) {
+            setShowTermsDialog(true)
+        } else {
+            handleJoinPool()
+        }
+    }, [requiredAcceptance, handleJoinPool])
+
     const buttonConfig = useMemo<Record<POOLSTATUS, PoolStatusConfig>>(
         () => ({
             [POOLSTATUS.INACTIVE]: {
@@ -98,7 +112,7 @@ export default function BottomBarHandler({
                 admin: { label: 'Start Pool', action: handleStartPool },
                 user: isParticipant
                     ? { label: 'View My Ticket', action: handleViewTicket }
-                    : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                    : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPoolWithTerms },
             },
             [POOLSTATUS.STARTED]: {
                 admin: { label: 'End pool', action: handleEndPool },
@@ -122,6 +136,7 @@ export default function BottomBarHandler({
             handleEndPool,
             isParticipant,
             handleViewTicket,
+            handleJoinPoolWithTerms,
         ],
     )
 
@@ -224,6 +239,14 @@ export default function BottomBarHandler({
         }
     }, [isPending, isConfirming])
 
+    useEffect(() => {
+        if (isCancelled) {
+            setIsLoading(false)
+            setTransactionProcessed(false)
+            updateBottomBarContent()
+        }
+    }, [isCancelled, updateBottomBarContent])
+
     const handleOnRampDialogClose = useCallback(() => {
         setOpenOnRampDialog(false)
         resetJoinPoolProcess()
@@ -232,5 +255,16 @@ export default function BottomBarHandler({
         router.refresh()
     }, [resetJoinPoolProcess, updateBottomBarContent, router])
 
-    return <OnRampDialog open={openOnRampDialog} setOpen={handleOnRampDialogClose} amount={poolPrice.toString()} />
+    return (
+        <>
+            <OnRampDialog open={openOnRampDialog} setOpen={handleOnRampDialogClose} amount={poolPrice.toString()} />
+            {requiredAcceptance && (
+                <HybridRegistration
+                    open={showTermsDialog}
+                    onOpenChange={setShowTermsDialog}
+                    onAccept={handleJoinPool}
+                />
+            )}
+        </>
+    )
 }

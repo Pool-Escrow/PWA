@@ -7,12 +7,14 @@ export interface PoolItem {
     softCap: number
     terms: string
     hostName: string
+    codeOfConductUrl: string | null
+    requiredAcceptance: boolean
 }
 
 export async function getDbPool(poolId: string): Promise<PoolItem | null> {
     const { data: poolData, error } = await db
         .from('pools')
-        .select('termsURL, description, softCap, bannerImage')
+        .select('termsURL, description, softCap, bannerImage, code_of_conduct_url, required_acceptance')
         .eq('contract_id', poolId)
         .single()
 
@@ -31,6 +33,8 @@ export async function getDbPool(poolId: string): Promise<PoolItem | null> {
         softCap: poolData.softCap,
         terms: poolData.termsURL,
         hostName,
+        codeOfConductUrl: poolData.code_of_conduct_url,
+        requiredAcceptance: poolData.required_acceptance,
     }
 }
 

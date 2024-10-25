@@ -42,6 +42,8 @@ describe('PoolDetailsTest', () => {
             poolBalance: 1,
             description: 'test description',
             termsUrl: 'http://terms.com',
+            codeOfConductUrl: 'http://terms.com',
+            requiredAcceptance: false,
             tokenDecimals: 18,
             progress: 1,
             softCap: 1,
@@ -77,9 +79,11 @@ describe('PoolDetailsTest', () => {
             poolBalance: 1,
             description: 'test description',
             termsUrl: 'http://terms.com',
+            codeOfConductUrl: 'http://terms.com',
             tokenDecimals: 18,
             progress: 1,
             softCap: 1,
+            requiredAcceptance: false,
         }
         const { queryByTestId } = render(
             <Providers cookie={null}>

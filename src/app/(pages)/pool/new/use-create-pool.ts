@@ -55,6 +55,7 @@ export function useCreatePool() {
     const [transactionProcessed, setTransactionProcessed] = useState(false)
     const [hasAttemptedChainCreation, setHasAttemptedChainCreation] = useState(false)
     const [poolUpdated, setPoolUpdated] = useState(false)
+    const createPoolOnChainRef = useRef<(() => void) | null>(null)
 
     const createPoolOnChain = useCallback(() => {
         if (!state.internalPoolId || !state.poolData || hasAttemptedChainCreation) {
@@ -98,8 +99,11 @@ export function useCreatePool() {
             })
             .finally(() => {
                 isCreatingPool.current = false
+                setHasAttemptedChainCreation(false) // Reset this here
             })
     }, [state.internalPoolId, state.poolData, executeTransactions, setStep, setError, hasAttemptedChainCreation])
+
+    createPoolOnChainRef.current = createPoolOnChain
 
     const handleCancellation = useCallback(async () => {
         if (!state.internalPoolId) return
@@ -193,6 +197,7 @@ export function useCreatePool() {
                 .finally(() => {
                     setPoolUpdated(false)
                     setTransactionProcessed(false)
+                    setHasAttemptedChainCreation(false) // Reset this here as well
                 })
         } else {
             setError('Failed to find pool creation event')
@@ -202,6 +207,7 @@ export function useCreatePool() {
             })
             setTransactionProcessed(false)
             setPoolUpdated(false)
+            setHasAttemptedChainCreation(false) // Reset this here too
         }
     }, [
         isConfirmed,
@@ -250,7 +256,7 @@ export function useCreatePool() {
     return {
         formAction,
         state,
-        createPoolOnChain,
+        createPoolOnChain: () => createPoolOnChainRef.current?.(),
         isPending: txResult.isLoading,
         isConfirming,
         callsStatus: txResult.callsStatus,
@@ -265,5 +271,7 @@ export function useCreatePool() {
         isDesktop,
         isWaitingForRetry,
         transactionProcessed,
+        poolUpdated,
+        hasAttemptedChainCreation,
     }
 }

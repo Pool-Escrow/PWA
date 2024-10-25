@@ -118,6 +118,10 @@ export async function createPoolAction(_prevState: FormState, formData: FormData
             requiredAcceptance,
         })
 
+        if (!internalPoolId) {
+            throw new Error('Failed to create pool, internalPoolId is null')
+        }
+
         console.log('Pool created successfully, internalPoolId:', internalPoolId)
 
         return {
