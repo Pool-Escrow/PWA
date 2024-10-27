@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { PrivyClient } from '@privy-io/server-auth'
 
 import type { User } from '@privy-io/server-auth'
-import { cache } from 'react'
+import { Address } from 'viem'
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
 const privyAppSecret = process.env.PRIVY_APP_SECRET
@@ -18,7 +18,7 @@ const getPrivyVerificationKey = async () => {
     return process.env.PRIVY_VERIFICATION_KEY || (await privy.getVerificationKey())
 }
 
-const uncachedVerifyToken = async (): Promise<User | undefined> => {
+export const verifyToken = async (): Promise<User | undefined> => {
     const accessToken = cookies().get('privy-token')?.value
 
     if (!accessToken) return
@@ -35,4 +35,7 @@ const uncachedVerifyToken = async (): Promise<User | undefined> => {
     }
 }
 
-export const verifyToken = cache(uncachedVerifyToken)
+export const getUserWalletAddress = async (): Promise<Address | undefined> => {
+    const user = await verifyToken()
+    return user?.wallet?.address as Address | undefined
+}

@@ -5,7 +5,7 @@ import MainContentWrapper from '@/app/_components/main-wrapper'
 
 import BottomBar from '@/app/@bottombar/default'
 import PoolDetails from './pool-details'
-import { POOLSTATUS, type PoolDetailsDTO } from '../_lib/definitions'
+import { PoolDetailsDTO, POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 // Mock the 'server-only' module
 vi.mock('server-only', () => {
@@ -51,7 +51,7 @@ describe('PoolDetailsTest', () => {
         const { queryByTestId } = render(
             <Providers cookie={null}>
                 <MainContentWrapper>
-                    <PoolDetails pool={pool} />
+                    <PoolDetails poolId='1' />
                 </MainContentWrapper>
                 <BottomBar />
             </Providers>,
@@ -86,7 +86,7 @@ describe('PoolDetailsTest', () => {
         const { queryByTestId } = render(
             <Providers cookie={null}>
                 <MainContentWrapper>
-                    <PoolDetails pool={pool} />
+                    <PoolDetails poolId='1' />
                 </MainContentWrapper>
                 <BottomBar />
             </Providers>,

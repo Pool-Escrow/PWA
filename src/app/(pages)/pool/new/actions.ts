@@ -4,9 +4,10 @@ import { db } from '@/app/_server/database/db'
 import { createPoolUseCase } from '@/app/_server/use-cases/pools/create-pool'
 import { CreatePoolFormSchema } from './_lib/definitions'
 import { verifyToken } from '@/app/_server/auth/privy'
-import { getAdminStatusAction, getUserAddressAction } from '../../pools/actions'
+import { getUserAddressAction } from '../../pools/actions'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { fromZonedTime } from 'date-fns-tz'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 
 type FormState = {
     message?: string
@@ -32,7 +33,7 @@ type FormState = {
 export async function createPoolAction(_prevState: FormState, formData: FormData): Promise<FormState> {
     console.log('createPoolAction started')
     const walletAddress = await getUserAddressAction()
-    const isAdmin = await getAdminStatusAction()
+    const isAdmin = await getUserAdminStatusActionWithCookie()
 
     if (!isAdmin) {
         console.log('Unauthorized user')
@@ -145,7 +146,7 @@ export async function updatePoolStatus(
         throw new Error('User not found trying to add as mainhost')
     }
 
-    const isAdmin = await getAdminStatusAction()
+    const isAdmin = await getUserAdminStatusActionWithCookie()
     if (!isAdmin) {
         throw new Error('User is not authorized to delete pools')
     }
@@ -196,7 +197,7 @@ export async function deletePool(poolId: string) {
         throw new Error('User not authenticated')
     }
 
-    const isAdmin = await getAdminStatusAction()
+    const isAdmin = await getUserAdminStatusActionWithCookie()
     if (!isAdmin) {
         throw new Error('User is not authorized to delete pools')
     }

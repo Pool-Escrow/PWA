@@ -1,8 +1,8 @@
-import { getAdminStatusAction } from '@/app/(pages)/pools/actions'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 import Participants from './_components/participants'
 
 export default async function ManageParticipantsPage({ params }: { params: { 'pool-id': string } }) {
-    const isAdmin = await getAdminStatusAction()
+    const isAdmin = await getUserAdminStatusActionWithCookie()
 
     return (
         <div>

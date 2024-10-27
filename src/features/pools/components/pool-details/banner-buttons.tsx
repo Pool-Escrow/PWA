@@ -2,7 +2,7 @@
 
 import { QrCode, EditIcon } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
-import ShareDialog from './share-dialog'
+import ShareDialog from '../dialogs/share'
 import { Button } from '@/app/_components/ui/button'
 import { motion } from 'framer-motion'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'

@@ -16,8 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar
 import { useUserDetails } from '../_components/use-user-details'
 import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
-import { getAdminStatusAction } from '@/app/(pages)/pools/actions'
 import useTransactions from '@/app/_client/hooks/use-transactions'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 
 const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) => {
     const { data: userDetails } = useUserDetails(params['participant-id'])
@@ -64,10 +64,10 @@ const ParticipantPayout = ({ params }: { params: { 'pool-id': string; 'participa
     }
 
     useEffect(() => {
-        getAdminStatusAction().then(isUserAdmin => {
+        getUserAdminStatusActionWithCookie().then(isUserAdmin => {
             setIsAdmin(isUserAdmin)
         })
-    }, [getAdminStatusAction])
+    }, [])
 
     useEffect(() => {
         if (isSuccess) {

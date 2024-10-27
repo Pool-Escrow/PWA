@@ -4,30 +4,14 @@ import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { Button } from '@/app/_components/ui/button'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { usePrivy } from '@privy-io/react-auth'
 import { useQuery } from '@tanstack/react-query'
-
-async function validateAdminStatus() {
-    const response = await fetch('/api/validate-admin', {
-        method: 'GET',
-    })
-    if (!response.ok) {
-        throw new Error('Failed to validate admin status')
-    }
-    return response.json()
-}
 
 export default function RenderBottomBar() {
     const setBottomBar = useAppStore(state => state.setBottomBarContent)
-    const { user } = usePrivy()
 
     const { data: isAdmin, isLoading } = useQuery({
-        queryKey: ['admin-status', user?.id],
-        queryFn: async () => {
-            const { isAdmin } = await validateAdminStatus()
-            return isAdmin
-        },
-        enabled: !!user,
+        queryKey: ['userAdminStatus'],
+        queryFn: () => getUserAdminStatus(),
     })
 
     useEffect(() => {
@@ -49,4 +33,7 @@ export default function RenderBottomBar() {
     if (isLoading) return null
 
     return null
+}
+function getUserAdminStatus(): any {
+    throw new Error('Function not implemented.')
 }

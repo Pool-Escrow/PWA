@@ -9,6 +9,8 @@ import Link from 'next/link'
 import frog from '@/public/app/images/frog.png'
 import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 
 interface PoolItem {
     id: string
@@ -45,6 +47,16 @@ export default function PoolListCard({
     softCap,
 }: PoolItem) {
     const [dateString, setDateString] = useState<string>('Date information unavailable')
+    const queryClient = useQueryClient()
+
+    const prefetch = () => {
+        queryClient.prefetchQuery({
+            queryKey: ['pool-details', id],
+            queryFn: getPoolDetailsById,
+            staleTime: 60000,
+        })
+    }
+
     const statusIndicator = getPoolStatus({ startDate, endDate })
 
     const resolvedImage = image || frog.src
@@ -56,7 +68,7 @@ export default function PoolListCard({
     if (!id) return <PoolCardSkeleton />
 
     return (
-        <Link href={`/pool/${id}`}>
+        <Link href={`/pool/${id}`} onMouseEnter={prefetch} onFocus={prefetch}>
             <motion.div
                 className='flex h-24 items-center gap-[14px] rounded-[1.5rem] bg-[#f4f4f4] p-3 pr-4'
                 whileHover={{ scale: 1.05 }}

@@ -6,9 +6,12 @@ import { toast } from 'sonner'
 import { useDisconnect } from 'wagmi'
 import { useServerActionMutation } from './server-action-hooks'
 import { createUserAction } from '@/server/actions/create-user.action'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function useAuth() {
     const router = useRouter()
+    const queryClient = useQueryClient()
+    const { user } = usePrivy()
 
     const { mutate: createNewUser } = useServerActionMutation(createUserAction, {
         onSuccess: () => {
@@ -37,6 +40,7 @@ export function useAuth() {
     const { logout } = useLogout({
         onSuccess: () => {
             console.log('[use-auth] logout success')
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
             if (connectors.length > 0) {
                 console.log('[use-auth] disconnecting connectors', connectors)
                 disconnect()
@@ -48,6 +52,7 @@ export function useAuth() {
     const { login } = useLogin({
         async onComplete(user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount) {
             console.log('[use-auth] auth complete')
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
 
             if (isNewUser) {
                 router.replace('/profile/new')
