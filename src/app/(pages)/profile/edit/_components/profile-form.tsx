@@ -58,7 +58,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
 
     const [state, formAction] = useFormState(validateProfileAction, initialState)
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         setBottomBarContent(
             <Button
                 type='submit'
