@@ -12,6 +12,7 @@ import Text from '@/app/_components/forms-controls/text.control'
 import AvatarUploader from './avatar-uploader'
 import { validateProfileAction } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
+import { usePrivy } from '@privy-io/react-auth'
 
 const formFields = [
     {
@@ -49,6 +50,7 @@ interface ProfilePageProps {
 export default function ProfileForm({ userInfo }: ProfilePageProps) {
     const queryClient = useQueryClient()
     const router = useRouter()
+    const { user } = usePrivy()
     const { setBottomBarContent } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
     }))
@@ -78,7 +80,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
 
         if (state?.message === 'Profile updated successfully') {
             queryClient.invalidateQueries({
-                queryKey: ['userInfo'],
+                queryKey: ['user-info', user?.id],
             })
             router.back()
         }
