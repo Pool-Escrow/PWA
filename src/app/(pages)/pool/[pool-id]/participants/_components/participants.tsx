@@ -14,11 +14,12 @@ import ParticipantList from './participantsList'
 import { useSetWinners } from './use-set-winners'
 import { toast } from 'sonner'
 import PoolBalanceProgress from './pool-balance-progress'
+import { usePoolDetails } from '../../ticket/_components/use-pool-details'
+import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 
 interface PoolParticipantsProps {
     poolId: string
     isAdmin: boolean
-    poolData: PoolDetailsDTO
 }
 
 export enum TabValue {
@@ -27,19 +28,21 @@ export enum TabValue {
     Winners = 'winners',
 }
 
-const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
+const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     const { setBottomBarContent } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
     }))
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
+    const poolData = usePoolDetails(poolId)
     const [currentTab, setCurrentTab] = useState(TabValue.Registered)
 
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
     const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
     const [totalSavedPayout, setTotalSavedPayout] = useState<string>('0')
-
+    const tokenAddress = poolData?.poolDetails?.poolDetailFromSC?.[4]
+    const tokenDecimals = useTokenDecimals(tokenAddress || '16').tokenDecimalsData.tokenDecimals
     const filteredParticipants = useMemo(() => {
         return (
             participants?.filter(
@@ -154,12 +157,16 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                             <PoolBalanceProgress
                                 current={Number(
                                     formatUnits(
-                                        BigInt(poolData.poolBalance) - BigInt(totalSavedPayout),
-                                        poolData.tokenDecimals,
+                                        BigInt(poolData?.poolDetails?.poolDetailFromSC?.[2]?.balance ?? 0) -
+                                            BigInt(totalSavedPayout),
+                                        tokenDecimals,
                                     ),
                                 )}
                                 deposits={Number(
-                                    formatUnits(BigInt(poolData.totalDeposits), poolData.tokenDecimals),
+                                    formatUnits(
+                                        BigInt(poolData?.poolDetails?.poolDetailFromSC?.[2]?.totalDeposits ?? 0),
+                                        tokenDecimals,
+                                    ),
                                 )}></PoolBalanceProgress>
                         </div>
                     )}
@@ -168,7 +175,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
                         poolId={poolId}
                         isAdmin={isAdmin}
                         tabValue={currentTab}
-                        poolData={poolData}
+                        tokenDecimals={tokenDecimals}
                     />
                 </Tabs>
             </div>

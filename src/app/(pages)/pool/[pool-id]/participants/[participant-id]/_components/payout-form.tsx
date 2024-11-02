@@ -23,9 +23,6 @@ interface PayoutFormProps {
 }
 
 const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAddress }) => {
-    const { setTopBarTitle } = useAppStore(s => ({
-        setTopBarTitle: s.setTopBarTitle,
-    }))
     const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess } = useWriteContract()
     const { executeTransactions } = useTransactions()
@@ -66,10 +63,6 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
             console.log('setWinner Error', error)
         }
     }
-    useEffect(() => {
-        setTopBarTitle('User Profile')
-        return () => setTopBarTitle(null)
-    }, [setTopBarTitle])
 
     useEffect(() => {
         const savedPayout = getPayoutForParticipant(poolId.toString(), participantId)

@@ -24,35 +24,17 @@ interface Participant {
     avatar: string
     displayName: string
     checkedInAt: string | undefined | null
-    // amountWon: number
-    // amountClaimed: number
+    amountWon: number
+    amountClaimed: number
 }
 
-const fetchUserDetails = async (address: Address): Promise<ParticipantStatus | null> => {
+const fetchUserDetails = async (address: Address) => {
     const supabase = getSupabaseBrowserClient()
-
-    const { data, error }: PostgrestSingleResponse<ParticipantStatus> = await supabase
-        .from('pool_participants')
-        .select(
-            `
-            status,
-            checked_in_at,
-            users (
-                avatar,
-                displayName,
-                walletAddress
-            )
-        `,
-        )
-        .eq('users.walletAddress', address)
-        .limit(1)
+    const { data } = await supabase
+        .from('users')
+        .select('id, avatar, displayName, walletAddress')
+        .eq('walletAddress', address)
         .single()
-
-    if (error) {
-        console.error(`Error fetching details for address ${address}:`, error)
-        return null
-    }
-
     return data
 }
 
@@ -60,7 +42,7 @@ const fetchPoolParticipants = async (userId: number, poolId: string) => {
     const supabase = getSupabaseBrowserClient()
     const { data, error } = await supabase
         .from('pool_participants')
-        .select('user_id, pool_id, checked_in_at')
+        .select('user_id, pool_id, checked_in_at, status')
         .eq('user_id', userId)
         .eq('pool_id', poolId)
         .maybeSingle()
@@ -83,16 +65,34 @@ export const useParticipants = (poolId: string) => {
 
             const participantDetails: Participant[] = await Promise.all(
                 participants.map(async (address: Address) => {
-                    const participantStatus = await fetchUserDetails(address)
+                    const userDetails = await fetchUserDetails(address)
+                    // const participantStatus = await fetchPoolParticipants(userDetails?.id, poolId)
+                    const winnerDetails = await fetchWinnerDetail({
+                        queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
+                    })
+                    let amountWon = winnerDetails.winnerDetailFromSC.amountWon
+                    let amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
+
+                    let checkedInAt = undefined
+                    let status = undefined
+                    if (userDetails && userDetails.id) {
+                        const poolParticipants = await fetchPoolParticipants(userDetails.id, poolId)
+                        checkedInAt = poolParticipants?.['checked_in_at']
+                        status = poolParticipants?.status
+                    }
+
                     return {
                         address,
-                        avatar: participantStatus?.users?.avatar ?? blo(address || '0x'),
-                        displayName: participantStatus?.users?.displayName ?? formatAddress(address),
-                        status: participantStatus?.status || 'JOINED',
-                        checkedInAt: participantStatus?.checked_in_at || null,
+                        avatar: userDetails?.avatar ?? blo(address || '0x'),
+                        displayName: userDetails?.displayName ?? formatAddress(address),
+                        status: status || 'JOINED',
+                        checkedInAt: checkedInAt,
+                        amountWon: Number(amountWon),
+                        amountClaimed: Number(amountClaimed),
                     }
                 }),
             )
+            console.log('participantDetails', participantDetails)
 
             return participantDetails
         },

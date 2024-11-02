@@ -20,6 +20,8 @@ import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 import { blo } from 'blo'
 import PageWrapper from '@/components/page-wrapper'
 import UserMenu from '@/components/user-menu'
+import PayoutForm from './_components/payout-form'
+import { useParticipants } from '@/hooks/use-participants'
 
 type Props = {
     params: {
@@ -35,43 +37,9 @@ const ParticipantPayout = ({ params }: Props) => {
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? currentTokenAddress
 
-    const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
     const { data: hash, isPending, isSuccess } = useWriteContract()
-    const { executeTransactions } = useTransactions()
 
-    const inputRef = useRef<HTMLInputElement | null>(null)
-    const [inputValue, setInputValue] = useState<string>('0')
     const [isAdmin, setIsAdmin] = useState<boolean>(false)
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.target.value)
-    }
-
-    const onPayoutButtonClicked = () => {
-        const SetWinnerFunction = getAbiItem({
-            abi: poolAbi,
-            name: 'setWinner',
-        })
-        console.log('tokenDecimals', tokenDecimalsData.tokenDecimals)
-        const winnerAmount = parseUnits(inputValue, tokenDecimalsData.tokenDecimals)
-
-        const args = [
-            {
-                address: currentPoolAddress,
-                abi: [SetWinnerFunction],
-                functionName: SetWinnerFunction.name,
-                args: [BigInt(poolId), participantId, winnerAmount],
-            },
-        ]
-
-        console.log('executeTransactions', args, poolId, participantId, winnerAmount)
-
-        try {
-            executeTransactions(args)
-        } catch (error) {
-            console.log('setWinner Error', error)
-        }
-    }
 
     useEffect(() => {
         getUserAdminStatusActionWithCookie().then(isUserAdmin => {
@@ -87,7 +55,10 @@ const ParticipantPayout = ({ params }: Props) => {
 
     const avatar = userDetails?.avatar ?? blo(participantId)
     const displayName = userDetails?.displayName ?? formatAddress(participantId)
+    const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])
 
+    const currentParticipant = participants?.find(participant => participant.address === params['participant-id'])
+    const isCheckedIn = currentParticipant?.checkedInAt != null
     if (!isAdmin) {
         return <div className={'mt-4 w-full text-center'}>You are not authorized to create a payout.</div>
     }
@@ -105,32 +76,18 @@ const ParticipantPayout = ({ params }: Props) => {
                             {displayName}
                         </h3>
                     </div>
-                    <div className='mb-4 flex flex-row justify-center'>
-                        <p>Checked in</p>
+                    <div className='flex flex-row justify-center'>
+                        {isCheckedIn ? (
+                            <p className='font-medium text-[#6993FF]'>Checked in</p>
+                        ) : (
+                            <p className='text-[#B2B2B2]'>Registered</p>
+                        )}
                     </div>
-                    <div className='mt-2 flex h-16 flex-row justify-center'>
-                        <div className='relative flex justify-center'>
-                            <Input
-                                className={cn(
-                                    'h-24 w-auto border-none text-center text-6xl font-bold focus:outline-none',
-                                )}
-                                placeholder='$'
-                                autoFocus={true}
-                                value={inputValue}
-                                type='number'
-                                onChange={handleInputChange}
-                                ref={inputRef}
-                                inputMode='numeric'
-                            />
-                        </div>
-                    </div>
-                    <div className='mt-8 flex w-full flex-col items-center justify-center space-y-2'>
-                        <Button
-                            onClick={onPayoutButtonClicked}
-                            className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                            Payout
-                        </Button>
-                    </div>
+                    <PayoutForm
+                        poolId={params['pool-id']}
+                        participantId={params['participant-id']}
+                        tokenAddress={tokenAddress}
+                    />
                 </div>
             </div>
         </PageWrapper>

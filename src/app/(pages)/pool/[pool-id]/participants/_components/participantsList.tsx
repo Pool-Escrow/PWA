@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import ParticipantCard from './participantCard'
 import { useParticipants } from '@/hooks/use-participants'
-import { PoolDetailsDTO } from '../../_lib/definitions'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { TabValue } from './participants'
 
@@ -12,13 +11,13 @@ const ParticipantList = ({
     poolId,
     isAdmin,
     tabValue,
-    poolData,
+    tokenDecimals,
 }: {
     participants: ReturnType<typeof useParticipants>['data']
     poolId: string
     isAdmin: boolean
     tabValue: TabValue
-    poolData: PoolDetailsDTO
+    tokenDecimals: number
 }) => {
     const [savedPayouts, setSavedPayouts] = useState<Record<string, any>>({})
 
@@ -88,7 +87,7 @@ const ParticipantList = ({
                         isAdmin={isAdmin}
                         wonAmount={participant.amountWon}
                         claimedAmount={participant.amountClaimed}
-                        tokenDecimals={poolData.tokenDecimals}
+                        tokenDecimals={tokenDecimals}
                     />
                 ))
             ) : (
