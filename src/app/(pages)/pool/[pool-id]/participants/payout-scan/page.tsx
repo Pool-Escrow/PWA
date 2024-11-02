@@ -1,9 +1,11 @@
+import PageWrapper from '@/components/page-wrapper'
+
 export default function PayoutScanPage() {
-	return (
-		<div>
-			<h1>ScanQR</h1>
-		</div>
-	)
+    return (
+        <PageWrapper topBarProps={{ title: 'Scan to Payout', backButton: true }}>
+            <h1>ScanQR</h1>
+        </PageWrapper>
+    )
 }
 
 // import Appbar from '@/components/appbar'

@@ -2,8 +2,8 @@ import { getFormattedEventTime } from '@/app/_lib/utils/get-relative-date'
 
 interface PoolDetailsHeadingProps {
     name: string
-    startDate: string
-    endDate: string
+    startDate: Date
+    endDate: Date
     hostName: string
 }
 

@@ -11,7 +11,6 @@ export type AppStore = AppState & AppActions
 
 export const initAppStore = (): AppState => ({
     // Settings state
-    topBarTitle: null,
     bottomBarContent: null,
     myPoolsTab: 'upcoming',
     transactionInProgress: false,

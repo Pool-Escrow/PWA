@@ -13,6 +13,7 @@ const ImageUploader = dynamic(() => import('@/app/_components/forms-controls/ima
 const NumberControl = dynamic(() => import('@/app/_components/forms-controls/number.control'), { ssr: false })
 const TextArea = dynamic(() => import('@/app/_components/forms-controls/text-area.control'), { ssr: false })
 const Text = dynamic(() => import('@/app/_components/forms-controls/text.control'), { ssr: false })
+const Switch = dynamic(() => import('@/app/_components/forms-controls/switch.control'), { ssr: false })
 
 export const formFields = [
     {
@@ -60,9 +61,16 @@ export const formFields = [
     {
         key: 'termsURL',
         name: 'termsURL',
-        label: 'Link To Rules, Terms, and Conditions',
-        description: 'Paste a link to your rules',
+        label: 'Link to T&C, rules, or Code of Conduct',
+        description: 'Paste a link to the pool terms document',
         component: Text,
+    },
+    {
+        key: 'requiredAcceptance',
+        name: 'requiredAcceptance',
+        label: 'Required Acceptance',
+        description: 'Select if participants must accept the rules, terms, and conditions',
+        component: Switch,
     },
 ] as const
 

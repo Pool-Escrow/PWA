@@ -1,14 +1,31 @@
-import { getPoolDetailsUseCase } from '@/app/_server/use-cases/pools/get-pool-details'
-import PoolDetails from './_components/pool-details'
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
+import { getPoolDetailsById } from '@/features/pools/server/db/pools'
+import PoolDetails from '@/features/pools/pages/pool-details'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import PageWrapper from '@/components/page-wrapper'
 
-export default async function PoolPage({ params }: { params: { 'pool-id': string } }) {
-    const poolDetails = await getPoolDetailsUseCase(params['pool-id'])
+type Props = {
+    params: { 'pool-id': string }
+}
 
-    const data = {
-        pool: poolDetails,
-    }
-    console.log('page for pool', params['pool-id'])
-    console.log('data loaded', data)
+export default async function PoolDetailsPage({ params: { 'pool-id': poolId } }: Props) {
+    const queryClient = new QueryClient()
 
-    return data?.pool && <PoolDetails pool={data.pool} />
+    queryClient.prefetchQuery({
+        queryKey: ['pool-details', poolId],
+        queryFn: getPoolDetailsById,
+    })
+
+    queryClient.prefetchQuery({
+        queryKey: ['userAdminStatus'],
+        queryFn: () => getUserAdminStatusActionWithCookie(),
+    })
+
+    return (
+        <PageWrapper topBarProps={{ title: 'Pool Details', backButton: true }}>
+            <HydrationBoundary state={dehydrate(queryClient)}>
+                <PoolDetails poolId={poolId} />
+            </HydrationBoundary>
+        </PageWrapper>
+    )
 }

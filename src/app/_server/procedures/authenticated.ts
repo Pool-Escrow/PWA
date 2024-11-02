@@ -11,10 +11,13 @@ export const authenticatedProcedure = createServerActionProcedure().handler(asyn
         if (!user) {
             throw new AuthenticationError('Authenticated user not found')
         }
-        // todo: create a rate limited procedure
+
+        // User-based rate limiting
         rateLimitByKey(`${user.id}-global`, 10, 10_000)
+
         return { user }
     } catch (error) {
+        console.error('Authentication procedure failed:', error)
         throw error
     }
 })

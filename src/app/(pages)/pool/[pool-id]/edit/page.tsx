@@ -1,7 +1,9 @@
+import PageWrapper from '@/components/page-wrapper'
+
 export default function EditPoolPage() {
-	return (
-		<div>
-			<h1>Edit Pool</h1>
-		</div>
-	)
+    return (
+        <PageWrapper topBarProps={{ title: 'Edit Pool', backButton: true }}>
+            <h1>Edit Pool</h1>
+        </PageWrapper>
+    )
 }

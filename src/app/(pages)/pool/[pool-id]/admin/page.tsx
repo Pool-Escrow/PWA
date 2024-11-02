@@ -1,6 +1,7 @@
 'use client'
 
 import { formatTimeDiff } from '@/app/_lib/utils/date-time'
+import PageWrapper from '@/components/page-wrapper'
 import type { Database } from '@/types/db'
 import { usePrivy, useWallets } from '@privy-io/react-auth'
 import { useQueryClient } from '@tanstack/react-query'
@@ -179,7 +180,9 @@ const AdminPoolPage = () => {
     //     return <></>
     // }
     return (
-        <div>WTF IS THIS</div>
+        <PageWrapper topBarProps={{ title: 'Admin', backButton: true }}>
+            <div>Admin Page</div>
+        </PageWrapper>
         // <Page>
         //     <Section>
         //         <div className='flex w-full flex-col items-center justify-center'>

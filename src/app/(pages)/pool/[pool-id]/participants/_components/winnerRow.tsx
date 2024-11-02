@@ -1,13 +1,12 @@
 export default function WinnerRow() {
-	return (
-		<div>
-			<h1>Winner Row</h1>
-		</div>
-	)
+    return (
+        <div>
+            <h1>Winner Row</h1>
+        </div>
+    )
 }
 
 // import circleTick from '@/public/images/circle-tick.svg'
-// import frogImage from '@/public/images/frog.png'
 
 // import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
 // import { useQuery } from '@tanstack/react-query'
@@ -51,7 +50,7 @@ export default function WinnerRow() {
 // 				alt='profile image'
 // 				height={56}
 // 				width={56}
-// 				src={`${profileData?.profileImageUrl ?? frogImage.src}`}
+// 				src={`${profileData?.profileImageUrl ?? blo(address)}`}
 // 				className=' flex rounded-full w-14 h-14 object-cover'
 // 			/>
 // 			<div className='flex flex-1 flex-col '>

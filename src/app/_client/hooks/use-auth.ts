@@ -6,9 +6,12 @@ import { toast } from 'sonner'
 import { useDisconnect } from 'wagmi'
 import { useServerActionMutation } from './server-action-hooks'
 import { createUserAction } from '@/server/actions/create-user.action'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function useAuth() {
     const router = useRouter()
+    const queryClient = useQueryClient()
+    const { user } = usePrivy()
 
     const { mutate: createNewUser } = useServerActionMutation(createUserAction, {
         onSuccess: () => {
@@ -34,20 +37,35 @@ export function useAuth() {
         },
     })
 
-    const { logout } = useLogout({
+    const { logout: privyLogout } = useLogout({
         onSuccess: () => {
             console.log('[use-auth] logout success')
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
             if (connectors.length > 0) {
                 console.log('[use-auth] disconnecting connectors', connectors)
                 disconnect()
             }
-            router.replace('/')
         },
     })
+
+    // Create a wrapper function that handles both logout and navigation
+    const handleLogout = async () => {
+        try {
+            await privyLogout()
+            console.log('[use-auth] navigation after logout')
+            router.replace('/')
+            router.refresh()
+            return true
+        } catch (error) {
+            console.error('[use-auth] logout error:', error)
+            throw error
+        }
+    }
 
     const { login } = useLogin({
         async onComplete(user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount) {
             console.log('[use-auth] auth complete')
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
 
             if (isNewUser) {
                 router.replace('/profile/new')
@@ -110,5 +128,10 @@ export function useAuth() {
 
     const { ready, authenticated } = usePrivy()
 
-    return { login, logout, authenticated: ready && authenticated, ready }
+    return {
+        login,
+        logout: handleLogout,
+        authenticated: ready && authenticated,
+        ready,
+    }
 }

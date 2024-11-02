@@ -1,5 +1,5 @@
 import { useWallets } from '@privy-io/react-auth'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import type { Hash, TransactionReceipt } from 'viem'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { useCallsStatus, useWriteContracts } from 'wagmi/experimental'
@@ -58,6 +58,8 @@ export default function useTransactions() {
 
     const [isConfirmed, setIsConfirmed] = useState(false)
 
+    const transactionInProgressRef = useRef(false)
+
     useEffect(() => {
         if (callsStatus?.status === 'CONFIRMED' && callsStatus.receipts && callsStatus.receipts.length > 0) {
             const paymasterReceipt = callsStatus.receipts[0]
@@ -87,33 +89,57 @@ export default function useTransactions() {
         }
     }, [hash])
 
-    async function executeCoinbaseTransactions(contractCalls: ContractCall[]) {
-        console.log('Executing smart transactions', contractCalls)
-        await writeContractsAsync(
-            {
-                contracts: contractCalls,
-                capabilities: {
-                    paymasterService: {
-                        url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+    const executeCoinbaseTransactions = useCallback(
+        async (contractCalls: ContractCall[]) => {
+            if (transactionInProgressRef.current) return
+            transactionInProgressRef.current = true
+
+            console.log('Executing smart transactions', contractCalls)
+            try {
+                await writeContractsAsync(
+                    {
+                        contracts: contractCalls,
+                        capabilities: {
+                            paymasterService: {
+                                url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+                            },
+                        },
+                        chainId: base.id,
                     },
-                },
-                chainId: baseSepolia.id,
-            },
-            {
-                onSettled(data, error, variables, context) {
-                    console.log('Transaction settled', data, error, variables, context)
-                },
-            },
-        )
-    }
+                    {
+                        onSettled(data, error, variables, context) {
+                            console.log('Transaction settled', data, error, variables, context)
+                            transactionInProgressRef.current = false
+                        },
+                    },
+                )
+            } catch (error) {
+                console.error('Error executing Coinbase transaction:', error)
+                transactionInProgressRef.current = false
+            }
+        },
+        [writeContractsAsync],
+    )
 
-    async function executeEoaTransactions(contractCalls: ContractCall[]) {
-        console.log('Executing EOA transactions', contractCalls)
-        await writeContractAsync(contractCalls[0])
-    }
+    const executeEoaTransactions = useCallback(
+        async (contractCalls: ContractCall[]) => {
+            if (transactionInProgressRef.current) return
+            transactionInProgressRef.current = true
 
-    return {
-        executeTransactions: async (contractCalls: ContractCall[]) => {
+            console.log('Executing EOA transactions', contractCalls)
+            try {
+                await writeContractAsync(contractCalls[0])
+            } catch (error) {
+                console.error('Error executing EOA transaction:', error)
+            } finally {
+                transactionInProgressRef.current = false
+            }
+        },
+        [writeContractAsync],
+    )
+
+    const executeTransactions = useCallback(
+        async (contractCalls: ContractCall[]) => {
             console.log('Executing transactions', contractCalls)
             if (walletType === 'coinbase_wallet') {
                 console.log('Coinbase wallet detected', wallets[0].connectorType)
@@ -123,6 +149,11 @@ export default function useTransactions() {
                 await executeEoaTransactions(contractCalls)
             }
         },
+        [walletType, wallets, executeCoinbaseTransactions, executeEoaTransactions],
+    )
+
+    return {
+        executeTransactions,
         isConfirmed,
         resetConfirmation,
         isPending: isPaymasterPending,

@@ -28,9 +28,8 @@ export enum TabValue {
 }
 
 const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
-    const { setBottomBarContent, setTopBarTitle } = useAppStore(s => ({
+    const { setBottomBarContent } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
-        setTopBarTitle: s.setTopBarTitle,
     }))
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
@@ -50,15 +49,6 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
             ) || []
         )
     }, [participants, query])
-
-    useEffect(() => {
-        if (isAdmin) {
-            setTopBarTitle('Manage Participants')
-        } else {
-            setTopBarTitle('Participants')
-        }
-        return () => setTopBarTitle(null)
-    }, [setTopBarTitle, isAdmin])
 
     useEffect(() => {
         const allPayouts = usePayoutStore.getState().payouts[poolId] || []
@@ -134,7 +124,7 @@ const Participants = ({ poolId, isAdmin, poolData }: PoolParticipantsProps) => {
     if (error) return <div>Error loading participants</div>
 
     return (
-        <div className='mx-auto max-w-md overflow-hidden rounded-lg bg-white'>
+        <div className='overflow-hidden rounded-lg bg-white'>
             <div className='p-4'>
                 <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
                 <Tabs

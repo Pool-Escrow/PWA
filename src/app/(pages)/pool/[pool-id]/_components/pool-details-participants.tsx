@@ -1,10 +1,11 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Avatars from './avatars'
 import Link from 'next/link'
+import { Address } from 'viem'
 
 interface PoolDetailsParticipantsProps {
     numParticipants: number
-    avatarUrls: string[]
+    avatarUrls: Array<{ url?: string; address: Address }>
     poolId: string
 }
 

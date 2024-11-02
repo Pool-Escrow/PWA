@@ -2,7 +2,7 @@ import { render } from '@testing-library/react'
 import RenderBottomBar from './render-bottom-bar'
 import { Providers } from '@/app/_client/providers'
 import '@testing-library/jest-dom'
-import MainContentWrapper from '@/app/_components/main-wrapper'
+import MainWrapper from '@/app/_components/main-wrapper'
 
 import BottomBar from '@/app/@bottombar/default'
 
@@ -11,9 +11,9 @@ describe('RenderBottomBar', () => {
     it.todo('should render the "Create Pool" button when user is admin', async () => {
         const container = render(
             <Providers cookie={null}>
-                <MainContentWrapper>
+                <MainWrapper>
                     <RenderBottomBar />
-                </MainContentWrapper>
+                </MainWrapper>
                 <BottomBar />
             </Providers>,
         )
@@ -24,9 +24,9 @@ describe('RenderBottomBar', () => {
     it.todo('should not render the "Create Pool" button when user is not admin', () => {
         const { queryByTestId } = render(
             <Providers cookie={null}>
-                <MainContentWrapper>
+                <MainWrapper>
                     <RenderBottomBar />
-                </MainContentWrapper>
+                </MainWrapper>
                 <BottomBar />
             </Providers>,
         )

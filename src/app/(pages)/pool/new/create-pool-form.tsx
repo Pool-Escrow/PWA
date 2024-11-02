@@ -22,10 +22,11 @@ export default function CreatePoolForm() {
         handleRetry,
         handleRetryDialogClose,
         isDesktop,
+        poolUpdated,
+        hasAttemptedChainCreation,
     } = useCreatePool()
-    const { setBottomBarContent, setTopBarTitle, setTransactionInProgress } = useAppStore(s => ({
+    const { setBottomBarContent, setTransactionInProgress } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
-        setTopBarTitle: s.setTopBarTitle,
         setTransactionInProgress: s.setTransactionInProgress,
     }))
     const hasCreatedPool = useRef(false)
@@ -75,7 +76,7 @@ export default function CreatePoolForm() {
 
     useEffect(() => {
         console.log('Effect: Setting up bottom bar content')
-        setTopBarTitle('Create Pool')
+        // TODO: Set top bar title: Create Pool
         setBottomBarContent(
             <Button
                 type='submit'
@@ -98,12 +99,10 @@ export default function CreatePoolForm() {
         setTransactionInProgress(isPending || isConfirming)
 
         return () => {
-            setTopBarTitle(null)
             setBottomBarContent(null)
         }
     }, [
         setBottomBarContent,
-        setTopBarTitle,
         setTransactionInProgress,
         isPending,
         isConfirming,
@@ -116,8 +115,16 @@ export default function CreatePoolForm() {
         console.log('Effect: Checking pool creation status', {
             message: state.message,
             internalPoolId: state.internalPoolId,
+            poolUpdated,
+            hasAttemptedChainCreation,
         })
-        if (state.message === 'Pool created successfully' && state.internalPoolId && !hasCreatedPool.current) {
+        if (
+            state.message === 'Pool created successfully' &&
+            state.internalPoolId &&
+            !hasCreatedPool.current &&
+            !poolUpdated &&
+            !hasAttemptedChainCreation
+        ) {
             console.log('Pool created successfully, calling createPoolOnChain')
             hasCreatedPool.current = true
             createPoolOnChain()
@@ -125,8 +132,9 @@ export default function CreatePoolForm() {
         if (state.message?.includes('Error')) {
             console.log('Pool creation failed:', state.message)
             setIsSubmitting(false)
+            hasCreatedPool.current = false // Reset this here
         }
-    }, [state.message, state.internalPoolId, createPoolOnChain])
+    }, [state.message, state.internalPoolId, createPoolOnChain, poolUpdated, hasAttemptedChainCreation])
 
     return (
         <>

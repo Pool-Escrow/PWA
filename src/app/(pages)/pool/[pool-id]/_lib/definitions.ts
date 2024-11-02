@@ -47,6 +47,7 @@ const PoolDetailsDTOSchema = z.object({
     // Calculated fields
     goal: z.number().nonnegative(),
     progress: z.number().nonnegative(),
+    requiredAcceptance: z.boolean(),
 })
 
 // Derived type from Zod schema

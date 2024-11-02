@@ -3,13 +3,11 @@ import Link from 'next/link'
 
 function PoolDetailsTermsUrl({ termsUrl }: { termsUrl: string }) {
     return (
-        <Link href={termsUrl} passHref legacyBehavior>
-            <a target='_blank' rel='external noopener noreferrer nofollow' className='self-center'>
-                <div className='mt-4 inline-flex w-full justify-between'>
-                    {termsUrl}
-                    <ExternalLinkIcon className='size-4' />
-                </div>
-            </a>
+        <Link href={termsUrl} target='_blank' rel='external noopener noreferrer nofollow'>
+            <div className='inline-flex w-full justify-between self-center'>
+                Terms and conditions
+                <ExternalLinkIcon className='size-4' />
+            </div>
         </Link>
     )
 }

@@ -1,4 +1,3 @@
-// import frog from '@/../public/images/frog.png'
 // import { Badge } from '@/components/ui/badge'
 // import { usePoolDetailsDB } from '@/lib/hooks/use-pool-details-db'
 // import { useTokenDecimals } from '@/lib/hooks/use-token-decimals'
@@ -33,7 +32,7 @@ const PoolCardRow = ({ poolId }: PoolCardRowProps) => {
     return (
         <div>PoolRow</div>
         // <div className='flex items-center justify-start gap-[10px]'>
-        //     <PoolCardRowImage image={poolDetailsDB?.poolImageUrl ?? frog.src} />
+        //     <PoolCardRowImage image={poolDetailsDB?.poolImageUrl ?? blo(address)} />
         //     <div className='flex-1'>
         //         <div className='overflow-hidden text-ellipsis text-nowrap text-xs font-medium text-black'>
         //             {poolDetailsDB?.poolDBInfo?.name}

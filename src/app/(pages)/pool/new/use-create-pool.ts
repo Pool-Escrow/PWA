@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { parseEther, Hash, parseEventLogs, ContractFunctionExecutionError } from 'viem'
+import { Hash, parseEventLogs, ContractFunctionExecutionError, parseUnits } from 'viem'
 import { createPoolAction, deletePool, updatePoolStatus } from './actions'
 import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { useWaitForTransactionReceipt } from 'wagmi'
@@ -21,6 +21,7 @@ const initialState = {
         price: [],
         softCap: [],
         termsURL: [],
+        requiredAcceptance: [],
     },
     internalPoolId: undefined,
     poolData: undefined,
@@ -53,6 +54,7 @@ export function useCreatePool() {
     const [transactionProcessed, setTransactionProcessed] = useState(false)
     const [hasAttemptedChainCreation, setHasAttemptedChainCreation] = useState(false)
     const [poolUpdated, setPoolUpdated] = useState(false)
+    const createPoolOnChainRef = useRef<(() => void) | null>(null)
 
     const createPoolOnChain = useCallback(() => {
         if (!state.internalPoolId || !state.poolData || hasAttemptedChainCreation) {
@@ -70,7 +72,7 @@ export function useCreatePool() {
                 BigInt(startDate / 1000), // is important to convert to seconds
                 BigInt(endDate / 1000),
                 name,
-                parseEther(price),
+                parseUnits(price, 6),
                 1000, // TODO: implement max participants
                 currentTokenAddress,
             ],
@@ -96,8 +98,11 @@ export function useCreatePool() {
             })
             .finally(() => {
                 isCreatingPool.current = false
+                setHasAttemptedChainCreation(false) // Reset this here
             })
     }, [state.internalPoolId, state.poolData, executeTransactions, setStep, setError, hasAttemptedChainCreation])
+
+    createPoolOnChainRef.current = createPoolOnChain
 
     const handleCancellation = useCallback(async () => {
         if (!state.internalPoolId) return
@@ -191,6 +196,7 @@ export function useCreatePool() {
                 .finally(() => {
                     setPoolUpdated(false)
                     setTransactionProcessed(false)
+                    setHasAttemptedChainCreation(false) // Reset this here as well
                 })
         } else {
             setError('Failed to find pool creation event')
@@ -200,6 +206,7 @@ export function useCreatePool() {
             })
             setTransactionProcessed(false)
             setPoolUpdated(false)
+            setHasAttemptedChainCreation(false) // Reset this here too
         }
     }, [
         isConfirmed,
@@ -248,7 +255,7 @@ export function useCreatePool() {
     return {
         formAction,
         state,
-        createPoolOnChain,
+        createPoolOnChain: () => createPoolOnChainRef.current?.(),
         isPending: txResult.isLoading,
         isConfirming,
         callsStatus: txResult.callsStatus,
@@ -263,5 +270,7 @@ export function useCreatePool() {
         isDesktop,
         isWaitingForRetry,
         transactionProcessed,
+        poolUpdated,
+        hasAttemptedChainCreation,
     }
 }

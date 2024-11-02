@@ -116,6 +116,7 @@ export type Database = {
             pools: {
                 Row: {
                     bannerImage: string
+                    code_of_conduct_url: string | null
                     contract_id: number | null
                     createdAt: string
                     description: string
@@ -123,6 +124,7 @@ export type Database = {
                     internal_id: number
                     name: string
                     price: number
+                    required_acceptance: boolean
                     softCap: number
                     startDate: string
                     status: Database['public']['Enums']['poolStatus']
@@ -132,6 +134,7 @@ export type Database = {
                 }
                 Insert: {
                     bannerImage: string
+                    code_of_conduct_url?: string | null
                     contract_id?: number | null
                     createdAt?: string
                     description: string
@@ -139,6 +142,7 @@ export type Database = {
                     internal_id?: never
                     name: string
                     price: number
+                    required_acceptance?: boolean
                     softCap: number
                     startDate: string
                     status?: Database['public']['Enums']['poolStatus']
@@ -148,6 +152,7 @@ export type Database = {
                 }
                 Update: {
                     bannerImage?: string
+                    code_of_conduct_url?: string | null
                     contract_id?: number | null
                     createdAt?: string
                     description?: string
@@ -155,6 +160,7 @@ export type Database = {
                     internal_id?: never
                     name?: string
                     price?: number
+                    required_acceptance?: boolean
                     softCap?: number
                     startDate?: string
                     status?: Database['public']['Enums']['poolStatus']

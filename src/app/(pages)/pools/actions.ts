@@ -32,13 +32,18 @@ export const getTokenBalanceAction = async () => {
     return getAddressBalanceUseCase(address)
 }
 
-export const getAdminStatusAction = async () => {
-    // authenticatedProcedure.createServerAction().handler(async ({ ctx: { user } }) => {
-    const user = await verifyToken()
+// export const getAdminStatusAction = async () => {
+//     // authenticatedProcedure.createServerAction().handler(async ({ ctx: { user } }) => {
+//     const user = await verifyToken()
 
-    const address = user?.wallet?.address as Address
-    return isAdminUseCase(address)
-}
+//     console.log('[getAdminStatusAction] user', user?.id)
+
+//     const address = user?.wallet?.address as Address
+
+//     console.log('[getAdminStatusAction] address', address)
+
+//     return isAdminUseCase(address)
+// }
 
 export const getUserAddressAction = async () => {
     // authenticatedProcedure.createServerAction().handler(async ({ ctx: { user } }) => {

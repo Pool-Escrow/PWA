@@ -1,22 +1,15 @@
-/**
- * @file src/app/my-pools/page.tsx
- * @description This file initiates the participant pools page rendering.
- */
-
 import MyPools from './_components/my-pools'
 import { getMyPoolsPageAction } from './actions'
-import { AuthenticatedGuard } from '@/components/authenticated-guard'
 import RenderBottomBar from '../pools/_components/render-bottom-bar'
+import PageWrapper from '@/components/page-wrapper'
 
 export default async function MyPoolsPage() {
     const { upcomingPools, pastPools } = await getMyPoolsPageAction()
 
     return (
-        <>
+        <PageWrapper topBarProps={{ backButton: true, title: 'My Pools' }}>
             <MyPools initialUpcomingPools={upcomingPools} initialPastPools={pastPools} />
-            <AuthenticatedGuard loading={null}>
-                <RenderBottomBar />
-            </AuthenticatedGuard>
-        </>
+            <RenderBottomBar />
+        </PageWrapper>
     )
 }

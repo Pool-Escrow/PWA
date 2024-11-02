@@ -9,9 +9,9 @@ import { toast } from 'sonner'
 import { Tables } from '@/types/db'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import Text from '@/app/_components/forms-controls/text.control'
-import getQueryClientConfig from '@/app/_client/providers/configs/query-client.config'
 import AvatarUploader from './avatar-uploader'
 import { validateProfileAction } from '../actions'
+import { useQueryClient } from '@tanstack/react-query'
 
 const formFields = [
     {
@@ -47,11 +47,10 @@ interface ProfilePageProps {
 }
 
 export default function ProfileForm({ userInfo }: ProfilePageProps) {
+    const queryClient = useQueryClient()
     const router = useRouter()
-    const { setBottomBarContent, setTopBarTitle, topBarTitle } = useAppStore(s => ({
+    const { setBottomBarContent } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
-        setTopBarTitle: s.setTopBarTitle,
-        topBarTitle: s.topBarTitle,
     }))
     const [avatarChanged, setAvatarChanged] = useState(false)
 
@@ -78,7 +77,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
         }
 
         if (state?.message === 'Profile updated successfully') {
-            getQueryClientConfig().client.invalidateQueries({
+            queryClient.invalidateQueries({
                 queryKey: ['userInfo'],
             })
             router.back()

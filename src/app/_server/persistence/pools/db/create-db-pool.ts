@@ -15,9 +15,12 @@ interface PoolItem {
     endDate: number
     price: number
     tokenAddress: Address
+    requiredAcceptance: boolean
 }
 
 export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
+    console.log('Creating pool in database...')
+
     const { data: createdPool, error } = await db
         .from('pools')
         .insert({
@@ -33,6 +36,8 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
             status: 'draft',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            required_acceptance: data.requiredAcceptance,
+            contract_id: null, // Explicitly set contract_id to null
         })
         .select('*')
         .single()

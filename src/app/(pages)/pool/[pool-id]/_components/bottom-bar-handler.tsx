@@ -8,11 +8,15 @@ import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
 import { useRouter } from 'next/navigation'
-import OnRampDialog from '@/app/(pages)/profile/_components/onramps/onramp.dialog'
+// import OnRampDialog from '@/app/(pages)/profile/_components/onramps/onramp.dialog'
 import { Loader2 } from 'lucide-react'
 import { useAccount, useReadContract } from 'wagmi'
 import { getAbiItem } from 'viem'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import HybridRegistration from './terms-acceptance-dialog'
+import { addParticipantToPool } from '../../new/actions'
+import { MoonpayConfig, useFundWallet } from '@privy-io/react-auth'
+import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 
 type ButtonConfig = {
     label: string
@@ -27,10 +31,12 @@ type PoolStatusConfig = {
 interface BottomBarHandlerProps {
     isAdmin: boolean
     poolStatus: POOLSTATUS
-    poolId: bigint
+    poolId: string
     poolPrice: number
     poolTokenSymbol: string
     tokenDecimals: number
+    requiredAcceptance: boolean
+    termsUrl: string
 }
 
 export default function BottomBarHandler({
@@ -40,8 +46,10 @@ export default function BottomBarHandler({
     poolPrice,
     poolTokenSymbol,
     tokenDecimals,
+    requiredAcceptance,
+    termsUrl,
 }: BottomBarHandlerProps) {
-    const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
+    // const [openOnRampDialog, setOpenOnRampDialog] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [transactionProcessed, setTransactionProcessed] = useState(false)
     const updateBottomBarContentRef = useRef<NodeJS.Timeout | null>(null)
@@ -49,7 +57,9 @@ export default function BottomBarHandler({
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
     const setTransactionInProgress = useAppStore(state => state.setTransactionInProgress)
 
-    const { address } = useAccount()
+    const { address } = useAccount() as { address: Address | undefined }
+    const { fundWallet } = useFundWallet()
+
     const { data: isParticipant, isLoading: isParticipantLoading } = useReadContract({
         abi: [
             getAbiItem({
@@ -59,11 +69,23 @@ export default function BottomBarHandler({
         ],
         address: currentPoolAddress,
         functionName: 'isParticipant',
-        args: [address || '0x', poolId],
+        args: [address || '0x', BigInt(poolId)],
         query: {
             enabled: Boolean(address && poolId),
         },
     })
+
+    const { handleOnRamp, isReady } = useOnRamp()
+
+    const handleOnRampClick = async () => {
+        const success = await handleOnRamp(poolPrice)
+        if (success) {
+            resetJoinPoolProcess()
+            setIsLoading(false)
+            updateBottomBarContent()
+            router.refresh()
+        }
+    }
 
     const {
         handleEnableDeposits,
@@ -76,17 +98,37 @@ export default function BottomBarHandler({
         isConfirmed,
         isConfirming,
         resetConfirmation,
-    } = usePoolActions(
-        poolId,
-        poolPrice,
-        tokenDecimals,
-        () => setOpenOnRampDialog(true),
-        () => router.refresh(),
-    )
+        isCancelled,
+    } = usePoolActions(poolId, poolPrice, tokenDecimals, handleOnRampClick, async () => {
+        try {
+            if (address === undefined) {
+                console.log('user address not found')
+                return
+            }
+            // Asumiendo que tienes acceso a poolId y userAddress
+            const success = await addParticipantToPool(poolId, address)
+            if (success) {
+                // Manejar el éxito (por ejemplo, actualizar la UI)
+            }
+        } catch (error) {
+            console.error('Error joining pool:', error)
+            // Manejar el error (por ejemplo, mostrar un mensaje al usuario)
+        }
+    })
 
     const handleViewTicket = useCallback(() => {
         router.push(`/pool/${poolId}/ticket`)
     }, [router, poolId])
+
+    const [showTermsDialog, setShowTermsDialog] = useState(false)
+
+    const handleJoinPoolWithTerms = useCallback(() => {
+        if (requiredAcceptance) {
+            setShowTermsDialog(true)
+        } else {
+            handleJoinPool()
+        }
+    }, [requiredAcceptance, handleJoinPool])
 
     const buttonConfig = useMemo<Record<POOLSTATUS, PoolStatusConfig>>(
         () => ({
@@ -98,7 +140,7 @@ export default function BottomBarHandler({
                 admin: { label: 'Start Pool', action: handleStartPool },
                 user: isParticipant
                     ? { label: 'View My Ticket', action: handleViewTicket }
-                    : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPool },
+                    : { label: `Register for ${poolPrice} ${poolTokenSymbol}`, action: handleJoinPoolWithTerms },
             },
             [POOLSTATUS.STARTED]: {
                 admin: { label: 'End pool', action: handleEndPool },
@@ -122,6 +164,7 @@ export default function BottomBarHandler({
             handleEndPool,
             isParticipant,
             handleViewTicket,
+            handleJoinPoolWithTerms,
         ],
     )
 
@@ -224,13 +267,33 @@ export default function BottomBarHandler({
         }
     }, [isPending, isConfirming])
 
-    const handleOnRampDialogClose = useCallback(() => {
-        setOpenOnRampDialog(false)
-        resetJoinPoolProcess()
-        setIsLoading(false)
-        updateBottomBarContent()
-        router.refresh()
-    }, [resetJoinPoolProcess, updateBottomBarContent, router])
+    useEffect(() => {
+        if (isCancelled) {
+            setIsLoading(false)
+            setTransactionProcessed(false)
+            updateBottomBarContent()
+        }
+    }, [isCancelled, updateBottomBarContent])
 
-    return <OnRampDialog open={openOnRampDialog} setOpen={handleOnRampDialogClose} amount={poolPrice.toString()} />
+    // const handleOnRampDialogClose = useCallback(() => {
+    //     setOpenOnRampDialog(false)
+    //     resetJoinPoolProcess()
+    //     setIsLoading(false)
+    //     updateBottomBarContent()
+    //     router.refresh()
+    // }, [resetJoinPoolProcess, updateBottomBarContent, router])
+
+    return (
+        <>
+            {/* <OnRampDialog open={openOnRampDialog} setOpen={handleOnRampDialogClose} amount={poolPrice.toString()} /> */}
+            {requiredAcceptance && (
+                <HybridRegistration
+                    open={showTermsDialog}
+                    onOpenChange={setShowTermsDialog}
+                    onAccept={handleJoinPool}
+                    termsUrl={termsUrl}
+                />
+            )}
+        </>
+    )
 }

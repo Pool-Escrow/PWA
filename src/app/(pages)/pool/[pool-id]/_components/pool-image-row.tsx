@@ -5,7 +5,7 @@ import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 import Link from 'next/link'
 import PoolStatus from './pool-status'
-import ShareDialog from './share-dialog'
+import ShareDialog from '@/features/pools/components/dialogs/share'
 
 interface PoolImageRowProps {
     poolStatus?: number

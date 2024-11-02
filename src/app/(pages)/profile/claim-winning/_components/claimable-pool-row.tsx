@@ -29,7 +29,7 @@ const ClaimablePoolRow: React.FC<ClaimablePoolRowProps> = ({ poolId }) => {
         <div className='flex flex-row space-x-4 py-4'>
             ClaimablePoolRow
             {/* <Image
-                src={`${poolData?.poolImageUrl ?? frogImage.src}`}
+                src={poolData?.poolImageUrl}
                 className='flex size-14 rounded-xl object-cover'
                 alt='avatar'
                 width={56}

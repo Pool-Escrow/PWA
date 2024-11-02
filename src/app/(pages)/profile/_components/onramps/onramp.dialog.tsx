@@ -7,7 +7,7 @@ import OnRampCoinbaseButton from '@/app/(pages)/profile/_components/onramps/onra
 import OnRampForm from './onramp.form'
 import ReceiveDialog from '@/app/(pages)/profile/_components/receive/receive.dialog'
 import Unlimit from '@/app/(pages)/profile/_components/onramps/unlimit'
-import { OnrampWithStripe } from '@/app/(pages)/profile/_components/onramps/onramp-stripe'
+// import { OnrampWithStripe } from '@/app/(pages)/profile/_components/onramps/onramp-stripe'
 import { MoonpayCurrencyCode, MoonpayPaymentMethod, useFundWallet, useWallets } from '@privy-io/react-auth'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useAccount, useBalance } from 'wagmi'
@@ -79,7 +79,7 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                     </div>
 
                     <div className='flex w-full flex-col'>
-                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                        {/* <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
                                 <div className='font-semibold'>Buy with Unlimit</div>
                                 <div className='text-sm text-gray-500'>
@@ -93,21 +93,22 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                                 className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 On Ramp
                             </Unlimit>
-                        </div>
-                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                        </div> */}
+
+                        {/* <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
                                 <div className='font-semibold'>Buy with Coinbase Pay</div>
                                 <div className='text-sm text-gray-500'>
                                     Using cards, banks and international options
                                 </div>
-                            </div>
-                            {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            </div> */}
+                        {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 Buy
                             </Button> */}
-                            <OnRampCoinbaseButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' />
-                        </div>
+                        {/* <OnRampCoinbaseButton className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push' /> */}
+                        {/* </div> */}
 
-                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+                        {/* <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
                                 <div className='font-semibold'>Buy with Stripe</div>
                                 <div className='text-sm text-gray-500'>
@@ -115,7 +116,8 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                                 </div>
                             </div>
                             <OnrampWithStripe />
-                        </div>
+                        </div> */}
+
                         <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
                                 <div className='font-semibold'>Buy with Moonpay</div>
@@ -130,17 +132,18 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                                 On Ramp
                             </Button>
                         </div>
-                        <div className='mb-6 flex w-full flex-row items-center justify-between'>
+
+                        {/* <div className='mb-6 flex w-full flex-row items-center justify-between'>
                             <div className='flex flex-col'>
                                 <div className='font-semibold'>External Wallet</div>
                                 <div className='text-sm text-gray-500'>Receive from Coinbase, Rainbow or Metamask</div>
-                            </div>
-                            {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            </div> */}
+                        {/* <Button className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 Receive
                             </Button> */}
-                            {/* <OnRampForm decimalPlaces={BigInt(18)} balance={BigInt(100)} /> */}
-                            <ReceiveDialog />
-                        </div>
+                        {/* <OnRampForm decimalPlaces={BigInt(18)} balance={BigInt(100)} /> */}
+                        {/* <ReceiveDialog />
+                        </div> */}
                     </div>
                 </Drawer.Header>
             </Drawer.Content>

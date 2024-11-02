@@ -1,15 +1,16 @@
+import PageWrapper from '@/components/page-wrapper'
+
 export default function RefundPage() {
     return (
-        <div>
+        <PageWrapper topBarProps={{ title: 'Refund', backButton: true }}>
             <h1>Refund Page</h1>
-        </div>
+        </PageWrapper>
     )
 }
 
 // 'use client'
 
 // import Section from '@/components/section'
-// import frogImage from '@/public/images/frog.png'
 // import { usePrivy, useWallets } from '@privy-io/react-auth'
 // import { useRouter } from 'next/router'
 
@@ -33,7 +34,7 @@ export default function RefundPage() {
 // 	const { wallets, ready: walletsReady } = useWallets()
 
 // 	const [profileImageUrl, setProfileImageUrl] = useState<string | undefined>(
-// 		`${frogImage.src}`,
+// 		`${blo(address)}`,
 // 	)
 
 // 	const { toast } = useToast()

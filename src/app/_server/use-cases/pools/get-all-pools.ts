@@ -1,6 +1,5 @@
 import 'server-only'
 
-import { cache } from 'react'
 import { getContractPools } from '../../persistence/pools/blockchain/get-contract-pools'
 import { getDbPools } from '../../persistence/pools/db/get-db-pools'
 
@@ -23,7 +22,7 @@ const statusMap: Record<number, string> = {
     4: 'DELETED',
 }
 
-export const getAllPoolsUseCase = cache(async (): Promise<PoolItem[]> => {
+export const getAllPoolsUseCase = async (): Promise<PoolItem[]> => {
     const [contractPools, dbPools] = await Promise.all([getContractPools(), getDbPools()])
 
     let invalidPools: string[] = []
@@ -69,4 +68,4 @@ export const getAllPoolsUseCase = cache(async (): Promise<PoolItem[]> => {
     })
 
     return sortedPools
-})
+}
