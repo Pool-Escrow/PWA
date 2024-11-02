@@ -1,11 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
-import { formatAddress } from '@/app/_lib/utils/addresses'
-import type { Address } from 'viem'
-import { usePoolDetails } from '@/app/(pages)/pool/[pool-id]/ticket/_components/use-pool-details'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { fetchWinnerDetail } from '@/app/(pages)/pool/[pool-id]/participants/_components/fetch-winner-detail'
-import { PostgrestSingleResponse } from '@supabase/supabase-js'
+import { usePoolDetails } from '@/app/(pages)/pool/[pool-id]/ticket/_components/use-pool-details'
+import { formatAddress } from '@/app/_lib/utils/addresses'
+import { useQuery } from '@tanstack/react-query'
 import { blo } from 'blo'
+import type { Address } from 'viem'
 
 interface UserDetails {
     avatar: string | null
@@ -61,8 +60,6 @@ export const useParticipants = (poolId: string) => {
         queryFn: async () => {
             const participants = poolDetails?.poolDetailFromSC?.[5] || []
 
-            console.log('participants', poolId, participants)
-
             const participantDetails: Participant[] = await Promise.all(
                 participants.map(async (address: Address) => {
                     const userDetails = await fetchUserDetails(address)
@@ -92,7 +89,6 @@ export const useParticipants = (poolId: string) => {
                     }
                 }),
             )
-            console.log('participantDetails', participantDetails)
 
             return participantDetails
         },

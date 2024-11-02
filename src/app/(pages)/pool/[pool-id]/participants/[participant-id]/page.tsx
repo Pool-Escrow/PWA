@@ -1,27 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { formatAddress } from '@/app/_lib/utils/addresses'
-import { cn } from '@/lib/utils/tailwind'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import PageWrapper from '@/components/page-wrapper'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { useParticipants } from '@/hooks/use-participants'
+import { blo } from 'blo'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Address } from 'viem'
-import { getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
-import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { useUserDetails } from '../_components/use-user-details'
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { poolAbi } from '@/types/contracts'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
-import { blo } from 'blo'
-import PageWrapper from '@/components/page-wrapper'
-import UserMenu from '@/components/user-menu'
 import PayoutForm from './_components/payout-form'
-import { useParticipants } from '@/hooks/use-participants'
 
 type Props = {
     params: {
@@ -65,7 +57,7 @@ const ParticipantPayout = ({ params }: Props) => {
 
     return (
         <PageWrapper topBarProps={{ title: 'Payout', backButton: true }}>
-            <div className='max-w-md overflow-hidden rounded-lg bg-white'>
+            <div className='mx-auto flex max-w-md overflow-hidden rounded-lg bg-white'>
                 <div className='mt-6 flex flex-col items-center'>
                     <Avatar className='size-[73px]' aria-label='User Avatar'>
                         <AvatarImage alt='User Avatar' src={avatar} />

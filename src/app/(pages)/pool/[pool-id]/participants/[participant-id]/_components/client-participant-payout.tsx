@@ -1,18 +1,18 @@
 'use client'
 
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { formatAddress } from '@/app/_lib/utils/addresses'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { useParticipants } from '@/hooks/use-participants'
 import frog from '@/public/app/images/frog.png'
 import type { Address } from 'viem'
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { useUserDetails } from '../../_components/use-user-details'
 import { usePoolDetails } from '../../../ticket/_components/use-pool-details'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { useUserDetails } from '../../_components/use-user-details'
 import PayoutForm from './payout-form'
-import { useParticipants } from '@/hooks/use-participants'
 
 function ClientParticipantPayout({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) {
     const { data: userDetails } = useUserDetails(params['participant-id'])
-    const { poolDetails } = usePoolDetails(BigInt(params?.['pool-id']))
+    const { poolDetails } = usePoolDetails(params?.['pool-id'])
     const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? currentTokenAddress

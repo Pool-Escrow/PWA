@@ -1,20 +1,19 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
 
+import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
+import useTransactions from '@/app/_client/hooks/use-transactions'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
 import { toast } from 'sonner'
 import { Address, formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
-import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
-import { poolAbi } from '@/types/contracts'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
 
 interface PayoutFormProps {
     poolId: string
