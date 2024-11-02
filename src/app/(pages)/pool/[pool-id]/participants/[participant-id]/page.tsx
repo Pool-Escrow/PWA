@@ -6,7 +6,9 @@ import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import PageWrapper from '@/components/page-wrapper'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 import { useParticipants } from '@/hooks/use-participants'
+import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { blo } from 'blo'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Address } from 'viem'
@@ -26,7 +28,7 @@ const ParticipantPayout = ({ params }: Props) => {
     const { 'participant-id': participantId, 'pool-id': poolId } = params
     const { data: userDetails } = useUserDetails(participantId)
     const { poolDetails } = usePoolDetails(poolId)
-
+    const { data: participantsData } = useParticipants(poolId)
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? currentTokenAddress
 
     const { data: hash, isPending, isSuccess } = useWriteContract()
@@ -34,6 +36,9 @@ const ParticipantPayout = ({ params }: Props) => {
     const [isAdmin, setIsAdmin] = useState<boolean>(false)
     const [isAdminLoading, setIsAdminLoading] = useState(true)
 
+    const userPoolData = participantsData?.find(participant => participant.address === participantId)
+    const amountClaimed = userPoolData?.amountClaimed ?? 0
+    const amountWon = userPoolData?.amountWon ?? 0
     useEffect(() => {
         getUserAdminStatusActionWithCookie()
             .then(isUserAdmin => {
@@ -69,10 +74,23 @@ const ParticipantPayout = ({ params }: Props) => {
         <PageWrapper topBarProps={{ title: 'Payout', backButton: true }}>
             <div className='mx-auto flex max-w-md overflow-hidden rounded-lg bg-white'>
                 <div className='mt-6 flex flex-col items-center'>
-                    <Avatar className='size-[73px]' aria-label='User Avatar'>
-                        <AvatarImage alt='User Avatar' src={avatar} />
-                        <AvatarFallback className='bg-[#d9d9d9]' />
-                    </Avatar>
+                    <div>
+                        <div className='relative'>
+                            <Avatar className='size-[73px]' aria-label='User Avatar'>
+                                <AvatarImage alt='User Avatar' src={avatar} />
+                                <AvatarFallback className='bg-[#d9d9d9]' />
+                            </Avatar>
+                            {amountClaimed > 0 ? (
+                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-white'>
+                                    <Image src={circleTickIcon} alt='paid' width={20} height={20} />
+                                </span>
+                            ) : amountWon > 0 ? (
+                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-[#5572E9]'></span>
+                            ) : (
+                                <></>
+                            )}
+                        </div>
+                    </div>
                     <div className='flex flex-row'>
                         <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
                             {displayName}
