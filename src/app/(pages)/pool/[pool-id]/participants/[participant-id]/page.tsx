@@ -32,11 +32,16 @@ const ParticipantPayout = ({ params }: Props) => {
     const { data: hash, isPending, isSuccess } = useWriteContract()
 
     const [isAdmin, setIsAdmin] = useState<boolean>(false)
+    const [isAdminLoading, setIsAdminLoading] = useState(true)
 
     useEffect(() => {
-        getUserAdminStatusActionWithCookie().then(isUserAdmin => {
-            setIsAdmin(isUserAdmin)
-        })
+        getUserAdminStatusActionWithCookie()
+            .then(isUserAdmin => {
+                setIsAdmin(isUserAdmin)
+            })
+            .finally(() => {
+                setIsAdminLoading(false)
+            })
     }, [])
 
     useEffect(() => {
@@ -51,6 +56,11 @@ const ParticipantPayout = ({ params }: Props) => {
 
     const currentParticipant = participants?.find(participant => participant.address === params['participant-id'])
     const isCheckedIn = currentParticipant?.checkedInAt != null
+
+    if (isAdminLoading) {
+        return null
+    }
+
     if (!isAdmin) {
         return <div className={'mt-4 w-full text-center'}>You are not authorized to create a payout.</div>
     }
