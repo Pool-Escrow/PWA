@@ -5,7 +5,7 @@ import { Input } from '@/app/_components/ui/input'
 import { useWallets } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
 import type { Address } from 'viem'
-import { useBalance } from 'wagmi'
+import { useBalance, useWriteContract } from 'wagmi'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
 import { useTokenDecimals } from './use-token-decimals'
@@ -26,6 +26,10 @@ export default function AmountSection() {
         setWithdrawAddress(event.target.value)
     }
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
+    const isPageTransitioning = useAppStore(state => state.isPageTransitioning)
+    // const { data: hash, sendTransaction } = useSendTransaction()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
 
     const { tokenDecimalsData } = useTokenDecimals(currentTokenAddress)
     const { transferToken, isSuccess, setIsSuccess } = useTransferToken()
@@ -41,15 +45,17 @@ export default function AmountSection() {
     }
 
     useEffect(() => {
-        setBottomBarContent(
-            <Button
-                onClick={() => onWithdrawButtonClicked(amount, withdrawAddress)}
-                className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
-                <span>Withdraw</span>
-            </Button>,
-        )
+        if (!isPageTransitioning) {
+            setBottomBarContent(
+                <Button
+                    onClick={() => onWithdrawButtonClicked(amount, withdrawAddress)}
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    <span>Withdraw</span>
+                </Button>,
+            )
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [amount, withdrawAddress])
+    }, [amount, withdrawAddress, isPageTransitioning])
 
     useEffect(() => {
         if (isSuccess) {

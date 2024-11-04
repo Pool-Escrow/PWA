@@ -57,6 +57,7 @@ export default function BottomBarHandler({
     const router = useRouter()
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
     const setTransactionInProgress = useAppStore(state => state.setTransactionInProgress)
+    const isPageTransitioning = useAppStore(state => state.isPageTransitioning)
 
     const { data: user } = useUserInfo()
     const address = user?.address
@@ -235,7 +236,9 @@ export default function BottomBarHandler({
         }
 
         console.log('✅ [BottomBarHandler] Setting bottom bar content:', content)
-        setBottomBarContent(content)
+        if (!isPageTransitioning) {
+            setBottomBarContent(content)
+        }
     }, [
         isParticipant,
         isParticipantLoading,
@@ -244,6 +247,7 @@ export default function BottomBarHandler({
         poolStatus,
         buttonConfig,
         setBottomBarContent,
+        isPageTransitioning,
     ])
 
     useEffect(() => {

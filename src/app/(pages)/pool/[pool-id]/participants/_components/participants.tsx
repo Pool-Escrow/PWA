@@ -27,8 +27,9 @@ export enum TabValue {
 }
 
 const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
-    const { setBottomBarContent } = useAppStore(s => ({
+    const { setBottomBarContent, isPageTransitioning } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
+        isPageTransitioning: s.isPageTransitioning,
     }))
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
@@ -63,7 +64,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     }, [poolId])
 
     useEffect(() => {
-        if (isAdmin && currentTab === TabValue.Winners) {
+        if (isAdmin && currentTab === TabValue.Winners && !isPageTransitioning) {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
@@ -80,7 +81,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts])
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isPageTransitioning])
 
     useEffect(() => {
         const allPayouts = usePayoutStore.getState().payouts[poolId] || []
@@ -94,7 +95,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     }, [poolId])
 
     useEffect(() => {
-        if (isAdmin && currentTab === TabValue.Winners) {
+        if (isAdmin && currentTab === TabValue.Winners && !isPageTransitioning) {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
@@ -111,7 +112,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts])
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isPageTransitioning])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)

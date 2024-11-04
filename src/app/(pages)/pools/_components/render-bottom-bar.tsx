@@ -9,14 +9,14 @@ import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 
 export default function RenderBottomBar() {
     const setBottomBar = useAppStore(state => state.setBottomBarContent)
-
+    const isPageTransitioning = useAppStore(state => state.isPageTransitioning)
     const { data: isAdmin, isLoading } = useQuery({
         queryKey: ['userAdminStatus'],
         queryFn: () => getUserAdminStatusActionWithCookie(),
     })
 
     useEffect(() => {
-        if (isAdmin) {
+        if (isAdmin && !isPageTransitioning) {
             setBottomBar(
                 <Button
                     data-testid='create-pool-button'
@@ -29,7 +29,7 @@ export default function RenderBottomBar() {
         return () => {
             setBottomBar(null)
         }
-    }, [isAdmin, setBottomBar])
+    }, [isAdmin, setBottomBar, isPageTransitioning])
 
     if (isLoading) return null
 
