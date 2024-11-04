@@ -50,7 +50,8 @@ interface ProfilePageProps {
 export default function ProfileForm({ userInfo }: ProfilePageProps) {
     const queryClient = useQueryClient()
     const router = useRouter()
-    const { user } = usePrivy()
+    const { user, ready } = usePrivy()
+
     const { setBottomBarContent } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
     }))
@@ -74,6 +75,10 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
     }, [setBottomBarContent])
 
     useEffect(() => {
+        if (!ready) {
+            toast('User state not ready. Please try again.')
+            return
+        }
         if (state?.message) {
             toast(state.message)
         }
@@ -84,7 +89,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
             })
             router.back()
         }
-    }, [state?.message, router])
+    }, [state?.message, router, ready])
 
     const handleChange = (value: string) => {
         if (value === 'avatar') {
