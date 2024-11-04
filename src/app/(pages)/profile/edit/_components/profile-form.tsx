@@ -78,7 +78,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
     }, [setBottomBarContent, isPageTransitioning])
 
     useEffect(() => {
-        if (!ready) {
+        if (!ready || user?.id == null) {
             toast('User state not ready. Please try again.')
             return
         }
