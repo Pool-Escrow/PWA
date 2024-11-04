@@ -52,14 +52,17 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
     const router = useRouter()
     const { user, ready } = usePrivy()
 
-    const { setBottomBarContent } = useAppStore(s => ({
+    const { setBottomBarContent, isPageTransitioning } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
+        isPageTransitioning: s.isPageTransitioning,
     }))
     const [avatarChanged, setAvatarChanged] = useState(false)
 
     const [state, formAction] = useFormState(validateProfileAction, initialState)
 
     useEffect(() => {
+        if (isPageTransitioning) return
+
         setBottomBarContent(
             <Button
                 type='submit'
@@ -72,7 +75,7 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
         return () => {
             setBottomBarContent(null)
         }
-    }, [setBottomBarContent])
+    }, [setBottomBarContent, isPageTransitioning])
 
     useEffect(() => {
         if (!ready) {

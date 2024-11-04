@@ -7,12 +7,14 @@ export interface SettingsState {
     bottomBarContent: React.ReactNode | null
     myPoolsTab: MyPoolsTab['id']
     transactionInProgress: boolean
+    isPageTransitioning: boolean
 }
 
 export interface SettingsActions {
     setBottomBarContent: (content: React.ReactNode | null) => void
     setMyPoolsTab: (tab: MyPoolsTab['id']) => void
     setTransactionInProgress: (open: boolean) => void
+    setIsPageTransitioning: (isTransitioning: boolean) => void
 }
 
 export type SettingsSlice = SettingsState & SettingsActions
@@ -21,7 +23,9 @@ export const createSettingsSlice: StateCreator<SettingsSlice, [], [], SettingsSl
     bottomBarContent: null,
     myPoolsTab: 'upcoming',
     transactionInProgress: false,
+    isPageTransitioning: false,
     setBottomBarContent: (content: React.ReactNode | null) => set({ bottomBarContent: content }),
     setMyPoolsTab: (tab: MyPoolsTab['id']) => set({ myPoolsTab: tab }),
     setTransactionInProgress: (open: boolean) => set({ transactionInProgress: open }),
+    setIsPageTransitioning: (isTransitioning: boolean) => set({ isPageTransitioning: isTransitioning }),
 })
