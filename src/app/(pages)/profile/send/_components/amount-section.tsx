@@ -5,27 +5,16 @@ import { Input } from '@/app/_components/ui/input'
 import { useWallets } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
 import type { Address } from 'viem'
-import { getAbiItem } from 'viem'
-import { useBalance, useWriteContract } from 'wagmi'
+import { useBalance } from 'wagmi'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
 import { useTokenDecimals } from './use-token-decimals'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { tokenAbi } from '@/types/contracts'
+import { useTransferToken } from './use-transfer-tokens'
 
 export default function AmountSection() {
     const { wallets } = useWallets()
-
-    const { data: tokenBalanceData } = useBalance({
-        address: wallets[0]?.address as Address,
-        token: currentTokenAddress,
-    })
-
-    const decimals = BigInt(tokenBalanceData?.decimals ?? BigInt(18))
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const tokenBalance = ((tokenBalanceData?.value ?? BigInt(0)) / BigInt(10) ** decimals).toString()
 
     const [amount, setAmount] = useState('')
     const [withdrawAddress, setWithdrawAddress] = useState('')
@@ -37,34 +26,18 @@ export default function AmountSection() {
         setWithdrawAddress(event.target.value)
     }
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
-    // const { data: hash, sendTransaction } = useSendTransaction()
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
 
     const { tokenDecimalsData } = useTokenDecimals(currentTokenAddress)
-    const TransferFunction = getAbiItem({
-        abi: tokenAbi,
-        name: 'transfer',
-    })
+    const { transferToken, isSuccess, setIsSuccess } = useTransferToken()
+
     const onWithdrawButtonClicked = (amount: string, withdrawAddress: string) => {
-        console.log('to', withdrawAddress)
-        console.log('amount', amount)
-        // writeContract({
-        //     to: withdrawAddress as Address,
+        // console.log('to', withdrawAddress)
+        // console.log('amount', amount)
 
-        //     : BigInt(amount) * BigInt(Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
-        // })
-
-        // TODO: use the transaction hook for that
-        writeContract({
-            address: currentTokenAddress,
-            abi: [TransferFunction],
-            functionName: 'transfer',
-            args: [
-                withdrawAddress as Address,
-                BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
-            ],
-        })
+        transferToken(
+            withdrawAddress as Address,
+            BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
+        )
     }
 
     useEffect(() => {
@@ -77,6 +50,14 @@ export default function AmountSection() {
         )
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [amount, withdrawAddress])
+
+    useEffect(() => {
+        if (isSuccess) {
+            setAmount('')
+            setWithdrawAddress('')
+            setIsSuccess(false)
+        }
+    }, [isSuccess, setIsSuccess])
 
     return (
         <div className='flex flex-col gap-y-6'>
