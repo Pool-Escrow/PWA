@@ -78,17 +78,15 @@ export default function ProfileForm({ userInfo }: ProfilePageProps) {
     }, [setBottomBarContent, isRouting])
 
     useEffect(() => {
-        if (!ready || user?.id == null) {
-            toast('User state not ready. Please try again.')
-            return
-        }
         if (state?.message) {
             toast(state.message)
         }
-
+        if (!ready || user?.id == null) {
+            return
+        }
         if (state?.message === 'Profile updated successfully') {
             queryClient.invalidateQueries({
-                queryKey: ['user-info', user?.id],
+                queryKey: ['user-info', user.id],
             })
             router.back()
         }
