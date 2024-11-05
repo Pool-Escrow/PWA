@@ -26,7 +26,7 @@ export default function AmountSection() {
         setWithdrawAddress(event.target.value)
     }
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
-    const isPageTransitioning = useAppStore(state => state.isPageTransitioning)
+    const isRouting = useAppStore(state => state.isRouting)
     // const { data: hash, sendTransaction } = useSendTransaction()
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
@@ -45,7 +45,7 @@ export default function AmountSection() {
     }
 
     useEffect(() => {
-        if (!isPageTransitioning) {
+        if (!isRouting) {
             setBottomBarContent(
                 <Button
                     onClick={() => onWithdrawButtonClicked(amount, withdrawAddress)}
@@ -55,7 +55,7 @@ export default function AmountSection() {
             )
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [amount, withdrawAddress, isPageTransitioning])
+    }, [amount, withdrawAddress, isRouting])
 
     useEffect(() => {
         if (isSuccess) {

@@ -18,7 +18,7 @@ import { Loader2Icon } from 'lucide-react'
 
 export default function ClaimablePrizesList() {
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
-    const isPageTransitioning = useAppStore(state => state.isPageTransitioning)
+    const isRouting = useAppStore(state => state.isRouting)
 
     const { claimablePools, isPending } = useClaimablePools()
     const { executeTransactions } = useTransactions()
@@ -53,7 +53,7 @@ export default function ClaimablePrizesList() {
         if (!claimablePools || poolIdsToClaimFrom?.length === 0) {
             setBottomBarContent(undefined)
         } else {
-            if (!isPageTransitioning) {
+            if (!isRouting) {
                 setBottomBarContent(
                     <Button
                         onClick={() => void onClaimFromPoolsButtonClicked()}

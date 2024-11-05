@@ -27,9 +27,9 @@ export enum TabValue {
 }
 
 const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
-    const { setBottomBarContent, isPageTransitioning } = useAppStore(s => ({
+    const { setBottomBarContent, isRouting } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
-        isPageTransitioning: s.isPageTransitioning,
+        isRouting: s.isRouting,
     }))
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
@@ -64,7 +64,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     }, [poolId])
 
     useEffect(() => {
-        if (isAdmin && currentTab === TabValue.Winners && !isPageTransitioning) {
+        if (isAdmin && currentTab === TabValue.Winners && !isRouting) {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
@@ -81,7 +81,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isPageTransitioning])
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isRouting])
 
     useEffect(() => {
         const allPayouts = usePayoutStore.getState().payouts[poolId] || []
@@ -95,7 +95,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
     }, [poolId])
 
     useEffect(() => {
-        if (isAdmin && currentTab === TabValue.Winners && !isPageTransitioning) {
+        if (isAdmin && currentTab === TabValue.Winners && !isRouting) {
             setBottomBarContent(
                 <Button
                     className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
@@ -112,7 +112,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isPageTransitioning])
+    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isRouting])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)

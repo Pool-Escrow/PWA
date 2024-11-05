@@ -23,22 +23,22 @@ const ClientFrozenRouter = dynamic(() => Promise.resolve(FrozenRouter), {
 
 export default function MainWrapper({ children }: { children: React.ReactNode }) {
     const router = useRouter()
-    const { isBottomBarVisible, setIsTransitioning } = useAppStore(state => ({
+    const { isBottomBarVisible, isRouting, setIsRouting } = useAppStore(state => ({
         isBottomBarVisible: Boolean(state.bottomBarContent),
-        setIsTransitioning: state.setIsPageTransitioning,
+        setIsRouting: state.setIsRouting,
+        isRouting: state.isRouting,
     }))
 
     const pathname = usePathname()
-    const [isRouting, setIsRouting] = useState(false)
+
     const [currentPath, setCurrentPath] = useState(pathname)
 
     useEffect(() => {
         if (pathname !== currentPath && !isRouting) {
-            setIsTransitioning(true)
             setIsRouting(true)
             setCurrentPath(pathname)
         }
-    }, [pathname, currentPath, isRouting, setIsTransitioning])
+    }, [pathname, currentPath, isRouting, setIsRouting])
 
     const handleDragEnd = (_event: any, info: any) => {
         if (info.offset.x > 100) {
@@ -62,7 +62,6 @@ export default function MainWrapper({ children }: { children: React.ReactNode })
                 initial={false}
                 onExitComplete={() => {
                     setIsRouting(false)
-                    setIsTransitioning(false)
                 }}>
                 <motion.div
                     key={currentPath}

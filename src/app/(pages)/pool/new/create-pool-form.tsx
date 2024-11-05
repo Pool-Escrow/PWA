@@ -25,10 +25,10 @@ export default function CreatePoolForm() {
         poolUpdated,
         hasAttemptedChainCreation,
     } = useCreatePool()
-    const { setBottomBarContent, setTransactionInProgress, isPageTransitioning } = useAppStore(s => ({
+    const { setBottomBarContent, setTransactionInProgress, isRouting } = useAppStore(s => ({
         setBottomBarContent: s.setBottomBarContent,
         setTransactionInProgress: s.setTransactionInProgress,
-        isPageTransitioning: s.isPageTransitioning,
+        isRouting: s.isRouting,
     }))
     const hasCreatedPool = useRef(false)
 
@@ -77,7 +77,7 @@ export default function CreatePoolForm() {
 
     useEffect(() => {
         console.log('Effect: Setting up bottom bar content')
-        if (!isPageTransitioning) {
+        if (!isRouting) {
             setBottomBarContent(
                 <Button
                     type='submit'
@@ -110,7 +110,7 @@ export default function CreatePoolForm() {
         isButtonDisabled,
         isProcessing,
         hasErrors,
-        isPageTransitioning,
+        isRouting,
     ])
 
     useEffect(() => {
