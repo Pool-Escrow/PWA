@@ -2,10 +2,8 @@
 
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
-import { useWallets } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
 import type { Address } from 'viem'
-import { useBalance, useWriteContract } from 'wagmi'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
 import { useTokenDecimals } from './use-token-decimals'
@@ -14,8 +12,6 @@ import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useTransferToken } from './use-transfer-tokens'
 
 export default function AmountSection() {
-    const { wallets } = useWallets()
-
     const [amount, setAmount] = useState('')
     const [withdrawAddress, setWithdrawAddress] = useState('')
 
@@ -27,17 +23,11 @@ export default function AmountSection() {
     }
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
     const isRouting = useAppStore(state => state.isRouting)
-    // const { data: hash, sendTransaction } = useSendTransaction()
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { data: hash, isPending, isSuccess, writeContract } = useWriteContract()
 
     const { tokenDecimalsData } = useTokenDecimals(currentTokenAddress)
     const { transferToken, isSuccess, setIsSuccess } = useTransferToken()
 
     const onWithdrawButtonClicked = (amount: string, withdrawAddress: string) => {
-        // console.log('to', withdrawAddress)
-        // console.log('amount', amount)
-
         transferToken(
             withdrawAddress as Address,
             BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
@@ -54,7 +44,6 @@ export default function AmountSection() {
                 </Button>,
             )
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [amount, withdrawAddress, isRouting])
 
     useEffect(() => {
