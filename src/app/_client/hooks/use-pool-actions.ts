@@ -4,7 +4,7 @@ import useTransactions from '@/app/_client/hooks/use-transactions'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import type { Address, Hash } from 'viem'
-import { getAbiItem, parseUnits } from 'viem'
+import { getAbiItem, parseUnits, custom, createWalletClient } from 'viem'
 import { toast } from 'sonner'
 import { approve } from '@/app/_lib/blockchain/functions/token/approve'
 import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
@@ -12,6 +12,15 @@ import { useReadContract } from 'wagmi'
 import { useWaitForTransactionReceipt } from 'wagmi'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+
+import { ethers } from 'ethers'
+import { createPublicClient, http } from 'viem'
+import { base, sepolia } from 'viem/chains'
+
+const publicClient = createPublicClient({
+    chain: base,
+    transport: http(),
+})
 
 export function usePoolActions(
     poolId: string,
@@ -163,6 +172,7 @@ export function usePoolActions(
             return
         }
 
+        // Show popup to please check if you MM is unlocked or not
         if (!wallets[0]?.address) {
             console.error('❌ [usePoolActions] No wallet address available')
             return
@@ -189,16 +199,72 @@ export function usePoolActions(
             console.log('🚀 [usePoolActions] Join pool')
             toast('Joining pool...')
 
-            const transactions = [
-                ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice.toString() })] : []),
-                deposit({ poolId, amount: bigIntPrice.toString() }),
-            ]
-            console.log('📝 [usePoolActions] Transaction payload:', transactions)
+            // const transactions = [
+            //     ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice.toString() })] : []),
+            //     deposit({ poolId, amount: bigIntPrice.toString() }),
+            // ]
 
-            await executeTransactions(transactions, {
-                type: 'JOIN_POOL',
-                onSuccess: onSuccessfulJoin,
-            })
+            console.log('Wallets are', wallets)
+
+            if (wallets[0]) {
+                console.log('You have the wallet now stacke tokens')
+
+                // Approve the paymentToken for the HyperLogue contract
+                const { request: approvalRequest } = await publicClient.simulateContract({
+                    account: wallets[0].address as `0x${string}`,
+                    address: currentTokenAddress,
+                    abi: tokenAbi,
+                    functionName: 'approve',
+                    args: [currentPoolAddress, parseUnits('150', 6)],
+                })
+
+                const wallet = wallets[0]
+                const provider = await wallet.getEthereumProvider()
+
+                const walletClient = createWalletClient({
+                    chain: base,
+                    transport: custom(provider),
+                })
+
+                // Send the approval transaction
+                const approvalHash = await walletClient.writeContract(approvalRequest)
+
+                const approvalReceipt = await publicClient.waitForTransactionReceipt({
+                    hash: approvalHash,
+                })
+                console.log('Approval transaction confirmed:', approvalReceipt)
+
+                // DO The actual transfer of funds
+
+                const { request } = await publicClient.simulateContract({
+                    account: wallet.address as `0x${string}`,
+                    address: currentPoolAddress,
+                    abi: poolAbi,
+                    functionName: 'deposit',
+                    args: [
+                        // hyperlogue?.id ?? state.id,
+                        // signature as `0x${string}`,
+                        // hyperlogueData,
+                        // ethers.parseEther(formData.entranceFee),
+                        // BigInt(formData.minParticipants),
+                        BigInt(poolId),
+                        parseUnits('150', 6),
+                    ],
+                })
+                const depoistedSuccess = await walletClient.writeContract(request)
+                console.log('depoistedSuccess', depoistedSuccess)
+            } else {
+                console.log('No Wallets exits', wallets)
+            }
+
+            // Wait for the approval transaction to be confirmed
+
+            // console.log('📝 [usePoolActions] Transaction payload:', transactions)
+
+            // await executeTransactions(transactions, {
+            //     type: 'JOIN_POOL',
+            //     onSuccess: onSuccessfulJoin,
+            // })
 
             if (result.hash) {
                 console.log('⏳ [usePoolActions] Transaction submitted, waiting for confirmation')
