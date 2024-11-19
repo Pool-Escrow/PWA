@@ -28,7 +28,7 @@ export default function AmountSection() {
     const { transferToken, isSuccess, setIsSuccess } = useTransferToken()
 
     const onWithdrawButtonClicked = (amount: string, withdrawAddress: string) => {
-        transferToken(
+        void transferToken(
             withdrawAddress as Address,
             BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
         )
@@ -55,19 +55,22 @@ export default function AmountSection() {
     }, [isSuccess, setIsSuccess])
 
     return (
-        <div className='flex flex-col gap-y-6'>
+        <div className='flex flex-col gap-y-3'>
             <Container>
                 <SectionContent>
                     <div className='mx-2 flex flex-col justify-center'>
                         <h3 className='text-[11pt] font-semibold text-black'>Withdraw Amount</h3>
                         <h3 className='text-[36pt] font-bold text-[#2785EA]'>
-                            <Input
-                                value={amount}
-                                onChange={handleAmountInputChange}
-                                className='border-none text-2xl font-bold focus:border-none'
-                                type='number'
-                                placeholder='$0'
-                            />
+                            <div className='flex items-center'>
+                                <span className={`mr-[1px] ${amount ? 'text-black' : 'text-gray-400'}`}>$</span>
+                                <Input
+                                    value={amount}
+                                    onChange={handleAmountInputChange}
+                                    className='rounded-none border-none bg-transparent p-0 text-[36pt] font-bold caret-[#2785EA] outline-none ring-0 focus:border-none focus:outline-none focus:ring-0'
+                                    type='number'
+                                    placeholder='0'
+                                />
+                            </div>
                         </h3>
                     </div>
                 </SectionContent>
@@ -76,15 +79,16 @@ export default function AmountSection() {
                 <SectionContent>
                     <div className='mx-2 flex flex-col justify-center'>
                         <h3 className='text-[11pt] font-semibold text-black'>Address to send amount to</h3>
-                        <h3 className='mb-8 text-[36pt] font-bold text-[#2785EA]'>
+                        <div className='mt-2 border-b border-gray-200'></div>
+                        <h3 className='mb-[18px] text-[36pt] font-bold text-[#2785EA]'>
                             <Input
                                 value={withdrawAddress}
                                 onChange={handleWithdrawAddressInputChange}
-                                className='text-2xl font-bold'
+                                className='h-12 text-sm [&::placeholder]:text-sm [&::placeholder]:font-normal'
                                 placeholder='Paste address here'
                             />
                         </h3>
-                        <p>
+                        <p className='text-[12px] leading-[14px]'>
                             <span className='font-bold'>Important</span>: Only send to an ERC20 token wallet that
                             accepts USDC. Failure to do this will result in a{' '}
                             <span className='mx-1 font-bold'>loss</span>
