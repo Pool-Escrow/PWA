@@ -31,6 +31,7 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
             scannerRef.current = new QrScannerPrimitive(
                 videoRef.current,
                 result => {
+                    // console.log('QR Scanner decoded:', result.data)
                     if (isMountedRef.current) {
                         setResult(result.data)
                         onDecode?.(result.data)
@@ -68,6 +69,9 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
     }, [])
 
     useEffect(() => {
+        // Set mounted to true when component mounts
+        isMountedRef.current = true
+
         return () => {
             isMountedRef.current = false
             stopScanner()
