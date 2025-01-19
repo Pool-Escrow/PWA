@@ -158,7 +158,10 @@ const QrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
                 <video ref={videoRef} className='h-full w-full object-cover' />
                 <div className='absolute inset-0'>
                     <div className='relative h-full w-full'>
-                        <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-5/6 max-w-[512px] -translate-x-1/2 -translate-y-1/2 rounded-3xl' />
+                        <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-5/6 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:-left-[3px] before:-top-[3px] before:h-8 before:w-8 before:rounded-tl-lg before:border-l-4 before:border-t-4 before:border-[#44DCAF] after:absolute after:-right-[3px] after:-top-[3px] after:h-8 after:w-8 after:rounded-tr-lg after:border-r-4 after:border-t-4 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:-bottom-[3px] [&>*:nth-child(1)]:-left-[3px] [&>*:nth-child(1)]:h-8 [&>*:nth-child(1)]:w-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-4 [&>*:nth-child(1)]:border-l-4 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:-bottom-[3px] [&>*:nth-child(2)]:-right-[3px] [&>*:nth-child(2)]:h-8 [&>*:nth-child(2)]:w-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-4 [&>*:nth-child(2)]:border-r-4 [&>*:nth-child(2)]:border-[#44DCAF]'>
+                            <span></span>
+                            <span></span>
+                        </div>
                     </div>
                 </div>
                 <motion.div
