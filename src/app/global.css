@@ -234,11 +234,16 @@
     padding-bottom: env(safe-area-inset-bottom);
 }
 
+.camera-box {
+    opacity: 1;
+    box-shadow: 0 0 0 100pc rgba(0, 0, 0, 0.8);
+}
+
 @layer base {
-  * {
-    @apply border-border;
+    * {
+        @apply border-border;
     }
-  body {
-    @apply bg-background text-foreground;
+    body {
+        @apply bg-background text-foreground;
     }
 }

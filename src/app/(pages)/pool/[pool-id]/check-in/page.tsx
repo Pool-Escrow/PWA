@@ -6,9 +6,6 @@ import { motion } from 'framer-motion'
 import QrScannerPrimitive from 'qr-scanner'
 import { cn } from '@/lib/utils/tailwind'
 import { Button } from '@/app/_components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/app/_components/ui/label'
-import { Input } from '@/app/_components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_components/ui/card'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import PageWrapper from '@/components/page-wrapper'
@@ -152,32 +149,32 @@ const QrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
             scannerOptions,
         })
 
+        useEffect(() => {
+            startScanner()
+        }, [])
+
         return (
-            <Card ref={ref} className={cn('mx-auto w-full max-w-sm overflow-hidden', className)} {...props}>
-                <div className='relative aspect-square'>
-                    <video ref={videoRef} className='h-full w-full object-cover' />
-                    <motion.div
-                        className='pointer-events-none absolute inset-0 border-4 border-blue-500'
-                        animate={{
-                            scale: [1, 1.05, 1],
-                            opacity: [0.5, 1, 0.5],
-                        }}
-                        transition={{
-                            duration: 2,
-                            ease: 'easeInOut',
-                            times: [0, 0.5, 1],
-                            repeat: Infinity,
-                        }}
-                    />
+            <div className='relative'>
+                <video ref={videoRef} className='h-full w-full object-cover' />
+                <div className='absolute inset-0'>
+                    <div className='relative h-full w-full'>
+                        <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-5/6 max-w-[512px] -translate-x-1/2 -translate-y-1/2 rounded-3xl' />
+                    </div>
                 </div>
-                <div className='p-4'>
-                    <Button onClick={isScanning ? stopScanner : startScanner} className='w-full'>
-                        {isScanning ? stopButtonText : startButtonText}
-                    </Button>
-                    {result && <p className='mt-2 text-sm text-gray-600'>Result: {result}</p>}
-                    {error && <p className='mt-2 text-sm text-red-600'>Error: {error.message}</p>}
-                </div>
-            </Card>
+                <motion.div
+                    className='pointer-events-none absolute'
+                    animate={{
+                        scale: [1, 1, 1],
+                        opacity: [0.5, 1, 0.5],
+                    }}
+                    transition={{
+                        duration: 2,
+                        ease: 'easeInOut',
+                        times: [0, 0.5, 1],
+                        repeat: Infinity,
+                    }}
+                />
+            </div>
         )
     },
 )
@@ -195,6 +192,7 @@ export default function CheckInPage() {
 
     const handleDecode = (decodedResult: string) => {
         setResult(decodedResult)
+        console.log('decodedResult', decodedResult)
         setError(null)
         stopScanning()
     }
@@ -214,6 +212,10 @@ export default function CheckInPage() {
         if (timerRef.current) {
             clearInterval(timerRef.current)
         }
+    }, [])
+
+    useEffect(() => {
+        startScanning()
     }, [])
 
     useEffect(() => {
@@ -237,45 +239,56 @@ export default function CheckInPage() {
     }, [isScanning, stopScanning])
 
     return (
-        <PageWrapper topBarProps={{ title: 'Check-in', backButton: true }}>
-            <div className='container mx-auto max-w-2xl p-4'>
-                <h1 className='mb-6 text-center text-3xl font-bold'>Participant Check-in Preview</h1>
+        // <PageWrapper topBarProps={{ title: 'Check-in', backButton: true }}>
+        //     <div className='container mx-auto max-w-2xl p-4'>
+        //         <h1 className='mb-6 text-center text-3xl font-bold'>Participant Check-in Preview</h1>
 
-                <Card className='mb-6'>
-                    <CardHeader>
-                        <CardTitle>QR Scanner</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <QrScanner
-                            onDecode={handleDecode}
-                            onError={handleError}
-                            startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-                            stopButtonText='Stop'
-                        />
-                        {isScanning ? (
-                            <p className='mt-2 text-center'>Time left: {timeLeft} seconds</p>
-                        ) : (
-                            <Button onClick={startScanning} className='mt-2 w-full'>
-                                Resume Scanning
-                            </Button>
-                        )}
-                    </CardContent>
-                    <CardFooter>
-                        {result && (
-                            <div className='flex items-center text-green-600'>
-                                <CheckCircle2 className='mr-2 h-5 w-5' />
-                                <span>Result: {result}</span>
-                            </div>
-                        )}
-                        {error && (
-                            <div className='flex items-center text-red-600'>
-                                <AlertCircle className='mr-2 h-5 w-5' />
-                                <span>Error: {error}</span>
-                            </div>
-                        )}
-                    </CardFooter>
-                </Card>
-            </div>
-        </PageWrapper>
+        //         <Card className='mb-6'>
+        //             <CardHeader>
+        //                 <CardTitle>QR Scanner</CardTitle>
+        //             </CardHeader>
+        //             <CardContent>
+        //                 <QrScanner
+        //                     onDecode={handleDecode}
+        //                     onError={handleError}
+        //                     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+        //                     stopButtonText='Stop'
+        //                 />
+        //                 {isScanning && <p className='mt-2 text-center'>Time left: {timeLeft} seconds</p>}
+        //             </CardContent>
+        //             <CardFooter>
+        //                 {result && (
+        //                     <div className='flex items-center text-green-600'>
+        //                         <CheckCircle2 className='mr-2 h-5 w-5' />
+        //                         <span>Result: {result}</span>
+        //                     </div>
+        //                 )}
+        //                 {error && (
+        //                     <div className='flex items-center text-red-600'>
+        //                         <AlertCircle className='mr-2 h-5 w-5' />
+        //                         <span>Error: {error}</span>
+        //                     </div>
+        //                 )}
+        //             </CardFooter>
+        //         </Card>
+        //     </div>
+        // </PageWrapper>
+        // <PageWrapper>hello</PageWrapper>
+        // <PageWrapper>
+        // {/* <QrScanner
+        //     onDecode={handleDecode}
+        //     onError={handleError}
+        //     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+        //     stopButtonText='Stop'
+        // /> */}
+        // </PageWrapper>
+        <div className='absolute left-0 top-0 flex h-full w-full bg-blue-500'>
+            <QrScanner
+                onDecode={handleDecode}
+                onError={handleError}
+                startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                stopButtonText='Stop'
+            />
+        </div>
     )
 }
