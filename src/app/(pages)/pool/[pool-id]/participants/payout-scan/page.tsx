@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation'
 import { QrCodeCheckInData } from '@/types/qr'
 import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { useRouter } from 'next/navigation'
+import PoolQrScanner from '../../_components/qr-scanner'
 
 const useCanvasContextOverride = () => {
     useEffect(() => {
@@ -65,7 +66,7 @@ export default function CheckInPage() {
             isProcessing.current = true
 
             showToast({ type: 'info', message: 'Directing to user payout' })
-            router.push(`/pool/${qrData.poolId}/participants/${qrData.address}/payout`)
+            router.push(`/pool/${qrData.poolId}/participants/${qrData.address}`)
         } catch (err) {
             showToast({
                 type: 'error',
@@ -162,7 +163,7 @@ export default function CheckInPage() {
         // /> */}
         // </PageWrapper>
         <div className='absolute left-0 top-0 flex h-full w-full'>
-            <QrScanner
+            <PoolQrScanner
                 onDecode={handleDecode}
                 onError={handleError}
                 startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}

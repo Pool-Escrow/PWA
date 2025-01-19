@@ -21,7 +21,7 @@ const SearchBar = ({
         </div>
         {isAdmin && (
             <Link
-                href={`/pool/${poolId}/participants/`}
+                href={`/pool/${poolId}/participants/payout-scan`}
                 className='absolute right-[10px] z-10 flex h-10 w-6 items-center'>
                 <QrCodeIcon size={18} />
             </Link>
