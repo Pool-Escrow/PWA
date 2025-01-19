@@ -9,6 +9,7 @@ import { Button } from '@/app/_components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_components/ui/card'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import PageWrapper from '@/components/page-wrapper'
+import BackCircleButton from '@/components/back-circle-button'
 
 // Hook useQrScanner
 interface UseQrScannerProps {
@@ -285,13 +286,24 @@ export default function CheckInPage() {
         //     stopButtonText='Stop'
         // /> */}
         // </PageWrapper>
-        <div className='absolute left-0 top-0 flex h-full w-full bg-blue-500'>
+        <div className='absolute left-0 top-0 flex h-full w-full'>
             <QrScanner
                 onDecode={handleDecode}
                 onError={handleError}
                 startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
                 stopButtonText='Stop'
             />
+            <header className='absolute top-4 w-full text-white'>
+                <nav className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
+                    <div className='ml-6 w-6'>
+                        <BackCircleButton />
+                    </div>
+                    <div className='text-center'>
+                        <div className='w-full text-center'>Manage Participants</div>
+                    </div>
+                    <div className='justify-self-end'></div>
+                </nav>
+            </header>
         </div>
     )
 }
