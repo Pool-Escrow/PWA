@@ -10,7 +10,12 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_com
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import PageWrapper from '@/components/page-wrapper'
 import BackCircleButton from '@/components/back-circle-button'
-
+import { useParams } from 'next/navigation'
+import { checkInAction } from './actions'
+import { Address } from 'viem'
+import { toast } from 'sonner'
+import { QrCodeCheckInData } from '@/types/qr'
+import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 // Hook useQrScanner
 interface UseQrScannerProps {
     onDecode?: (result: string) => void
@@ -195,14 +200,63 @@ export default function CheckInPage() {
     const [error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
     const [timeLeft, setTimeLeft] = useState(20)
+    const [checkInStatus, setCheckInStatus] = useState<{ success: boolean; message: string } | null>(null)
+    const params = useParams()
     const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const isProcessing = useRef(false)
     useCanvasContextOverride()
 
-    const handleDecode = (decodedResult: string) => {
-        setResult(decodedResult)
-        console.log('decodedResult', decodedResult)
-        setError(null)
-        stopScanning()
+    const { showToast } = usePoolCreationStore(state => ({
+        showToast: state.showToast,
+    }))
+    const handleDecode = async (decodedResult: string) => {
+        if (isProcessing.current) return
+
+        try {
+            // Parse the QR code JSON data
+            const qrData: QrCodeCheckInData = JSON.parse(decodedResult)
+
+            setResult(qrData.address)
+            setError(null)
+            stopScanning()
+            isProcessing.current = true
+
+            showToast({ type: 'info', message: 'Processing Check-in' })
+
+            // Verify that the scanned poolId matches the current pool
+            if (qrData.poolId !== params?.['pool-id']) {
+                showToast({ type: 'error', message: 'This QR code is for a different pool.' })
+                return
+            }
+
+            const response = await checkInAction(params['pool-id'] as string, qrData.address as Address)
+
+            if (response.success) {
+                showToast({
+                    type: 'success',
+                    message: 'Check-in successful!',
+                })
+            } else {
+                if (response.message.includes('already checked in')) {
+                    showToast({
+                        type: 'info',
+                        message: 'This participant has already been checked in.',
+                    })
+                } else {
+                    showToast({
+                        type: 'error',
+                        message: response.message,
+                    })
+                }
+            }
+        } catch (err) {
+            showToast({
+                type: 'error',
+                message: err instanceof Error ? err.message : 'Invalid QR code format',
+            })
+        } finally {
+            isProcessing.current = false
+        }
     }
 
     const handleError = (err: Error | string) => {
