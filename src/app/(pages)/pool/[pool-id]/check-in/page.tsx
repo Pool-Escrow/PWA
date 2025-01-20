@@ -1,30 +1,20 @@
 'use client'
 
-import * as React from 'react'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils/tailwind'
-import { Button } from '@/app/_components/ui/button'
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_components/ui/card'
-import { AlertCircle, CheckCircle2 } from 'lucide-react'
-import PageWrapper from '@/components/page-wrapper'
-import BackCircleButton from '@/components/back-circle-button'
-import { useParams } from 'next/navigation'
-import { checkInAction } from './actions'
-import { Address } from 'viem'
-import { toast } from 'sonner'
-import { QrCodeCheckInData } from '@/types/qr'
 import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import PoolQrScanner from '../_components/qr-scanner'
+import PageWrapper from '@/components/page-wrapper'
 import ScannerPageLayout from '@/components/scanner-page-layout'
+import { QrCodeCheckInData } from '@/types/qr'
+import { useParams } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Address } from 'viem'
+import PoolQrScanner from '../_components/qr-scanner'
+import { checkInAction } from './actions'
 
 // Participant Check-in Preview
 export default function CheckInPage() {
     const [result, setResult] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
-    const [timeLeft, setTimeLeft] = useState(20)
-    const [checkInStatus, setCheckInStatus] = useState<{ success: boolean; message: string } | null>(null)
     const params = useParams()
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const isProcessing = useRef(false)
@@ -89,7 +79,6 @@ export default function CheckInPage() {
 
     const startScanning = useCallback(() => {
         setIsScanning(true)
-        setTimeLeft(20)
     }, [])
 
     const stopScanning = useCallback(() => {
