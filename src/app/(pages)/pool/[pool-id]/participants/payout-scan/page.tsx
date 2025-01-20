@@ -9,6 +9,8 @@ import { QrCodeCheckInData } from '@/types/qr'
 import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { useRouter } from 'next/navigation'
 import PoolQrScanner from '../../_components/qr-scanner'
+import PageWrapper from '@/components/page-wrapper'
+import ScannerPageLayout from '@/components/scanner-page-layout'
 
 const useCanvasContextOverride = () => {
     useEffect(() => {
@@ -119,67 +121,15 @@ export default function CheckInPage() {
     }, [isScanning, stopScanning])
 
     return (
-        // <PageWrapper topBarProps={{ title: 'Check-in', backButton: true }}>
-        //     <div className='container mx-auto max-w-2xl p-4'>
-        //         <h1 className='mb-6 text-center text-3xl font-bold'>Participant Check-in Preview</h1>
-
-        //         <Card className='mb-6'>
-        //             <CardHeader>
-        //                 <CardTitle>QR Scanner</CardTitle>
-        //             </CardHeader>
-        //             <CardContent>
-        //                 <QrScanner
-        //                     onDecode={handleDecode}
-        //                     onError={handleError}
-        //                     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-        //                     stopButtonText='Stop'
-        //                 />
-        //                 {isScanning && <p className='mt-2 text-center'>Time left: {timeLeft} seconds</p>}
-        //             </CardContent>
-        //             <CardFooter>
-        //                 {result && (
-        //                     <div className='flex items-center text-green-600'>
-        //                         <CheckCircle2 className='mr-2 h-5 w-5' />
-        //                         <span>Result: {result}</span>
-        //                     </div>
-        //                 )}
-        //                 {error && (
-        //                     <div className='flex items-center text-red-600'>
-        //                         <AlertCircle className='mr-2 h-5 w-5' />
-        //                         <span>Error: {error}</span>
-        //                     </div>
-        //                 )}
-        //             </CardFooter>
-        //         </Card>
-        //     </div>
-        // </PageWrapper>
-        // <PageWrapper>hello</PageWrapper>
-        // <PageWrapper>
-        // {/* <QrScanner
-        //     onDecode={handleDecode}
-        //     onError={handleError}
-        //     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-        //     stopButtonText='Stop'
-        // /> */}
-        // </PageWrapper>
-        <div className='absolute left-0 top-0 flex h-full w-full'>
-            <PoolQrScanner
-                onDecode={handleDecode}
-                onError={handleError}
-                startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-                stopButtonText='Stop'
-            />
-            <header className='absolute top-4 w-full text-white'>
-                <nav className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
-                    <div className='ml-6 w-6'>
-                        <BackCircleButton />
-                    </div>
-                    <div className='text-center'>
-                        <div className='w-full text-center text-sm font-semibold'>Manage Participants</div>
-                    </div>
-                    <div className='justify-self-end'></div>
-                </nav>
-            </header>
-        </div>
+        <PageWrapper fullScreen>
+            <ScannerPageLayout title='Manage Participants'>
+                <PoolQrScanner
+                    onDecode={handleDecode}
+                    onError={handleError}
+                    startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                    stopButtonText='Stop'
+                />
+            </ScannerPageLayout>
+        </PageWrapper>
     )
 }
