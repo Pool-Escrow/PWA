@@ -59,6 +59,7 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
                     },
                     ...scannerOptions,
                     returnDetailedScanResult: true,
+                    maxScansPerSecond: 5,
                 },
             )
             scannerRef.current.start().catch((err: Error) => {
