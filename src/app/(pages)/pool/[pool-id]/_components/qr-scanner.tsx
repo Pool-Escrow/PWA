@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import QrScannerPrimitive from 'qr-scanner'
@@ -101,6 +103,32 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
     }
 }
 
+const useCanvasContextOverride = () => {
+    useEffect(() => {
+        const originalGetContext = HTMLCanvasElement.prototype.getContext
+
+        const customGetContext = function (
+            this: HTMLCanvasElement,
+            contextId: string,
+            options?: any,
+        ): RenderingContext | null {
+            if (contextId === '2d') {
+                options = options || {}
+                options.willReadFrequently = true
+            }
+            return originalGetContext.call(this, contextId, options)
+        }
+
+        // @ts-expect-error ts(2322) - This is a temporary fix to enable willReadFrequently for 2d context
+        HTMLCanvasElement.prototype.getContext = customGetContext
+
+        // Cleanup when unmounting the component
+        return () => {
+            HTMLCanvasElement.prototype.getContext = originalGetContext
+        }
+    }, [])
+}
+
 const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
     (
         {
@@ -123,6 +151,8 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
         useEffect(() => {
             startScanner()
         }, [])
+
+        useCanvasContextOverride()
 
         return (
             <div className='relative'>

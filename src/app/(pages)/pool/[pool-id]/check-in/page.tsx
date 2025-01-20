@@ -18,32 +18,6 @@ import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import PoolQrScanner from '../_components/qr-scanner'
 import ScannerPageLayout from '@/components/scanner-page-layout'
 
-const useCanvasContextOverride = () => {
-    useEffect(() => {
-        const originalGetContext = HTMLCanvasElement.prototype.getContext
-
-        const customGetContext = function (
-            this: HTMLCanvasElement,
-            contextId: string,
-            options?: any,
-        ): RenderingContext | null {
-            if (contextId === '2d') {
-                options = options || {}
-                options.willReadFrequently = true
-            }
-            return originalGetContext.call(this, contextId, options)
-        }
-
-        // @ts-expect-error ts(2322) - This is a temporary fix to enable willReadFrequently for 2d context
-        HTMLCanvasElement.prototype.getContext = customGetContext
-
-        // Cleanup when unmounting the component
-        return () => {
-            HTMLCanvasElement.prototype.getContext = originalGetContext
-        }
-    }, [])
-}
-
 // Participant Check-in Preview
 export default function CheckInPage() {
     const [result, setResult] = useState<string | null>(null)
@@ -54,7 +28,6 @@ export default function CheckInPage() {
     const params = useParams()
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const isProcessing = useRef(false)
-    useCanvasContextOverride()
 
     const { showToast } = usePoolCreationStore(state => ({
         showToast: state.showToast,
