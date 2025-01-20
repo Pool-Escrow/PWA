@@ -1,71 +1,88 @@
-import PageWrapper from '@/components/page-wrapper'
+'use client'
 
-export default function PayoutScanPage() {
+import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
+import PageWrapper from '@/components/page-wrapper'
+import ScannerPageLayout from '@/components/scanner-page-layout'
+import { QrCodeCheckInData } from '@/types/qr'
+import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import PoolQrScanner from '../../_components/qr-scanner'
+
+// Participant Check-in Preview
+export default function CheckInPage() {
+    const [result, setResult] = useState<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
+    const [isScanning, setIsScanning] = useState(true)
+    const params = useParams()
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
+    const isProcessing = useRef(false)
+    const router = useRouter()
+
+    const { showToast } = usePoolCreationStore(state => ({
+        showToast: state.showToast,
+    }))
+
+    const handleDecode = async (decodedResult: string) => {
+        if (isProcessing.current) return
+
+        try {
+            isProcessing.current = true
+            // Parse the QR code JSON data
+            const qrData: QrCodeCheckInData = JSON.parse(decodedResult)
+
+            // Verify that the scanned poolId matches the current pool
+            if (qrData.poolId !== params?.['pool-id']) {
+                showToast({ type: 'error', message: 'This QR code is for a different pool.' })
+                return
+            }
+
+            setResult(qrData.address)
+            setError(null)
+            stopScanning()
+            isProcessing.current = true
+
+            showToast({ type: 'info', message: 'Directing to user payout' })
+            router.push(`/pool/${qrData.poolId}/participants/${qrData.address}`)
+        } catch (err) {
+            showToast({
+                type: 'error',
+                message: err instanceof Error ? err.message : 'Invalid QR code format',
+            })
+        } finally {
+            isProcessing.current = false
+        }
+    }
+
+    const handleError = (err: Error | string) => {
+        setError(typeof err === 'string' ? err : err.message)
+        setResult(null)
+    }
+
+    const startScanning = useCallback(() => {
+        setIsScanning(true)
+    }, [])
+
+    const stopScanning = useCallback(() => {
+        setIsScanning(false)
+        if (timerRef.current) {
+            clearInterval(timerRef.current)
+        }
+    }, [])
+
+    useEffect(() => {
+        startScanning()
+    }, [])
+
     return (
-        <PageWrapper topBarProps={{ title: 'Scan to Payout', backButton: true }}>
-            <h1>ScanQR</h1>
+        <PageWrapper fullScreen>
+            <ScannerPageLayout title='Manage Participants'>
+                <PoolQrScanner
+                    onDecode={handleDecode}
+                    onError={handleError}
+                    startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                    stopButtonText='Stop'
+                />
+            </ScannerPageLayout>
         </PageWrapper>
     )
 }
-
-// import Appbar from '@/components/appbar'
-// import Page from '@/components/page'
-// import Section from '@/components/section'
-// import router from 'next/router'
-// import React, { useEffect, useState } from 'react'
-// import { QrReader } from 'react-qr-reader'
-
-// const ScanQR: React.FC = () => {
-// 	const [, setQRData] = useState<string>()
-// 	const [parentRoute, setParentRoute] = useState<string>()
-
-// 	const handleScan = async (data: string | null) => {
-// 		if (data) {
-// 			setQRData(data)
-// 			console.log('data', data)
-
-// 			try {
-// 				const dataObj = JSON.parse(data)
-// 				console.log('data', data)
-// 				router.push(
-// 					`/admin/pool-id/${dataObj?.poolId}/participants/${dataObj?.address}`,
-// 				)
-// 			} catch (error) {
-// 				console.error(error)
-// 			}
-// 		}
-// 	}
-
-// 	useEffect(() => {
-// 		const paths = router?.asPath.split('/')
-// 		paths.pop() // Remove the last sub-route
-// 		setParentRoute(paths.join('/'))
-// 	}, [])
-
-// 	return (
-// 		<Page>
-// 			<Appbar backRoute={`${parentRoute}`} pageTitle='Scan to Payout' />
-// 			<Section>
-// 				<div className='h-full w-full relative flex flex-col'>
-// 					<QrReader
-// 						className='w-full h-full'
-// 						scanDelay={1000}
-// 						onResult={(result, error) => {
-// 							if (!!result) {
-// 								setQRData(result?.getText())
-// 								handleScan(result?.getText())
-// 							}
-
-// 							if (!!error) {
-// 								console.info(error)
-// 							}
-// 						}}
-// 						constraints={{ facingMode: 'environment' }}
-// 					/>
-// 				</div>
-// 			</Section>
-// 		</Page>
-// 	)
-// }
-
-// export default ScanQR
