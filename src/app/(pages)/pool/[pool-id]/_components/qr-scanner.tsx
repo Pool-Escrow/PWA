@@ -53,7 +53,6 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
                 },
                 {
                     onDecodeError: (error: Error | string) => {
-                        console.log('onDecodeError', error)
                         if (isMountedRef?.current) {
                             setError(error instanceof Error ? error : new Error(error))
                             onError?.(error instanceof Error ? error : new Error(error))
