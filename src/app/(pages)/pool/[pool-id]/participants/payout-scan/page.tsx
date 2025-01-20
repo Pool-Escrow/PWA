@@ -16,18 +16,25 @@ export default function CheckInPage() {
     const params = useParams()
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const isProcessing = useRef(false)
-
     const router = useRouter()
 
     const { showToast } = usePoolCreationStore(state => ({
         showToast: state.showToast,
     }))
+
     const handleDecode = async (decodedResult: string) => {
         if (isProcessing.current) return
 
         try {
+            isProcessing.current = true
             // Parse the QR code JSON data
             const qrData: QrCodeCheckInData = JSON.parse(decodedResult)
+
+            // Verify that the scanned poolId matches the current pool
+            if (qrData.poolId !== params?.['pool-id']) {
+                showToast({ type: 'error', message: 'This QR code is for a different pool.' })
+                return
+            }
 
             setResult(qrData.address)
             setError(null)
