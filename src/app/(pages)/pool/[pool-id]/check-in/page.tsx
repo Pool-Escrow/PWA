@@ -18,8 +18,6 @@ import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import PoolQrScanner from '../_components/qr-scanner'
 import ScannerPageLayout from '@/components/scanner-page-layout'
 
-// Hook useQrScanner
-
 const useCanvasContextOverride = () => {
     useEffect(() => {
         const originalGetContext = HTMLCanvasElement.prototype.getContext
@@ -131,26 +129,6 @@ export default function CheckInPage() {
     useEffect(() => {
         startScanning()
     }, [])
-
-    useEffect(() => {
-        if (isScanning) {
-            timerRef.current = setInterval(() => {
-                setTimeLeft(prevTime => {
-                    if (prevTime <= 1) {
-                        stopScanning()
-                        return 0
-                    }
-                    return prevTime - 1
-                })
-            }, 1000)
-        }
-
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current)
-            }
-        }
-    }, [isScanning, stopScanning])
 
     return (
         <PageWrapper fullScreen>
