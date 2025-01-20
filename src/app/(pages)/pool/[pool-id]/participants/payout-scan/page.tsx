@@ -1,21 +1,18 @@
 'use client'
 
-import * as React from 'react'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { QrCodeCheckInData } from '@/types/qr'
 import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import PoolQrScanner from '../../_components/qr-scanner'
 import PageWrapper from '@/components/page-wrapper'
 import ScannerPageLayout from '@/components/scanner-page-layout'
+import { QrCodeCheckInData } from '@/types/qr'
+import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import PoolQrScanner from '../../_components/qr-scanner'
 
 // Participant Check-in Preview
 export default function CheckInPage() {
     const [result, setResult] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
-    const [timeLeft, setTimeLeft] = useState(20)
-    const [checkInStatus, setCheckInStatus] = useState<{ success: boolean; message: string } | null>(null)
     const params = useParams()
     const timerRef = useRef<NodeJS.Timeout | null>(null)
     const isProcessing = useRef(false)
@@ -56,7 +53,6 @@ export default function CheckInPage() {
 
     const startScanning = useCallback(() => {
         setIsScanning(true)
-        setTimeLeft(20)
     }, [])
 
     const stopScanning = useCallback(() => {
@@ -69,26 +65,6 @@ export default function CheckInPage() {
     useEffect(() => {
         startScanning()
     }, [])
-
-    useEffect(() => {
-        if (isScanning) {
-            timerRef.current = setInterval(() => {
-                setTimeLeft(prevTime => {
-                    if (prevTime <= 1) {
-                        stopScanning()
-                        return 0
-                    }
-                    return prevTime - 1
-                })
-            }, 1000)
-        }
-
-        return () => {
-            if (timerRef.current) {
-                clearInterval(timerRef.current)
-            }
-        }
-    }, [isScanning, stopScanning])
 
     return (
         <PageWrapper fullScreen>
