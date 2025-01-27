@@ -36,6 +36,8 @@ export const getCspDirectives = () => ({
         'https://pulse.walletconnect.org',
         'https://chain-proxy.wallet.coinbase.com',
         'https://*.moonpay.com',
+        'https://www.okx.com/api/v5/dex/cross-chain',
+        'https://www.okx.com/api/'
     ],
 
     // Content restrictions
@@ -47,6 +49,7 @@ export const getCspDirectives = () => ({
         'https://*.supabase.co',
         'https://explorer-api.walletconnect.com',
         'https://*.poolparty.cc',
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/*",
     ],
     'font-src': [
         "'self'",
