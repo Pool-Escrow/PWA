@@ -1,6 +1,6 @@
 'use client'
 import { use } from "chai";
-import { API_paths, sendGetRequest, sendPostRequest } from "./utils";
+import { API_paths, sendGetRequest, sendPostRequest, USDC_BASE } from "./utils";
 import { useWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
 import { Button } from '@/app/_components/ui/button'
@@ -13,22 +13,20 @@ import {
 } from '@/app/_components/ui/dropdown-menu'
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select'
+import {useSendTransaction} from '@privy-io/react-auth';
+import {encodeFunctionData} from 'viem';
 
 import * as React from "react"
 import Image from "next/image"
 import { ChevronDown } from "lucide-react"
 import { set } from "lodash";
+import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
 // import { Button } from "@/components/ui/button"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 let networks = [
-    {
-        chainId:"1",
-        chainName:"Ethereum",
-        dexTokenApproveAddress:"0x40aA958dd87FC8305b97f2BA922CDdCa374bcD7f"
-    },
     {
         chainId:"8453",
         chainName:"Base",
@@ -40,38 +38,24 @@ let networks = [
 
 const tokens = [
   {
-    id: "usdc",
-    name: "USDC",
-    // icon: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-01-28%20at%201.19.44%E2%80%AFAM-WhDXF5kQVcwo3s8M1Wbe9q5S2hQLzQ.png",
+    decimals: "0",
+    tokenContractAddress: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    tokenLogoUrl: "https://static.okx.com/cdn/web3/currency/token/137-0x1e4a5963abfd975d8c9021ce480b42188849d41d-1.png/type=default_350_0?v=1735291541821",
+    tokenName: "Wrapped BTC",
+    tokenSymbol: "WBTC",
   },
 ]
-const handleTest = () => {
-    console.log('test')
-    const getRequestPath = '/api/v5/dex/aggregator/quote';
-    const getParams = {
-    'chainId': 42161,
-    'amount': 1000000000000,
-    'toTokenAddress': '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-    'fromTokenAddress': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
-    };
-    sendGetRequest(getRequestPath, getParams);
-}
-
-const handleTest2 = () => {
-    console.log('test22222')
-    const postRequestPath = '/api/v5/mktplace/nft/ordinals/listings';
-    const postParams = {
-    'slug': 'sats'
-    };
-    sendPostRequest(postRequestPath, postParams);
-}
 
 const CrossChainSwapSection = () => {
+    const {sendTransaction} = useSendTransaction();
     const { wallets } = useWallets();
-    const [fromNetwork, setFromNetwork] = React.useState(networks[0])
+    const [fromNetwork, setFromNetwork] = React.useState(USDC_BASE[0])
     const [fromToken, setFromToken] = React.useState(tokens[0])
     const [fromAmount, setFromAmount] = React.useState("0.0")
+    const [recievedAmount, setRecievedAmount] = React.useState("0.0")
     const [fetchedNetworks, setFetchedNetworks] = React.useState([])
+    const [fetchedTokens, setFetchedTokens] = React.useState([])
+
     useEffect(() => {
         const {path, call} = API_paths['chains'];
         const connectedWallet = wallets[0];
@@ -81,27 +65,154 @@ const CrossChainSwapSection = () => {
             console.log("PAAATH", path)
             const fetchChains = async () => {
                     let res = await sendGetRequest(path, null).then((res) => {
-                    console.log('res', res)
                     return res
                     }).catch((err) => {
                         console.log('err', err)
                     }).then((res) => {
-                        console.log(res);
-                        networks = res.data;
-                        setFetchedNetworks(res.data);
-                        console.log('networks', networks)
-                        return res;
+                        if (res.data === undefined || res.code == "51000") {
+                            setFromNetwork(USDC_BASE[0]);
+                            if (fetchedNetworks.length == 0){
+                                    setFetchedNetworks([USDC_BASE[0]]);
+                                }
+                            console.log('fetchedNetworks', fetchedNetworks)
+                            return res;
+                        }
+                        else if (res.code === "50011") {
+                            console.log('TIMEOUT');
+                            wait(1000);
+                            fetchRoute();
+                        }
+                        else{
+                            networks = res?.data;
+                            setFetchedNetworks(res.data);
+                            console.log('networks', networks)
+                            return res;
+                        }
                     });
-                    console.log('res22sssss//', res)
             }
-            fetchChains();
+            void fetchChains();
+        }
+    },[wallets])
+
+    useEffect(() => {
+
+        const fetchTokens = async () => {
+            const {path, call} = API_paths['tokens'];
+            const networkChainId = fromNetwork.chainId;
+            let res = await sendGetRequest(path, {'chainId' : networkChainId}).then((res) => {
+                console.log('res', res)
+                return res
+            }).catch((err) => {
+                console.log('err', err)
+            }).then((res) => {
+                console.log(res);
+                if (res === undefined) {
+                    setFromToken(USDC_BASE[1]);
+                    if (fetchedNetworks.length == 0){
+                        setFetchedTokens([USDC_BASE[1]]);
+                    }
+                    return res;
+                }
+                else if (res.code === "50011" || res.code == "51000") {
+                    console.log('TIMEOUT');
+                    wait(1000);
+                    fetchTokens();
+                }
+                else {
+                    setFetchedTokens(res.data);
+                    console.log('tokens', fetchedTokens)
+                    return res;
+                }
+            });
         }
 
-        console.log('wallets', wallets)
-    }, [wallets])
+        fetchTokens();
+    },[fromNetwork])
+
+    useEffect(() => {
+        console.log('fromAmount', fromAmount)
+        const fetchRoute = async () => {
+            const {path, call} = API_paths['route'];
+            const params = {
+                'fromChainId': fromNetwork.chainId,
+                'toChainId': USDC_BASE[0].chainId,
+                'fromTokenAddress': fromToken.tokenContractAddress,
+                'toTokenAddress': USDC_BASE[1].tokenContractAddress,
+                'amount': fromAmount,
+                'slippage': 0.02
+            }
+            let res = await sendGetRequest(path, params).then((res) => {
+                console.log('res', res)
+                return res
+            }).catch((err) => {
+                console.log('err', err)
+            }).then((res) => {
+                console.log(res);
+                if (res === undefined || res.code == "51000") {
+                    console.log('codddddde')
+                    return res;
+                }
+                else if (res.code == "50011") {
+                    console.log('TIMEOUT');
+                    wait(1000);
+                    fetchRoute();
+                }
+                else {
+                    setRecievedAmount(res.data[0].routerList[0].toTokenAmount);
+                    return res;
+                }
+            });
+        }
+        fetchRoute();
+    }, [fromAmount])
 
 
+    const handleApproveBridge = async () => {
 
+        console.log('|||||||||||||||||||handleApproveBridge')
+        const provider = await wallets[0].getEthereumProvider();
+        const {path, call} = API_paths['approve'];
+        const params = {
+            'chainId': fromNetwork.chainId,
+            'tokenContractAddress': fromToken.tokenContractAddress,
+            'approveAmount': fromAmount
+        }
+        let res = await sendGetRequest(path, params).then(async (res) => {
+            console.log('res', res)
+            const data = res.data[0].data;
+            const dexAddress = res.data[0].dexContractAddress;
+            const txRequest = {
+                from: wallets[0].address,
+                to: dexAddress,
+                data: data,
+                value: '0x0',
+            }
+            console.log('txRequest', txRequest)
+            await provider.request({
+                method: 'eth_sendTransaction',
+                params: [txRequest],
+            }).then((res) => {
+                console.log('res', res)
+                return res;
+            }).catch((err) => { console.log('err', err) });
+
+        }).catch((err) => {
+            console.log('err', err)
+        }).then((res) => {
+            console.log(res);
+            if (res === undefined || res.code == "51000") {
+                return res;
+            }
+            else if (res.code == "50011") {
+                console.log('TIMEOUT');
+                wait(1000);
+                handleApproveBridge();
+            }
+            else {
+                return res;
+            }
+        });
+    }
     return (
         <div className="w-full max-w-md mx-auto space-y-4 p-4">
           {/* From Section */}
@@ -140,8 +251,8 @@ const CrossChainSwapSection = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Select
-                  value={fromToken.id}
-                  onValueChange={(value) => setFromToken(tokens.find((t) => t.id === value) || tokens[0])}
+                  value={fromToken.tokenSymbol}
+                  onValueChange={(value) => setFromToken(fetchedTokens.find((t) => t.tokenSymbol === value) || tokens[0])}
                 >
                   <SelectTrigger className="gap-2 w-[120px]">
                     <Image
@@ -154,17 +265,17 @@ const CrossChainSwapSection = () => {
                     <SelectValue>{fromToken.name}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {tokens.map((token) => (
-                      <SelectItem key={token.id} value={token.id}>
+                    {fetchedTokens?.map((token) => (
+                      <SelectItem key={token.tokenSymbol} value={token.tokenSymbol}>
                         <div className="flex items-center gap-2">
                           <Image
-                            src={"/placeholder.svg"}
+                            src={token.tokenLogoUrl || "/placeholder.svg"}
                             alt={token.name}
                             width={20}
                             height={20}
                             className="rounded-full"
                           />
-                          {token.name}
+                          {token.tokenSymbol}
                         </div>
                       </SelectItem>
                     ))}
@@ -186,31 +297,31 @@ const CrossChainSwapSection = () => {
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-2 border rounded-md">
                   <Image
-                    src={"/placeholder.svg"}
-                    alt={networks[1].chainName}
+                    src={"https://raw.githubusercontent.com/base-org/brand-kit/a3b352afcc0839a0a355ccc2ae3279442fa56343/logo/in-product/Base_Network_Logo.svg"}
+                    alt={USDC_BASE[0].chainName}
                     width={20}
                     height={20}
                     className="rounded-full"
                   />
-                  <span>{networks[1].chainName}</span>
+                  <span>{USDC_BASE[0].chainName}</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-2 border rounded-md">
                   <Image
-                    src={"/placeholder.svg"}
-                    alt={tokens[0].name}
+                    src={USDC_BASE[1].tokenLogoUrl || "/placeholder.svg"}
+                    alt={USDC_BASE[1].tokenName}
                     width={20}
                     height={20}
                     className="rounded-full"
                   />
-                  <span>{tokens[0].name}</span>
+                  <span>{USDC_BASE[1].tokenSymbol}</span>
                 </div>
               </div>
-              <span className="w-24 text-right">0.0</span>
+              <span className="w-24 text-right">{recievedAmount}</span>
             </div>
           </div>
 
           {/* Bridge Button */}
-          <Button className="w-full" size="lg">
+          <Button className="w-full" size="lg" onClick={handleApproveBridge}>
             Bridge
           </Button>
         </div>

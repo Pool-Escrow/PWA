@@ -50,6 +50,8 @@ export const getCspDirectives = () => ({
         'https://explorer-api.walletconnect.com',
         'https://*.poolparty.cc',
         "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/*",
+        "https://static.okx.com/cdn/web3/currency/token/*",
+        "https://static.okx.com",
     ],
     'font-src': [
         "'self'",
