@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import PoolDetails from '@/features/pools/pages/pool-details'
