@@ -171,6 +171,7 @@ const CrossChainSwapSection = () => {
 
         console.log('|||||||||||||||||||handleApproveBridge')
         const provider = await wallets[0].getEthereumProvider();
+        console.log('CHAIIIIIN', wallets[0].chainId)
         const {path, call} = API_paths['approve'];
         const params = {
             'chainId': fromNetwork.chainId,
@@ -182,6 +183,7 @@ const CrossChainSwapSection = () => {
             const data = res.data[0].data;
             const dexAddress = res.data[0].dexContractAddress;
             const txRequest = {
+                gasLimit: res.data[0].gasLimit,
                 from: wallets[0].address,
                 to: dexAddress,
                 data: data,
