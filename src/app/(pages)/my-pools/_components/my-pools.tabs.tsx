@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LoaderIcon } from 'lucide-react'
@@ -7,7 +8,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
 import PoolList from '../../pools/_components/pool-list'
 import { myPoolsTabsConfig, type MyPoolsTab } from './my-pools.tabs.config'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 
 interface MyPoolsTabsProps {
     currentTab: MyPoolsTab['id']
@@ -97,7 +98,10 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                                     transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                                 />
                             )}
-                            <span className='z-10 w-full text-center text-base font-semibold'>{name}</span>
+                            <span
+                                className={`z-10 w-full text-center text-base font-semibold ${currentTab === id ? 'text-white' : ''}`}>
+                                {name}
+                            </span>
                         </TabsTrigger>
                     ))}
                 </TabsList>
