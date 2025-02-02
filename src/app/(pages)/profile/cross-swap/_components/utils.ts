@@ -41,9 +41,9 @@ function createSignature(method, request_path, params) {
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function sendGetRequest(request_path, params) {
-  
-    
-  
+
+
+
   // Generate a signature
   const { signature, timestamp } = createSignature("GET", request_path, params);
   console.log(request_path);
@@ -98,7 +98,7 @@ return new Promise((resolve, reject) => {
 
   req.end();
 });
-  
+
 }
 
 function sendPostRequest(request_path, params) {
@@ -165,6 +165,17 @@ const USDC_BASE =[
   }
 ]
 
+const toDecimals = (amount: number, decimals: number) => {
+  return amount * Math.pow(10, decimals);
+}
+
+const toWholeNumber = (amount: number, decimals: number) => {
+  return amount / Math.pow(10, decimals);
+}
+
+const toHex = (value: number): string => {
+  return `0x${value.toString(16)}`;
+}
 
 export {
     preHash,
@@ -173,7 +184,10 @@ export {
     sendGetRequest,
     sendPostRequest,
     API_paths,
-    USDC_BASE
+    USDC_BASE,
+    toDecimals,
+    toWholeNumber,
+    toHex
 };
 // GET request example
 // const getRequestPath = '/api/v5/dex/aggregator/quote';

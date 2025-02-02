@@ -2,9 +2,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 import { use } from "chai";
-import { API_paths, sendGetRequest, sendPostRequest, USDC_BASE } from "./utils";
+import { API_paths, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE } from "./utils";
 import { useWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
+import { toast } from 'sonner';
 import { Button } from '@/app/_components/ui/button'
 import {
     DropdownMenu,
@@ -16,12 +17,12 @@ import {
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select'
 import {useSendTransaction} from '@privy-io/react-auth';
-import {encodeFunctionData} from 'viem';
+import {decodeFunctionData, encodeFunctionData, toHex} from 'viem';
 
 import * as React from "react"
 import Image from "next/image"
 import { ChevronDown, Search, X } from "lucide-react"
-import { set } from "lodash";
+import { set, toNumber } from "lodash";
 import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
@@ -130,6 +131,10 @@ const CrossChainSwapSection = () => {
                     }
                     return res;
                 }
+                else if (res.code ==="82102") {
+                    console.log('minimum amount error')
+                    alert('Minimum amount error')
+                }
                 else if (res.code === "50011" || res.code == "51000") {
                     console.log('TIMEOUT');
                     wait(1000);
@@ -147,7 +152,7 @@ const CrossChainSwapSection = () => {
     },[fromNetwork, selectedNetwork])
 
     useEffect(() => {
-        console.log('fromAmount', fromAmount)
+        console.log('fromAmount', toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)))
         const fetchRoute = async () => {
             const {path, call} = API_paths['route'];
             const params = {
@@ -155,7 +160,7 @@ const CrossChainSwapSection = () => {
                 'toChainId': USDC_BASE[0].chainId,
                 'fromTokenAddress': fromToken.tokenContractAddress,
                 'toTokenAddress': USDC_BASE[1].tokenContractAddress,
-                'amount': fromAmount,
+                'amount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
                 'slippage': 0.02
             }
             let res = await sendGetRequest(path, params).then((res) => {
@@ -167,7 +172,12 @@ const CrossChainSwapSection = () => {
                 console.log(res);
                 if (res === undefined || res.code == "51000") {
                     console.log('codddddde')
+                    toast.error(res?.msg)
                     return res;
+                }
+                else if (res.code ==="82102") {
+                    console.log('minimum amount error')
+                    toast.error(res?.msg)
                 }
                 else if (res.code == "50011") {
                     console.log('TIMEOUT');
@@ -175,7 +185,7 @@ const CrossChainSwapSection = () => {
                     fetchRoute();
                 }
                 else {
-                    setRecievedAmount(res.data[0].routerList[0].toTokenAmount);
+                    setRecievedAmount(toWholeNumber(res.data[0].routerList[0].toTokenAmount, toNumber(USDC_BASE[1].decimals)).toString());
                     return res;
                 }
             });
@@ -193,14 +203,17 @@ const CrossChainSwapSection = () => {
         const params = {
             'chainId': fromNetwork.chainId,
             'tokenContractAddress': fromToken.tokenContractAddress,
-            'approveAmount': fromAmount
+            'approveAmount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals))*4,
         }
         let res = await sendGetRequest(path, params).then(async (res) => {
             console.log('res', res)
             const data = res.data[0].data;
             const dexAddress = res.data[0].dexContractAddress;
+            // const callData =
+            // console.log('callData', callData)
             const txRequest = {
-                gasLimit: res.data[0].gasLimit,
+                gas: toHex(toNumber(res.data[0].gasLimit)),
+                gasPrice: toHex(toNumber(res.data[0].gasPrice)),
                 from: wallets[0].address,
                 to: dexAddress,
                 data: data,
@@ -375,12 +388,12 @@ const CrossChainSwapSection = () => {
                   <span>{USDC_BASE[1].tokenSymbol}</span>
                 </div>
               </div>
-              <span className="w-24 text-right">0.0</span>
+              <span className="w-24 text-right">{recievedAmount}</span>
             </div>
           </div>
 
           {/* Bridge Button */}
-          <Button className="w-full" size="lg">
+          <Button className="w-full" size="lg" onClick={handleApproveBridge}>
             Bridge
           </Button>
         </div>
