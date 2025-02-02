@@ -141,7 +141,8 @@ function sendPostRequest(request_path, params) {
 
 const API_paths = {
   'tokenPairs/crosschain' : {'path': '/api/v5/dex/cross-chain/supported/bridge-tokens-pairs', 'call': 'GET'},
-  'tokens' : {'path': '/api/v5/dex/aggregator/all-tokens', 'call':'GET'},
+  'tokens' : {'path': '/api/v5/dex/cross-chain/supported/tokens', 'call':'GET'},
+  'tokens/all' : {'path': '/api/v5/dex/aggregator/all-tokens', 'call':'GET'},
   'chains' : {'path': '/api/v5/dex/cross-chain/supported/chain', 'call':'GET'},
   'route' : {'path': '/api/v5/dex/cross-chain/quote', 'call':'GET'},
   'approve' : {'path': '/api/v5/dex/aggregator/approve-transaction', 'call':'GET'},
@@ -163,6 +164,7 @@ const USDC_BASE =[
     tokenSymbol: "USDC",
   }
 ]
+
 
 export {
     preHash,
