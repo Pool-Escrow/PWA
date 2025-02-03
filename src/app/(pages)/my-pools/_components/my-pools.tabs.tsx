@@ -102,7 +102,7 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                     ))}
                 </TabsList>
             </div>
-            <div className='relative mt-32 flex-1 overflow-x-hidden' {...swipeHandlers}>
+            <div className='relative mt-32 flex-1' {...swipeHandlers}>
                 <AnimatePresence mode='popLayout' initial={false} custom={direction}>
                     <motion.div
                         key={currentTab}
