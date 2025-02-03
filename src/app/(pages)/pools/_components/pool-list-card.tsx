@@ -77,13 +77,13 @@ export default function PoolListCard({
                     <Image src={resolvedImage} alt='Pool Image' fill priority sizes='72px' className='object-cover' />
                     {status !== POOLSTATUS.ENDED && status in POOL_STATUSES_CONFIGS && (
                         <div className='flex absolute bottom-0 items-center z-10 bg-black/40 backdrop-blur-md w-full'>
-                            <div style={{ backgroundColor: POOL_STATUSES_CONFIGS[status].color }} className={'ml-2 mr-0.4 mb-0.5 size-[5px] rounded-full animate-pulse'} />
+                            <div style={{ backgroundColor: POOL_STATUSES_CONFIGS[status as POOLSTATUS].color }} className={'ml-2 mr-0.4 mb-0.5 size-[5px] rounded-full animate-pulse'} />
                             <div
                                 className={cn(
                                     'flex w-full items-center justify-center pr-[6px] pb-0.5 text-center text-[10px] text-white',
                                     status === POOLSTATUS.INACTIVE || POOLSTATUS.DEPOSIT_ENABLED,
                                 )}>
-                                {POOL_STATUSES_CONFIGS[status]?.name}
+                                {POOL_STATUSES_CONFIGS[status as POOLSTATUS]?.name}
                             </div>
                         </div>
                     )}

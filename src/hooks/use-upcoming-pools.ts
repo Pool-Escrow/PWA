@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { getContractPools } from '@/app/_server/persistence/pools/blockchain/get-contract-pools'
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
     const supabase = getSupabaseBrowserClient()
@@ -33,17 +34,17 @@ const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
                 image: dbPool.bannerImage ?? '',
                 startDate: new Date(Number(contractPool.timeStart) * 1000),
                 endDate: new Date(Number(contractPool.timeEnd) * 1000),
-                status,
+                status: status as POOLSTATUS,
                 numParticipants: Number(contractPool.numParticipants),
                 softCap: dbPool.softCap,
             }
         })
-        .filter((pool): pool is PoolItem => pool !== null)
+        .filter((pool) => pool !== null)
         .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
 
     console.log('upcoming pools', upcomingPools)
 
-    return upcomingPools
+    return upcomingPools as PoolItem[]
 }
 
 export const useUpcomingPools = () => {

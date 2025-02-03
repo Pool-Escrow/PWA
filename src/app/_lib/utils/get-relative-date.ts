@@ -66,7 +66,7 @@ export const getStatusString = ({
     status,
     startDate,
     endDate,
-}: Pick<PoolBase, 'startDate' | 'endDate'> & { status: POOLSTATUS }): string => {
+}: Pick<PoolBase, 'startDate' | 'endDate'> & { status: POOLSTATUS | string }): string => {
     const definitions: Partial<Record<POOLSTATUS, PoolStatusDefinition>>   = {
         [POOLSTATUS.INACTIVE]: { verb: 'Starts', reference: startDate },
         [POOLSTATUS.DEPOSIT_ENABLED]: { verb: 'Starts', reference: startDate },
@@ -77,7 +77,7 @@ export const getStatusString = ({
     if (!(status in definitions)) {
         return 'Date information unavailable'
     }
-    const definition = definitions[status] as PoolStatusDefinition
+    const definition = definitions[status as POOLSTATUS] as PoolStatusDefinition
 
     const time = getPrettyDate(definition.reference)
     const adjustedVerb = definition.verb
