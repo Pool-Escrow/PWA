@@ -19,7 +19,7 @@ interface PoolItem {
     image: string
     startDate: Date
     endDate: Date
-    status: POOLSTATUS
+    status: POOLSTATUS | string
     numParticipants: number
     softCap: number
 }
