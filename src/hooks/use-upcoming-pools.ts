@@ -33,7 +33,7 @@ const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
                 image: dbPool.bannerImage ?? '',
                 startDate: new Date(Number(contractPool.timeStart) * 1000),
                 endDate: new Date(Number(contractPool.timeEnd) * 1000),
-                status: status.toString(),
+                status,
                 numParticipants: Number(contractPool.numParticipants),
                 softCap: dbPool.softCap,
             }

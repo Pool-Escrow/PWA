@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
+import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
@@ -88,7 +89,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     name={pool.name}
                     imageUrl={pool.imageUrl || ''}
                     buttons={<PoolDetailsBannerButtons isAdmin={isAdmin} />}
-                    // status={<PoolDetailsBannerStatus />}
+                    status={<PoolDetailsBannerStatus status={pool.status} />}
                 />
                 <PoolDetailsHeading
                     name={pool.name}

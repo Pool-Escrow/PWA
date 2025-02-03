@@ -1,7 +1,8 @@
 'use client'
 
-import { getPoolStatus } from '@/app/_lib/utils/get-pool.status'
 import { getStatusString } from '@/app/_lib/utils/get-relative-date'
+import {POOLSTATUS} from '@/app/(pages)/pool/[pool-id]/_lib/definitions';
+import {POOL_STATUSES_CONFIGS} from '@/app/_lib/consts/pool.consts';
 import { cn } from '@/lib/utils/tailwind'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -18,7 +19,7 @@ interface PoolItem {
     image: string
     startDate: Date
     endDate: Date
-    status: string
+    status: POOLSTATUS
     numParticipants: number
     softCap: number
 }
@@ -57,13 +58,12 @@ export default function PoolListCard({
         })
     }
 
-    const statusIndicator = getPoolStatus({ startDate, endDate })
-
+    // only show ended 
     const resolvedImage = image || frog.src
 
     useEffect(() => {
-        setDateString(getStatusString({ status: statusIndicator, startDate, endDate }))
-    }, [statusIndicator, startDate, endDate])
+        setDateString(getStatusString({ status, startDate, endDate }))
+    }, [status, startDate, endDate])
 
     if (!id) return <PoolCardSkeleton />
 
@@ -73,15 +73,18 @@ export default function PoolListCard({
                 className='flex h-24 items-center gap-[14px] rounded-[1.5rem] bg-[#f4f4f4] p-3 pr-4'
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}>
-                <div className='relative size-[72px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
+                <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
                     <Image src={resolvedImage} alt='Pool Image' fill priority sizes='72px' className='object-cover' />
-                    {status !== 'past' && (
-                        <div
-                            className={cn(
-                                'absolute bottom-0 z-10 flex w-full items-center justify-center bg-black/40 pr-[9px] text-center text-[10px] text-white backdrop-blur-md before:mr-[4px] before:size-[5px] before:rounded-full',
-                                statusIndicator === 'live' && 'before:animate-pulse before:bg-[#24ff00]',
-                            )}>
-                            {statusIndicator.charAt(0).toUpperCase() + statusIndicator.slice(1)}
+                    {status !== POOLSTATUS.ENDED && status in POOL_STATUSES_CONFIGS && (
+                        <div className='flex absolute bottom-0 items-center z-10 bg-black/40 backdrop-blur-md w-full'>
+                            <div style={{ backgroundColor: POOL_STATUSES_CONFIGS[status].color }} className={'ml-2 mr-0.4 mb-0.5 size-[5px] rounded-full animate-pulse'} />
+                            <div
+                                className={cn(
+                                    'flex w-full items-center justify-center pr-[6px] pb-0.5 text-center text-[10px] text-white',
+                                    status === POOLSTATUS.INACTIVE || POOLSTATUS.DEPOSIT_ENABLED,
+                                )}>
+                                {POOL_STATUSES_CONFIGS[status]?.name}
+                            </div>
                         </div>
                     )}
                 </div>
