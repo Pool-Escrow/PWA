@@ -8,7 +8,7 @@ import { useUserNextPool } from '@/hooks/use-user-next-pool'
 export default function NextUserPool() {
     const { data: pool, isLoading, error } = useUserNextPool()
 
-    const noNextPool = isLoading || error || !pool
+    const hasNextPool = !isLoading && !error && pool
 
     return (
         <>
@@ -16,7 +16,7 @@ export default function NextUserPool() {
                 <h1 className='text-lg font-semibold'>Your Pools</h1>
                 <ChevronRightIcon className='size-6 text-[#1a70e0]' />
             </Link>
-            {!noNextPool && <PoolList pools={[pool]} name='user' />}
+            {hasNextPool && <PoolList pools={[pool]} name='user' />}
         </>
     )
 }
