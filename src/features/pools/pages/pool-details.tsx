@@ -48,7 +48,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
             isAdmin,
         })
     }, [pool, isAdmin, isPoolPending, isUserInfoPending])
-
+    console.log(pool, '<<POOL>>')
     if (isPoolPending || isUserInfoPending)
         return (
             <div className='flex flex-col space-y-3 bg-white p-2'>
@@ -92,6 +92,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     status={<PoolDetailsBannerStatus status={pool.status} />}
                 />
                 <PoolDetailsHeading
+                    status={pool.status}
                     name={pool.name}
                     startDate={pool.startDate}
                     endDate={pool.endDate}
