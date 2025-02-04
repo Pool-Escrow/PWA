@@ -63,4 +63,4 @@ Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription
 Dialog.Footer = DialogFooter
 
-export { Dialog }
+export { Dialog, DialogOverlay, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription }

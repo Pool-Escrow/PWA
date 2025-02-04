@@ -36,6 +36,9 @@ export const getCspDirectives = () => ({
         'https://pulse.walletconnect.org',
         'https://chain-proxy.wallet.coinbase.com',
         'https://*.moonpay.com',
+        'https://www.okx.com/api/v5/dex/cross-chain',
+        'https://www.okx.com/api/',
+        'https://www.okx.com/'
     ],
 
     // Content restrictions
@@ -47,6 +50,9 @@ export const getCspDirectives = () => ({
         'https://*.supabase.co',
         'https://explorer-api.walletconnect.com',
         'https://*.poolparty.cc',
+        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/*",
+        "https://static.okx.com/cdn/web3/currency/token/*",
+        "https://static.okx.com",
     ],
     'font-src': [
         "'self'",
@@ -56,7 +62,7 @@ export const getCspDirectives = () => ({
 
     // Form/Frame controls
     'form-action': ["'self'"],
-    'frame-src': ["'self'", 'https://app.privy.io', 'https://auth.privy.io', 'https://js.stripe.com'],
+    'frame-src': ["'self'", 'https://app.privy.io', 'https://auth.privy.io', 'https://js.stripe.com', 'https://www.okx.com/'],
 
     // Other
     'upgrade-insecure-requests': [],

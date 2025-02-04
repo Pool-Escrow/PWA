@@ -28,7 +28,8 @@
     "dependencies": {
         "@coinbase/cbpay-js": "2.3.0",
         "@gatefi/js-sdk": "0.20.0",
-        "@privy-io/react-auth": "1.83.1",
+        "@okxweb3/dex-widget": "1.3.9",
+        "@privy-io/react-auth": "2.0.0",
         "@privy-io/server-auth": "1.12.1",
         "@privy-io/wagmi": "0.2.12",
         "@radix-ui/react-alert-dialog": "1.1.2",
@@ -40,6 +41,7 @@
         "@radix-ui/react-label": "2.1.0",
         "@radix-ui/react-popover": "1.1.2",
         "@radix-ui/react-progress": "1.1.0",
+        "@radix-ui/react-scroll-area": "1.2.2",
         "@radix-ui/react-select": "2.1.2",
         "@radix-ui/react-slot": "1.1.0",
         "@radix-ui/react-switch": "1.1.1",
