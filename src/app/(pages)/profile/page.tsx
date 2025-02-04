@@ -1,5 +1,3 @@
-'use client'
-
 import Balance from '@/app/_components/balance/balance'
 import UserInfo from './_components/user-info/user-info'
 import { ClaimablePrizes } from './claim-winning/_components'
