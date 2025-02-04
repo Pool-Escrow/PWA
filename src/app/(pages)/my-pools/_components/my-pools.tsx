@@ -1,13 +1,10 @@
 'use client'
 
 import * as React from 'react'
-// import { Button } from '@/app/_components/ui/button'
-// import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
 import MyPoolsTabs from './my-pools.tabs'
 import type { MyPoolsTab } from './my-pools.tabs.config'
-// import { Route } from 'next'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { useServerActionQuery } from '@/app/_client/hooks/server-action-hooks'
