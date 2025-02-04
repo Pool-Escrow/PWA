@@ -15,18 +15,18 @@ const GetAllPoolInfo = getAbiItem({
     name: 'getAllPoolInfo',
 })
 
-interface PoolItem {
+export interface ContractPool {
     id: string
     name: string
-    startDate: Date
-    endDate: Date
+    status: number
+    timeStart: number
+    timeEnd: number
     numParticipants: number
-    status: string
 }
 
 const publicClient = getPublicClient(serverConfig)
 
-export async function getContractPools() {
+export async function getContractPools(): Promise<ContractPool[]> {
     const latestPoolId = await publicClient?.readContract({
         address: currentPoolAddress,
         abi: [LatestPoolId],
@@ -51,7 +51,7 @@ export async function getContractPools() {
                 return {
                     id: poolIds[index].toString(),
                     name: poolDetail.poolName,
-                    status: poolStatus,
+                    status: Number(poolStatus),
                     timeStart: Number(poolDetail.timeStart),
                     timeEnd: Number(poolDetail.timeEnd),
                     numParticipants: participants.length,
@@ -59,5 +59,5 @@ export async function getContractPools() {
             }
             return null
         })
-        .filter(pool => pool !== null)
+        .filter((pool): pool is ContractPool => pool !== null)
 }

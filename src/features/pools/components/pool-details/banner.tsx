@@ -11,7 +11,6 @@ interface PoolDetailsCardBannerProps {
 
 export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: PoolDetailsCardBannerProps) {
     const [isLoaded, setIsLoaded] = useState(false)
-
     return (
         <div className='detail_card_banner relative overflow-hidden'>
             <AnimatePresence mode='wait'>
@@ -36,7 +35,7 @@ export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: P
                 </motion.div>
             </AnimatePresence>
             {buttons}
-            {/* <div className='detail_card_banner_status'>{status}</div> */}
+            <div className='detail_card_banner_status'>{status}</div>
         </div>
     )
 }

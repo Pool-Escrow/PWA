@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
+import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
@@ -47,7 +48,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
             isAdmin,
         })
     }, [pool, isAdmin, isPoolPending, isUserInfoPending])
-
+    console.log(pool, '<<POOL>>')
     if (isPoolPending || isUserInfoPending)
         return (
             <div className='flex flex-col space-y-3 bg-white p-2'>
@@ -88,9 +89,10 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     name={pool.name}
                     imageUrl={pool.imageUrl || ''}
                     buttons={<PoolDetailsBannerButtons isAdmin={isAdmin} />}
-                    // status={<PoolDetailsBannerStatus />}
+                    status={<PoolDetailsBannerStatus status={pool.status} />}
                 />
                 <PoolDetailsHeading
+                    status={pool.status}
                     name={pool.name}
                     startDate={pool.startDate}
                     endDate={pool.endDate}

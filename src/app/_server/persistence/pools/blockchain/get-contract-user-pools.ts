@@ -5,6 +5,7 @@ import { multicall } from '@wagmi/core'
 import { getAbiItem } from 'viem'
 import type { Address } from 'viem'
 import { currentPoolAddress, serverConfig } from '../../../blockchain/server-config'
+import { ContractPool } from './get-contract-pools'
 
 const GetPoolsCreatedBy = getAbiItem({
     abi: poolAbi,
@@ -21,7 +22,7 @@ const GetAllPoolInfo = getAbiItem({
     name: 'getAllPoolInfo',
 })
 
-export async function getUserPools(userAddress: Address) {
+export async function getUserPools(userAddress: Address): Promise<ContractPool[]> {
     const [createdPoolsResult, joinedPoolsResult] = await multicall(serverConfig, {
         contracts: [
             {
@@ -64,7 +65,7 @@ export async function getUserPools(userAddress: Address) {
                 return {
                     id: allUserPools[index].toString(),
                     name: poolDetail.poolName,
-                    status: poolStatus,
+                    status: Number(poolStatus),
                     timeStart: Number(poolDetail.timeStart),
                     timeEnd: Number(poolDetail.timeEnd),
                     numParticipants: participants.length,
@@ -72,5 +73,5 @@ export async function getUserPools(userAddress: Address) {
             }
             return null
         })
-        .filter(Boolean)
+        .filter((pool): pool is ContractPool => pool !== null)
 }

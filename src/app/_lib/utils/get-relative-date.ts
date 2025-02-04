@@ -5,6 +5,7 @@
  * source: https://www.builder.io/blog/relative-time
  */
 import { toZonedTime } from 'date-fns-tz'
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 export function getRelativeTimeString(date: Date | number | string, lang = navigator.language): string {
     // Check if the input is valid
@@ -43,31 +44,45 @@ export function getRelativeTimeString(date: Date | number | string, lang = navig
 }
 
 interface PoolBase {
-    startDate: string | Date
-    endDate: string | Date
+    startDate: Date
+    endDate: Date
+}
+
+type PoolStatusDefinition = {
+    verb: string
+    reference: Date
+}
+
+export function getPrettyDate(poolDate: Date) {
+    const date = new Date(poolDate)
+    const day = String(date.getDate()).padStart(2, '0') // Ensures two-digit day
+    const month = date.toLocaleString('en-GB', { month: 'long' }) // Gets full month name
+    const year = date.getFullYear()
+
+    return `${day} ${month} ${year}`
 }
 
 export const getStatusString = ({
     status,
     startDate,
     endDate,
-}: Pick<PoolBase, 'startDate' | 'endDate'> & { status: 'live' | 'upcoming' | 'past' }): string => {
-    const definitions = {
-        upcoming: { verb: 'Starts', reference: startDate },
-        past: { verb: 'Ended', reference: endDate },
-        live: { verb: 'Ends', reference: endDate },
+}: Pick<PoolBase, 'startDate' | 'endDate'> & { status: POOLSTATUS | string }): string => {
+    const definitions: Partial<Record<POOLSTATUS, PoolStatusDefinition>> = {
+        [POOLSTATUS.INACTIVE]: { verb: 'Starts', reference: startDate },
+        [POOLSTATUS.DEPOSIT_ENABLED]: { verb: 'Starts', reference: startDate },
+        [POOLSTATUS.ENDED]: { verb: 'Ended', reference: endDate },
+        [POOLSTATUS.STARTED]: { verb: 'Ends', reference: endDate },
     }
 
-    const { verb, reference } = definitions[status]
-
-    if (!reference) {
+    if (!(status in definitions)) {
         return 'Date information unavailable'
     }
+    const definition = definitions[status as POOLSTATUS] as PoolStatusDefinition
 
-    const relativeTime = getRelativeTimeString(reference)
-    const adjustedVerb = status === 'past' ? 'Ended' : verb
+    const time = getPrettyDate(definition.reference)
+    const adjustedVerb = definition.verb
 
-    return `${adjustedVerb} ${relativeTime}`
+    return `${adjustedVerb} ${time}`
 }
 
 export const getFormattedEventTime = (startDate: Date | string, endDate: Date | string): string => {
