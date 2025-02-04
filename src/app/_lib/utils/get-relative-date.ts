@@ -5,7 +5,7 @@
  * source: https://www.builder.io/blog/relative-time
  */
 import { toZonedTime } from 'date-fns-tz'
-import {POOLSTATUS} from '@/app/(pages)/pool/[pool-id]/_lib/definitions';
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 export function getRelativeTimeString(date: Date | number | string, lang = navigator.language): string {
     // Check if the input is valid
@@ -49,17 +49,17 @@ interface PoolBase {
 }
 
 type PoolStatusDefinition = {
-    verb: string;
-    reference: Date;
-};
+    verb: string
+    reference: Date
+}
 
 export function getPrettyDate(poolDate: Date) {
-    const date = new Date(poolDate);
-    const day = String(date.getDate()).padStart(2, '0'); // Ensures two-digit day
-    const month = date.toLocaleString('en-GB', { month: 'long' }); // Gets full month name
-    const year = date.getFullYear();
+    const date = new Date(poolDate)
+    const day = String(date.getDate()).padStart(2, '0') // Ensures two-digit day
+    const month = date.toLocaleString('en-GB', { month: 'long' }) // Gets full month name
+    const year = date.getFullYear()
 
-    return`${day} ${month} ${year}`;
+    return `${day} ${month} ${year}`
 }
 
 export const getStatusString = ({
@@ -67,7 +67,7 @@ export const getStatusString = ({
     startDate,
     endDate,
 }: Pick<PoolBase, 'startDate' | 'endDate'> & { status: POOLSTATUS | string }): string => {
-    const definitions: Partial<Record<POOLSTATUS, PoolStatusDefinition>>   = {
+    const definitions: Partial<Record<POOLSTATUS, PoolStatusDefinition>> = {
         [POOLSTATUS.INACTIVE]: { verb: 'Starts', reference: startDate },
         [POOLSTATUS.DEPOSIT_ENABLED]: { verb: 'Starts', reference: startDate },
         [POOLSTATUS.ENDED]: { verb: 'Ended', reference: endDate },

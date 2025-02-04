@@ -1,8 +1,8 @@
 'use client'
 
 import { getStatusString } from '@/app/_lib/utils/get-relative-date'
-import {POOLSTATUS} from '@/app/(pages)/pool/[pool-id]/_lib/definitions';
-import {POOL_STATUSES_CONFIGS} from '@/app/_lib/consts/pool.consts';
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import { POOL_STATUSES_CONFIGS } from '@/app/_lib/consts/pool.consts'
 import { cn } from '@/lib/utils/tailwind'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -58,7 +58,7 @@ export default function PoolListCard({
         })
     }
 
-    // only show ended 
+    // only show ended
     const resolvedImage = image || frog.src
 
     useEffect(() => {
@@ -76,11 +76,14 @@ export default function PoolListCard({
                 <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
                     <Image src={resolvedImage} alt='Pool Image' fill priority sizes='72px' className='object-cover' />
                     {status !== POOLSTATUS.ENDED && status in POOL_STATUSES_CONFIGS && (
-                        <div className='flex absolute bottom-0 items-center z-10 bg-black/40 backdrop-blur-md w-full'>
-                            <div style={{ backgroundColor: POOL_STATUSES_CONFIGS[status as POOLSTATUS].color }} className={'ml-2 mr-0.4 mb-0.5 size-[5px] rounded-full animate-pulse'} />
+                        <div className='absolute bottom-0 z-10 flex w-full items-center bg-black/40 backdrop-blur-md'>
+                            <div
+                                style={{ backgroundColor: POOL_STATUSES_CONFIGS[status as POOLSTATUS].color }}
+                                className={'mr-0.4 mb-0.5 ml-2 size-[5px] animate-pulse rounded-full'}
+                            />
                             <div
                                 className={cn(
-                                    'flex w-full items-center justify-center pr-[6px] pb-0.5 text-center text-[10px] text-white',
+                                    'flex w-full items-center justify-center pb-0.5 pr-[6px] text-center text-[10px] text-white',
                                     status === POOLSTATUS.INACTIVE || POOLSTATUS.DEPOSIT_ENABLED,
                                 )}>
                                 {POOL_STATUSES_CONFIGS[status as POOLSTATUS]?.name}

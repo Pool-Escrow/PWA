@@ -13,7 +13,7 @@ export default function PoolDetailsHeading({ name, status, startDate, endDate, h
     return (
         <div className='mb-[1.81rem] mt-[0.81rem] flex flex-col gap-[0.38rem]'>
             <h1 className='text-[1.125rem] font-semibold'>{name}</h1>
-            <h2 className='text-xs'>{getStatusString({status, startDate, endDate})}</h2>
+            <h2 className='text-xs'>{getStatusString({ status, startDate, endDate })}</h2>
             {/*TODO: Needs to show the actual host, get the mainHost address and look for the user name for that address in the database */}
             <h2 className='text-xs font-semibold'>{`Hosted by: ${hostName}`}</h2>
         </div>
