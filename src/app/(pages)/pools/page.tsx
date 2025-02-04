@@ -10,7 +10,7 @@ export default function PoolsPage() {
             topBarProps={{
                 backButton: false,
             }}>
-            <div className='flex flex-1 flex-col space-y-6'>
+            <div className='flex flex-1 flex-col space-y-6 overflow-clip'>
                 <Balance />
                 <NextUserPool />
                 <UpcomingPools />
