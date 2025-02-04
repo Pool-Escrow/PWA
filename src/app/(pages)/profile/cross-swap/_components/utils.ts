@@ -2,8 +2,10 @@
 import https from 'https';
 import crypto from 'crypto';
 import querystring from 'querystring';
-
-// Define API credentials and project ids
+import { readContract } from '@wagmi/core';
+import { getConfig } from '@/app/_client/providers/configs/wagmi.config';
+import { erc20Abi, erc20Abi_bytes32 } from 'viem';
+// Define API credntials and project ids
 const api_config = {
   "api_key": process.env.NEXT_PUBLIC_OKX_API_KEY,
   "secret_key": process.env.NEXT_PUBLIC_OKX_SECRET_KEY,
@@ -148,6 +150,7 @@ const API_paths = {
   'approve' : {'path': '/api/v5/dex/aggregator/approve-transaction', 'call':'GET'},
   'swap' : {'path': '/api/v5/dex/cross-chain/build-tx', 'call':'GET'},
   'status' : {'path': '/api/v5/dex/cross-chain/status', 'call':'GET'},
+  'approval/status': {'path': '/priapi/v1/dx/trade/multi/batchGetTokenApproveInfo', 'call': 'GET'}
 }
 
 const USDC_BASE =[
@@ -164,6 +167,258 @@ const USDC_BASE =[
     tokenSymbol: "USDC",
   }
 ]
+
+const checkApprovalStatus = async ( tokenContractAddress: string, dexAddress: string, userAddress) : Promise<boolean> => {
+  const abi = [
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "name",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_spender",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "approve",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_from",
+                "type": "address"
+            },
+            {
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "transferFrom",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            }
+        ],
+        "name": "balanceOf",
+        "outputs": [
+            {
+                "name": "balance",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "symbol",
+        "outputs": [
+            {
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": false,
+        "inputs": [
+            {
+                "name": "_to",
+                "type": "address"
+            },
+            {
+                "name": "_value",
+                "type": "uint256"
+            }
+        ],
+        "name": "transfer",
+        "outputs": [
+            {
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {
+                "name": "_owner",
+                "type": "address"
+            },
+            {
+                "name": "_spender",
+                "type": "address"
+            }
+        ],
+        "name": "allowance",
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "fallback"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "spender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "Approval",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "name": "from",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "name": "to",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "name": "value",
+                "type": "uint256"
+            }
+        ],
+        "name": "Transfer",
+        "type": "event"
+    }
+]
+console.log(userAddress, dexAddress)
+const config = getConfig();
+// allowance
+console.log('in')
+  // const result = await readContract(config, {
+  //   address: tokenContractAddress,
+  //   abi: erc20Abi,
+  //   functionName: 'allowance',
+  //   args: [userAddress, dexAddress]
+  // })
+
+  const {path, call} = API_paths['approval/status'];
+  const params = {
+    'userWalletAddress': userAddress,
+    'tokenContractAddress': tokenContractAddress,
+    'chainId': 8453,
+    'defiPlatformIds': 11,
+  }
+
+  let res = await sendGetRequest(path, params).then((res) => {
+    console.log('////////////res',res);
+
+  }).catch((err) => {
+    console.log(err);
+  })
+  console.log("///////////////////resultttt", result);
+  return true
+}
 
 const toDecimals = (amount: number, decimals: number) => {
   return amount * Math.pow(10, decimals);
@@ -187,7 +442,8 @@ export {
     USDC_BASE,
     toDecimals,
     toWholeNumber,
-    toHex
+    toHex,
+    checkApprovalStatus
 };
 // GET request example
 // const getRequestPath = '/api/v5/dex/aggregator/quote';

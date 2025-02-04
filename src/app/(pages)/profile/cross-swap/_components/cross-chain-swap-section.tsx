@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 import { use } from "chai";
-import { API_paths, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE } from "./utils";
+import { API_paths, checkApprovalStatus, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE } from "./utils";
 import { useWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
 import { toast } from 'sonner';
@@ -27,6 +27,7 @@ import { wait } from "@testing-library/user-event/dist/cjs/utils/index.js";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_components/ui/dialog";
 import { Input } from "@/app/_components/ui/input";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { hash } from "crypto";
 
 
 
@@ -63,6 +64,7 @@ const CrossChainSwapSection = () => {
     const [isSelectOpen, setIsSelectOpen] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState("")
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
+    const [ifApproved, setIfApproved] = React.useState(false)
 
 
 
@@ -157,12 +159,13 @@ const CrossChainSwapSection = () => {
             const {path, call} = API_paths['route'];
             const params = {
                 'fromChainId': fromNetwork.chainId,
-                'toChainId': USDC_BASE[0].chainId,
+                'toChainId': "137",//USDC_BASE[0].chainId,
                 'fromTokenAddress': fromToken.tokenContractAddress,
-                'toTokenAddress': USDC_BASE[1].tokenContractAddress,
+                'toTokenAddress': "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", //USDC_BASE[1].tokenContractAddress
                 'amount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
                 'slippage': 0.02
             }
+            console.log('||||||||||||params', params);
             let res = await sendGetRequest(path, params).then((res) => {
                 console.log('res', res)
                 return res
@@ -209,13 +212,17 @@ const CrossChainSwapSection = () => {
             console.log('res', res)
             const data = res.data[0].data;
             const dexAddress = res.data[0].dexContractAddress;
+            console
+            const res2 = await checkApprovalStatus(fromToken.tokenContractAddress, dexAddress, wallets[0].address)
+            console.log("//////////",res2);
+            // setIfApproved(checkApprovalStatus(fromToken.tokenContractAddress, dexAddress, wallets[0].address))
             // const callData =
             // console.log('callData', callData)
             const txRequest = {
                 gas: toHex(toNumber(res.data[0].gasLimit)),
                 gasPrice: toHex(toNumber(res.data[0].gasPrice)),
                 from: wallets[0].address,
-                to: dexAddress,
+                to: fromToken.tokenContractAddress,
                 data: data,
                 value: '0x0',
             }
@@ -225,6 +232,7 @@ const CrossChainSwapSection = () => {
                 params: [txRequest],
             }).then((res) => {
                 console.log('res', res)
+                setIfApproved(true);
                 return res;
             }).catch((err) => { console.log('err', err) });
 
@@ -245,6 +253,71 @@ const CrossChainSwapSection = () => {
             }
         });
     }
+
+    const handleSwap = async () => {
+      const provider = await wallets[0].getEthereumProvider();
+      console.log('amount', toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString());
+      const {path, call} = API_paths['swap'];
+      const params ={
+        fromChainId: fromNetwork.chainId,
+        toChainId: "137",//USDC_BASE[0].chainId,
+        fromTokenAddress: fromToken.tokenContractAddress,
+        toTokenAddress: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//USDC_BASE[1].tokenContractAddress,
+        amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString(),
+        slippage: '0.015',
+        userWalletAddress:wallets[0].address,
+      }
+      console.log('paramsmmsms', params);
+      let res = await sendGetRequest(path, params).then(async (res) => {
+        console.log('res', res)
+        const data = res.data[0].tx;
+        console.log('DATATATTA', data);
+        const txRequest = {
+            gas: toHex(toNumber(data.gasLimit)),
+            gasPrice: toHex(toNumber(data.gasPrice)),
+            from: data.from,
+            to: data.to,
+            data: data.data,
+            value: toHex(toNumber(data.value)),
+        }
+        console.log('txRequest', txRequest)
+        await provider.request({
+            method: 'eth_sendTransaction',
+            params: [txRequest],
+        }).then((res) => {
+            console.log('res', res)
+            // setIfApproved(true);
+            return res;
+        }).catch((err) => { console.log('err', err) });
+
+    }).catch((err) => {
+        console.log('err', err)
+    }).then((res) => {
+        console.log(res);
+        if (res === undefined || res.code == "51000") {
+            return res;
+        }
+        else if (res.code == "50011") {
+            console.log('TIMEOUT');
+            wait(1000);
+            handleSwap();
+        }
+        else {
+            return res;
+        }
+    });
+    }
+
+    const fetchStatus = async () => {
+      const {path, call} = API_paths['status'];
+      const params = {
+        "hash": "0x80891b9a50187d548b0f6aa6d03a6ba1ac7201bff2d0f4756284a40b843132d6"
+      }
+      const res = await sendGetRequest(path, params).then(async (res) => {
+        console.log('{{{{{{{{res}}}}}}}}', res)
+      })
+    }
+    fetchStatus()
     return (
         <div className="w-full max-w-md mx-auto space-y-4 p-4">
             {/* Network Selection Dialog */}
@@ -394,7 +467,10 @@ const CrossChainSwapSection = () => {
 
           {/* Bridge Button */}
           <Button className="w-full" size="lg" onClick={handleApproveBridge}>
-            Bridge
+            {ifApproved ? "Bridge" : "Approve"}
+          </Button>
+          <Button className="w-full" size="lg" onClick={handleSwap}>
+            {ifApproved ? "Bridge" : "Approve"}
           </Button>
         </div>
       )

@@ -37,7 +37,8 @@ export const getCspDirectives = () => ({
         'https://chain-proxy.wallet.coinbase.com',
         'https://*.moonpay.com',
         'https://www.okx.com/api/v5/dex/cross-chain',
-        'https://www.okx.com/api/'
+        'https://www.okx.com/api/',
+        'https://www.okx.com/'
     ],
 
     // Content restrictions
