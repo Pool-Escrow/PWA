@@ -1,6 +1,6 @@
 export enum POOL_PRETTY_STATUS {
     INACTIVE = 'Upcoming',
-    DEPOSIT_ENABLED = 'Registring',
+    DEPOSIT_ENABLED = 'Registering',
     STARTED = 'Live',
     ENDED = 'Ended',
     DELETED = 'Deleted',
