@@ -165,7 +165,9 @@ const CrossChainSwapSection = () => {
                 'amount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
                 'slippage': 0.02
             }
-            console.log('||||||||||||params', params);
+            await checkApprovalStatus(fromToken.tokenContractAddress, wallets[0].address, toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals))).then((res) => {
+              setIfApproved(res);
+            });
             let res = await sendGetRequest(path, params).then((res) => {
                 console.log('res', res)
                 return res
@@ -194,7 +196,7 @@ const CrossChainSwapSection = () => {
             });
         }
         fetchRoute();
-    }, [fromAmount])
+    }, [fromToken, fromAmount])
 
 
     const handleApproveBridge = async () => {
@@ -212,12 +214,6 @@ const CrossChainSwapSection = () => {
             console.log('res', res)
             const data = res.data[0].data;
             const dexAddress = res.data[0].dexContractAddress;
-            console
-            const res2 = await checkApprovalStatus(fromToken.tokenContractAddress, dexAddress, wallets[0].address)
-            console.log("//////////",res2);
-            // setIfApproved(checkApprovalStatus(fromToken.tokenContractAddress, dexAddress, wallets[0].address))
-            // const callData =
-            // console.log('callData', callData)
             const txRequest = {
                 gas: toHex(toNumber(res.data[0].gasLimit)),
                 gasPrice: toHex(toNumber(res.data[0].gasPrice)),
@@ -311,13 +307,13 @@ const CrossChainSwapSection = () => {
     const fetchStatus = async () => {
       const {path, call} = API_paths['status'];
       const params = {
-        "hash": "0x80891b9a50187d548b0f6aa6d03a6ba1ac7201bff2d0f4756284a40b843132d6"
+        "hash": "0x0cdf3266070dd42dad413f309f068e952d846867dd5371eca64233697bd163bc"
       }
       const res = await sendGetRequest(path, params).then(async (res) => {
         console.log('{{{{{{{{res}}}}}}}}', res)
       })
     }
-    fetchStatus()
+    // fetchStatus()
     return (
         <div className="w-full max-w-md mx-auto space-y-4 p-4">
             {/* Network Selection Dialog */}
@@ -466,12 +462,16 @@ const CrossChainSwapSection = () => {
           </div>
 
           {/* Bridge Button */}
-          <Button className="w-full" size="lg" onClick={handleApproveBridge}>
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={ifApproved ? handleSwap : handleApproveBridge}
+          >
             {ifApproved ? "Bridge" : "Approve"}
           </Button>
-          <Button className="w-full" size="lg" onClick={handleSwap}>
+          {/* <Button className="w-full" size="lg" onClick={handleSwap}>
             {ifApproved ? "Bridge" : "Approve"}
-          </Button>
+          </Button> */}
         </div>
       )
     // return (
