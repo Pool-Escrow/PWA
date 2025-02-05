@@ -26,7 +26,7 @@ const PoolCardRow = ({ poolId }: PoolCardRowProps) => {
 
     const formatAmount = (num: number): string => {
         if (num < 0.01) {
-            return num.toExponential(2)
+            return num.toExponential(0)
         }
         return num.toFixed(2)
     }
@@ -45,7 +45,7 @@ const PoolCardRow = ({ poolId }: PoolCardRowProps) => {
                 <div className='text-[11px] font-semibold text-[#5371E7]'>{capitalize('Winner')}</div>
             </div>
             <div className='flex items-center gap-[6px] font-thin'>
-                <div className='inline-flex h-[30px] w-[43px] flex-nowrap items-center justify-center gap-1.5 rounded-[9px] bg-[#D9E4FF] px-2.5 py-[5px]'>
+                <div className='inline-flex h-[30px] w-[43px] flex-nowrap items-center justify-center gap-1.5 rounded-[9px] bg-[#D9E4FF] py-[5px]'>
                     <div className='text-center text-[10px] font-medium leading-tight text-[#5674EA]'>${wonAmount}</div>
                 </div>
             </div>
