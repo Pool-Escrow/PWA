@@ -55,7 +55,8 @@ async function sendGetRequest(request_path, params) {
     'OK-ACCESS-SIGN': signature,
     'OK-ACCESS-TIMESTAMP': timestamp,
     'OK-ACCESS-PASSPHRASE': api_config['passphrase'],
-    'OK-ACCESS-PROJECT': api_config['project'] // This applies only to WaaS APIs
+    'OK-ACCESS-PROJECT': api_config['project'], // This applies only to WaaS APIs
+    // 'Access-Control-Allow-Origin': '*'
   };
 
   const options = {
@@ -65,19 +66,6 @@ async function sendGetRequest(request_path, params) {
     headers: headers
   };
   console.log(options);
-//   const req = https.request(options, (res) => {
-//     let data = '';
-//     res.on('data', (chunk) => {
-//       data += chunk;
-//     });
-//     res.on('end', () => {
-//       console.log(data);
-//       return data;
-//     });
-//   });
-// //   console.log();
-
-//   req.end();
 return new Promise((resolve, reject) => {
   const req = https.request(options, (res) => {
     let data = '';
@@ -121,7 +109,7 @@ function sendPostRequest(request_path, params) {
     hostname: 'www.okx.com',
     path: request_path,
     method: 'POST',
-    headers: headers
+    headers: headers,
   };
 
   const req = https.request(options, (res) => {
@@ -147,6 +135,7 @@ const API_paths = {
   'tokens/all' : {'path': '/api/v5/dex/aggregator/all-tokens', 'call':'GET'},
   'chains' : {'path': '/api/v5/dex/cross-chain/supported/chain', 'call':'GET'},
   'route' : {'path': '/api/v5/dex/cross-chain/quote', 'call':'GET'},
+  'route/detailed' : {'path': '/priapi/v1/dx/trade/bridge/v3/quote', 'call':'GET'},
   'approve' : {'path': '/api/v5/dex/aggregator/approve-transaction', 'call':'GET'},
   'swap' : {'path': '/api/v5/dex/cross-chain/build-tx', 'call':'GET'},
   'status' : {'path': '/api/v5/dex/cross-chain/status', 'call':'GET'},
@@ -209,6 +198,13 @@ const checkApprovalStatus = async ( tokenContractAddress: string, userAddress, t
   }
 }
 
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}m ${secs}s`;
+}
+
+
 const toDecimals = (amount: number, decimals: number) => {
   return amount * Math.pow(10, decimals);
 }
@@ -233,7 +229,7 @@ export {
     toWholeNumber,
     toHex,
     checkApprovalStatus,
-    BridgeInfo,
+    formatTime
 };
 // GET request example
 // const getRequestPath = '/api/v5/dex/aggregator/quote';

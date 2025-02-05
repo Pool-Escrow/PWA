@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 import { use } from "chai";
-import { API_paths, checkApprovalStatus, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE, BridgeInfo } from "./utils";
+import { API_paths, checkApprovalStatus, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE, BridgeInfo, formatTime } from "./utils";
 import { useWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
 import { toast } from 'sonner';
@@ -180,10 +180,10 @@ const CrossChainSwapSection = () => {
                         to: { amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)), token: USDC_BASE[1].tokenSymbol }
                     },
                     fee: {
-                        networkFee: toWholeNumber(routerResult.fromChainNetworkFee, toNumber(data.fromToken.decimals)),
-                        token: data.fromToken.tokenSymbol
+                        networkFee: toWholeNumber(routerResult.fromChainNetworkFee, 18),
+                        token: 'ETH'
                     },
-                    estimatedTime: routerResult.estimatedTime,
+                    estimatedTime: formatTime(toNumber(routerResult.estimateTime)),
                     slippage: "0.015",
                 }
                 setRouterInfo(router);

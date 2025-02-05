@@ -25,9 +25,9 @@ export function BridgeInfoCard({ bridgeInfo }: BridgeInfoProps) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {/* <span className="text-sm text-muted-foreground">
-              {bridgeInfo.protocol} ({bridgeInfo.protocolType})
-            </span> */}
+            <span className="text-sm text-foreground">
+              {bridgeInfo.protocol}
+            </span>
             {/* <Badge variant="success" className="bg-green-100 text-green-700 hover:bg-green-100">
               {bridgeInfo.speed}
             </Badge> */}
