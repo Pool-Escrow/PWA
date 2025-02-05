@@ -19,7 +19,8 @@ const config: Config = {
                 'skeleton-pulse': 'skeleton-fade-in 0.8s ease-out forwards, skeleton-shimmer 2s infinite linear',
             },
             backgroundImage: {
-                cta: 'linear-gradient(180deg, #36a0f7, #1364da)',
+                'cta': 'linear-gradient(180deg, #36a0f7, #1364da)',
+                'cta-active': 'linear-gradient(180deg, #2b80c5, #0f50af)',
             },
             borderRadius: {
                 lg: 'var(--radius)',
