@@ -168,6 +168,20 @@ const USDC_BASE =[
   }
 ]
 
+export type BridgeInfo = {
+  protocol: string
+  rate: {
+    from: { amount: number; token: string }
+    to: { amount: number; token: string }
+  }
+  fee: {
+    networkFee: number
+    token: string
+  }
+  estimatedTime: string
+  slippage: string
+}
+
 const checkApprovalStatus = async ( tokenContractAddress: string, userAddress, totalAmount) : Promise<boolean> => {
   const {path, call} = API_paths['approval/status'];
   const params = {
@@ -218,7 +232,8 @@ export {
     toDecimals,
     toWholeNumber,
     toHex,
-    checkApprovalStatus
+    checkApprovalStatus,
+    BridgeInfo,
 };
 // GET request example
 // const getRequestPath = '/api/v5/dex/aggregator/quote';

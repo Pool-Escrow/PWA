@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 import { use } from "chai";
-import { API_paths, checkApprovalStatus, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE } from "./utils";
+import { API_paths, checkApprovalStatus, sendGetRequest, sendPostRequest, toDecimals, toWholeNumber, USDC_BASE, BridgeInfo } from "./utils";
 import { useWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
 import { toast } from 'sonner';
@@ -28,6 +28,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/app/_compone
 import { Input } from "@/app/_components/ui/input";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { hash } from "crypto";
+import { BridgeInfoCard } from "./bridge-card";
 
 
 
@@ -37,8 +38,6 @@ let networks = [
         chainName:"Base",
         dexTokenApproveAddress:"0x57df6092665eb6058DE53939612413ff4B09114E"
     }
-
-
 ]
 
 const tokens = [
@@ -65,6 +64,8 @@ const CrossChainSwapSection = () => {
     const [searchQuery, setSearchQuery] = React.useState("")
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
     const [ifApproved, setIfApproved] = React.useState(false)
+    const [routerInfo, setRouterInfo] = React.useState({})
+    const [status, setStatus] = React.useState({})
 
 
 
@@ -170,6 +171,22 @@ const CrossChainSwapSection = () => {
             });
             let res = await sendGetRequest(path, params).then((res) => {
                 console.log('res', res)
+                const data = res.data[0];
+                const routerResult = data.routerList[0];
+                const router: BridgeInfo =  {
+                    protocol: routerResult.router.bridgeName,
+                    rate: {
+                        from: { amount: toWholeNumber(data.fromTokenAmount, toNumber(data.fromToken.decimals)), token: data.fromToken.tokenSymbol },
+                        to: { amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)), token: USDC_BASE[1].tokenSymbol }
+                    },
+                    fee: {
+                        networkFee: toWholeNumber(routerResult.fromChainNetworkFee, toNumber(data.fromToken.decimals)),
+                        token: data.fromToken.tokenSymbol
+                    },
+                    estimatedTime: routerResult.estimatedTime,
+                    slippage: "0.015",
+                }
+                setRouterInfo(router);
                 return res
             }).catch((err) => {
                 console.log('err', err)
@@ -469,9 +486,7 @@ const CrossChainSwapSection = () => {
           >
             {ifApproved ? "Bridge" : "Approve"}
           </Button>
-          {/* <Button className="w-full" size="lg" onClick={handleSwap}>
-            {ifApproved ? "Bridge" : "Approve"}
-          </Button> */}
+          {Object.keys(routerInfo).length !== 0 && <BridgeInfoCard bridgeInfo={routerInfo} />}
         </div>
       )
     // return (
