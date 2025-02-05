@@ -96,7 +96,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     return (
         <div className='overflow-hidden rounded-lg bg-white'>
-            <div className='p-4'>
+            <div className='p-4 pt-0'>
                 <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
                 <Tabs
                     defaultValue={TabValue.Registered}
@@ -104,23 +104,20 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                     onValueChange={(value: string) => handleTabChange(value as TabValue)}>
                     {isAdmin && (
                         <>
-                            <TabsList className='z-10 flex fixed left-0 right-0 justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
-                                <TabsTrigger 
-                                    className='relative font-semibold data-[state=active]:text-black before:absolute before:bottom-[-1px] before:left-0 before:h-[2px] before:w-full before:bg-black data-[state=active]:before:block before:hidden' 
-                                    value={TabValue.Registered}
-                                >
+                            <TabsList className='fixed left-0 right-0 z-10 flex justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Registered}>
                                     Registered
                                 </TabsTrigger>
-                                <TabsTrigger 
-                                    className='relative font-semibold data-[state=active]:text-black before:absolute before:bottom-[-1px] before:left-0 before:h-[2px] before:w-full before:bg-black data-[state=active]:before:block before:hidden' 
-                                    value={TabValue.CheckedIn}
-                                >
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.CheckedIn}>
                                     Checked in
                                 </TabsTrigger>
-                                <TabsTrigger 
-                                    className='relative font-semibold data-[state=active]:text-black before:absolute before:bottom-[-1px] before:left-0 before:h-[2px] before:w-full before:bg-black data-[state=active]:before:block before:hidden' 
-                                    value={TabValue.Winners}
-                                >
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Winners}>
                                     Winners
                                 </TabsTrigger>
                             </TabsList>

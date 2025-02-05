@@ -72,8 +72,8 @@ const ParticipantPayout = ({ params }: Props) => {
 
     return (
         <PageWrapper topBarProps={{ title: 'Payout', backButton: true }}>
-            <div className='mx-auto flex max-w-md overflow-hidden rounded-lg bg-white'>
-                <div className='mt-6 flex flex-col items-center'>
+            <div className='mx-auto flex w-full overflow-hidden rounded-lg bg-white'>
+                <div className='mt-6 flex w-full flex-col items-center'>
                     <div>
                         <div className='relative'>
                             <Avatar className='size-[73px]' aria-label='User Avatar'>
