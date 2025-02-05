@@ -96,30 +96,37 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     return (
         <div className='overflow-hidden rounded-lg bg-white'>
-            <div className='p-4'>
+            <div className='p-4 pt-0'>
                 <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
                 <Tabs
                     defaultValue={TabValue.Registered}
                     className='w-full'
                     onValueChange={(value: string) => handleTabChange(value as TabValue)}>
                     {isAdmin && (
-                        <TabsList className='z-10 flex w-full justify-start space-x-0 rounded-none bg-white p-0 md:space-x-8'>
-                            <TabsTrigger className='font-semibold' value={TabValue.Registered}>
-                                Registered
-                            </TabsTrigger>
-                            <TabsTrigger className='font-semibold' value={TabValue.CheckedIn}>
-                                Checked in
-                            </TabsTrigger>
-                            <TabsTrigger className='font-semibold' value={TabValue.Winners}>
-                                Winners
-                            </TabsTrigger>
-                            {/* <TabsTrigger value='refunded'>Refunded</TabsTrigger> */}
-                        </TabsList>
+                        <>
+                            <TabsList className='fixed left-0 right-0 z-10 flex justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Registered}>
+                                    Registered
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.CheckedIn}>
+                                    Checked in
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Winners}>
+                                    Winners
+                                </TabsTrigger>
+                            </TabsList>
+                            <div className='h-[48px]'></div>
+                        </>
                     )}
                     <TabsContent value='registered'></TabsContent>
                     <TabsContent value='checkedIn'></TabsContent>
                     <TabsContent value='winners'></TabsContent>
-                    {/* <TabsContent value='refunded'>Refunded</TabsContent> */}
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
                             <PoolBalanceProgress

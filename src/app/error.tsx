@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -65,8 +66,8 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
     return (
         <div className='flex flex-1 flex-col items-center bg-gradient-to-b py-20'>
             <h1 className='text-2xl font-bold'>Oops! Something went wrong</h1>
-            <p className='text-l my-2 text-balance text-center'>
-                We're sorry for the inconvenience. Our team has been notified.
+            <p className='my-2 text-balance text-center text-[16px]'>
+                We&apos;re sorry for the inconvenience. Our team has been notified.
             </p>
 
             {isProduction ? (

@@ -1,6 +1,7 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import * as React from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
@@ -17,8 +18,11 @@ import PoolDetailsInfo from '@/app/(pages)/pool/[pool-id]/_components/pool-detai
 import BottomBarHandler from '@/app/(pages)/pool/[pool-id]/_components/bottom-bar-handler'
 import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect } from 'react'
+import PullToRefresh from '@/app/_components/pull-to-refresh'
 
 export default function PoolDetails({ poolId }: { poolId: string }) {
+    const queryClient = useQueryClient()
+
     const {
         data: pool,
         isPending: isPoolPending,
@@ -36,6 +40,15 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
         queryKey: ['userAdminStatus'],
         queryFn: () => getUserAdminStatusActionWithCookie(),
     })
+
+    const handleRefresh = async () => {
+        console.log('🔄 Refreshing pool details...')
+        await Promise.all([
+            queryClient.invalidateQueries({ queryKey: ['pool-details', poolId] }),
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] }),
+        ])
+        console.log('✅ Pool details refreshed')
+    }
 
     console.log('🔄 [PoolDetails] Rendering with poolId:', poolId)
 
@@ -82,6 +95,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     }))
 
     return (
+        <PullToRefresh onRefresh={handleRefresh}>
         <div className='space-y-3 bg-white p-2'>
             <PoolDetailsCard>
                 <PoolDetailsBanner
@@ -101,7 +115,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     tokenSymbol={pool.tokenSymbol}
                     poolId={pool.contractId}
                 /> */}
-                <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
+                <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5 pb-4'>
                     {pool.status != POOLSTATUS.ENDED && (
                         <PoolDetailsProgress
                             data-testid='pool-details-progress'
@@ -136,5 +150,6 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                 termsUrl={pool.termsUrl || ''}
             />
         </div>
+        </PullToRefresh>
     )
 }
