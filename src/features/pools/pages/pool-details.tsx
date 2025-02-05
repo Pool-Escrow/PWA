@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
@@ -116,7 +117,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     tokenSymbol={pool.tokenSymbol}
                     poolId={pool.contractId}
                 /> */}
-                <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
+                <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5 pb-4'>
                     {pool.status != POOLSTATUS.ENDED && (
                         <PoolDetailsProgress
                             data-testid='pool-details-progress'
