@@ -1,18 +1,20 @@
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import https from 'https';
 import crypto from 'crypto';
 import querystring from 'querystring';
-import { readContract } from '@wagmi/core';
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config';
-import { erc20Abi, erc20Abi_bytes32 } from 'viem';
-// Define API credntials and project ids
+
+// OKX API configuration
 const api_config = {
   "api_key": process.env.NEXT_PUBLIC_OKX_API_KEY,
   "secret_key": process.env.NEXT_PUBLIC_OKX_SECRET_KEY,
   "passphrase": process.env.NEXT_PUBLIC_OKX_PASSPHRASE,
-  "project": process.env.NEXT_PUBLIC_OKX_PROJECT_ID // This applies only to onchainOS APIs
+  "project": process.env.NEXT_PUBLIC_OKX_PROJECT_ID
 };
 
+// OKX SIGNATURE GENERATION
 function preHash(timestamp, method, request_path, params) {
   // Create a pre-signature based on strings and parameters
   let query_string = '';
@@ -44,19 +46,15 @@ function createSignature(method, request_path, params) {
 // eslint-disable-next-line @typescript-eslint/require-await
 async function sendGetRequest(request_path, params) {
 
-
-
   // Generate a signature
   const { signature, timestamp } = createSignature("GET", request_path, params);
-  console.log(request_path);
   // Generate the request header
   const headers = {
     'OK-ACCESS-KEY': api_config['api_key'],
     'OK-ACCESS-SIGN': signature,
     'OK-ACCESS-TIMESTAMP': timestamp,
     'OK-ACCESS-PASSPHRASE': api_config['passphrase'],
-    'OK-ACCESS-PROJECT': api_config['project'], // This applies only to WaaS APIs
-    // 'Access-Control-Allow-Origin': '*'
+    'OK-ACCESS-PROJECT': api_config['project'],
   };
 
   const options = {
@@ -65,21 +63,21 @@ async function sendGetRequest(request_path, params) {
     method: 'GET',
     headers: headers
   };
-  console.log(options);
-return new Promise((resolve, reject) => {
-  const req = https.request(options, (res) => {
-    let data = '';
-    res.on('data', (chunk) => {
-      data += chunk;
-    });
-    res.on('end', () => {
-      try {
-        const parsedData = JSON.parse(data);
-        resolve(parsedData);
-      } catch (error) {
-        reject(error);
-      }
-    });
+
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(data);
+          resolve(parsedData);
+        } catch (error) {
+          reject(error);
+        }
+      });
   });
 
   req.on('error', (error) => {
@@ -181,20 +179,17 @@ const checkApprovalStatus = async ( tokenContractAddress: string, userAddress, t
   }
   try {
     const res = await sendGetRequest(path, params);
-      const approvedAmount = res.data[11]?.amount;
-      // console.log('///APPROVED AMOUNT', res.data[11]?.amount);
-
+      const approvedAmount = res?.data[11]?.amount;
       if (approvedAmount === "0") {
         return false;
       } else if (approvedAmount > totalAmount) {
         return true;
       } else {
-        // console.log("amountssss", approvedAmount, totalAmount)
         return false;
       }
   } catch (err) {
     console.log(err);
-    return false; // Ensure a boolean is always returned
+    return false;
   }
 }
 
@@ -231,18 +226,3 @@ export {
     checkApprovalStatus,
     formatTime
 };
-// GET request example
-// const getRequestPath = '/api/v5/dex/aggregator/quote';
-// const getParams = {
-//   'chainId': 42161,
-//   'amount': 1000000000000,
-//   'toTokenAddress': '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-//   'fromTokenAddress': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
-// };
-// sendGetRequest(getRequestPath, getParams);
-// // POST request example
-// const postRequestPath = '/api/v5/mktplace/nft/ordinals/listings';
-// const postParams = {
-//   'slug': 'sats'
-// };
-// sendPostRequest(postRequestPath, postParams);
