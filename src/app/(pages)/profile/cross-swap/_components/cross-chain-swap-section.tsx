@@ -326,7 +326,7 @@ const CrossChainSwapSection = () => {
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle>Select network</DialogTitle>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsNetworkSelectOpen(false)}>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setIsNetworkSelectOpen(true)}>
               <X className="h-4 w-4" />
             </Button>
           </DialogHeader>
@@ -334,7 +334,7 @@ const CrossChainSwapSection = () => {
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search networks" className="pl-9" />
           </div>
-          <ScrollArea className="h-[300px] pr-4">
+          {/* <ScrollArea className="h-[300px] pr-4">
             <div className="grid grid-cols-2 gap-2">
               {fetchedNetworks.slice(1).map((network) => (
                 <Button
@@ -351,7 +351,7 @@ const CrossChainSwapSection = () => {
                 </Button>
               ))}
             </div>
-          </ScrollArea>
+          </ScrollArea> */}
         </DialogContent>
       </Dialog>
           {/* Token Selection Dialog */}
