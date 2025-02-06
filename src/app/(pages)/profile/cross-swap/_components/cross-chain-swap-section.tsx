@@ -75,145 +75,137 @@ const CrossChainSwapSection = () => {
     useEffect(() => {
         const {path, call} = API_paths['chains'];
         const connectedWallet = wallets[0];
-        // console.log('connectedWallet', connectedWallet);
-        // Get Chain Balances from RPC's
         if (connectedWallet) {
             console.log("PAAATH", path)
             const fetchChains = async () => {
-                    let res = await sendGetRequest(path, null).then((res) => {
-                    return res
-                    }).catch((err) => {
-                        console.log('err', err)
-                    }).then((res) => {
-                        if (res.data === undefined || res.code == "51000") {
-                            setFromNetwork(USDC_BASE[0]);
-                            if (fetchedNetworks.length == 0){
-                                    setFetchedNetworks([USDC_BASE[0]]);
-                                }
-                            console.log('fetchedNetworks', fetchedNetworks)
-                            return res;
-                        }
-                        else if (res.code === "50011") {
-                            console.log('TIMEOUT');
-                            wait(1000);
-                            fetchRoute();
-                        }
-                        else{
-                            networks = res?.data;
-                            setFetchedNetworks(res.data);
-                            console.log('networks', networks)
-                            return res;
-                        }
-                    });
+              let res = await sendGetRequest(path, null).then((res) => {
+              return res
+              }).catch((err) => {
+                  console.log('err', err)
+              }).then((res) => {
+                  if (res.data === undefined || res.code == "51000") {
+                      setFromNetwork(USDC_BASE[0]);
+                      if (fetchedNetworks.length == 0){
+                              setFetchedNetworks([USDC_BASE[0]]);
+                          }
+                      console.log('fetchedNetworks', fetchedNetworks)
+                      return res;
+                  }
+                  else if (res.code === "50011") {
+                      console.log('TIMEOUT');
+                      wait(1000);
+                      fetchRoute();
+                  }
+                  else{
+                      networks = res?.data;
+                      setFetchedNetworks(res.data);
+                      console.log('networks', networks)
+                      return res;
+                  }
+              });
             }
-            void fetchChains();
+          void fetchChains();
         }
     },[wallets])
 
     useEffect(() => {
-
         const fetchTokens = async () => {
-            const {path, call} = API_paths['tokens/all'];
-            const networkChainId = fromNetwork.chainId;
-            let res = await sendGetRequest(path, {'chainId' : networkChainId}).then((res) => {
-                console.log('res', res)
-                return res
-            }).catch((err) => {
-                console.log('err', err)
-            }).then((res) => {
-                console.log(res);
-                if (res === undefined) {
-                    setFromToken(USDC_BASE[1]);
-                    if (fetchedNetworks.length == 0){
-                        setFetchedTokens([USDC_BASE[1]]);
-                    }
-                    return res;
-                }
-                else if (res.code ==="82102") {
-                    console.log('minimum amount error')
-                    alert('Minimum amount error')
-                }
-                else if (res.code === "50011" || res.code == "51000") {
-                    console.log('TIMEOUT');
-                    wait(1000);
-                    fetchTokens();
-                }
-                else {
-                    setFetchedTokens(res.data);
-                    console.log('tokens', fetchedTokens)
-                    return res;
-                }
-            });
+          const {path, call} = API_paths['tokens/all'];
+          const networkChainId = fromNetwork.chainId;
+          let res = await sendGetRequest(path, {'chainId' : networkChainId}).then((res) => {
+              console.log('res', res)
+              return res
+          }).catch((err) => {
+              console.log('err', err)
+          }).then((res) => {
+              console.log(res);
+              if (res === undefined) {
+                  setFromToken(USDC_BASE[1]);
+                  if (fetchedNetworks.length == 0){
+                      setFetchedTokens([USDC_BASE[1]]);
+                  }
+                  return res;
+              }
+              else if (res.code ==="82102") {
+                  console.log('minimum amount error')
+                  alert('Minimum amount error')
+              }
+              else if (res.code === "50011" || res.code == "51000") {
+                  console.log('TIMEOUT');
+                  wait(1000);
+                  fetchTokens();
+              }
+              else {
+                  setFetchedTokens(res.data);
+                  console.log('tokens', fetchedTokens)
+                  return res;
+              }
+          });
         }
-
-        fetchTokens();
+        void fetchTokens();
     },[fromNetwork, selectedNetwork])
 
     useEffect(() => {
-        console.log('fromAmount', toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)))
-        const fetchRoute = async () => {
-            const {path, call} = API_paths['route'];
-            const params = {
-                'fromChainId': fromNetwork.chainId,
-                'toChainId': "137",//USDC_BASE[0].chainId,
-                'fromTokenAddress': fromToken.tokenContractAddress,
-                'toTokenAddress': "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359", //USDC_BASE[1].tokenContractAddress
-                'amount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
-                'slippage': 0.02
-            }
-            await checkApprovalStatus(fromToken.tokenContractAddress, wallets[0].address, toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals))).then((res) => {
-              setIfApproved(res);
-            });
-            let res = await sendGetRequest(path, params).then((res) => {
-                console.log('res', res)
-                const data = res.data[0];
-                const routerResult = data.routerList[0];
-                const router: BridgeInfo =  {
-                    protocol: routerResult.router.bridgeName,
-                    rate: {
-                        from: { amount: toWholeNumber(data.fromTokenAmount, toNumber(data.fromToken.decimals)), token: data.fromToken.tokenSymbol },
-                        to: { amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)), token: USDC_BASE[1].tokenSymbol }
-                    },
-                    fee: {
-                        networkFee: toWholeNumber(routerResult.fromChainNetworkFee, 18),
-                        token: 'ETH'
-                    },
-                    estimatedTime: formatTime(toNumber(routerResult.estimateTime)),
-                    slippage: "0.015",
-                }
-                setRouterInfo(router);
-                return res
-            }).catch((err) => {
-                console.log('err', err)
-            }).then((res) => {
-                console.log(res);
-                if (res === undefined || res.code == "51000") {
-                    console.log('codddddde')
-                    toast.error(res?.msg)
-                    return res;
-                }
-                else if (res.code ==="82102") {
-                    console.log('minimum amount error')
-                    toast.error(res?.msg)
-                }
-                else if (res.code == "50011") {
-                    console.log('TIMEOUT');
-                    wait(1000);
-                    fetchRoute();
-                }
-                else {
-                    setRecievedAmount(toWholeNumber(res.data[0].routerList[0].toTokenAmount, toNumber(USDC_BASE[1].decimals)).toString());
-                    return res;
-                }
-            });
-        }
-        fetchRoute();
+      // console.log('fromAmount', toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)))
+      const fetchRoute = async () => {
+          const {path, call} = API_paths['route'];
+          const params = {
+              'fromChainId': fromNetwork.chainId,
+              'toChainId': USDC_BASE[0].chainId,//"137",//
+              'fromTokenAddress': fromToken.tokenContractAddress,
+              'toTokenAddress': USDC_BASE[1].tokenContractAddress, //"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+              'amount': toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
+              'slippage': 0.02
+          }
+          await checkApprovalStatus(fromToken.tokenContractAddress, wallets[0].address, toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals))).then((res) => {
+            setIfApproved(res);
+          });
+          let res = await sendGetRequest(path, params).then((res) => {
+              const data = res.data[0];
+              const routerResult = data.routerList[0];
+              const router: BridgeInfo =  {
+                  protocol: routerResult.router.bridgeName,
+                  rate: {
+                      from: { amount: toWholeNumber(data.fromTokenAmount, toNumber(data.fromToken.decimals)), token: data.fromToken.tokenSymbol },
+                      to: { amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)), token: USDC_BASE[1].tokenSymbol }
+                  },
+                  fee: {
+                      networkFee: toWholeNumber(routerResult.fromChainNetworkFee, 18),
+                      token: 'ETH'
+                  },
+                  estimatedTime: formatTime(toNumber(routerResult.estimateTime)),
+                  slippage: "0.015",
+              }
+              setRouterInfo(router);
+              return res
+          }).catch((err) => {
+              console.log('err', err)
+          }).then((res) => {
+              console.log(res);
+              if (res === undefined || res.code == "51000") {
+                  toast.error(res?.msg)
+                  return res;
+              }
+              else if (res.code ==="82102") {
+                  console.log('minimum amount error')
+                  toast.error(res?.msg)
+              }
+              else if (res.code == "50011") {
+                  console.log('TIMEOUT');
+                  wait(1000);
+                  fetchRoute();
+              }
+              else {
+                  setRecievedAmount(toWholeNumber(res.data[0].routerList[0].toTokenAmount, toNumber(USDC_BASE[1].decimals)).toString());
+                  return res;
+              }
+          });
+      }
+      fetchRoute();
     }, [fromToken, fromAmount])
 
 
     const handleApproveBridge = async () => {
-
-        console.log('|||||||||||||||||||handleApproveBridge')
         const provider = await wallets[0].getEthereumProvider();
         console.log('CHAIIIIIN', wallets[0].chainId)
         const {path, call} = API_paths['approve'];
