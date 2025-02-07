@@ -26,7 +26,7 @@ jobs:
         steps:
             - name: Notify about starting this deployment
               uses: hasura/comment-progress@v2.3.0
-              if: github.event_name == 'pull_request'
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
@@ -89,7 +89,7 @@ jobs:
 
             - name: Notify about the result of this deployment
               uses: hasura/comment-progress@v2.3.0
-              if: github.event_name == 'pull_request'
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
               with:
                   github-token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
