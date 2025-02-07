@@ -28,7 +28,7 @@ jobs:
               uses: hasura/comment-progress@v2.3.0
               if: github.event_name == 'pull_request'
               with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
                   repository: ${{ github.repository }}
                   number: ${{ github.event.pull_request.number }}
                   id: deploying-comment
@@ -91,7 +91,7 @@ jobs:
               uses: hasura/comment-progress@v2.3.0
               if: github.event_name == 'pull_request'
               with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
                   repository: ${{ github.repository }}
                   number: ${{ github.event.pull_request.number }}
                   id: deploying-comment
