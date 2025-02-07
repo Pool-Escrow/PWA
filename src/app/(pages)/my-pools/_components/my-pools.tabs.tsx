@@ -1,13 +1,16 @@
 'use client'
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useLayoutEffect, useRef, useState, useEffect } from 'react'
 import { LoaderIcon } from 'lucide-react'
-import { useLayoutEffect, useRef, useState } from 'react'
 import { useSwipeable } from 'react-swipeable'
+import { AnimatePresence, motion } from 'framer-motion'
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select';
+import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
+import { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import PoolList from '../../pools/_components/pool-list'
 import { myPoolsTabsConfig, type MyPoolsTab } from './my-pools.tabs.config'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
 
 interface MyPoolsTabsProps {
     currentTab: MyPoolsTab['id']
@@ -16,6 +19,22 @@ interface MyPoolsTabsProps {
     upcomingPools: PoolItem[]
     pastPools: PoolItem[]
 }
+
+const SelectFilter = () => {
+    return (
+	<Select>
+		<SelectTrigger aria-label="statuses">
+			<SelectValue placeholder="All Statuses" />
+		</SelectTrigger>
+			<SelectContent>
+					<SelectGroup>
+                        <SelectItem value="all">All Statuses</SelectItem>
+						<SelectItem value="live">Live</SelectItem>
+						<SelectItem value="registered">Registered</SelectItem>
+					</SelectGroup>
+			</SelectContent>
+	</Select>
+)};
 
 const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
     currentTab,
@@ -28,6 +47,19 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
     const [isAnimating, setIsAnimating] = useState(false)
     const prevTabRef = useRef(currentTab)
     const [isClient, setIsClient] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
+    const [currentPools, setCurrentPools] = useState([] as PoolItem[])
+    const [selectedStatus, setSelectedStatus] = useState('all');
+
+    useEffect(() => {
+        console.log('changed')
+        let pools = currentTab === 'active' ? upcomingPools : pastPools;
+        if (selectedStatus !== 'all' && currentTab === 'active') {
+            pools = pools.filter((pool) => String(pool.status) === selectedStatus)
+        }
+        setCurrentPools(pools.filter((pool) => pool.name?.toLowerCase().includes(searchTerm?.toLowerCase())))
+    }, [currentTab, searchTerm, selectedStatus])
+
 
     useLayoutEffect(() => {
         setIsClient(true)
@@ -43,13 +75,21 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
         prevTabRef.current = currentTab
     }, [currentTab, initialLoad])
 
+    const handleFilterValueChange = (value: string) => {
+        setSelectedStatus(value);
+    };
+
     const handleTabChange = (newTab: string) => {
+        console.log({newTab})
+        console.log({currentTab})
+        console.log({isAnimating})
         if (!isAnimating && newTab !== currentTab) {
             onChangeTab(newTab)
         }
     }
 
     const handleAnimationComplete = () => {
+        console.log('complete')
         setIsAnimating(false)
     }
 
@@ -68,6 +108,9 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
         if (newIndex !== currentIndex) {
             onChangeTab(myPoolsTabsConfig[newIndex].id)
         }
+    }
+    function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setSearchTerm(e.target.value)
     }
 
     const swipeHandlers = useSwipeable({
@@ -102,7 +145,22 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                     ))}
                 </TabsList>
             </div>
-            <div className='relative mt-32 flex-1 overflow-x-hidden' {...swipeHandlers}>
+            <div className='relative mt-32 flex-1' {...swipeHandlers}>
+                <SearchBar query={searchTerm} onChange={handleSearchChange} />
+                {currentTab === 'active'  && ( 
+                    <Select value={selectedStatus} onValueChange={handleFilterValueChange}>
+                        <SelectTrigger aria-label="statuses">
+                            <SelectValue placeholder="All Statuses" />
+                        </SelectTrigger>
+                            <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="all">All Statuses</SelectItem>
+                                        <SelectItem value={`${POOLSTATUS.STARTED}`}>Live</SelectItem>
+                                        <SelectItem value={`${POOLSTATUS.DEPOSIT_ENABLED}`}>Registered</SelectItem>
+                                    </SelectGroup>
+                            </SelectContent>
+                    </Select>
+                )}
                 <AnimatePresence mode='popLayout' initial={false} custom={direction}>
                     <motion.div
                         key={currentTab}
@@ -114,7 +172,7 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                         onAnimationComplete={handleAnimationComplete}
                         className='absolute w-full'>
                         <TabsContent value={currentTab}>
-                            <PoolList pools={currentTab === 'upcoming' ? upcomingPools : pastPools} name={currentTab} />
+                            <PoolList pools={currentPools} name={currentTab} />
                         </TabsContent>
                     </motion.div>
                 </AnimatePresence>
