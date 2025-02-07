@@ -25,12 +25,14 @@ jobs:
             url: ${{ steps.deploy.outputs.url }}
         steps:
             - name: Notify about starting this deployment
-              uses: peter-evans/create-or-update-comment@v3
+              uses: hasura/comment-progress@v2.3.0
               if: github.event_name == 'pull_request_target'
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  body: |
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  repository: ${{ github.repository }}
+                  number: ${{ github.event.pull_request.number }}
+                  id: deploying-comment
+                  message: |
                       🚀 **Deployment Started!** 🚧
                       | Details | Link |
                       | --- | --- |
@@ -86,12 +88,15 @@ jobs:
                   echo "url=$(vercel deploy --prebuilt --token ${{ secrets.VERCEL_TOKEN }} ${{ github.ref == 'refs/heads/main' && '--prod'  || '' }})" >> $GITHUB_OUTPUT
 
             - name: Notify about the result of this deployment
-              uses: peter-evans/create-or-update-comment@v3
+              uses: hasura/comment-progress@v2.3.0
               if: github.event_name == 'pull_request_target'
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  issue-number: ${{ github.event.pull_request.number }}
-                  body: |
+                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  repository: ${{ github.repository }}
+                  number: ${{ github.event.pull_request.number }}
+                  id: deploying-comment
+                  recreate: true
+                  message: |
                       ✅ **Deployment Complete!** 🌐
                       | Details | Link |
                       | --- | --- |
