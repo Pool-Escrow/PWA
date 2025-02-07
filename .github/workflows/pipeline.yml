@@ -3,7 +3,7 @@ name: Unified CI/CD Pipeline
 on:
     push:
         branches: ['main']
-    pull_request_target:
+    pull_request:
         types: [opened, synchronize, reopened]
     workflow_dispatch:
 
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
     build-and-deploy:
-        if: github.repository == 'Pool-Escrow/PWA' || github.event_name == 'pull_request_target'
+        if: github.repository == 'Pool-Escrow/PWA' || github.event_name == 'pull_request'
         runs-on: ubuntu-22.04
         environment:
             name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
@@ -26,9 +26,9 @@ jobs:
         steps:
             - name: Notify about starting this deployment
               uses: hasura/comment-progress@v2.3.0
-              if: github.event_name == 'pull_request_target'
+              if: github.event_name == 'pull_request'
               with:
-                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
                   number: ${{ github.event.pull_request.number }}
                   id: deploying-comment
@@ -89,9 +89,9 @@ jobs:
 
             - name: Notify about the result of this deployment
               uses: hasura/comment-progress@v2.3.0
-              if: github.event_name == 'pull_request_target'
+              if: github.event_name == 'pull_request'
               with:
-                  github-token: ${{ secrets.COMMENTER_TOKEN }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
                   repository: ${{ github.repository }}
                   number: ${{ github.event.pull_request.number }}
                   id: deploying-comment
