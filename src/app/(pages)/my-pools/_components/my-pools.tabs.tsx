@@ -20,22 +20,6 @@ interface MyPoolsTabsProps {
     pastPools: PoolItem[]
 }
 
-const SelectFilter = () => {
-    return (
-	<Select>
-		<SelectTrigger aria-label="statuses">
-			<SelectValue placeholder="All Statuses" />
-		</SelectTrigger>
-			<SelectContent>
-					<SelectGroup>
-                        <SelectItem value="all">All Statuses</SelectItem>
-						<SelectItem value="live">Live</SelectItem>
-						<SelectItem value="registered">Registered</SelectItem>
-					</SelectGroup>
-			</SelectContent>
-	</Select>
-)};
-
 const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
     currentTab,
     onChangeTab,
@@ -145,22 +129,7 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                     ))}
                 </TabsList>
             </div>
-            <div className='relative mt-32 flex-1' {...swipeHandlers}>
-                <SearchBar query={searchTerm} onChange={handleSearchChange} />
-                {currentTab === 'active'  && ( 
-                    <Select value={selectedStatus} onValueChange={handleFilterValueChange}>
-                        <SelectTrigger aria-label="statuses">
-                            <SelectValue placeholder="All Statuses" />
-                        </SelectTrigger>
-                            <SelectContent>
-                                    <SelectGroup>
-                                        <SelectItem value="all">All Statuses</SelectItem>
-                                        <SelectItem value={`${POOLSTATUS.STARTED}`}>Live</SelectItem>
-                                        <SelectItem value={`${POOLSTATUS.DEPOSIT_ENABLED}`}>Registered</SelectItem>
-                                    </SelectGroup>
-                            </SelectContent>
-                    </Select>
-                )}
+            <div className='relative mt-20 flex-1' {...swipeHandlers}>
                 <AnimatePresence mode='popLayout' initial={false} custom={direction}>
                     <motion.div
                         key={currentTab}
@@ -172,7 +141,26 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                         onAnimationComplete={handleAnimationComplete}
                         className='absolute w-full'>
                         <TabsContent value={currentTab}>
+                            <div>
+                                <div className='pb-8'>
+                                <SearchBar query={searchTerm} onChange={handleSearchChange} />
+                                    {currentTab === 'active'  && ( 
+                                        <Select value={selectedStatus} onValueChange={handleFilterValueChange}>
+                                            <SelectTrigger aria-label="statuses">
+                                                <SelectValue placeholder="All Statuses" />
+                                            </SelectTrigger>
+                                                <SelectContent>
+                                                        <SelectGroup>
+                                                            <SelectItem value="all">All Statuses</SelectItem>
+                                                            <SelectItem value={`${POOLSTATUS.STARTED}`}>Live</SelectItem>
+                                                            <SelectItem value={`${POOLSTATUS.DEPOSIT_ENABLED}`}>Registered</SelectItem>
+                                                        </SelectGroup>
+                                                </SelectContent>
+                                        </Select>
+                                    )}
+                                    </div>
                             <PoolList pools={currentPools} name={currentTab} />
+                            </div>
                         </TabsContent>
                     </motion.div>
                 </AnimatePresence>
@@ -182,3 +170,4 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
 }
 
 export default MyPoolsTabs
+

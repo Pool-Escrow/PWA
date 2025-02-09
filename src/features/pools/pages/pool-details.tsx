@@ -80,7 +80,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
         url: participant.avatarUrl,
         address: participant.address,
     }))
-    console.log("<<POOL>>>", pool)
+
     return (
         <div className='space-y-3 bg-white p-2'>
             <PoolDetailsCard>
