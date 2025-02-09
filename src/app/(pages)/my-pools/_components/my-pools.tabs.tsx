@@ -1,11 +1,12 @@
 'use client'
 
 import { useLayoutEffect, useRef, useState, useEffect } from 'react'
+import * as React from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
+import { AnimatePresence, motion } from 'framer-motion'
 import { LoaderIcon } from 'lucide-react'
 import { useSwipeable } from 'react-swipeable'
-import { AnimatePresence, motion } from 'framer-motion'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select';
 import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
 import { PoolItem } from '@/app/_lib/entities/models/pool-item'
@@ -36,7 +37,6 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
     const [selectedStatus, setSelectedStatus] = useState('all');
 
     useEffect(() => {
-        console.log('changed')
         let pools = currentTab === 'active' ? upcomingPools : pastPools;
         if (selectedStatus !== 'all' && currentTab === 'active') {
             pools = pools.filter((pool) => String(pool.status) === selectedStatus)
@@ -64,16 +64,12 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
     };
 
     const handleTabChange = (newTab: string) => {
-        console.log({newTab})
-        console.log({currentTab})
-        console.log({isAnimating})
         if (!isAnimating && newTab !== currentTab) {
             onChangeTab(newTab)
         }
     }
 
     const handleAnimationComplete = () => {
-        console.log('complete')
         setIsAnimating(false)
     }
 
@@ -124,7 +120,10 @@ const MyPoolsTabs: React.FC<MyPoolsTabsProps> = ({
                                     transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                                 />
                             )}
-                            <span className='z-10 w-full text-center text-base font-semibold'>{name}</span>
+                            <span
+                                className={`z-10 w-full text-center text-base font-semibold ${currentTab === id ? 'text-white' : ''}`}>
+                                {name}
+                            </span>
                         </TabsTrigger>
                     ))}
                 </TabsList>

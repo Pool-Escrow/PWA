@@ -6,9 +6,6 @@ import { motion } from 'framer-motion'
 import QrScannerPrimitive from 'qr-scanner'
 import { cn } from '@/lib/utils/tailwind'
 import { Button } from '@/app/_components/ui/button'
-import { Switch } from '@/components/ui/switch'
-import { Label } from '@/app/_components/ui/label'
-import { Input } from '@/app/_components/ui/input'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/app/_components/ui/card'
 import { AlertCircle, CheckCircle2 } from 'lucide-react'
 import PageWrapper from '@/components/page-wrapper'
@@ -155,7 +152,7 @@ const QrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
         return (
             <Card ref={ref} className={cn('mx-auto w-full max-w-sm overflow-hidden', className)} {...props}>
                 <div className='relative aspect-square'>
-                    <video ref={videoRef} className='h-full w-full object-cover' />
+                    <video ref={videoRef} className='size-full object-cover' />
                     <motion.div
                         className='pointer-events-none absolute inset-0 border-4 border-blue-500'
                         animate={{
@@ -263,13 +260,13 @@ export default function CheckInPage() {
                     <CardFooter>
                         {result && (
                             <div className='flex items-center text-green-600'>
-                                <CheckCircle2 className='mr-2 h-5 w-5' />
+                                <CheckCircle2 className='mr-2 size-5' />
                                 <span>Result: {result}</span>
                             </div>
                         )}
                         {error && (
                             <div className='flex items-center text-red-600'>
-                                <AlertCircle className='mr-2 h-5 w-5' />
+                                <AlertCircle className='mr-2 size-5' />
                                 <span>Error: {error}</span>
                             </div>
                         )}

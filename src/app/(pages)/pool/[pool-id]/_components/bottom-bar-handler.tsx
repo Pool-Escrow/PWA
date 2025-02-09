@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { Button } from '@/app/_components/ui/button'
 import { poolAbi } from '@/types/contracts'
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
@@ -187,7 +188,7 @@ export default function BottomBarHandler({
             return (
                 <Button
                     key={key}
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    className='active:bg-cta-active mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
                     onClick={() => {
                         setIsLoading(true)
                         config.action()
