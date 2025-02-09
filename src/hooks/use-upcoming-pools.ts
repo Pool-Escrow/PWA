@@ -16,7 +16,16 @@ const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
             const dbPool = dbPools?.find(dp => dp.contract_id === parseInt(contractPool.id))
             return transformContractPoolToUIPool(contractPool, dbPool)
         })
-        .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
+        .sort((a, b) => {
+            // First, sort by status (descending)
+            const statusDiff = Number(b.status) - Number(a.status);
+            if (statusDiff !== 0) return statusDiff;
+
+            // If status is the same, sort by startDate (ascending)
+            const dateA = new Date(a.startDate || a.endDate).getTime();
+            const dateB = new Date(b.startDate || b.endDate).getTime();
+            return dateA - dateB;
+        })
 }
 
 export const useUpcomingPools = () => {

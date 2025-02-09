@@ -29,6 +29,7 @@ type PoolStatusConfig = {
 }
 
 interface BottomBarHandlerProps {
+    onPoolUpdate: () => void
     isAdmin: boolean
     poolStatus: POOLSTATUS
     poolId: string
@@ -40,6 +41,7 @@ interface BottomBarHandlerProps {
 }
 
 export default function BottomBarHandler({
+    onPoolUpdate,
     isAdmin,
     poolStatus,
     poolId,
@@ -49,7 +51,7 @@ export default function BottomBarHandler({
     requiredAcceptance,
     termsUrl,
 }: BottomBarHandlerProps) {
-    // console.log('🔄 [BottomBarHandler] Rendering with:', { poolId, poolStatus, isAdmin })
+    //console.log('🔄 [BottomBarHandler] Rendering with:', { poolId, poolStatus, isAdmin })
 
     const [isLoading, setIsLoading] = useState(false)
     const [transactionProcessed, setTransactionProcessed] = useState(false)
@@ -176,6 +178,7 @@ export default function BottomBarHandler({
             handleStartPool,
             handleJoinPool,
             handleEndPool,
+            isParticipant,
             localIsParticipant,
             handleViewTicket,
             handleJoinPoolWithTerms,
@@ -261,6 +264,13 @@ export default function BottomBarHandler({
             setLocalIsParticipant(isParticipant)
         }
     }, [isParticipant, isParticipantLoading])
+
+    useEffect(() => {
+        if (!isParticipantLoading && isParticipant) {
+            onPoolUpdate()
+            setBottomBarContent(renderButton({ label: 'View My Ticket', action: handleViewTicket }, 'view-ticket'))
+        }
+    }, [isParticipant])
 
     useEffect(() => {
         // console.log('✨ [BottomBarHandler] Confirmation status:', {
