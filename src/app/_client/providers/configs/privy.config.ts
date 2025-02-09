@@ -52,14 +52,13 @@ export default {
         //     getCustomAccessToken: async () => '',
         //     isLoading: false
         // },
-        // embeddedWallets: {
-        //     createOnLogin: 'users-without-wallets',
-        //     noPromptOnSignature: true,
-        //     priceDisplay: {
-        //         primary: 'native-token',
-        //         secondary: '',
-        //     },
-        // },
+        embeddedWallets: {
+            createOnLogin: 'users-without-wallets',
+            priceDisplay: {
+                primary: 'native-token',
+                secondary: null,
+            },
+        },
         loginMethodsAndOrder: {
             primary: [
                 'coinbase_wallet',

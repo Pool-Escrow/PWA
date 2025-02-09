@@ -63,7 +63,7 @@ export function useAuth() {
     }
 
     const { login } = useLogin({
-        async onComplete(user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount) {
+        async onComplete({user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount}) {
             console.log('[use-auth] auth complete')
             queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
 
