@@ -1,9 +1,9 @@
 'use client'
 
-import * as React from 'react'
-import { useState, useEffect, useRef, useCallback } from 'react'
-import QrScannerPrimitive from 'qr-scanner'
 import { motion } from 'framer-motion'
+import QrScannerPrimitive from 'qr-scanner'
+import * as React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface QrScannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onError'> {
     onDecode?: (result: string) => void
@@ -157,12 +157,16 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
             <div className='relative'>
                 <video ref={videoRef} className='h-full w-full object-cover' />
                 <div className='absolute inset-0'>
-                    <div className='relative h-full w-full'>
-                        <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-3/4 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:-left-[3px] before:-top-[3px] before:h-8 before:w-8 before:rounded-tl-lg before:border-l-8 before:border-t-8 before:border-[#44DCAF] after:absolute after:-right-[3px] after:-top-[3px] after:h-8 after:w-8 after:rounded-tr-lg after:border-r-8 after:border-t-8 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:-bottom-[3px] [&>*:nth-child(1)]:-left-[3px] [&>*:nth-child(1)]:h-8 [&>*:nth-child(1)]:w-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-8 [&>*:nth-child(1)]:border-l-8 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:-bottom-[3px] [&>*:nth-child(2)]:-right-[3px] [&>*:nth-child(2)]:h-8 [&>*:nth-child(2)]:w-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-8 [&>*:nth-child(2)]:border-r-8 [&>*:nth-child(2)]:border-[#44DCAF]'>
-                            <span></span>
-                            <span></span>
+                    {isScanning ? (
+                        <div className='relative h-full w-full'>
+                            <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-3/4 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:-left-[3px] before:-top-[3px] before:h-8 before:w-8 before:rounded-tl-lg before:border-l-8 before:border-t-8 before:border-[#44DCAF] after:absolute after:-right-[3px] after:-top-[3px] after:h-8 after:w-8 after:rounded-tr-lg after:border-r-8 after:border-t-8 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:-bottom-[3px] [&>*:nth-child(1)]:-left-[3px] [&>*:nth-child(1)]:h-8 [&>*:nth-child(1)]:w-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-8 [&>*:nth-child(1)]:border-l-8 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:-bottom-[3px] [&>*:nth-child(2)]:-right-[3px] [&>*:nth-child(2)]:h-8 [&>*:nth-child(2)]:w-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-8 [&>*:nth-child(2)]:border-r-8 [&>*:nth-child(2)]:border-[#44DCAF]'>
+                                <span></span>
+                                <span></span>
+                            </div>
                         </div>
-                    </div>
+                    ) : (
+                        <div className='camera-scanned-overlay relative h-full w-full'></div>
+                    )}
                 </div>
                 <motion.div
                     className='pointer-events-none absolute'
