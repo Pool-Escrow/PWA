@@ -254,6 +254,11 @@ const tokenAddressToLogo = (tokenAddress: string, tokens) => {
   return token?.tokenLogoUrl;
 }
 
+const chainIdToName = (chainId: string, chains) => {
+  const chain = chains.find(chain => chain.chainId === chainId);
+  return chain?.chainName;
+}
+
 
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -290,5 +295,6 @@ export {
     fetchStatus,
     getOKXAccount,
     tokenAddressToName,
-    tokenAddressToLogo
+    tokenAddressToLogo,
+    chainIdToName
 };

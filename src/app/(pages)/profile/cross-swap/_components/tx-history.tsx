@@ -9,6 +9,7 @@ import { Button } from '@/app/_components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select'
 import { fetchStatus, tokenAddressToName } from "./utils"
+import { useState, useEffect } from "react"
 
 interface Transaction {
   id: string
@@ -16,33 +17,24 @@ interface Transaction {
   tokenSymbol: string
   amount: string
   fromToken: string
-//   toToken: string
   status: "failed" | "success" | "pending"
 }
 
 interface TransactionHistoryProps {
   isOpen: boolean
   onClose: () => void
-  transactions: Transaction[]
+  transactions: []
   networks: string[]
   tokens: string[]
 }
 
-export function TransactionHistory({ isOpen, onClose, transactions, networks, tokens}: TransactionHistoryProps) {
+export function TransactionHistory({ isOpen, onClose, transactions, networks, tokens }: TransactionHistoryProps) {
+  const [successfulTransactions, setSuccessfulTransactions] = useState<Transaction[]>([]);
+  const txnIds = transactions.map((txn) => txn.id);
 
-  // console.log('tokens', tokens)
-  const handleTransactionClick = async (transactionId: string) => {
-    try {
-      // Simulate API fetch
-      await fetchStatus(transactionId).then((res) => {
-        console.log('res', res)
-      })
-      console.log(`Fetching details for transaction ${transactionId}`)
-      // Add your fetch logic here
-    } catch (error) {
-      console.error("Error fetching transaction details:", error)
-    }
-  }
+  // Delay function
+
+   // Runs only when modal opens
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -77,24 +69,24 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
         <div className="space-y-2">
           {transactions.map((transaction) => (
             <Button
-              key={transaction.txHash}
+              key={transaction.id}
               variant="ghost"
               className="w-full justify-between p-4 h-auto"
-              onClick={() => handleTransactionClick(transaction.id)}
+              onClick={() => console.log(`Fetching details for transaction ${transaction.id}`)}
             >
               <div className="flex items-start gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-100" />
                 <div className="flex flex-col items-start">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">
-                      {transaction.tokenSymbol} → {transaction.toToken}
+                      {transaction.fromChain.name} | {transaction.fromToken.name} → {transaction.toChain.name} | {transaction.toToken.name}
                     </span>
                     <span className="text-sm font-medium">
                       {transaction.amount}
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {format(new Date(transaction.date), "MM/dd/yyyy")}
+                    {transaction.date}
                   </span>
                   <span className="text-xs text-pink-500">{transaction.status}</span>
                 </div>
@@ -107,4 +99,3 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
     </Dialog>
   )
 }
-

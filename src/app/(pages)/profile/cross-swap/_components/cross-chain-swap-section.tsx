@@ -16,9 +16,12 @@ import {
     formatTime,
     fetchStatus,
     getOKXAccount,
+    tokenAddressToName,
+    tokenAddressToLogo,
+    chainIdToName,
 } from './utils'
 import { useWallets } from '@privy-io/react-auth'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/app/_components/ui/button'
 import {
@@ -65,6 +68,7 @@ let tokens = [
         tokenSymbol: 'WBTC',
     },
 ]
+const waitTimeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const CrossChainSwapSection = () => {
     const { sendTransaction } = useSendTransaction()
@@ -79,6 +83,8 @@ const CrossChainSwapSection = () => {
     const [isSelectOpen, setIsSelectOpen] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState('')
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
+    const [successfulTransactions, setSuccessfulTransactions] = useState<[]>([]);
+
     const [transactionHistory, setTransactionHistory] = React.useState([])
     const [isHistoryOpen, setIsHistoryOpen] = React.useState(false)
     const [ifApproved, setIfApproved] = React.useState(false)
@@ -308,6 +314,57 @@ const CrossChainSwapSection = () => {
         void fetchRoute()
     }, [fromToken, fromAmount])
 
+    useEffect(() => {
+        // if (!isHistoryOpen) return; // Prevent fetching when modal is closed
+
+        const fetchWithThrottle = async () => {
+          const results = [];
+            await fetchTxnHistory();
+            console.log('INNNNNNNNtransactionHistory', transactionHistory)
+          for (const txn of transactionHistory) {
+            try {
+                console.log('txnId', txn.txHash)
+                if (results.some(existingTxn => existingTxn.id === txn.txHash) ) {
+                    console.log('ALREADY EXISTS')
+                    continue;
+                }else if (results.length >=5 ) {
+                    console.log('MAX LIMIT REACHED')
+                    break;
+                }
+              const res = await fetchStatus(txn.txHash);
+              console.log(`Fetched status for ${txn.txHash}:`, res);
+
+              if (res.status == "SUCCESS") {
+                console.log(`Transaction ${txn.txHash} is successful!`);
+                    results.push({
+                        id: txn.txHash,
+                        date: new Date(parseInt(txn.txTime)).toISOString(),
+                        fromChain: { chainId: res.fromChainId, name: chainIdToName(res.fromChainId, fetchedNetworks) },
+                        toChain: { chainId: res.toChainId, name: chainIdToName(res.toChainId, fetchedNetworks) },
+                        amount: res.fromAmount,
+                        toAmount: res.toAmount,
+                        fromToken: { name: tokenAddressToName(res.fromTokenAddress, fetchedTokens), logo: tokenAddressToLogo(res.fromTokenAddress, fetchedTokens) },
+                        toToken: { name: USDC_BASE[1].tokenSymbol, logo: USDC_BASE[1].tokenLogoUrl }, // HARDCODE TO USDC BASE
+                        toTxnHash: res.toTxHash,
+                        status: res.detailStatus
+                    });
+              }
+            } catch (error) {
+              console.error(`Error fetching status for ${txnId}:`, error);
+            }
+
+            await waitTimeout(1000); // ⏳ Wait 1 sec before the next request
+          }
+          console.log('results', results)
+          setSuccessfulTransactions(results); // ✅ Update UI with successful transactions
+        };
+
+        fetchWithThrottle();
+      }, [fetchedNetworks]);
+    // useEffect(() => {
+    //     if (successfulTransactions.length > 0 && isHistoryOpen === false)
+    //               setIsHistoryOpen(true)
+    // }, [successfulTransactions])
     const handleApproveBridge = async () => {
         const provider = await wallets[0].getEthereumProvider()
         const { path, call } = API_paths['approve']
@@ -437,34 +494,37 @@ const CrossChainSwapSection = () => {
 
         const txnList = data.data[0].trasactionList
         console.log('txnList', data.data[0].transactionList)
-        const txnHistory = data.data[0].transactionList
-            ?.filter(txn => txn.txStatus === "success" && txn.itype === "2") // ✅ Keep only valid transactions
-            .map( (txn) => {
-                // const res = await fetch(`/api/swap-status`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify(txn.txHash),
-                // })
-                // const status = await res.json();
-                // console.log('status', status)
-                return {
-                    id: txn.txHash,
-                    date: new Date(parseInt(txn.txTime)).toISOString(),
-                    tokenSymbol: txn.symbol,
-                    amount: txn.amount,
-                    fromToken: txn.tokenAddress,
-                    status: txn.txStatus
-                }
-            });
-        console.log('txnHistory', txnHistory)
-        setTransactionHistory(txnHistory)
+        // const txnHistory = data.data[0].transactionList
+        //     ?.filter(txn => txn.txStatus === "success" && txn.itype === "2") // ✅ Keep only valid transactions
+        //     .map( (txn) => {
+        //         // const res = await fetch(`/api/swap-status`, {
+        //         //     method: 'POST',
+        //         //     headers: {
+        //         //         'Content-Type': 'application/json',
+        //         //     },
+        //         //     body: JSON.stringify(txn.txHash),
+        //         // })
+        //         // const status = await res.json();
+        //         // console.log('status', status)
+        //         return {
+        //             id: txn.txHash,
+        //             date: new Date(parseInt(txn.txTime)).toISOString(),
+        //             tokenSymbol: txn.symbol,
+        //             amount: txn.amount,
+        //             fromToken: txn.tokenAddress,
+        //             status: txn.txStatus
+        //         }
+        //     });
+        const txnIds = data.data[0].transactionList?.filter(txn => txn.txStatus === "success" && txn.itype === "2").map((txn) => txn.txHash);
+
+        console.log('txnHistory', txnIds)
+        setTransactionHistory(data.data[0].transactionList)
+        return txnIds
         // txnHash.map(async hash =>{
         //     const status = await fetchStatus(hash);
         //     console.log('status', status)
         // })
-        setIsHistoryOpen(true)
+        // setIsHistoryOpen(true)
     }
     // fetchStatus()
         // DOES NOT WORK
@@ -482,6 +542,10 @@ const CrossChainSwapSection = () => {
             })
 
         })
+    }
+
+    const handleHistory = () => {
+        setIsHistoryOpen(true)
     }
 
     const filteredTokens = fetchedTokens.filter(token => {
@@ -807,11 +871,11 @@ const CrossChainSwapSection = () => {
                         {ifApproved ? 'Bridge' : 'Approve'}
                     </button>
                     <button
-                        onClick={fetchTxnHistory}//{fetchTxnHistory fetchOrders}
+                        onClick={handleHistory}//{fetchTxnHistory fetchOrders}
                         className='h-[46px] w-full rounded-[2rem] bg-[#f4f4f4] px-6 py-[11px] text-center text-base font-semibold leading-normal text-[#383838]'>
                         Transaction History
                     </button>
-                    <TransactionHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} transactions={transactionHistory} networks={fetchedNetworks} tokens={fetchedTokens} />
+                    <TransactionHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} transactions={successfulTransactions} networks={fetchedNetworks} tokens={fetchedTokens} />
                 </div>
             </div>
         </div>
