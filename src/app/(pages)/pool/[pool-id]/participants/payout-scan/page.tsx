@@ -15,7 +15,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Address } from 'viem'
 import PoolQrScanner from '../../_components/qr-scanner'
-import { checkInAction } from '../../check-in/actions'
+import { checkInAction, checkParticipantStatusAction } from '../../check-in/actions'
 import { useUserDetails } from '../_components/use-user-details'
 import { QrScanDialog } from './_components/qrScanDialog'
 
@@ -73,10 +73,37 @@ export default function PayoutScanPage() {
             setError(null)
             stopScanning()
 
+            // Check participant status first
+            const statusResponse = await checkParticipantStatusAction(
+                params['pool-id'] as string,
+                parsedQrData.address as Address,
+            )
+
+            if (!statusResponse.success || statusResponse.status === 'NOT_REGISTERED') {
+                setCheckInStatus({
+                    success: false,
+                    message: statusResponse.message || 'User is not registered for this pool',
+                })
+                setCheckInState(CheckInState.ERROR)
+            } else if (statusResponse.status === 'CHECKED_IN') {
+                setCheckInStatus({
+                    success: true,
+                    message: statusResponse.message || 'User is already checked in',
+                })
+                setCheckInState(CheckInState.ALREADY_CHECKED_IN)
+            } else if (statusResponse.status === 'REGISTERED') {
+                setCheckInState(CheckInState.INITIAL)
+            }
+
             setScannedAddress(parsedQrData.address as Address)
             setShowDialog(true)
         } catch (err) {
             console.error(err)
+            setCheckInStatus({
+                success: false,
+                message: err instanceof Error ? err.message : 'Failed to process QR code',
+            })
+            setCheckInState(CheckInState.ERROR)
         } finally {
             isProcessing.current = false
         }
