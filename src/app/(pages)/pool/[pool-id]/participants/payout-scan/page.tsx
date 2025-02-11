@@ -34,8 +34,8 @@ export default function PayoutScanPage() {
     }))
 
     const handleDecode = async (decodedResult: string) => {
-        if (isProcessing.current) return
-        setIsScanning(false)
+        if (isProcessing.current || showDialog) return
+
         try {
             isProcessing.current = true
             const qrData: QrCodeCheckInData = JSON.parse(decodedResult)
@@ -98,6 +98,7 @@ export default function PayoutScanPage() {
                 <PoolQrScanner
                     onDecode={handleDecode}
                     onError={handleError}
+                    enableCallback={!showDialog}
                     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
                     stopButtonText='Stop'
                 />

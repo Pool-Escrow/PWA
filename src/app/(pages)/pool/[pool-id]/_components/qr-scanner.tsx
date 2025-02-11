@@ -11,12 +11,14 @@ interface QrScannerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onE
     scannerOptions?: QrScannerOptions
     startButtonText?: string
     stopButtonText?: string
+    enableCallback?: boolean
 }
 
 interface UseQrScannerProps {
     onDecode?: (result: string) => void
     onError?: (error: Error) => void
     scannerOptions?: QrScannerOptions
+    enableCallback?: boolean
 }
 
 // Componente QrScanner
@@ -32,7 +34,7 @@ type QrScannerOptions = {
     returnDetailedScanResult?: true
 }
 
-function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps = {}) {
+function useQrScanner({ onDecode, onError, scannerOptions, enableCallback = true }: UseQrScannerProps = {}) {
     const [result, setResult] = useState<string | null>(null)
     const [error, setError] = useState<Error | null>(null)
     const [isScanning, setIsScanning] = useState(false)
@@ -45,15 +47,14 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
             scannerRef.current = new QrScannerPrimitive(
                 videoRef.current,
                 result => {
-                    // console.log('QR Scanner decoded:', result.data)
-                    if (isMountedRef.current) {
+                    if (isMountedRef.current && enableCallback) {
                         setResult(result.data)
                         onDecode?.(result.data)
                     }
                 },
                 {
                     onDecodeError: (error: Error | string) => {
-                        if (isMountedRef?.current) {
+                        if (isMountedRef?.current && enableCallback) {
                             setError(error instanceof Error ? error : new Error(error))
                             onError?.(error instanceof Error ? error : new Error(error))
                         }
@@ -71,7 +72,7 @@ function useQrScanner({ onDecode, onError, scannerOptions }: UseQrScannerProps =
             })
             setIsScanning(true)
         }
-    }, [onDecode, onError, scannerOptions])
+    }, [onDecode, onError, scannerOptions, enableCallback])
 
     const stopScanner = useCallback(() => {
         if (scannerRef.current) {
@@ -137,6 +138,7 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
             scannerOptions,
             startButtonText = 'Start Scanning',
             stopButtonText = 'Stop Scanning',
+            enableCallback = true,
             ...props
         },
         ref,
@@ -145,6 +147,7 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
             onDecode,
             onError,
             scannerOptions,
+            enableCallback,
         })
 
         useEffect(() => {
@@ -157,7 +160,7 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
             <div className='relative'>
                 <video ref={videoRef} className='h-full w-full object-cover' />
                 <div className='absolute inset-0'>
-                    {isScanning ? (
+                    {enableCallback ? (
                         <div className='relative h-full w-full'>
                             <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-3/4 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:-left-[3px] before:-top-[3px] before:h-8 before:w-8 before:rounded-tl-lg before:border-l-8 before:border-t-8 before:border-[#44DCAF] after:absolute after:-right-[3px] after:-top-[3px] after:h-8 after:w-8 after:rounded-tr-lg after:border-r-8 after:border-t-8 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:-bottom-[3px] [&>*:nth-child(1)]:-left-[3px] [&>*:nth-child(1)]:h-8 [&>*:nth-child(1)]:w-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-8 [&>*:nth-child(1)]:border-l-8 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:-bottom-[3px] [&>*:nth-child(2)]:-right-[3px] [&>*:nth-child(2)]:h-8 [&>*:nth-child(2)]:w-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-8 [&>*:nth-child(2)]:border-r-8 [&>*:nth-child(2)]:border-[#44DCAF]'>
                                 <span></span>
