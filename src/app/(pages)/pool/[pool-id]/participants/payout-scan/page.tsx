@@ -75,15 +75,8 @@ export default function PayoutScanPage() {
 
             setScannedAddress(parsedQrData.address as Address)
             setShowDialog(true)
-
-            setTimeout(() => {
-                // router.push(`/pool/${parsedQrData.poolId}/participants/${parsedQrData.address}`)
-            }, 1500)
         } catch (err) {
-            // showToast({
-            //     type: 'error',
-            //     message: err instanceof Error ? err.message : 'Invalid QR code format',
-            // })
+            console.error(err)
         } finally {
             isProcessing.current = false
         }
