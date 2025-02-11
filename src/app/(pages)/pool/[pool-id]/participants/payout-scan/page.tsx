@@ -20,7 +20,7 @@ import { useUserDetails } from '../_components/use-user-details'
 import { QrScanDialog } from './_components/qrScanDialog'
 
 enum CheckInState {
-    INITIAL = 'INITIAL',
+    REGISTERED = 'REGISTERED',
     PROCESSING_CHECK_IN = 'PROCESSING_CHECK_IN',
     PROCESSING_PAYOUT = 'PROCESSING_PAYOUT',
     SUCCESS = 'SUCCESS',
@@ -34,7 +34,7 @@ export default function PayoutScanPage() {
     const [isScanning, setIsScanning] = useState(true)
     const [showDialog, setShowDialog] = useState(false)
     const [scannedAddress, setScannedAddress] = useState<Address | null>(null)
-    const [checkInState, setCheckInState] = useState<CheckInState>(CheckInState.INITIAL)
+    const [checkInState, setCheckInState] = useState<CheckInState>(CheckInState.REGISTERED)
     const [checkInStatus, setCheckInStatus] = useState<{ success?: boolean; message?: string } | null>(null)
     const [qrData, setQrData] = useState<QrCodeCheckInData | null>(null)
     const params = useParams()
@@ -51,7 +51,7 @@ export default function PayoutScanPage() {
 
     const resetQrDialog = () => {
         setShowDialog(false)
-        setCheckInState(CheckInState.INITIAL)
+        setCheckInState(CheckInState.PROCESSING_CHECK_IN)
         setCheckInStatus(null)
     }
     const handleDecode = async (decodedResult: string) => {
@@ -92,7 +92,7 @@ export default function PayoutScanPage() {
                 })
                 setCheckInState(CheckInState.ALREADY_CHECKED_IN)
             } else if (statusResponse.status === 'REGISTERED') {
-                setCheckInState(CheckInState.INITIAL)
+                setCheckInState(CheckInState.REGISTERED)
             }
 
             setScannedAddress(parsedQrData.address as Address)
@@ -203,7 +203,7 @@ export default function PayoutScanPage() {
                         </div>
                     </div>
                 )}
-                {checkInState == CheckInState.INITIAL && (
+                {checkInState == CheckInState.REGISTERED && (
                     <div className='flex h-full w-full flex-col'>
                         <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
                             {avatar && (
