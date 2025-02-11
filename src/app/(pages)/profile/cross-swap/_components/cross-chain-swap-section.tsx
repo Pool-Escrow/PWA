@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
@@ -12,6 +14,8 @@ import {
     USDC_BASE,
     BridgeInfo,
     formatTime,
+    fetchStatus,
+    getOKXAccount,
 } from './utils'
 import { useWallets } from '@privy-io/react-auth'
 import { useEffect } from 'react'
@@ -32,7 +36,7 @@ import { decodeFunctionData, encodeFunctionData, toHex } from 'viem'
 import * as React from 'react'
 import Image from 'next/image'
 import { ChevronDown, Search, X } from 'lucide-react'
-import { set, toNumber } from 'lodash'
+import { get, set, toNumber } from 'lodash'
 import { wait } from '@testing-library/user-event/dist/cjs/utils/index.js'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_components/ui/dialog'
 import { Input } from '@/app/_components/ui/input'
@@ -40,6 +44,8 @@ import { ScrollArea } from '@radix-ui/react-scroll-area'
 import { hash } from 'crypto'
 import { BridgeInfoCard } from './bridge-card'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/app/_components/ui/sheet'
+import { tokenAddress } from '@/types/contracts'
+import { TransactionHistory } from './tx-history'
 
 // TEMPLATE NETWORK AND TOKEN ARRAY
 let networks = [
@@ -49,7 +55,7 @@ let networks = [
         dexTokenApproveAddress: '0x57df6092665eb6058DE53939612413ff4B09114E',
     },
 ]
-const tokens = [
+let tokens = [
     {
         decimals: '0',
         tokenContractAddress: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
@@ -73,6 +79,8 @@ const CrossChainSwapSection = () => {
     const [isSelectOpen, setIsSelectOpen] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState('')
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
+    const [transactionHistory, setTransactionHistory] = React.useState([])
+    const [isHistoryOpen, setIsHistoryOpen] = React.useState(false)
     const [ifApproved, setIfApproved] = React.useState(false)
     const [routerInfo, setRouterInfo] = React.useState({})
     const [status, setStatus] = React.useState({})
@@ -90,6 +98,25 @@ const CrossChainSwapSection = () => {
         if (sheetRef.current) {
             const transform = `translateY(${Math.max(0, deltaY)}px)`
             sheetRef.current.style.transform = transform
+        }
+    }
+
+    const handleErrors = (res) => {
+        if (res === undefined) {
+            setFromToken(USDC_BASE[1])
+            if (fetchedNetworks.length == 0) {
+                setFetchedTokens([USDC_BASE[1]])
+            }
+            toast.error('Error fetching tokens')
+        } else if (res.code === '82102') {
+            console.log('minimum amount error')
+            alert('Minimum amount error')
+        } else if (res.code === "51000"){
+            console.log('error', res.msg)
+            toast.error(res?.msg)
+        } else {
+            console.log('error', res.msg)
+            toast.error(res?.msg)
         }
     }
 
@@ -154,29 +181,23 @@ const CrossChainSwapSection = () => {
             const fetchChains = async () => {
                 let res = await sendGetRequest(path, null)
                     .then(res => {
-                        return res
+                        if (res.code === '50011') {
+                            void wait(1000)
+                            void fetchChains()
+                        } else if (res.code === '0') {
+                            networks = res?.data
+                            setFetchedNetworks(res?.data)
+                            console.log('networks', networks)
+                            return res
+                        } else {
+                            console.log('error', res.msg)
+                            handleErrors(res);
+                            toast.error(res?.msg)
+                        }
                     })
                     .catch(err => {
                         console.log('err', err)
-                    })
-                    .then(res => {
-                        if (res.data === undefined || res.code == '51000') {
-                            setFromNetwork(USDC_BASE[0])
-                            if (fetchedNetworks.length == 0) {
-                                setFetchedNetworks([USDC_BASE[0]])
-                            }
-                            console.log('fetchedNetworks', fetchedNetworks)
-                            return res
-                        } else if (res.code === '50011') {
-                            console.log('TIMEOUT')
-                            wait(1000)
-                            fetchRoute()
-                        } else {
-                            networks = res?.data
-                            setFetchedNetworks(res.data)
-                            console.log('networks', networks)
-                            return res
-                        }
+                        toast.error(err?.msg)
                     })
             }
             void fetchChains()
@@ -189,32 +210,22 @@ const CrossChainSwapSection = () => {
             const networkChainId = fromNetwork.chainId
             let res = await sendGetRequest(path, { chainId: networkChainId })
                 .then(res => {
-                    console.log('res', res)
-                    return res
+                    if (res.code === '50011') {
+                        void wait(1000)
+                        void fetchTokens()
+                    } else if (res.code === '0') {
+                        tokens = res?.data
+                        setFetchedTokens(res?.data)
+                        return res
+                    } else {
+                        console.log('error', res.msg)
+                        handleErrors(res);
+                        toast.error(res?.msg)
+                    }
                 })
                 .catch(err => {
                     console.log('err', err)
-                })
-                .then(res => {
-                    console.log(res)
-                    if (res === undefined) {
-                        setFromToken(USDC_BASE[1])
-                        if (fetchedNetworks.length == 0) {
-                            setFetchedTokens([USDC_BASE[1]])
-                        }
-                        return res
-                    } else if (res.code === '82102') {
-                        console.log('minimum amount error')
-                        alert('Minimum amount error')
-                    } else if (res.code === '50011' || res.code == '51000') {
-                        console.log('TIMEOUT')
-                        wait(1000)
-                        fetchTokens()
-                    } else {
-                        setFetchedTokens(res.data)
-                        console.log('tokens', fetchedTokens)
-                        return res
-                    }
+                    toast.error(err?.msg)
                 })
         }
         void fetchTokens()
@@ -232,11 +243,11 @@ const CrossChainSwapSection = () => {
             const { path, call } = API_paths['route']
             const params = {
                 fromChainId: fromNetwork.chainId,
-                toChainId: USDC_BASE[0].chainId,
+                toChainId: "137",//USDC_BASE[0].chainId,
                 fromTokenAddress: fromToken.tokenContractAddress,
-                toTokenAddress: USDC_BASE[1].tokenContractAddress,
+                toTokenAddress: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//USDC_BASE[1].tokenContractAddress,
                 amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
-                slippage: 0.02,
+                slippage: '0.015',
             }
             await checkApprovalStatus(
                 fromToken.tokenContractAddress,
@@ -247,46 +258,33 @@ const CrossChainSwapSection = () => {
             })
             let res = await sendGetRequest(path, params)
                 .then(res => {
-                    const data = res.data[0]
-                    const routerResult = data.routerList[0]
-                    const router: BridgeInfo = {
-                        protocol: routerResult.router.bridgeName,
-                        rate: {
-                            from: {
-                                amount: toWholeNumber(data.fromTokenAmount, toNumber(data.fromToken.decimals)),
-                                token: data.fromToken.tokenSymbol,
+                    if (res.code === '50011') {
+                        void wait(1000)
+                        void fetchRoute()
+                    } else if (res.code === '0') {
+                        console.log('res', res)
+                        const data = res.data[0]
+                        const routerResult = data.routerList[0]
+                        const router: BridgeInfo = {
+                            protocol: routerResult.router.bridgeName,
+                            rate: {
+                                from: {
+                                    amount: toWholeNumber(data.fromTokenAmount, toNumber(data.fromToken.decimals)),
+                                    token: data.fromToken.tokenSymbol,
+                                },
+                                to: {
+                                    amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)),
+                                    token: USDC_BASE[1].tokenSymbol,
+                                },
                             },
-                            to: {
-                                amount: toWholeNumber(routerResult.toTokenAmount, toNumber(USDC_BASE[1].decimals)),
-                                token: USDC_BASE[1].tokenSymbol,
+                            fee: {
+                                networkFee: toWholeNumber(routerResult.fromChainNetworkFee, 18),
+                                token: 'ETH',
                             },
-                        },
-                        fee: {
-                            networkFee: toWholeNumber(routerResult.fromChainNetworkFee, 18),
-                            token: 'ETH',
-                        },
-                        estimatedTime: formatTime(toNumber(routerResult.estimateTime)),
-                        slippage: '0.015',
-                    }
-                    setRouterInfo(router)
-                    return res
-                })
-                .catch(err => {
-                    console.log('err', err)
-                })
-                .then(res => {
-                    console.log(res)
-                    if (res === undefined || res.code == '51000') {
-                        toast.error(res?.msg)
-                        return res
-                    } else if (res.code === '82102') {
-                        console.log('minimum amount error')
-                        toast.error(res?.msg)
-                    } else if (res.code == '50011') {
-                        console.log('TIMEOUT')
-                        wait(1000)
-                        fetchRoute()
-                    } else {
+                            estimatedTime: formatTime(toNumber(routerResult.estimateTime)),
+                            slippage: '0.015',
+                        }
+                        setRouterInfo(router)
                         setRecievedAmount(
                             toWholeNumber(
                                 res.data[0].routerList[0].toTokenAmount,
@@ -294,15 +292,24 @@ const CrossChainSwapSection = () => {
                             ).toString(),
                         )
                         return res
+                    } else {
+                        console.log('error', res.msg)
+                        handleErrors(res);
+                        toast.error(res?.msg)
                     }
+
                 })
+                .catch(err => {
+                    console.log('err', err)
+                    toast.error(err?.msg)
+                })
+
         }
-        fetchRoute()
+        void fetchRoute()
     }, [fromToken, fromAmount])
 
     const handleApproveBridge = async () => {
         const provider = await wallets[0].getEthereumProvider()
-        console.log('CHAIIIIIN', wallets[0].chainId)
         const { path, call } = API_paths['approve']
         const params = {
             chainId: fromNetwork.chainId,
@@ -311,46 +318,44 @@ const CrossChainSwapSection = () => {
         }
         let res = await sendGetRequest(path, params)
             .then(async res => {
-                console.log('res', res)
-                const data = res.data[0].data
-                const dexAddress = res.data[0].dexContractAddress
-                const txRequest = {
-                    gas: toHex(toNumber(res.data[0].gasLimit)),
-                    gasPrice: toHex(toNumber(res.data[0].gasPrice)),
-                    from: wallets[0].address,
-                    to: fromToken.tokenContractAddress,
-                    data: data,
-                    value: '0x0',
+                if (res.code === '50011') {
+                    void wait(1000)
+                    void handleApproveBridge()
+                } else if (res.code === '0') {
+                    console.log('res', res)
+                    const data = res.data[0].data
+                    const dexAddress = res.data[0].dexContractAddress
+                    const txRequest = {
+                        gas: toHex(toNumber(res.data[0].gasLimit)),
+                        gasPrice: toHex(toNumber(res.data[0].gasPrice)),
+                        from: wallets[0].address,
+                        to: fromToken.tokenContractAddress,
+                        data: data,
+                        value: '0x0',
+                    }
+                    console.log('txRequest', txRequest)
+                    await provider
+                        .request({
+                            method: 'eth_sendTransaction',
+                            params: [txRequest],
+                        })
+                        .then(res => {
+                            console.log('res', res)
+                            setIfApproved(true)
+                            return res
+                        })
+                        .catch(err => {
+                            console.log('err', err)
+                        })
+                } else {
+                    console.log('error', res.msg)
+                    handleErrors(res);
+                    toast.error(res?.msg)
                 }
-                console.log('txRequest', txRequest)
-                await provider
-                    .request({
-                        method: 'eth_sendTransaction',
-                        params: [txRequest],
-                    })
-                    .then(res => {
-                        console.log('res', res)
-                        setIfApproved(true)
-                        return res
-                    })
-                    .catch(err => {
-                        console.log('err', err)
-                    })
             })
             .catch(err => {
                 console.log('err', err)
-            })
-            .then(res => {
-                console.log(res)
-                if (res === undefined || res.code == '51000') {
-                    return res
-                } else if (res.code == '50011') {
-                    console.log('TIMEOUT')
-                    wait(1000)
-                    handleApproveBridge()
-                } else {
-                    return res
-                }
+                toast.error(err?.msg)
             })
     }
 
@@ -370,58 +375,112 @@ const CrossChainSwapSection = () => {
         console.log('paramsmmsms', params)
         let res = await sendGetRequest(path, params)
             .then(async res => {
-                console.log('res', res)
-                const data = res.data[0].tx
-                console.log('DATATATTA', data)
-                const txRequest = {
-                    gas: toHex(toNumber(data.gasLimit)),
-                    gasPrice: toHex(toNumber(data.gasPrice)),
-                    from: data.from,
-                    to: data.to,
-                    data: data.data,
-                    value: toHex(toNumber(data.value)),
+                if (res.code === '50011') {
+                    void wait(1000)
+                    void handleSwap()
+                } else if (res.code === '0') {
+                    console.log('res', res)
+                    const data = res.data[0].tx
+                    console.log('DATATATTA', data)
+                    const txRequest = {
+                        gas: toHex(toNumber(data.gasLimit)),
+                        gasPrice: toHex(toNumber(data.gasPrice)),
+                        from: data.from,
+                        to: data.to,
+                        data: data.data,
+                        value: toHex(toNumber(data.value)),
+                    }
+                    console.log('txRequest', txRequest)
+                    await provider
+                        .request({
+                            method: 'eth_sendTransaction',
+                            params: [txRequest],
+                        })
+                        .then(res => {
+                            console.log('res', res)
+                            // txHistory.push(res);
+                            // Push to supabase?s
+                            return res
+                        })
+                        .catch(err => {
+                            console.log('err', err)
+                        })
+                } else {
+                    console.log('error', res.msg)
+                    handleErrors(res);
+                    toast.error(res?.msg)
                 }
-                console.log('txRequest', txRequest)
-                await provider
-                    .request({
-                        method: 'eth_sendTransaction',
-                        params: [txRequest],
-                    })
-                    .then(res => {
-                        console.log('res', res)
-                        // txHistory.push(res);
-                        // Push to supabase?s
-                        return res
-                    })
-                    .catch(err => {
-                        console.log('err', err)
-                    })
             })
             .catch(err => {
                 console.log('err', err)
-            })
-            .then(res => {
-                console.log(res)
-                if (res === undefined || res.code == '51000') {
-                    return res
-                } else if (res.code == '50011') {
-                    console.log('TIMEOUT')
-                    wait(1000)
-                    handleSwap()
-                } else {
-                    return res
-                }
+                toast.error(err?.msg)
             })
     }
-
-    const fetchStatus = async () => {
-        console.log('txHistory', txHistory)
-        const { path, call } = API_paths['status']
+    const fetchTxnHistory = async () => {
+        // console.log('txHistory', txHistory)
+        const { path, call } = API_paths['history']
         const params = {
-            hash: txHistory[-1],
+            address: wallets[0].address,
+            chains: [fromNetwork.chainId],
+            // tokenAddress: fromToken.tokenContractAddress,
         }
-        const res = await sendGetRequest(path, params).then(async res => {
-            console.log('{{{{{{{{res}}}}}}}}', res)
+        const res = await fetch(`/api/cross-swap`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(params),
+        })
+
+        const data = await res.json();
+        console.log('data', data)
+
+        const txnList = data.data[0].trasactionList
+        console.log('txnList', data.data[0].transactionList)
+        const txnHistory = data.data[0].transactionList
+            ?.filter(txn => txn.txStatus === "success" && txn.itype === "2") // ✅ Keep only valid transactions
+            .map( (txn) => {
+                // const res = await fetch(`/api/swap-status`, {
+                //     method: 'POST',
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify(txn.txHash),
+                // })
+                // const status = await res.json();
+                // console.log('status', status)
+                return {
+                    id: txn.txHash,
+                    date: new Date(parseInt(txn.txTime)).toISOString(),
+                    tokenSymbol: txn.symbol,
+                    amount: txn.amount,
+                    fromToken: txn.tokenAddress,
+                    status: txn.txStatus
+                }
+            });
+        console.log('txnHistory', txnHistory)
+        setTransactionHistory(txnHistory)
+        // txnHash.map(async hash =>{
+        //     const status = await fetchStatus(hash);
+        //     console.log('status', status)
+        // })
+        setIsHistoryOpen(true)
+    }
+    // fetchStatus()
+        // DOES NOT WORK
+
+    const fetchOrders = async () => {
+        await getOKXAccount(wallets[0].address).then(async (accountId) => {
+            console.log('IIDDDD', accountId)
+            const { path, call } = API_paths['orders'];
+            const params = {
+                accountId: accountId,
+                widgetVersion: 1
+            }
+            await sendGetRequest(path, params).then(res => {
+                console.log('orders', res)
+            })
+
         })
     }
 
@@ -747,6 +806,12 @@ const CrossChainSwapSection = () => {
                         className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         {ifApproved ? 'Bridge' : 'Approve'}
                     </button>
+                    <button
+                        onClick={fetchTxnHistory}//{fetchTxnHistory fetchOrders}
+                        className='h-[46px] w-full rounded-[2rem] bg-[#f4f4f4] px-6 py-[11px] text-center text-base font-semibold leading-normal text-[#383838]'>
+                        Transaction History
+                    </button>
+                    <TransactionHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} transactions={transactionHistory} networks={fetchedNetworks} tokens={fetchedTokens} />
                 </div>
             </div>
         </div>

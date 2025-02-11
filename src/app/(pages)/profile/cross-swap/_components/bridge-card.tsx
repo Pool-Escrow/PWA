@@ -1,6 +1,6 @@
 import { Info } from 'lucide-react'
 import { Card, CardContent } from '@/app/_components/ui/card'
-import { Badge } from '@/app/_components/ui/badge'
+import { Button } from '@/app/_components/ui/button'
 
 interface BridgeInfoProps {
     bridgeInfo: {

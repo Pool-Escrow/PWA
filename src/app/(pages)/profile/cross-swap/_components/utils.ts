@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -5,6 +6,8 @@
 import https from 'https';
 import crypto from 'crypto';
 import querystring from 'querystring';
+import { wait } from '@testing-library/user-event/dist/cjs/utils/index.js'
+
 
 // OKX API configuration
 const api_config = {
@@ -50,6 +53,7 @@ async function sendGetRequest(request_path, params) {
   const { signature, timestamp } = createSignature("GET", request_path, params);
   // Generate the request header
   const headers = {
+    'Content-Type': 'application/json',
     'OK-ACCESS-KEY': api_config['api_key'],
     'OK-ACCESS-SIGN': signature,
     'OK-ACCESS-TIMESTAMP': timestamp,
@@ -89,7 +93,7 @@ async function sendGetRequest(request_path, params) {
 
 }
 
-function sendPostRequest(request_path, params) {
+async function sendPostRequest(request_path, params) {
   // Generate a signature
   const { signature, timestamp } = createSignature("POST", request_path, params);
 
@@ -110,21 +114,18 @@ function sendPostRequest(request_path, params) {
     headers: headers,
   };
 
-  const req = https.request(options, (res) => {
-    let data = '';
-    res.on('data', (chunk) => {
-      data += chunk;
+  try {
+    const response = await fetch(`https://www.okx.com${request_path}`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(params)
     });
-    res.on('end', () => {
-      console.log(data);
-    });
-  });
-
-  if (params) {
-    req.write(JSON.stringify(params));
+    const data = await response.json();
+    return data;
   }
-
-  req.end();
+  catch (error) {
+    console.error('Error:', error);
+}
 }
 
 const API_paths = {
@@ -137,7 +138,11 @@ const API_paths = {
   'approve' : {'path': '/api/v5/dex/aggregator/approve-transaction', 'call':'GET'},
   'swap' : {'path': '/api/v5/dex/cross-chain/build-tx', 'call':'GET'},
   'status' : {'path': '/api/v5/dex/cross-chain/status', 'call':'GET'},
-  'approval/status': {'path': '/priapi/v1/dx/trade/multi/batchGetTokenApproveInfo', 'call': 'GET'}
+  'approval/status': {'path': '/priapi/v1/dx/trade/multi/batchGetTokenApproveInfo', 'call': 'GET'},
+  'history' : {'path': '/api/v5/wallet/post-transaction/transactions-by-address', 'call':'GET'},
+  'orders' : {'path': '/priapi/v1/dx/trade/multi/orders', 'call':'GET'},
+  'account/OKX' : {'path': '/api/v5/wallet/account/create-wallet-account', 'call':'POST'},
+  'accounts' : {'path': '/api/v5/wallet/account/accounts', 'call':'GET'},
 }
 
 const USDC_BASE =[
@@ -193,6 +198,63 @@ const checkApprovalStatus = async ( tokenContractAddress: string, userAddress, t
   }
 }
 
+const fetchStatus = async (txnHash: string) => {
+  // console.log('txHistory', txHistory)
+  const { path, call } = API_paths['status']
+  const params = {
+      hash: txnHash,
+  }
+  const res = await sendGetRequest(path, params).then(async res => {
+    if (res === undefined || res.code == '51000') {
+        // console.log('RETRYING')
+        return "INVALID"
+      } else if (res.code == '50011') {
+        console.log('TIMEOUT')
+        wait(1000)
+        await fetchStatus(txnHash)
+    } else {
+        console.log('{{{{{{{{res}}}}}}}}', res)
+        return res.data[0]
+    }
+    console.log('{{{{{{{{res}}}}}}}}', res)
+  })
+  return res
+}
+
+const getOKXAccount = async (userAddress: string) => {
+  const { path, call } = API_paths['account/OKX']
+  const params = {
+    addresses: [{
+      chainIndex: "1",
+      address: userAddress
+    }]
+  }
+  // const res = await sendPostRequest(path, params).then(async res => {
+  //   // console.log('{{{{{{{{res}}}}}}}}', res)
+  //   return res?.data[0]?.accountId
+  // })
+  const res = await fetch(`/api/accounts`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(params),
+})
+  console.log(res)
+  return res
+}
+
+const tokenAddressToName = (tokenAddress: string, tokens) => {
+  const token = tokens.find(token => token.tokenContractAddress === tokenAddress);
+  return token?.tokenSymbol;
+}
+
+const tokenAddressToLogo = (tokenAddress: string, tokens) => {
+  const token = tokens.find(token => token.tokenContractAddress === tokenAddress);
+  return token?.tokenLogoUrl;
+}
+
+
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -224,5 +286,9 @@ export {
     toWholeNumber,
     toHex,
     checkApprovalStatus,
-    formatTime
+    formatTime,
+    fetchStatus,
+    getOKXAccount,
+    tokenAddressToName,
+    tokenAddressToLogo
 };
