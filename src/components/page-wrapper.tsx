@@ -1,6 +1,7 @@
 'use client'
 
-import TopBar, { TopBarProps } from './top-bar'
+import type { TopBarProps } from './top-bar';
+import TopBar from './top-bar'
 
 type PageWrapperProps = {
     children: React.ReactNode

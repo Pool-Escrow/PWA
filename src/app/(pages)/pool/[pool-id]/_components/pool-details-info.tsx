@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 

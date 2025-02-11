@@ -91,7 +91,9 @@ const ParticipantList = ({
                     />
                 ))
             ) : (
-                <p>No participants found.</p>
+                <p className={`${tabValue !== TabValue.Winners ? 'pt-4' : ''}`}>
+                    No participants found.
+                </p>
             )}
         </>
     )
