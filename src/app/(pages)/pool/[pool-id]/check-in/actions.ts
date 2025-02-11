@@ -61,7 +61,7 @@ export async function checkInAction(poolId: string, address: Address) {
         }
 
         if (userPoolData?.status === 'CHECKED_IN') {
-            return { success: false, message: 'User is already checked in' }
+            return { success: true, message: 'This user is already checked in. Would you like to go to Payout?' }
         }
 
         console.log('user is not checked in')
@@ -83,6 +83,6 @@ export async function checkInAction(poolId: string, address: Address) {
         return { success: true, message: 'Check-in successful' }
     } catch (error) {
         console.error('Error in check-in process:', error)
-        return { success: false, message: 'Check-in failed' }
+        return { success: false, message: error }
     }
 }
