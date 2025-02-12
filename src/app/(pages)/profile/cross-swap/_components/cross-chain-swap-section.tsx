@@ -483,7 +483,7 @@ const CrossChainSwapSection = () => {
         const { path, call } = API_paths['history']
         const params = {
             address: wallets[0].address,
-            chains: [fromNetwork.chainId],
+            chains: [fromNetwork.chainId, "137", "1", "42161", "10", "59144", "100", "324", "534352"],
         }
         // FETCH TXN HISTORY FROM OKX
         const res = await fetch(`/api/cross-swap`, {
