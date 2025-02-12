@@ -40,7 +40,7 @@ import { decodeFunctionData, encodeFunctionData, toHex } from 'viem'
 import * as React from 'react'
 import Image from 'next/image'
 import { ChevronDown, Search, X } from 'lucide-react'
-import { get, set, toNumber } from 'lodash'
+import { chain, get, set, toNumber } from 'lodash'
 import { wait } from '@testing-library/user-event/dist/cjs/utils/index.js'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_components/ui/dialog'
 import { Input } from '@/app/_components/ui/input'
@@ -451,6 +451,7 @@ const CrossChainSwapSection = () => {
                         to: data.to,
                         data: data.data,
                         value: toHex(BigInt(data.value)),
+                        chainId: toHex(BigInt(data.chainId)),
                     }
                     console.log('txRequest', txRequest)
                     await provider
