@@ -17,6 +17,7 @@ import type { Address } from 'viem'
 import PoolQrScanner from '../../_components/qr-scanner'
 import { checkInAction, checkParticipantStatusAction } from '../../check-in/actions'
 import { useUserDetails } from '../_components/use-user-details'
+import { DialogContent } from './_components/DialogContent'
 import { QrScanDialog } from './_components/qrScanDialog'
 
 enum CheckInState {
@@ -55,15 +56,17 @@ export default function PayoutScanPage() {
         setCheckInStatus(null)
     }
     const handleDecode = async (decodedResult: string) => {
+        console.log('handleDecode')
         if (isProcessing.current || showDialog) return
 
         try {
             isProcessing.current = true
             const parsedQrData: QrCodeCheckInData = JSON.parse(decodedResult)
-
             if (parsedQrData.poolId !== params?.['pool-id']) {
                 setCheckInStatus({ success: false, message: 'This QR code is for a different pool' })
                 setCheckInState(CheckInState.ERROR)
+                setShowDialog(true)
+
                 return
             }
 
@@ -168,6 +171,163 @@ export default function PayoutScanPage() {
     const displayName = userDetails?.displayName ?? (scannedAddress ? formatAddress(scannedAddress) : '')
     const truncatedAddress = scannedAddress ? `${scannedAddress.slice(0, 5)}...${scannedAddress.slice(-6)}` : ''
 
+    const getDialogContent = () => {
+        switch (checkInState) {
+            case CheckInState.ERROR:
+                return (
+                    <DialogContent
+                        avatar={
+                            <div className='relative size-16 rounded-full border-2 border-white bg-white md:size-24'>
+                                <Image src={circleErrorIcon} alt='Error Image' fill />
+                            </div>
+                        }
+                        title='Check in failed'
+                        subtitle={checkInStatus?.message}
+                        titleColor='#FE6651'
+                        footer={
+                            <Button
+                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                onClick={resetQrDialog}
+                                disabled={false}
+                                style={{
+                                    backgroundColor: '#EEEFF0',
+                                    color: '#787878',
+                                }}>
+                                Ok
+                            </Button>
+                        }
+                    />
+                )
+
+            case CheckInState.REGISTERED:
+                return (
+                    <DialogContent
+                        avatar={
+                            <Avatar
+                                className='size-16 rounded-full border-2 border-white bg-white md:size-24'
+                                aria-label='User Avatar'>
+                                <AvatarImage alt={`Avatar Image`} src={avatar} />
+                            </Avatar>
+                        }
+                        title={displayName}
+                        subtitle={truncatedAddress}
+                        footer={
+                            <>
+                                <Button
+                                    className='h-full w-1/2 rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                    onClick={resetQrDialog}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
+                                    onClick={handleCheckIn}>
+                                    Check In
+                                </Button>
+                            </>
+                        }
+                    />
+                )
+
+            case CheckInState.PROCESSING_CHECK_IN:
+                return (
+                    <DialogContent
+                        avatar={
+                            <Avatar
+                                className='size-16 rounded-full border-2 border-white bg-white md:size-24'
+                                aria-label='User Avatar'>
+                                <AvatarImage alt={`Avatar Image`} src={avatar} />
+                            </Avatar>
+                        }
+                        title='Processing Check in'
+                        subtitle='Please do not close'
+                        footer={
+                            <Button
+                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                onClick={() => {}}
+                                disabled={true}>
+                                Processing...
+                            </Button>
+                        }
+                    />
+                )
+
+            case CheckInState.SUCCESS:
+                return (
+                    <DialogContent
+                        avatar={
+                            <div className='relative size-16 rounded-full border-2 border-white bg-white md:size-24'>
+                                <Image src={circleTickIcon} alt='Checked In Image' fill />
+                            </div>
+                        }
+                        title='Checked in'
+                        subtitle={`${displayName} has been successfully checked in`}
+                        titleColor='#6993FF'
+                        footer={
+                            <Button
+                                className='h-full w-full rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
+                                onClick={resetQrDialog}>
+                                Continue
+                            </Button>
+                        }
+                    />
+                )
+
+            case CheckInState.ALREADY_CHECKED_IN:
+                return (
+                    <DialogContent
+                        avatar={
+                            <Avatar
+                                className='size-16 rounded-full border-2 border-white bg-white md:size-24'
+                                aria-label='User Avatar'>
+                                <AvatarImage alt={`Avatar Image`} src={avatar} />
+                            </Avatar>
+                        }
+                        title={`${displayName} is already checked in.\nWould you like to go to Payout?`}
+                        footer={
+                            <>
+                                <Button
+                                    className='h-full w-1/2 rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                    onClick={resetQrDialog}>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
+                                    onClick={handlePayout}>
+                                    Payout
+                                </Button>
+                            </>
+                        }
+                    />
+                )
+
+            case CheckInState.PROCESSING_PAYOUT:
+                return (
+                    <DialogContent
+                        avatar={
+                            <Avatar
+                                className='size-16 rounded-full border-2 border-white bg-white md:size-24'
+                                aria-label='User Avatar'>
+                                <AvatarImage alt={`Avatar Image`} src={avatar} />
+                            </Avatar>
+                        }
+                        title='Redirecting to payout'
+                        subtitle='Please do not close'
+                        footer={
+                            <Button
+                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                onClick={() => {}}
+                                disabled={true}>
+                                Processing...
+                            </Button>
+                        }
+                    />
+                )
+
+            default:
+                return null
+        }
+    }
+
     return (
         <PageWrapper fullScreen>
             <ScannerPageLayout title='Manage Participants'>
@@ -181,148 +341,7 @@ export default function PayoutScanPage() {
             </ScannerPageLayout>
 
             <QrScanDialog isOpen={showDialog} onClose={() => resetQrDialog()}>
-                {checkInState == CheckInState.ERROR && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            <Avatar
-                                className='size-16 rounded-full border-2 border-white bg-white lg:size-24'
-                                aria-label='User Avatar'>
-                                <AvatarImage alt={`Error`} src={circleErrorIcon} />
-                            </Avatar>
-
-                            <h2 className='text-[15px] font-medium text-[#FE6651] md:text-[24px]'>Check in failed</h2>
-                            <p className='text-[12px] font-medium italic md:text-[20px]'>{checkInStatus?.message}</p>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] focus:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
-                                onClick={() => resetQrDialog()}
-                                disabled>
-                                Ok
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {checkInState == CheckInState.REGISTERED && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            {avatar && (
-                                <Avatar
-                                    className='size-16 rounded-full border-2 border-white bg-white lg:size-24'
-                                    aria-label='User Avatar'>
-                                    <AvatarImage alt={`Avatar Image`} src={avatar} />
-                                </Avatar>
-                            )}
-                            <h2 className='text-[15px] font-medium md:text-[24px]'>{displayName}</h2>
-                            <p className='text-[12px] font-medium italic md:text-[20px]'>{truncatedAddress}</p>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-1/2 rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] focus:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
-                                onClick={() => resetQrDialog()}>
-                                Cancel
-                            </Button>
-                            <Button
-                                className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] focus:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
-                                onClick={handleCheckIn}>
-                                Check In
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {checkInState == CheckInState.PROCESSING_CHECK_IN && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            {avatar && (
-                                <Avatar
-                                    className='size-16 rounded-full border-2 border-white bg-white lg:size-24'
-                                    aria-label='User Avatar'>
-                                    <AvatarImage alt={`Avatar Image`} src={avatar} />
-                                </Avatar>
-                            )}
-                            <h2 className='text-[15px] font-medium md:text-[24px]'>Processing Check in</h2>
-                            <p className='text-[12px] font-medium italic md:text-[20px]'>Please do not close</p>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] focus:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
-                                disabled>
-                                Processing...
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {checkInState == CheckInState.SUCCESS && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            <div className='relative size-16 rounded-full border-2 border-white bg-white lg:size-24'>
-                                <Image src={circleTickIcon} alt='Checked In Image' fill />
-                            </div>
-                            <h2 className='text-[15px] font-medium text-[#6993FF] md:text-[24px]'>Checked in</h2>
-                            <p className='text-center text-[12px] font-medium italic md:text-[20px]'>
-                                {displayName} has been successfully checked in
-                            </p>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-full rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] focus:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
-                                onClick={() => resetQrDialog()}>
-                                Continue
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {checkInState == CheckInState.ALREADY_CHECKED_IN && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            {avatar && (
-                                <Avatar
-                                    className='size-16 rounded-full border-2 border-white bg-white lg:size-24'
-                                    aria-label='User Avatar'>
-                                    <AvatarImage alt={`Avatar Image`} src={avatar} />
-                                </Avatar>
-                            )}
-                            <h2 className='text-center text-[15px] font-medium md:text-[24px]'>
-                                {displayName} is already checked in. <br />
-                                Would you like to go to Payout?
-                            </h2>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-1/2 rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] focus:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
-                                onClick={() => resetQrDialog()}>
-                                Cancel
-                            </Button>
-                            <Button
-                                className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] focus:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
-                                onClick={handlePayout}>
-                                Payout
-                            </Button>
-                        </div>
-                    </div>
-                )}
-                {checkInState == CheckInState.PROCESSING_PAYOUT && (
-                    <div className='flex h-full w-full flex-col'>
-                        <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
-                            {avatar && (
-                                <Avatar
-                                    className='size-16 rounded-full border-2 border-white bg-white lg:size-24'
-                                    aria-label='User Avatar'>
-                                    <AvatarImage alt={`Avatar Image`} src={avatar} />
-                                </Avatar>
-                            )}
-                            <h2 className='text-[15px] font-medium md:text-[24px]'>Redirecting to payout</h2>
-                            <p className='text-[12px] font-medium italic md:text-[20px]'>Please do not close</p>
-                        </div>
-                        <div className='flex h-12 w-full flex-row items-end justify-between gap-[10px] align-bottom md:h-[100px]'>
-                            <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] focus:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
-                                disabled>
-                                Processing...
-                            </Button>
-                        </div>
-                    </div>
-                )}
+                {getDialogContent()}
             </QrScanDialog>
         </PageWrapper>
     )

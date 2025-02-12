@@ -1,17 +1,17 @@
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { useAuth } from './use-auth'
 import useTransactions from '@/app/_client/hooks/use-transactions'
+import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
+import { approve } from '@/app/_lib/blockchain/functions/token/approve'
+import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
-import type { Address, Hash } from 'viem'
-import { getAbiItem, parseUnits } from 'viem'
-import { toast } from 'sonner'
-import { approve } from '@/app/_lib/blockchain/functions/token/approve'
-import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
-import { useReadContract } from 'wagmi'
-import { useWaitForTransactionReceipt } from 'wagmi'
-import { useState, useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import type { Address, Hash } from 'viem'
+import { parseUnits } from 'viem'
+import { useReadContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAuth } from './use-auth'
 
 export function usePoolActions(
     poolId: string,
@@ -167,11 +167,12 @@ export function usePoolActions(
             console.error('❌ [usePoolActions] No wallet address available')
             return
         }
-
+        console.log('tokenDecimals', tokenDecimals)
         console.log('💰 [usePoolActions] Checking funds...')
-        const bigIntPrice = parseUnits(poolPrice.toString(), tokenDecimals)
+        const bigIntPrice = parseUnits(poolPrice.toFixed(20), tokenDecimals)
         console.log('💵 [usePoolActions] Required amount:', bigIntPrice.toString())
         console.log('💵 [usePoolActions] User balance:', userBalance?.toString())
+        console.log('bigIntPrice', bigIntPrice)
 
         if (balanceError) {
             console.error('❌ [usePoolActions] Balance check error:', balanceError)
