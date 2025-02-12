@@ -268,7 +268,7 @@ const toWholeNumber = (amount, decimals) => {
   return amount / Math.pow(10, decimals);
 }
 
-const toHex = (value: number): string => {
+const toHex = (value): string => {
   return `0x${value.toString(16)}`;
 }
 
