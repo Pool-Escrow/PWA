@@ -167,12 +167,10 @@ export function usePoolActions(
             console.error('❌ [usePoolActions] No wallet address available')
             return
         }
-        console.log('tokenDecimals', tokenDecimals)
         console.log('💰 [usePoolActions] Checking funds...')
         const bigIntPrice = parseUnits(poolPrice.toFixed(20), tokenDecimals)
         console.log('💵 [usePoolActions] Required amount:', bigIntPrice.toString())
         console.log('💵 [usePoolActions] User balance:', userBalance?.toString())
-        console.log('bigIntPrice', bigIntPrice)
 
         if (balanceError) {
             console.error('❌ [usePoolActions] Balance check error:', balanceError)
