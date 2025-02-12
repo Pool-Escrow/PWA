@@ -272,6 +272,11 @@ const toHex = (value): string => {
   return `0x${value.toString(16)}`;
 }
 
+const chainIdHex = (chainId: string): string => {
+  return `0x${parseInt(chainId, 10).toString(16)}`;
+}
+
+
 export {
     preHash,
     sign,
@@ -289,5 +294,6 @@ export {
     getOKXAccount,
     tokenAddressToName,
     tokenAddressToLogo,
-    chainIdToName
+    chainIdToName,
+    chainIdHex
 };

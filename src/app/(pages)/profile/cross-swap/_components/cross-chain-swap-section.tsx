@@ -20,6 +20,7 @@ import {
     tokenAddressToName,
     tokenAddressToLogo,
     chainIdToName,
+    chainIdHex,
 } from './utils'
 import { useWallets } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
@@ -50,6 +51,7 @@ import { BridgeInfoCard } from './bridge-card'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/app/_components/ui/sheet'
 import { tokenAddress } from '@/types/contracts'
 import { TransactionHistory } from './tx-history'
+import { chains } from './chains'
 
 // TEMPLATE NETWORK AND TOKEN ARRAY
 let networks = [
@@ -395,6 +397,28 @@ const CrossChainSwapSection = () => {
                         data: data,
                         value: '0x0',
                     }
+                    await provider.request({
+                        method:'wallet_switchEthereumChain',
+                        params: [{chainId: chainIdHex(fromNetwork.chainId)}]
+                    }).catch(async (err) => {
+                        console.log('err', err)
+                        console.log('chain', toNumber(fromNetwork.chainId)-1)
+                        if (err.code === 4902){
+                            console.log('chain0000', chains[toNumber(fromNetwork.chainId)-1])
+                            await provider.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [chains[toNumber(fromNetwork.chainId)-1]]
+                            }).then(async (res) => {
+                                await provider.request({
+                                    method:'wallet_switchEthereumChain',
+                                    params: [{chainId: chainIdHex(fromNetwork.chainId)}]
+                                })
+                                console.log('res', res)
+                            }).catch(err => {
+                                console.log('err', err)
+                            })
+                        }
+                    })
                     console.log('txRequest', txRequest)
                     await provider
                         .request({
@@ -451,7 +475,7 @@ const CrossChainSwapSection = () => {
                         to: data.to,
                         data: data.data,
                         value: toHex(BigInt(data.value)),
-                        chainId: toHex(BigInt(data.chainId)),
+                        chainId: BigInt(fromNetwork.chainId),
                     }
                     console.log('txRequest', txRequest)
                     await provider
