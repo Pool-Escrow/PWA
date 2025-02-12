@@ -71,7 +71,6 @@ let tokens = [
 const waitTimeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const CrossChainSwapSection = () => {
-    const { sendTransaction } = useSendTransaction()
     const { wallets } = useWallets()
     const [fromNetwork, setFromNetwork] = React.useState(USDC_BASE[0])
     const [fromToken, setFromToken] = React.useState(tokens[0])
@@ -107,6 +106,7 @@ const CrossChainSwapSection = () => {
         }
     }
 
+    // HANDLE OKX ERRORS - REFER OKX DOCS FOR ERROR CODES
     const handleErrors = (res) => {
         if (res === undefined) {
             setFromToken(USDC_BASE[1])
@@ -116,7 +116,7 @@ const CrossChainSwapSection = () => {
             toast.error('Error fetching tokens')
         } else if (res.code === '82102') {
             console.log('minimum amount error')
-            alert('Minimum amount error')
+            toast.error(res?.msg)
         } else if (res.code === "51000"){
             console.log('error', res.msg)
             toast.error(res?.msg)
@@ -178,7 +178,7 @@ const CrossChainSwapSection = () => {
             }
         }
     }, [])
-
+    // FETCH NETWORKS & CHAIN DETAILS WHEN WALLET IS IDENTIFIED
     useEffect(() => {
         const { path, call } = API_paths['chains']
         const connectedWallet = wallets[0]
@@ -193,7 +193,8 @@ const CrossChainSwapSection = () => {
                         } else if (res.code === '0') {
                             networks = res?.data
                             setFetchedNetworks(res?.data)
-                            console.log('networks', networks)
+                            toast.success('Networks fetched successfully')
+                            // console.log('networks', networks)
                             return res
                         } else {
                             console.log('error', res.msg)
@@ -222,6 +223,7 @@ const CrossChainSwapSection = () => {
                     } else if (res.code === '0') {
                         tokens = res?.data
                         setFetchedTokens(res?.data)
+                        toast.success('Tokens fetched successfully')
                         return res
                     } else {
                         console.log('error', res.msg)
@@ -297,6 +299,7 @@ const CrossChainSwapSection = () => {
                                 toNumber(USDC_BASE[1].decimals),
                             ).toString(),
                         )
+                        toast.success('Route fetched successfully')
                         return res
                     } else {
                         console.log('error', res.msg)
@@ -314,6 +317,7 @@ const CrossChainSwapSection = () => {
         void fetchRoute()
     }, [fromToken, fromAmount])
 
+    // FETCH TRANSACTION HISTORY
     useEffect(() => {
         // if (!isHistoryOpen) return; // Prevent fetching when modal is closed
 
@@ -321,6 +325,7 @@ const CrossChainSwapSection = () => {
           const results = [];
             const txnHistory = await fetchTxnHistory();
             // console.log('INNNNNNNNtransactionHistory', transactionHistory)
+            toast.message('Fetching transaction history... Please wait');
           for (const txn of txnHistory) {
             try {
                 console.log('txnId', txn.txHash)
@@ -357,11 +362,13 @@ const CrossChainSwapSection = () => {
           }
           console.log('results', results)
           setSuccessfulTransactions(results); // ✅ Update UI with successful transactions
+          toast.success('Transaction history fetched successfully');
         };
 
         void fetchWithThrottle();
       }, [fetchedNetworks, reloadHistory]);
 
+    // HANDLE APPROVE FUNCTION
     const handleApproveBridge = async () => {
         const provider = await wallets[0].getEthereumProvider()
         const { path, call } = API_paths['approve']
@@ -413,6 +420,7 @@ const CrossChainSwapSection = () => {
             })
     }
 
+    // HANDLE SWAP FUNCTION
     const handleSwap = async () => {
         const provider = await wallets[0].getEthereumProvider()
         console.log('amount', toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString())
@@ -426,7 +434,6 @@ const CrossChainSwapSection = () => {
             slippage: '0.015',
             userWalletAddress: wallets[0].address,
         }
-        console.log('paramsmmsms', params)
         let res = await sendGetRequest(path, params)
             .then(async res => {
                 if (res.code === '50011') {
@@ -453,8 +460,6 @@ const CrossChainSwapSection = () => {
                         .then(res => {
                             console.log('res', res)
                             setReloadHistory(true)
-                            // txHistory.push(res);
-                            // Push to supabase?s
                             return res
                         })
                         .catch(err => {
@@ -471,6 +476,8 @@ const CrossChainSwapSection = () => {
                 toast.error(err?.msg)
             })
     }
+
+    // FETCH TXN HISTORY OF WALLET ADDRESS
     const fetchTxnHistory = async () => {
         // console.log('txHistory', txHistory)
         const { path, call } = API_paths['history']
@@ -478,6 +485,7 @@ const CrossChainSwapSection = () => {
             address: wallets[0].address,
             chains: [fromNetwork.chainId],
         }
+        // FETCH TXN HISTORY FROM OKX
         const res = await fetch(`/api/cross-swap`, {
             method: 'POST',
             headers: {
@@ -485,47 +493,14 @@ const CrossChainSwapSection = () => {
             },
             body: JSON.stringify(params),
         })
-
         const data = await res.json();
-        console.log('data', data)
-
-        const txnList = data.data[0].trasactionList
-        // console.log('txnList', data.data[0].transactionList)
-        // const txnHistory = data.data[0].transactionList
-        //     ?.filter(txn => txn.txStatus === "success" && txn.itype === "2") // ✅ Keep only valid transactions
-        //     .map( (txn) => {
-        //         // const res = await fetch(`/api/swap-status`, {
-        //         //     method: 'POST',
-        //         //     headers: {
-        //         //         'Content-Type': 'application/json',
-        //         //     },
-        //         //     body: JSON.stringify(txn.txHash),
-        //         // })
-        //         // const status = await res.json();
-        //         // console.log('status', status)
-        //         return {
-        //             id: txn.txHash,
-        //             date: new Date(parseInt(txn.txTime)).toISOString(),
-        //             tokenSymbol: txn.symbol,
-        //             amount: txn.amount,
-        //             fromToken: txn.tokenAddress,
-        //             status: txn.txStatus
-        //         }
-        //     });
-        const txnIds = data.data[0].transactionList?.filter(txn => txn.txStatus === "success" && txn.itype === "2").map((txn) => txn.txHash);
-
-        // console.log('txnHistory', txnIds)
-        setTransactionHistory(data.data[0].transactionList);
-        return data.data[0].transactionList
-        // txnHash.map(async hash =>{
-        //     const status = await fetchStatus(hash);
-        //     console.log('status', status)
-        // })
-        // setIsHistoryOpen(true)
+        const txns = data.data[0].transactionList?.filter(txn => txn.txStatus === "success" && txn.itype === "2").map((txn) => txn);
+        console.log('txns', txns)
+        setTransactionHistory(txns);
+        return txns;
     }
-    // fetchStatus()
-        // DOES NOT WORK
 
+    // TEMP NOT USED
     const fetchOrders = async () => {
         await getOKXAccount(wallets[0].address).then(async (accountId) => {
             console.log('IIDDDD', accountId)
@@ -869,8 +844,9 @@ const CrossChainSwapSection = () => {
                     </button>
                     <button
                         onClick={handleHistory}//{fetchTxnHistory fetchOrders}
-                        className='h-[46px] w-full rounded-[2rem] bg-[#f4f4f4] px-6 py-[11px] text-center text-base font-semibold leading-normal text-[#383838]'>
-                        Transaction History
+                        disabled={successfulTransactions.length === 0} // ✅ Disable if no successful transactions
+                        className={`h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal
+                            ${successfulTransactions.length === 0 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#f4f4f4] text-[#383838]"}`}>                        Transaction History
                     </button>
                     <TransactionHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} transactions={successfulTransactions} networks={fetchedNetworks} tokens={fetchedTokens} />
                 </div>
