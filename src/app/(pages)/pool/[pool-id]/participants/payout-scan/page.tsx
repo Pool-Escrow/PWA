@@ -56,7 +56,6 @@ export default function PayoutScanPage() {
         setCheckInStatus(null)
     }
     const handleDecode = async (decodedResult: string) => {
-        console.log('handleDecode')
         if (isProcessing.current || showDialog) return
 
         try {
@@ -183,7 +182,8 @@ export default function PayoutScanPage() {
                         }
                         title='Check in failed'
                         subtitle={checkInStatus?.message}
-                        titleColor='#FE6651'
+                        titleColor='error'
+                        italicSubtitle={false}
                         footer={
                             <Button
                                 className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
@@ -261,7 +261,7 @@ export default function PayoutScanPage() {
                         }
                         title='Checked in'
                         subtitle={`${displayName} has been successfully checked in`}
-                        titleColor='#6993FF'
+                        titleColor='primary'
                         footer={
                             <Button
                                 className='h-full w-full rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
@@ -269,6 +269,7 @@ export default function PayoutScanPage() {
                                 Continue
                             </Button>
                         }
+                        italicSubtitle={false}
                     />
                 )
 
