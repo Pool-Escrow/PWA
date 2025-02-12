@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 'use client'
 import { use } from 'chai'
+import { numberToHex } from 'viem'
 import {
     API_paths,
     checkApprovalStatus,
@@ -387,8 +388,8 @@ const CrossChainSwapSection = () => {
                     const data = res.data[0].data
                     const dexAddress = res.data[0].dexContractAddress
                     const txRequest = {
-                        gas: toHex(toNumber(res.data[0].gasLimit)),
-                        gasPrice: toHex(toNumber(res.data[0].gasPrice)),
+                        gas: toHex(BigInt(res.data[0].gasLimit)),
+                        gasPrice: toHex(BigInt(res.data[0].gasPrice)),
                         from: wallets[0].address,
                         to: fromToken.tokenContractAddress,
                         data: data,
@@ -430,7 +431,7 @@ const CrossChainSwapSection = () => {
             toChainId: USDC_BASE[0].chainId,//'137', //
             fromTokenAddress: fromToken.tokenContractAddress,
             toTokenAddress: USDC_BASE[1].tokenContractAddress, //'0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', //
-            amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString(),
+            amount: toDecimals(BigInt(fromAmount), BigInt(fromToken.decimals)).toString(),
             slippage: '0.015',
             userWalletAddress: wallets[0].address,
         }
@@ -444,12 +445,12 @@ const CrossChainSwapSection = () => {
                     const data = res.data[0].tx
                     console.log('DATATATTA', data)
                     const txRequest = {
-                        gas: toHex(toNumber(data.gasLimit)),
-                        gasPrice: toHex(toNumber(data.gasPrice)),
+                        gas: toHex(BigInt(data.gasLimit)),
+                        gasPrice: toHex(BigInt(data.gasPrice)),
                         from: data.from,
                         to: data.to,
                         data: data.data,
-                        value: toHex(toNumber(data.value)),
+                        value: toHex(BigInt(data.value)),
                     }
                     console.log('txRequest', txRequest)
                     await provider

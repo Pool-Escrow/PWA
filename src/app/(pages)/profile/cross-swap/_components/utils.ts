@@ -260,11 +260,11 @@ const formatTime = (seconds: number): string => {
 }
 
 
-const toDecimals = (amount: number, decimals: number) => {
+const toDecimals = (amount, decimals) => {
   return amount * Math.pow(10, decimals);
 }
 
-const toWholeNumber = (amount: number, decimals: number) => {
+const toWholeNumber = (amount, decimals) => {
   return amount / Math.pow(10, decimals);
 }
 
