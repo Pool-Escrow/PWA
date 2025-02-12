@@ -334,7 +334,7 @@ const CrossChainSwapSection = () => {
               const res = await fetchStatus(txn.txHash);
               console.log(`Fetched status for ${txn.txHash}:`, res);
 
-              if (res.status == "SUCCESS") {
+              if (res.status == "SUCCESS" || res.status == "PENDING") {
                 console.log(`Transaction ${txn.txHash} is successful!`);
                     results.push({
                         id: txn.txHash,
