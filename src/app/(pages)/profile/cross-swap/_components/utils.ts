@@ -199,7 +199,6 @@ const checkApprovalStatus = async ( tokenContractAddress: string, userAddress, t
 }
 
 const fetchStatus = async (txnHash: string) => {
-  // console.log('txHistory', txHistory)
   const { path, call } = API_paths['status']
   const params = {
       hash: txnHash,
@@ -213,10 +212,8 @@ const fetchStatus = async (txnHash: string) => {
         wait(1000)
         await fetchStatus(txnHash)
     } else {
-        console.log('{{{{{{{{res}}}}}}}}', res)
         return res.data[0]
     }
-    console.log('{{{{{{{{res}}}}}}}}', res)
   })
   return res
 }
@@ -229,10 +226,6 @@ const getOKXAccount = async (userAddress: string) => {
       address: userAddress
     }]
   }
-  // const res = await sendPostRequest(path, params).then(async res => {
-  //   // console.log('{{{{{{{{res}}}}}}}}', res)
-  //   return res?.data[0]?.accountId
-  // })
   const res = await fetch(`/api/accounts`, {
     method: 'POST',
     headers: {

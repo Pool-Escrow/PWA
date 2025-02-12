@@ -10,20 +10,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_compone
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select'
 import { fetchStatus, tokenAddressToName } from "./utils"
 import { useState, useEffect } from "react"
+import { String } from "lodash"
 
 interface Transaction {
   id: string
   date: string
-  tokenSymbol: string
+  fromChain: object
+  toChain: object
   amount: string
-  fromToken: string
-  status: "failed" | "success" | "pending"
+  toAmount: string
+  fromToken: object
+  toToken: object
+  toTxnHash: string
+  status: string
 }
 
 interface TransactionHistoryProps {
   isOpen: boolean
   onClose: () => void
-  transactions: []
+  transactions: Transaction []
   networks: string[]
   tokens: string[]
 }

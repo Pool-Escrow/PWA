@@ -84,7 +84,7 @@ const CrossChainSwapSection = () => {
     const [searchQuery, setSearchQuery] = React.useState('')
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
     const [successfulTransactions, setSuccessfulTransactions] = useState<[]>([]);
-
+    const [reloadHistory, setReloadHistory] = useState(false);
     const [transactionHistory, setTransactionHistory] = React.useState([])
     const [isHistoryOpen, setIsHistoryOpen] = React.useState(false)
     const [ifApproved, setIfApproved] = React.useState(false)
@@ -249,9 +249,9 @@ const CrossChainSwapSection = () => {
             const { path, call } = API_paths['route']
             const params = {
                 fromChainId: fromNetwork.chainId,
-                toChainId: "137",//USDC_BASE[0].chainId,
+                toChainId: USDC_BASE[0].chainId, //"137"
                 fromTokenAddress: fromToken.tokenContractAddress,
-                toTokenAddress: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//USDC_BASE[1].tokenContractAddress,
+                toTokenAddress: USDC_BASE[1].tokenContractAddress,//"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//
                 amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
                 slippage: '0.015',
             }
@@ -319,20 +319,20 @@ const CrossChainSwapSection = () => {
 
         const fetchWithThrottle = async () => {
           const results = [];
-            await fetchTxnHistory();
-            console.log('INNNNNNNNtransactionHistory', transactionHistory)
-          for (const txn of transactionHistory) {
+            const txnHistory = await fetchTxnHistory();
+            // console.log('INNNNNNNNtransactionHistory', transactionHistory)
+          for (const txn of txnHistory) {
             try {
                 console.log('txnId', txn.txHash)
                 if (results.some(existingTxn => existingTxn.id === txn.txHash) ) {
-                    console.log('ALREADY EXISTS')
+                    // console.log('ALREADY EXISTS')
                     continue;
                 }else if (results.length >=5 ) {
                     console.log('MAX LIMIT REACHED')
                     break;
                 }
               const res = await fetchStatus(txn.txHash);
-              console.log(`Fetched status for ${txn.txHash}:`, res);
+            //   console.log(`Fetched status for ${txn.txHash}:`, res);
 
               if (res.status == "SUCCESS" || res.status == "PENDING") {
                 console.log(`Transaction ${txn.txHash} is successful!`);
@@ -350,7 +350,7 @@ const CrossChainSwapSection = () => {
                     });
               }
             } catch (error) {
-              console.error(`Error fetching status for ${txnId}:`, error);
+              console.error(`Error fetching status for ${txn.txHash}:`, error);
             }
 
             await waitTimeout(1000); // ⏳ Wait 1 sec before the next request
@@ -359,12 +359,9 @@ const CrossChainSwapSection = () => {
           setSuccessfulTransactions(results); // ✅ Update UI with successful transactions
         };
 
-        fetchWithThrottle();
-      }, [fetchedNetworks]);
-    // useEffect(() => {
-    //     if (successfulTransactions.length > 0 && isHistoryOpen === false)
-    //               setIsHistoryOpen(true)
-    // }, [successfulTransactions])
+        void fetchWithThrottle();
+      }, [fetchedNetworks, reloadHistory]);
+
     const handleApproveBridge = async () => {
         const provider = await wallets[0].getEthereumProvider()
         const { path, call } = API_paths['approve']
@@ -422,9 +419,9 @@ const CrossChainSwapSection = () => {
         const { path, call } = API_paths['swap']
         const params = {
             fromChainId: fromNetwork.chainId,
-            toChainId: '137', //USDC_BASE[0].chainId,
+            toChainId: USDC_BASE[0].chainId,//'137', //
             fromTokenAddress: fromToken.tokenContractAddress,
-            toTokenAddress: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', //USDC_BASE[1].tokenContractAddress,
+            toTokenAddress: USDC_BASE[1].tokenContractAddress, //'0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', //
             amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString(),
             slippage: '0.015',
             userWalletAddress: wallets[0].address,
@@ -455,6 +452,7 @@ const CrossChainSwapSection = () => {
                         })
                         .then(res => {
                             console.log('res', res)
+                            setReloadHistory(true)
                             // txHistory.push(res);
                             // Push to supabase?s
                             return res
@@ -479,7 +477,6 @@ const CrossChainSwapSection = () => {
         const params = {
             address: wallets[0].address,
             chains: [fromNetwork.chainId],
-            // tokenAddress: fromToken.tokenContractAddress,
         }
         const res = await fetch(`/api/cross-swap`, {
             method: 'POST',
@@ -493,7 +490,7 @@ const CrossChainSwapSection = () => {
         console.log('data', data)
 
         const txnList = data.data[0].trasactionList
-        console.log('txnList', data.data[0].transactionList)
+        // console.log('txnList', data.data[0].transactionList)
         // const txnHistory = data.data[0].transactionList
         //     ?.filter(txn => txn.txStatus === "success" && txn.itype === "2") // ✅ Keep only valid transactions
         //     .map( (txn) => {
@@ -517,9 +514,9 @@ const CrossChainSwapSection = () => {
         //     });
         const txnIds = data.data[0].transactionList?.filter(txn => txn.txStatus === "success" && txn.itype === "2").map((txn) => txn.txHash);
 
-        console.log('txnHistory', txnIds)
-        setTransactionHistory(data.data[0].transactionList)
-        return txnIds
+        // console.log('txnHistory', txnIds)
+        setTransactionHistory(data.data[0].transactionList);
+        return data.data[0].transactionList
         // txnHash.map(async hash =>{
         //     const status = await fetchStatus(hash);
         //     console.log('status', status)
