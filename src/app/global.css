@@ -252,3 +252,7 @@
         @apply bg-background text-foreground;
     }
 }
+
+.focus\:ring-ring:focus {
+    --tw-ring-color: none !important;
+}
