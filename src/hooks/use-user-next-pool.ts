@@ -7,7 +7,7 @@ import { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { transformContractPoolToUIPool } from '@/app/_lib/utils/pool-transforms'
 
-const fetchUserNextPool = async (userAddress: Address): Promise<PoolItem | null> => {
+const fetchUserNextPool = async (userAddress: Address): Promise<PoolItem[] | null> => {
     const supabase = getSupabaseBrowserClient()
     const userPools = await getUserPools(userAddress)
     const { data: dbPools } = await supabase.from('pools').select('*')
@@ -19,8 +19,7 @@ const fetchUserNextPool = async (userAddress: Address): Promise<PoolItem | null>
             return transformContractPoolToUIPool(contractPool, dbPool)
         })
         .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
-
-    return validPools[0] || null
+    return validPools?.slice(0, 3) || null
 }
 
 export const useUserNextPool = () => {
