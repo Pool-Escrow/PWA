@@ -36,10 +36,10 @@ const MyPools: React.FC<MyPoolsProps> = ({ initialUpcomingPools, initialPastPool
     })
 
     useEffect(() => {
-        const tabFromUrl = searchParams?.get('tab') as 'upcoming' | 'past'
+        const tabFromUrl = searchParams?.get('tab') as 'active' | 'past'
 
         if (initialLoadRef.current) {
-            if (tabFromUrl && ['upcoming', 'past'].includes(tabFromUrl)) {
+            if (tabFromUrl && ['active', 'past'].includes(tabFromUrl)) {
                 setMyPoolsTab(tabFromUrl)
             } else {
                 updateSearchParam(myPoolsTab)

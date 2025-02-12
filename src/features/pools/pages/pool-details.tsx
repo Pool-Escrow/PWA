@@ -142,6 +142,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
             </PoolDetailsCard>
 
             <BottomBarHandler
+                onPoolUpdate={handleRefresh}
                 poolId={pool.contractId}
                 isAdmin={isAdmin || false}
                 poolStatus={pool.status}

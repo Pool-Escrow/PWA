@@ -12,8 +12,8 @@ const SearchBar = ({
 }: {
     query: string
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    poolId: string
-    isAdmin: boolean
+    poolId?: string
+    isAdmin?: boolean
 }) => (
     <div className='relative mb-2 h-[38px]'>
         <div className='absolute left-4 z-10 flex h-full items-center'>

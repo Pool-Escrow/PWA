@@ -21,7 +21,7 @@ export type SettingsSlice = SettingsState & SettingsActions
 
 export const createSettingsSlice: StateCreator<SettingsSlice, [], [], SettingsSlice> = set => ({
     bottomBarContent: null,
-    myPoolsTab: 'upcoming',
+    myPoolsTab: 'active',
     transactionInProgress: false,
     isRouting: false,
     setBottomBarContent: (content: React.ReactNode | null) => set({ bottomBarContent: content }),
