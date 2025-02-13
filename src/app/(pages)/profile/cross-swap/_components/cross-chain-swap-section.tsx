@@ -226,7 +226,6 @@ const CrossChainSwapSection = () => {
                     } else if (res.code === '0') {
                         tokens = res?.data
                         setFetchedTokens(res?.data)
-                        toast.success('Tokens fetched successfully')
                         return res
                     } else {
                         console.log('error', res.msg)
@@ -485,6 +484,8 @@ const CrossChainSwapSection = () => {
                         })
                         .then(res => {
                             console.log('res', res)
+                            toast.success('Transaction sent successfully, please wait for confirmation')
+                            toast.message('Fetching transaction history... Please wait')
                             setReloadHistory(true)
                             return res
                         })
