@@ -50,6 +50,7 @@ import { BridgeInfoCard } from './bridge-card'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/app/_components/ui/sheet'
 import { tokenAddress } from '@/types/contracts'
 import { TransactionHistory } from './tx-history'
+import WalletAccountSection from './wallet-account-section'
 
 // TEMPLATE NETWORK AND TOKEN ARRAY
 let networks = [
@@ -69,7 +70,7 @@ let tokens = [
         tokenSymbol: 'WBTC',
     },
 ]
-const waitTimeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const waitTimeout = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 const CrossChainSwapSection = () => {
     const { wallets } = useWallets()
@@ -83,8 +84,8 @@ const CrossChainSwapSection = () => {
     const [isSelectOpen, setIsSelectOpen] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState('')
     const [isNetworkSelectOpen, setIsNetworkSelectOpen] = React.useState(false)
-    const [successfulTransactions, setSuccessfulTransactions] = useState<[]>([]);
-    const [reloadHistory, setReloadHistory] = useState(false);
+    const [successfulTransactions, setSuccessfulTransactions] = useState<[]>([])
+    const [reloadHistory, setReloadHistory] = useState(false)
     const [transactionHistory, setTransactionHistory] = React.useState([])
     const [isHistoryOpen, setIsHistoryOpen] = React.useState(false)
     const [ifApproved, setIfApproved] = React.useState(false)
@@ -108,7 +109,7 @@ const CrossChainSwapSection = () => {
     }
 
     // HANDLE OKX ERRORS - REFER OKX DOCS FOR ERROR CODES
-    const handleErrors = (res) => {
+    const handleErrors = res => {
         if (res === undefined) {
             setFromToken(USDC_BASE[1])
             if (fetchedNetworks.length == 0) {
@@ -118,7 +119,7 @@ const CrossChainSwapSection = () => {
         } else if (res.code === '82102') {
             console.log('minimum amount error')
             toast.error(res?.msg)
-        } else if (res.code === "51000"){
+        } else if (res.code === '51000') {
             console.log('error', res.msg)
             toast.error(res?.msg)
         } else {
@@ -199,7 +200,7 @@ const CrossChainSwapSection = () => {
                             return res
                         } else {
                             console.log('error', res.msg)
-                            handleErrors(res);
+                            handleErrors(res)
                             toast.error(res?.msg)
                         }
                     })
@@ -228,7 +229,7 @@ const CrossChainSwapSection = () => {
                         return res
                     } else {
                         console.log('error', res.msg)
-                        handleErrors(res);
+                        handleErrors(res)
                         toast.error(res?.msg)
                     }
                 })
@@ -254,7 +255,7 @@ const CrossChainSwapSection = () => {
                 fromChainId: fromNetwork.chainId,
                 toChainId: USDC_BASE[0].chainId, //"137"
                 fromTokenAddress: fromToken.tokenContractAddress,
-                toTokenAddress: USDC_BASE[1].tokenContractAddress,//"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//
+                toTokenAddress: USDC_BASE[1].tokenContractAddress, //"0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",//
                 amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)),
                 slippage: '0.015',
             }
@@ -304,16 +305,14 @@ const CrossChainSwapSection = () => {
                         return res
                     } else {
                         console.log('error', res.msg)
-                        handleErrors(res);
+                        handleErrors(res)
                         toast.error(res?.msg)
                     }
-
                 })
                 .catch(err => {
                     console.log('err', err)
                     toast.error(err?.msg)
                 })
-
         }
         void fetchRoute()
     }, [fromToken, fromAmount])
@@ -323,51 +322,57 @@ const CrossChainSwapSection = () => {
         // if (!isHistoryOpen) return; // Prevent fetching when modal is closed
 
         const fetchWithThrottle = async () => {
-          const results = [];
-            const txnHistory = await fetchTxnHistory();
+            const results = []
+            const txnHistory = await fetchTxnHistory()
             // console.log('INNNNNNNNtransactionHistory', transactionHistory)
-            toast.message('Fetching transaction history... Please wait');
-          for (const txn of txnHistory) {
-            try {
-                console.log('txnId', txn.txHash)
-                if (results.some(existingTxn => existingTxn.id === txn.txHash) ) {
-                    // console.log('ALREADY EXISTS')
-                    continue;
-                }else if (results.length >=5 ) {
-                    console.log('MAX LIMIT REACHED')
-                    break;
+            toast.message('Fetching transaction history... Please wait')
+            for (const txn of txnHistory) {
+                try {
+                    console.log('txnId', txn.txHash)
+                    if (results.some(existingTxn => existingTxn.id === txn.txHash)) {
+                        // console.log('ALREADY EXISTS')
+                        continue
+                    } else if (results.length >= 5) {
+                        console.log('MAX LIMIT REACHED')
+                        break
+                    }
+                    const res = await fetchStatus(txn.txHash)
+                    //   console.log(`Fetched status for ${txn.txHash}:`, res);
+
+                    if (res.status == 'SUCCESS' || res.status == 'PENDING') {
+                        console.log(`Transaction ${txn.txHash} is successful!`)
+                        results.push({
+                            id: txn.txHash,
+                            date: new Date(parseInt(txn.txTime)).toISOString(),
+                            fromChain: {
+                                chainId: res.fromChainId,
+                                name: chainIdToName(res.fromChainId, fetchedNetworks),
+                            },
+                            toChain: { chainId: res.toChainId, name: chainIdToName(res.toChainId, fetchedNetworks) },
+                            amount: res.fromAmount,
+                            toAmount: res.toAmount,
+                            fromToken: {
+                                name: tokenAddressToName(res.fromTokenAddress, fetchedTokens),
+                                logo: tokenAddressToLogo(res.fromTokenAddress, fetchedTokens),
+                            },
+                            toToken: { name: USDC_BASE[1].tokenSymbol, logo: USDC_BASE[1].tokenLogoUrl }, // HARDCODE TO USDC BASE
+                            toTxnHash: res.toTxHash,
+                            status: res.detailStatus,
+                        })
+                    }
+                } catch (error) {
+                    console.error(`Error fetching status for ${txn.txHash}:`, error)
                 }
-              const res = await fetchStatus(txn.txHash);
-            //   console.log(`Fetched status for ${txn.txHash}:`, res);
 
-              if (res.status == "SUCCESS" || res.status == "PENDING") {
-                console.log(`Transaction ${txn.txHash} is successful!`);
-                    results.push({
-                        id: txn.txHash,
-                        date: new Date(parseInt(txn.txTime)).toISOString(),
-                        fromChain: { chainId: res.fromChainId, name: chainIdToName(res.fromChainId, fetchedNetworks) },
-                        toChain: { chainId: res.toChainId, name: chainIdToName(res.toChainId, fetchedNetworks) },
-                        amount: res.fromAmount,
-                        toAmount: res.toAmount,
-                        fromToken: { name: tokenAddressToName(res.fromTokenAddress, fetchedTokens), logo: tokenAddressToLogo(res.fromTokenAddress, fetchedTokens) },
-                        toToken: { name: USDC_BASE[1].tokenSymbol, logo: USDC_BASE[1].tokenLogoUrl }, // HARDCODE TO USDC BASE
-                        toTxnHash: res.toTxHash,
-                        status: res.detailStatus
-                    });
-              }
-            } catch (error) {
-              console.error(`Error fetching status for ${txn.txHash}:`, error);
+                await waitTimeout(1000) // ⏳ Wait 1 sec before the next request
             }
+            console.log('results', results)
+            setSuccessfulTransactions(results) // ✅ Update UI with successful transactions
+            toast.success('Transaction history fetched successfully')
+        }
 
-            await waitTimeout(1000); // ⏳ Wait 1 sec before the next request
-          }
-          console.log('results', results)
-          setSuccessfulTransactions(results); // ✅ Update UI with successful transactions
-          toast.success('Transaction history fetched successfully');
-        };
-
-        void fetchWithThrottle();
-      }, [fetchedNetworks, reloadHistory]);
+        void fetchWithThrottle()
+    }, [fetchedNetworks, reloadHistory])
 
     // HANDLE APPROVE FUNCTION
     const handleApproveBridge = async () => {
@@ -411,7 +416,7 @@ const CrossChainSwapSection = () => {
                         })
                 } else {
                     console.log('error', res.msg)
-                    handleErrors(res);
+                    handleErrors(res)
                     toast.error(res?.msg)
                 }
             })
@@ -428,7 +433,7 @@ const CrossChainSwapSection = () => {
         const { path, call } = API_paths['swap']
         const params = {
             fromChainId: fromNetwork.chainId,
-            toChainId: USDC_BASE[0].chainId,//'137', //
+            toChainId: USDC_BASE[0].chainId, //'137', //
             fromTokenAddress: fromToken.tokenContractAddress,
             toTokenAddress: USDC_BASE[1].tokenContractAddress, //'0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359', //
             amount: toDecimals(toNumber(fromAmount), toNumber(fromToken.decimals)).toString(),
@@ -468,7 +473,7 @@ const CrossChainSwapSection = () => {
                         })
                 } else {
                     console.log('error', res.msg)
-                    handleErrors(res);
+                    handleErrors(res)
                     toast.error(res?.msg)
                 }
             })
@@ -484,7 +489,7 @@ const CrossChainSwapSection = () => {
         const { path, call } = API_paths['history']
         const params = {
             address: wallets[0].address,
-            chains: [fromNetwork.chainId, "137", "1", "42161", "10", "59144", "100", "324", "534352"],
+            chains: [fromNetwork.chainId, '137', '1', '42161', '10', '59144', '100', '324', '534352'],
         }
         // FETCH TXN HISTORY FROM OKX
         const res = await fetch(`/api/cross-swap`, {
@@ -494,26 +499,27 @@ const CrossChainSwapSection = () => {
             },
             body: JSON.stringify(params),
         })
-        const data = await res.json();
-        const txns = data.data[0].transactionList?.filter(txn => txn.txStatus === "success" && txn.itype === "2").map((txn) => txn);
+        const data = await res.json()
+        const txns = data.data[0].transactionList
+            ?.filter(txn => txn.txStatus === 'success' && txn.itype === '2')
+            .map(txn => txn)
         console.log('txns', txns)
-        setTransactionHistory(txns);
-        return txns;
+        setTransactionHistory(txns)
+        return txns
     }
 
     // TEMP NOT USED
     const fetchOrders = async () => {
-        await getOKXAccount(wallets[0].address).then(async (accountId) => {
+        await getOKXAccount(wallets[0].address).then(async accountId => {
             console.log('IIDDDD', accountId)
-            const { path, call } = API_paths['orders'];
+            const { path, call } = API_paths['orders']
             const params = {
                 accountId: accountId,
-                widgetVersion: 1
+                widgetVersion: 1,
             }
             await sendGetRequest(path, params).then(res => {
                 console.log('orders', res)
             })
-
         })
     }
 
@@ -533,6 +539,10 @@ const CrossChainSwapSection = () => {
         <div className='relative min-h-screen overflow-y-scroll [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             {/* Main Content Area */}
             <div className='mx-auto w-full max-w-md space-y-4 overflow-y-scroll p-1 pb-24 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+                <WalletAccountSection
+                    onHistoryClick={handleHistory}
+                    hasTransactions={successfulTransactions.length > 0}
+                />
                 {/* Token Selection Sheet */}
                 <Sheet open={isSelectOpen} onOpenChange={setIsSelectOpen}>
                     <SheetContent
@@ -840,16 +850,16 @@ const CrossChainSwapSection = () => {
                 <div className='mx-auto max-w-md'>
                     <button
                         onClick={ifApproved ? handleSwap : handleApproveBridge}
-                        className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                        className='h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         {ifApproved ? 'Bridge' : 'Approve'}
                     </button>
-                    <button
-                        onClick={handleHistory}//{fetchTxnHistory fetchOrders}
-                        disabled={successfulTransactions.length === 0} // ✅ Disable if no successful transactions
-                        className={`h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal
-                            ${successfulTransactions.length === 0 ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#f4f4f4] text-[#383838]"}`}>                        Transaction History
-                    </button>
-                    <TransactionHistory isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} transactions={successfulTransactions} networks={fetchedNetworks} tokens={fetchedTokens} />
+                    <TransactionHistory
+                        isOpen={isHistoryOpen}
+                        onClose={() => setIsHistoryOpen(false)}
+                        transactions={successfulTransactions}
+                        networks={fetchedNetworks}
+                        tokens={fetchedTokens}
+                    />
                 </div>
             </div>
         </div>
