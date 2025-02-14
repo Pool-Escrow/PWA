@@ -210,7 +210,10 @@
                 }
             ],
             "@typescript-eslint/consistent-type-imports": 1
-        }
+        },
+        "ignorePatterns": [
+            "contracts/*/*"
+        ]
     },
     "packageManager": "pnpm@9.12.1"
 }
