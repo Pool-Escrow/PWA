@@ -98,7 +98,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     return (
         <PullToRefresh onRefresh={handleRefresh}>
             <div
-                className='-webkit-overflow-scrolling-touch h-full space-y-3 overflow-y-auto overscroll-y-contain bg-white p-2'
+                className='h-full space-y-3 overflow-y-auto overscroll-y-contain bg-white p-2 overflow-scrolling-touch'
                 style={{
                     msOverflowStyle: 'none', // Hide scrollbar in IE/Edge
                     scrollbarWidth: 'none', // Hide scrollbar in Firefox

@@ -33,7 +33,7 @@ export default function PoolsPage() {
                 <div className='relative flex-1 overflow-hidden'>
                     <PullToRefresh onRefresh={handleRefresh}>
                         <div
-                            className='-webkit-overflow-scrolling-touch absolute inset-0 overflow-y-auto overscroll-y-contain'
+                            className='absolute inset-0 overflow-y-auto overscroll-y-contain'
                             style={{
                                 msOverflowStyle: 'none', // Hide scrollbar in IE/Edge
                                 scrollbarWidth: 'none', // Hide scrollbar in Firefox

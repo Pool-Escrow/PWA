@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import plugin from 'tailwindcss/plugin'
 
 const config: Config = {
     content: ['./src/**/*.tsx'],
@@ -144,7 +145,24 @@ const config: Config = {
             },
         },
     },
-    plugins: [require('tailwindcss-animate'), require('tailwindcss-safe-area')],
+    plugins: [
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require('tailwindcss-animate'),
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require('tailwindcss-safe-area'),
+        plugin(function ({
+            addUtilities,
+        }: {
+            addUtilities: (utilities: Record<string, Record<string, string>>) => void
+        }) {
+            const newUtilities = {
+                '.overflow-scrolling-touch': {
+                    '-webkit-overflow-scrolling': 'touch',
+                },
+            }
+            addUtilities(newUtilities)
+        }),
+    ],
 }
 
 export default config
