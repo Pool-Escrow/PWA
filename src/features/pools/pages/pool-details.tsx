@@ -119,7 +119,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     poolId={pool.contractId}
                 /> */}
                     <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5 pb-4'>
-                        {pool.status != POOLSTATUS.ENDED && (
+                        {pool.status != Number(POOLSTATUS.ENDED) && (
                             <PoolDetailsProgress
                                 data-testid='pool-details-progress'
                                 current={pool.poolBalance}

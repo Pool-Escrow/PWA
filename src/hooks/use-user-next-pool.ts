@@ -13,7 +13,7 @@ const fetchUserNextPool = async (userAddress: Address): Promise<PoolItem[] | nul
     const { data: dbPools } = await supabase.from('pools').select('*')
 
     const validPools = userPools
-        .filter(pool => pool.status <= POOLSTATUS.DEPOSIT_ENABLED)
+        .filter(pool => pool.status <= Number(POOLSTATUS.DEPOSIT_ENABLED))
         .map(contractPool => {
             const dbPool = dbPools?.find(dp => dp.contract_id === parseInt(contractPool.id))
             return transformContractPoolToUIPool(contractPool, dbPool)
