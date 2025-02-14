@@ -1,15 +1,17 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
 import { useEffect, useState, useRef } from 'react'
 
 interface PullToRefreshProps {
-    onRefresh: () => Promise<void>
+    keysToRefetch: string[] // Array of tanstack query keys to refetch
     children: React.ReactNode
     className?: string
 }
 
-export default function PullToRefresh({ onRefresh, children, className = '' }: PullToRefreshProps) {
+export default function PullToRefresh({ keysToRefetch, children, className = '' }: PullToRefreshProps) {
+    const queryClient = useQueryClient()
     const y = useMotionValue(0)
     const controls = useAnimation()
     const [isLoading, setIsLoading] = useState(false)
@@ -69,20 +71,29 @@ export default function PullToRefresh({ onRefresh, children, className = '' }: P
             })
 
             setIsLoading(true)
-            try {
-                await onRefresh()
-            } finally {
-                // Animate back to start after loading
-                controls.start({
-                    y: 0,
-                    transition: {
-                        type: 'spring',
-                        stiffness: 400,
-                        damping: 30,
-                        delay: 0.2, // Small delay to show completion
-                    },
-                })
-                setIsLoading(false)
+            for (const key of keysToRefetch) {
+                console.log('🔄 Refreshing pools data...')
+                queryClient
+                    .refetchQueries({ queryKey: [key] })
+                    .then(() => {
+                        console.log('✅ Pools data refreshed')
+                    })
+                    .catch(error => {
+                        console.error('Failed to refresh pools:', error)
+                    })
+                    .finally(() => {
+                        // Animate back to start after loading
+                        void controls.start({
+                            y: 0,
+                            transition: {
+                                type: 'spring',
+                                stiffness: 400,
+                                damping: 30,
+                                delay: 0.2, // Small delay to show completion
+                            },
+                        })
+                        setIsLoading(false)
+                    })
             }
         } else {
             // Spring back if not triggered
@@ -95,7 +106,7 @@ export default function PullToRefresh({ onRefresh, children, className = '' }: P
                 },
             })
         }
-    }
+    }, [isLoading, y, controls, keysToRefetch, queryClient])
 
     useEffect(() => {
         document.addEventListener('touchstart', handleTouchStart, { passive: true })

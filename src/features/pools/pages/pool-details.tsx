@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
 import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
@@ -22,8 +22,6 @@ import { useEffect } from 'react'
 import PullToRefresh from '@/app/_components/pull-to-refresh'
 
 export default function PoolDetails({ poolId }: { poolId: string }) {
-    const queryClient = useQueryClient()
-
     const {
         data: pool,
         isPending: isPoolPending,
@@ -41,15 +39,6 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
         queryKey: ['userAdminStatus'],
         queryFn: () => getUserAdminStatusActionWithCookie(),
     })
-
-    const handleRefresh = async () => {
-        console.log('🔄 Refreshing pool details...')
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['pool-details', poolId] }),
-            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] }),
-        ])
-        console.log('✅ Pool details refreshed')
-    }
 
     console.log('🔄 [PoolDetails] Rendering with poolId:', poolId)
 
@@ -96,7 +85,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     }))
 
     return (
-        <PullToRefresh onRefresh={handleRefresh}>
+        <PullToRefresh keysToRefetch={['pool-details', 'userAdminStatus']}>
             <div
                 className='h-full space-y-3 overflow-y-auto overscroll-y-contain bg-white p-2 overflow-scrolling-touch'
                 style={{
