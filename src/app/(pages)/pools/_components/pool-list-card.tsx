@@ -51,7 +51,7 @@ export default function PoolListCard({
     const queryClient = useQueryClient()
 
     const prefetch = () => {
-        queryClient.prefetchQuery({
+        void queryClient.prefetchQuery({
             queryKey: ['pool-details', id],
             queryFn: getPoolDetailsById,
             staleTime: 60000,

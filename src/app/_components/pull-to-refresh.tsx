@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query'
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 
 interface PullToRefreshProps {
     keysToRefetch: string[] // Array of tanstack query keys to refetch
@@ -55,13 +55,13 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
         }
     }
 
-    const handleTouchEnd = async () => {
+    const handleTouchEnd = useCallback(() => {
         if (isLoading) return
         const currentY = y.get()
 
         if (currentY > PULL_THRESHOLD) {
             // Animate to loading state
-            controls.start({
+            void controls.start({
                 y: LOADING_HEIGHT,
                 transition: {
                     type: 'spring',
@@ -97,7 +97,7 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
             }
         } else {
             // Spring back if not triggered
-            controls.start({
+            void controls.start({
                 y: 0,
                 transition: {
                     type: 'spring',
@@ -118,7 +118,7 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
             document.removeEventListener('touchmove', handleTouchMove)
             document.removeEventListener('touchend', handleTouchEnd)
         }
-    }, [isLoading])
+    }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 
     return (
         <div className={`relative h-full w-full ${className}`}>
