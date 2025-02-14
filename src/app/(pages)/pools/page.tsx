@@ -13,18 +13,12 @@ export default function PoolsPage() {
                 <div className='relative flex-1 overflow-hidden'>
                     <PullToRefresh keysToRefetch={['pools', 'next-user-pool', 'upcoming-pools']}>
                         <div
-                            className='absolute inset-0 overflow-y-auto overscroll-y-contain'
+                            className='absolute inset-0 overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:hidden'
                             style={{
                                 msOverflowStyle: 'none', // Hide scrollbar in IE/Edge
                                 scrollbarWidth: 'none', // Hide scrollbar in Firefox
                                 WebkitOverflowScrolling: 'touch',
                             }}>
-                            {/* Hide scrollbar in Chrome/Safari/Webkit */}
-                            <style jsx>{`
-                                div::-webkit-scrollbar {
-                                    display: none;
-                                }
-                            `}</style>
                             <div className='mt-4 space-y-4 pb-safe'>
                                 <NextUserPool />
                                 <UpcomingPools />

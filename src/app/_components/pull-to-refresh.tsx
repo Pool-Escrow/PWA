@@ -86,30 +86,27 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
             })
 
             setIsLoading(true)
-            for (const key of keysToRefetch) {
-                console.log('🔄 Refreshing pools data...')
-                queryClient
-                    .refetchQueries({ queryKey: [key] })
-                    .then(() => {
-                        console.log('✅ Pools data refreshed')
+
+            Promise.all(keysToRefetch.map(key => queryClient.refetchQueries({ queryKey: [key] })))
+                .then(() => {
+                    console.log('✅ All pools data refreshed')
+                })
+                .catch(error => {
+                    console.error('Failed to refresh pools:', error)
+                })
+                .finally(() => {
+                    // Animate back to start after loading
+                    void controls.start({
+                        y: 0,
+                        transition: {
+                            type: 'spring',
+                            stiffness: 400,
+                            damping: 30,
+                            delay: 0.2, // Small delay to show completion
+                        },
                     })
-                    .catch(error => {
-                        console.error('Failed to refresh pools:', error)
-                    })
-                    .finally(() => {
-                        // Animate back to start after loading
-                        void controls.start({
-                            y: 0,
-                            transition: {
-                                type: 'spring',
-                                stiffness: 400,
-                                damping: 30,
-                                delay: 0.2, // Small delay to show completion
-                            },
-                        })
-                        setIsLoading(false)
-                    })
-            }
+                    setIsLoading(false)
+                })
         } else {
             // Spring back if not triggered
             void controls.start({

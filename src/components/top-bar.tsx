@@ -33,7 +33,7 @@ function TopBarContent({ backButton, actionButton, title }: TopBarProps) {
             transition={pageTransition.transition}
             className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
             <div className='w-6'>{backButton && <BackButton />}</div>
-            {title && <div className='text-center'>{title}</div>}
+            <div className='text-center'>{Boolean(title) && title}</div>
             <div className='flex items-center gap-4 justify-self-end'>
                 <Button
                     size='icon'
