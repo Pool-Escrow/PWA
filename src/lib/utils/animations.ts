@@ -1,4 +1,4 @@
-export const getPageTransition = (pathname: string) => {
+export const getPageTransition = (pathname: string | null) => {
     const isProfilePage = pathname === '/profile'
 
     return {

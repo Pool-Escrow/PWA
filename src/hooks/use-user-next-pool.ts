@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { usePrivy } from '@privy-io/react-auth'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { getUserPools } from '@/app/_server/persistence/pools/blockchain/get-contract-user-pools'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { transformContractPoolToUIPool } from '@/app/_lib/utils/pool-transforms'
 
