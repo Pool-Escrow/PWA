@@ -2,6 +2,7 @@
 
 import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import PoolListCard from './pool-list-card'
+import { motion } from 'framer-motion'
 
 const poolMessages = {
     upcoming: {
@@ -39,25 +40,30 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
         const { title, message, cta, link, linkText } =
             poolMessages[name as keyof typeof poolMessages] || defaultMessage
         return (
-            <section className='flex-center flex-1 flex-col px-4 text-center'>
-                <h1 className='mb-4 text-lg font-semibold'>{title}</h1>
-                <p className='mb-2 text-sm'>{message}</p>
-                <p className='mx-auto max-w-xs text-sm leading-relaxed text-gray-500'>{cta}</p>
-                {link && linkText && (
-                    <a
-                        href={link}
-                        className='mt-4 text-sm text-blue-500 hover:underline'
-                        target='_blank'
-                        rel='noopener noreferrer'>
-                        {linkText}
-                    </a>
-                )}
-            </section>
+            <motion.div
+                className='flex h-24 items-center justify-center rounded-3xl bg-white p-4'
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
+                <div className='flex flex-col items-center gap-1'>
+                    <h2 className='text-sm font-semibold'>{title}</h2>
+                    <p className='text-xs text-gray-600'>{message}</p>
+                    <p className='text-xs text-gray-500'>{cta}</p>
+                    {link && linkText && (
+                        <a
+                            href={link}
+                            className='mt-1 text-xs text-blue-500 hover:underline'
+                            target='_blank'
+                            rel='noopener noreferrer'>
+                            {linkText}
+                        </a>
+                    )}
+                </div>
+            </motion.div>
         )
     }
 
     return (
-        <section className='flex flex-col gap-4 pb-4'>
+        <section className='flex flex-col gap-2 pb-4'>
             {pools?.length ? pools.map(pool => <PoolListCard key={pool.id} {...pool} />) : null}
         </section>
     )

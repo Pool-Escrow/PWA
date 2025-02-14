@@ -1,7 +1,7 @@
 'use client'
 
-import { motion, useAnimation, useMotionValue, useTransform, PanInfo } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
+import { useEffect, useState, useRef } from 'react'
 
 interface PullToRefreshProps {
     onRefresh: () => Promise<void>
@@ -13,20 +13,79 @@ export default function PullToRefresh({ onRefresh, children, className = '' }: P
     const y = useMotionValue(0)
     const controls = useAnimation()
     const [isLoading, setIsLoading] = useState(false)
+    const touchStartY = useRef(0)
+    const scrollStartY = useRef(0)
 
-    // Adjust thresholds for smoother feel
-    const PULL_THRESHOLD = 80 // Reduced from 100 for easier activation
-    const PULL_INDICATOR_SHOW = 20 // Show indicator earlier
+    const PULL_THRESHOLD = 80
+    const PULL_INDICATOR_SHOW = 20
+    const LOADING_HEIGHT = 40 // Height to maintain while loading
 
     const pullProgress = useTransform(y, [0, PULL_THRESHOLD], [0, 1])
     const rotate = useTransform(pullProgress, [0, 1], [0, 360])
     const scale = useTransform(pullProgress, [0, 1], [0.6, 1])
     const opacity = useTransform(y, [0, PULL_INDICATOR_SHOW, PULL_THRESHOLD], [0, 0.5, 1])
 
-    async function handleDragEnd() {
-        if (y.get() > PULL_THRESHOLD) {
-            console.log('Pull threshold reached, triggering refresh...')
-            // Start returning to position immediately while loading
+    const handleTouchStart = (e: TouchEvent) => {
+        if (isLoading) return
+        const target = e.target as HTMLElement
+        const scrollElement = target.closest('.overflow-y-auto')
+        if (!scrollElement) return
+
+        touchStartY.current = e.touches[0].clientY
+        scrollStartY.current = scrollElement.scrollTop
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+        if (isLoading) return
+        const target = e.target as HTMLElement
+        const scrollElement = target.closest('.overflow-y-auto')
+        if (!scrollElement) return
+
+        const touchY = e.touches[0].clientY
+        const deltaY = touchY - touchStartY.current
+
+        // Only handle pull-to-refresh when at the top
+        if (scrollElement.scrollTop === 0 && deltaY > 0) {
+            y.set(deltaY * 0.4) // More resistance for smoother feel
+            e.preventDefault()
+        } else {
+            y.set(0)
+        }
+    }
+
+    const handleTouchEnd = async () => {
+        if (isLoading) return
+        const currentY = y.get()
+
+        if (currentY > PULL_THRESHOLD) {
+            // Animate to loading state
+            controls.start({
+                y: LOADING_HEIGHT,
+                transition: {
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 40,
+                },
+            })
+
+            setIsLoading(true)
+            try {
+                await onRefresh()
+            } finally {
+                // Animate back to start after loading
+                controls.start({
+                    y: 0,
+                    transition: {
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 30,
+                        delay: 0.2, // Small delay to show completion
+                    },
+                })
+                setIsLoading(false)
+            }
+        } else {
+            // Spring back if not triggered
             controls.start({
                 y: 0,
                 transition: {
@@ -35,49 +94,30 @@ export default function PullToRefresh({ onRefresh, children, className = '' }: P
                     damping: 40,
                 },
             })
-            setIsLoading(true)
-            try {
-                await onRefresh()
-                console.log('Refresh completed successfully')
-            } catch (error) {
-                console.error('Refresh failed:', error)
-            } finally {
-                setIsLoading(false)
-            }
-        } else {
-            // Smoother return animation when not triggering refresh
-            controls.start({
-                y: 0,
-                transition: {
-                    type: 'spring',
-                    stiffness: 300,
-                    damping: 30,
-                },
-            })
-        }
-    }
-
-    async function handleDrag(_: any, info: PanInfo) {
-        // Prevent further dragging while loading
-        if (isLoading) {
-            y.set(0)
-            return
         }
     }
 
     useEffect(() => {
-        controls.start({ y: 0 })
-    }, [controls])
+        document.addEventListener('touchstart', handleTouchStart, { passive: true })
+        document.addEventListener('touchmove', handleTouchMove, { passive: false })
+        document.addEventListener('touchend', handleTouchEnd)
+
+        return () => {
+            document.removeEventListener('touchstart', handleTouchStart)
+            document.removeEventListener('touchmove', handleTouchMove)
+            document.removeEventListener('touchend', handleTouchEnd)
+        }
+    }, [isLoading])
 
     return (
-        <div className={`relative w-full ${className}`}>
+        <div className={`relative h-full w-full ${className}`}>
             {/* Loading indicator */}
             <motion.div
                 style={{ opacity }}
-                className='pointer-events-none absolute left-0 right-0 top-2 flex justify-center'>
+                className='pointer-events-none absolute left-0 right-0 top-2 z-10 flex justify-center'>
                 {isLoading ? (
                     <div className='relative h-7 w-7'>
-                        <div className='border-3 absolute h-full w-full animate-spin rounded-full border-primary/20 border-t-primary' />
+                        <div className='absolute h-full w-full animate-spin rounded-full border-[3px] border-primary/20 border-t-primary' />
                     </div>
                 ) : (
                     <motion.div
@@ -96,16 +136,16 @@ export default function PullToRefresh({ onRefresh, children, className = '' }: P
                 )}
             </motion.div>
 
-            {/* Pull to refresh content */}
+            {/* Content wrapper */}
             <motion.div
                 style={{ y }}
-                drag='y'
-                dragConstraints={{ top: 0, bottom: 120 }}
-                dragElastic={0.6}
-                onDragEnd={handleDragEnd}
-                onDrag={handleDrag}
                 animate={controls}
-                className='w-full touch-pan-y'>
+                className='h-full w-full'
+                transition={{
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 40,
+                }}>
                 {children}
             </motion.div>
         </div>

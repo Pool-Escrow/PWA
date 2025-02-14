@@ -70,7 +70,7 @@ export default function PoolListCard({
     return (
         <Link href={`/pool/${id}`} onMouseEnter={prefetch} onFocus={prefetch}>
             <motion.div
-                className='flex h-24 items-center gap-[14px] rounded-[1.5rem] bg-[#f4f4f4] p-3 pr-4'
+                className='flex h-24 items-center gap-[14px] rounded-3xl bg-white p-3 pr-4'
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}>
                 <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
@@ -79,6 +79,7 @@ export default function PoolListCard({
                         <div className='absolute bottom-0 z-10 flex w-full items-center bg-black/40 backdrop-blur-md'>
                             <div
                                 style={{ backgroundColor: POOL_STATUSES_CONFIGS[status as POOLSTATUS].color }}
+                                // eslint-disable-next-line tailwindcss/no-custom-classname
                                 className={'mr-0.4 mb-0.5 ml-2 size-[5px] animate-pulse rounded-full'}
                             />
                             <div

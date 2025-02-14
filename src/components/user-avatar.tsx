@@ -10,7 +10,7 @@ export default function UserAvatar() {
     const { data: userInfo, isLoading } = useUserInfo()
 
     return (
-        <Avatar className='relative size-10 cursor-pointer overflow-hidden' aria-label='Go to Profile' asChild>
+        <Avatar className='relative size-8 cursor-pointer overflow-hidden' aria-label='Go to Profile' asChild>
             <Link href={'/profile'}>
                 <AnimatePresence mode='wait'>
                     {isLoading ? (

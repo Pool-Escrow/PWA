@@ -1,21 +1,27 @@
 'use client'
 
+
 import { motion } from 'framer-motion'
 import BackButton from './back-button'
-import PageTitle from './page-title'
 import { usePathname } from 'next/navigation'
 import { getPageTransition } from '@/lib/utils/animations'
 import UserMenu from './user-menu'
+import Image from 'next/image'
+import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
+import eyeVisibleIcon from '@/public/app/icons/svg/eyevisible.svg'
+import eyeInvisibleIcon from '@/public/app/icons/svg/eyeinvisible.svg'
+import { Button } from '@/app/_components/ui/button'
+import { useEncryptStore } from '@/app/_stores/encrypt'
 
 export type TopBarProps = {
-    title?: string
     backButton?: boolean
     actionButton?: React.ReactNode
 }
 
-function TopBarContent({ title, backButton, actionButton }: TopBarProps) {
+function TopBarContent({ backButton, actionButton }: TopBarProps) {
     const pathname = usePathname()
     const pageTransition = getPageTransition(pathname)
+    const { isEncoded, toggleEncryption } = useEncryptStore()
 
     return (
         <motion.div
@@ -27,18 +33,30 @@ function TopBarContent({ title, backButton, actionButton }: TopBarProps) {
             transition={pageTransition.transition}
             className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
             <div className='w-6'>{backButton && <BackButton />}</div>
-            <div className='text-center'>
-                <PageTitle title={title} />
+            <div className='text-center'>{/* Title removed */}</div>
+            <div className='flex items-center gap-4 justify-self-end'>
+                <Button
+                    size='icon'
+                    variant='ghost'
+                    className='z-10 size-6 text-white hover:bg-transparent'
+                    onClick={toggleEncryption}>
+                    <Image
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                        src={isEncoded ? eyeVisibleIcon : (eyeInvisibleIcon as StaticImport)}
+                        alt={isEncoded ? 'Show balance' : 'Hide balance'}
+                        className='size-6'
+                    />
+                </Button>
+                {actionButton ?? <UserMenu />}
             </div>
-            <div className='justify-self-end'>{actionButton ?? <UserMenu />}</div>
         </motion.div>
     )
 }
 
 export default function TopBar(props: TopBarProps) {
     return (
-        <header className='z-30 bg-white'>
-            <nav className='mx-auto h-24 max-w-screen-md px-safe-or-6'>
+        <header className='z-30 bg-transparent text-white'>
+            <nav className='mx-auto h-[68px] max-w-screen-md px-safe-or-6'>
                 <TopBarContent {...props} />
             </nav>
         </header>

@@ -22,7 +22,7 @@ const Avatars = ({ numPeople, className, avatarUrls }: AvatarsProps) => {
             {displayedAvatars.map(({ url, address }, index) => (
                 <Avatar
                     key={index}
-                    className='size-10 rounded-full border-2 border-white bg-white'
+                    className='size10 rounded-full border-2 border-white bg-white'
                     aria-label='User Avatar'>
                     <AvatarImage alt={`Avatar ${index + 1}`} src={url || blo(address)} />
                     <AvatarFallback className='bg-[#d9d9d9]'>{address.slice(2, 6)}</AvatarFallback>
