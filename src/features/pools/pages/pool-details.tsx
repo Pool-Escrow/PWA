@@ -143,10 +143,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                 </PoolDetailsCard>
 
                 <BottomBarHandler
-                    onPoolUpdate={() => {
-                        console.log('🎯 [BottomBarHandler] Pool updated')
-                        console.log(pool, '<<POOL>> pending query refetch')
-                    }}
+                    keysToRefetch={['pool-details', 'userAdminStatus']}
                     poolId={pool.contractId}
                     isAdmin={isAdmin || false}
                     poolStatus={pool.status}

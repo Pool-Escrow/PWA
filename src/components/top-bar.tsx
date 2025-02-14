@@ -15,9 +15,10 @@ import { useEncryptStore } from '@/app/_stores/encrypt'
 export type TopBarProps = {
     backButton?: boolean
     actionButton?: React.ReactNode
+    title?: string
 }
 
-function TopBarContent({ backButton, actionButton }: TopBarProps) {
+function TopBarContent({ backButton, actionButton, title }: TopBarProps) {
     const pathname = usePathname()
     const pageTransition = getPageTransition(pathname)
     const { isEncoded, toggleEncryption } = useEncryptStore()
@@ -32,7 +33,7 @@ function TopBarContent({ backButton, actionButton }: TopBarProps) {
             transition={pageTransition.transition}
             className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
             <div className='w-6'>{backButton && <BackButton />}</div>
-            <div className='text-center'>{/* Title removed */}</div>
+            {title && <div className='text-center'>{title}</div>}
             <div className='flex items-center gap-4 justify-self-end'>
                 <Button
                     size='icon'

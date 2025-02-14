@@ -4,7 +4,6 @@ import * as React from 'react'
 import { Button } from '@/app/_components/ui/button'
 import { poolAbi } from '@/types/contracts'
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import type { Address } from 'viem'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
@@ -17,6 +16,7 @@ import HybridRegistration from './terms-acceptance-dialog'
 import { addParticipantToPool } from '../../new/actions'
 import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 import { useUserInfo } from '@/hooks/use-user-info'
+import { useQueryClient } from '@tanstack/react-query'
 
 type ButtonConfig = {
     label: string
@@ -29,7 +29,7 @@ type PoolStatusConfig = {
 }
 
 interface BottomBarHandlerProps {
-    onPoolUpdate: () => void
+    keysToRefetch: string[]
     isAdmin: boolean
     poolStatus: POOLSTATUS
     poolId: string
@@ -41,7 +41,7 @@ interface BottomBarHandlerProps {
 }
 
 export default function BottomBarHandler({
-    onPoolUpdate,
+    keysToRefetch,
     isAdmin,
     poolStatus,
     poolId,
@@ -51,8 +51,7 @@ export default function BottomBarHandler({
     requiredAcceptance,
     termsUrl,
 }: BottomBarHandlerProps) {
-    //console.log('🔄 [BottomBarHandler] Rendering with:', { poolId, poolStatus, isAdmin })
-
+    const queryClient = useQueryClient()
     const [isLoading, setIsLoading] = useState(false)
     const [transactionProcessed, setTransactionProcessed] = useState(false)
     const [localIsParticipant, setLocalIsParticipant] = useState(false)
@@ -82,14 +81,51 @@ export default function BottomBarHandler({
 
     const { handleOnRamp } = useOnRamp()
 
-    const handleOnRampClick = async () => {
-        const success = await handleOnRamp(poolPrice)
-        if (success) {
-            resetJoinPoolProcess()
-            setIsLoading(false)
-            updateBottomBarContent()
-            router.refresh()
+    const handleOnRampClick = () => {
+        handleOnRamp(poolPrice)
+            .then(success => {
+                if (success) {
+                    resetJoinPoolProcess()
+                    setIsLoading(false)
+                    updateBottomBarContent()
+                    router.refresh()
+                }
+            })
+            .catch(error => {
+                console.error('❌ [BottomBarHandler] Error on ramping:', error)
+                setIsLoading(false)
+                throw error
+            })
+    }
+
+    const handleSuccessfulJoin = () => {
+        // console.log('🎯 [BottomBarHandler] Executing onSuccessfulJoin callback')
+        if (address === undefined) {
+            console.error('❌ [BottomBarHandler] User address not found')
+            throw new Error('User address not found')
         }
+        console.log('📝 [BottomBarHandler] Adding participant to pool:', { poolId, address })
+
+        addParticipantToPool(poolId, address)
+            .then(success => {
+                console.log('✅ [BottomBarHandler] Add participant result:', success)
+
+                if (success) {
+                    console.log('🔄 [BottomBarHandler] Participant added successfully, updating UI')
+                    setLocalIsParticipant(true)
+                    updateBottomBarContent()
+                    router.refresh()
+                } else {
+                    console.error('❌ [BottomBarHandler] Failed to add participant')
+                    throw new Error('Failed to add participant')
+                }
+            })
+            .catch(error => {
+                console.error('❌ [BottomBarHandler] Error joining pool:', error)
+                setIsLoading(false)
+                setTransactionProcessed(false)
+                throw error
+            })
     }
 
     const {
@@ -104,32 +140,12 @@ export default function BottomBarHandler({
         isConfirming,
         resetConfirmation,
         isCancelled,
-    } = usePoolActions(poolId, poolPrice, tokenDecimals, handleOnRampClick, async () => {
-        // console.log('🎯 [BottomBarHandler] Executing onSuccessfulJoin callback')
-        try {
-            if (address === undefined) {
-                console.error('❌ [BottomBarHandler] User address not found')
-                throw new Error('User address not found')
-            }
-            console.log('📝 [BottomBarHandler] Adding participant to pool:', { poolId, address })
-            const success = await addParticipantToPool(poolId, address)
-            console.log('✅ [BottomBarHandler] Add participant result:', success)
-
-            if (success) {
-                console.log('🔄 [BottomBarHandler] Participant added successfully, updating UI')
-                setLocalIsParticipant(true)
-                updateBottomBarContent()
-                router.refresh()
-            } else {
-                console.error('❌ [BottomBarHandler] Failed to add participant')
-                throw new Error('Failed to add participant')
-            }
-        } catch (error) {
-            console.error('❌ [BottomBarHandler] Error joining pool:', error)
-            setIsLoading(false)
-            setTransactionProcessed(false)
-            throw error
-        }
+    } = usePoolActions({
+        poolId,
+        poolPrice,
+        tokenDecimals,
+        openOnRampDialog: handleOnRampClick,
+        onSuccessfulJoin: handleSuccessfulJoin,
     })
 
     const handleViewTicket = useCallback(() => {
@@ -176,9 +192,7 @@ export default function BottomBarHandler({
             poolTokenSymbol,
             handleEnableDeposits,
             handleStartPool,
-            handleJoinPool,
             handleEndPool,
-            isParticipant,
             localIsParticipant,
             handleViewTicket,
             handleJoinPoolWithTerms,
@@ -191,7 +205,7 @@ export default function BottomBarHandler({
             return (
                 <Button
                     key={key}
-                    className='active:bg-cta-active mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:bg-cta-active active:shadow-button-push'
                     onClick={() => {
                         setIsLoading(true)
                         config.action()
@@ -199,7 +213,7 @@ export default function BottomBarHandler({
                     disabled={isPending || isLoading || isConfirming}>
                     {isPending || isLoading || isConfirming ? (
                         <>
-                            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                            <Loader2 className='mr-2 size-4 animate-spin' />
                             Processing...
                         </>
                     ) : (
@@ -244,14 +258,16 @@ export default function BottomBarHandler({
             setBottomBarContent(content)
         }
     }, [
-        isParticipant,
         isParticipantLoading,
+        isParticipant,
         localIsParticipant,
         isAdmin,
         poolStatus,
+        isRouting,
+        renderButton,
+        handleViewTicket,
         buttonConfig,
         setBottomBarContent,
-        isRouting,
     ])
 
     useEffect(() => {
@@ -263,14 +279,26 @@ export default function BottomBarHandler({
         if (!isParticipantLoading && isParticipant !== undefined) {
             setLocalIsParticipant(isParticipant)
         }
-    }, [isParticipant, isParticipantLoading])
+    }, [isParticipant, isParticipantLoading, localIsParticipant])
 
     useEffect(() => {
         if (!isParticipantLoading && isParticipant) {
-            onPoolUpdate()
+            keysToRefetch.forEach(key => {
+                queryClient.refetchQueries({ queryKey: [key] }).catch(error => {
+                    console.error('❌ [BottomBarHandler] Error refetching query:', error)
+                })
+            })
             setBottomBarContent(renderButton({ label: 'View My Ticket', action: handleViewTicket }, 'view-ticket'))
         }
-    }, [isParticipant])
+    }, [
+        handleViewTicket,
+        isParticipant,
+        isParticipantLoading,
+        keysToRefetch,
+        queryClient,
+        renderButton,
+        setBottomBarContent,
+    ])
 
     useEffect(() => {
         // console.log('✨ [BottomBarHandler] Confirmation status:', {
@@ -323,7 +351,7 @@ export default function BottomBarHandler({
             setTransactionProcessed(false)
             updateBottomBarContent()
         }
-    }, [isPending, isConfirming, isConfirmed])
+    }, [isPending, isConfirming, isConfirmed, updateBottomBarContent])
 
     useEffect(() => {
         if (isCancelled) {

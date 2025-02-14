@@ -34,9 +34,9 @@ function BannerButton({ onClick, icon: Icon, tooltip }: BannerButtonProps) {
 interface PoolDetailsBannerButtonProps {
     isAdmin?: boolean | null
 }
-
 export default function PoolDetailsBannerButtons({ isAdmin }: PoolDetailsBannerButtonProps) {
-    const { 'pool-id': poolId } = useParams<{ 'pool-id': string }>()
+    const params = useParams<{ 'pool-id': string }>()
+    const poolId = params?.['pool-id']
     const router = useRouter()
 
     const buttons = [

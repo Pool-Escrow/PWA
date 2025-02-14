@@ -13,15 +13,21 @@ import { parseUnits } from 'viem'
 import { useReadContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useAuth } from './use-auth'
 
-export function usePoolActions(
-    poolId: string,
-    poolPrice: number,
-    tokenDecimals: number,
-    openOnRampDialog: () => void,
-    onSuccessfulJoin: () => void,
-) {
-    // console.log('🔄 [usePoolActions] Initializing with poolId:', poolId)
+type UsePoolActionsProps = {
+    poolId: string
+    poolPrice: number
+    tokenDecimals: number
+    openOnRampDialog: () => void
+    onSuccessfulJoin: () => void
+}
 
+export function usePoolActions({
+    poolId,
+    poolPrice,
+    tokenDecimals,
+    openOnRampDialog,
+    onSuccessfulJoin,
+}: UsePoolActionsProps) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
     const { wallets } = useWallets()
@@ -77,6 +83,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Deposits enabled successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error enabling deposits:', error)
+            })
     }
 
     const handleStartPool = () => {
@@ -100,6 +112,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Pool started successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error starting pool:', error)
+            })
     }
 
     const handleEndPool = () => {
@@ -135,6 +153,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Pool ended successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error ending pool:', error)
+            })
     }
 
     useEffect(() => {
@@ -149,7 +173,7 @@ export function usePoolActions(
         }
     }, [result.error])
 
-    const handleJoinPool = async () => {
+    const handleJoinPool = () => {
         console.log('🎯 [usePoolActions] Join pool button clicked')
 
         if (!isReady) {
@@ -194,9 +218,11 @@ export function usePoolActions(
             ]
             console.log('📝 [usePoolActions] Transaction payload:', transactions)
 
-            await executeTransactions(transactions, {
+            executeTransactions(transactions, {
                 type: 'JOIN_POOL',
                 onSuccess: onSuccessfulJoin,
+            }).catch(error => {
+                console.error('❌ [usePoolActions] Error joining pool:', error)
             })
 
             if (result.hash) {

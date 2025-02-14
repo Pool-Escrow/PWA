@@ -10,50 +10,65 @@ interface PullToRefreshProps {
     className?: string
 }
 
+// Define constants for the animation values
+const START_ROTATION = 0
+const END_ROTATION = 360
+const START_SCALE = 0.6
+const END_SCALE = 1
+const START_OPACITY = 0
+const MID_OPACITY = 0.5
+const END_OPACITY = 1
+const PULL_THRESHOLD = 80
+const PULL_INDICATOR_SHOW = 20
+const LOADING_HEIGHT = 40 // Height to maintain while loading
+
 export default function PullToRefresh({ keysToRefetch, children, className = '' }: PullToRefreshProps) {
+    const [isLoading, setIsLoading] = useState(false)
     const queryClient = useQueryClient()
     const y = useMotionValue(0)
     const controls = useAnimation()
-    const [isLoading, setIsLoading] = useState(false)
+
     const touchStartY = useRef(0)
     const scrollStartY = useRef(0)
 
-    const PULL_THRESHOLD = 80
-    const PULL_INDICATOR_SHOW = 20
-    const LOADING_HEIGHT = 40 // Height to maintain while loading
-
     const pullProgress = useTransform(y, [0, PULL_THRESHOLD], [0, 1])
-    const rotate = useTransform(pullProgress, [0, 1], [0, 360])
-    const scale = useTransform(pullProgress, [0, 1], [0.6, 1])
-    const opacity = useTransform(y, [0, PULL_INDICATOR_SHOW, PULL_THRESHOLD], [0, 0.5, 1])
+    const rotate = useTransform(pullProgress, [0, 1], [START_ROTATION, END_ROTATION])
+    const scale = useTransform(pullProgress, [0, 1], [START_SCALE, END_SCALE])
+    const opacity = useTransform(y, [0, PULL_INDICATOR_SHOW, PULL_THRESHOLD], [START_OPACITY, MID_OPACITY, END_OPACITY])
 
-    const handleTouchStart = (e: TouchEvent) => {
-        if (isLoading) return
-        const target = e.target as HTMLElement
-        const scrollElement = target.closest('.overflow-y-auto')
-        if (!scrollElement) return
+    const handleTouchStart = useCallback(
+        (e: TouchEvent) => {
+            if (isLoading) return
+            const target = e.target as HTMLElement
+            const scrollElement = target.closest('.overflow-y-auto')
+            if (!scrollElement) return
 
-        touchStartY.current = e.touches[0].clientY
-        scrollStartY.current = scrollElement.scrollTop
-    }
+            touchStartY.current = e.touches[0].clientY
+            scrollStartY.current = scrollElement.scrollTop
+        },
+        [isLoading],
+    )
 
-    const handleTouchMove = (e: TouchEvent) => {
-        if (isLoading) return
-        const target = e.target as HTMLElement
-        const scrollElement = target.closest('.overflow-y-auto')
-        if (!scrollElement) return
+    const handleTouchMove = useCallback(
+        (e: TouchEvent) => {
+            if (isLoading) return
+            const target = e.target as HTMLElement
+            const scrollElement = target.closest('.overflow-y-auto')
+            if (!scrollElement) return
 
-        const touchY = e.touches[0].clientY
-        const deltaY = touchY - touchStartY.current
+            const touchY = e.touches[0].clientY
+            const deltaY = touchY - touchStartY.current
 
-        // Only handle pull-to-refresh when at the top
-        if (scrollElement.scrollTop === 0 && deltaY > 0) {
-            y.set(deltaY * 0.4) // More resistance for smoother feel
-            e.preventDefault()
-        } else {
-            y.set(0)
-        }
-    }
+            // Only handle pull-to-refresh when at the top
+            if (scrollElement.scrollTop === 0 && deltaY > 0) {
+                y.set(deltaY * 0.4) // More resistance for smoother feel
+                e.preventDefault()
+            } else {
+                y.set(0)
+            }
+        },
+        [isLoading, touchStartY, y],
+    )
 
     const handleTouchEnd = useCallback(() => {
         if (isLoading) return
