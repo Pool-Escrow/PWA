@@ -121,19 +121,19 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
     }, [handleTouchStart, handleTouchMove, handleTouchEnd])
 
     return (
-        <div className={`relative h-full w-full ${className}`}>
+        <div className={`relative size-full ${className}`}>
             {/* Loading indicator */}
             <motion.div
                 style={{ opacity }}
-                className='pointer-events-none absolute left-0 right-0 top-2 z-10 flex justify-center'>
+                className='pointer-events-none absolute inset-x-0 top-2 z-10 flex justify-center'>
                 {isLoading ? (
-                    <div className='relative h-7 w-7'>
-                        <div className='absolute h-full w-full animate-spin rounded-full border-[3px] border-primary/20 border-t-primary' />
+                    <div className='relative size-7'>
+                        <div className='absolute size-full animate-spin rounded-full border-[3px] border-primary/20 border-t-primary' />
                     </div>
                 ) : (
                     <motion.div
                         style={{ rotate, scale }}
-                        className='flex h-7 w-7 items-center justify-center text-primary'>
+                        className='flex size-7 items-center justify-center text-primary'>
                         <svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
                             <path
                                 d='M12 4V2M12 22v-2m-8-8H2m20 0h-2m-2.05-5.95l-1.414-1.414M7.464 16.536l-1.414 1.414m0-11.314l1.414 1.414m9.193 9.193l1.414 1.414'
@@ -151,7 +151,7 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
             <motion.div
                 style={{ y }}
                 animate={controls}
-                className='h-full w-full'
+                className='size-full'
                 transition={{
                     type: 'spring',
                     stiffness: 400,
