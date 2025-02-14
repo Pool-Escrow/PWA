@@ -49,7 +49,7 @@ const EncryptText: React.FC<EncryptTextProps> = ({ children, balance, symbol = '
                       symbol: generateChars(3),
                   }
                 : null,
-        [isEncoded, formattedInteger.length],
+        [isEncoded],
     )
 
     const renderText = (text: string, className: string = '') =>

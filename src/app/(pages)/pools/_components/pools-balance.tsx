@@ -1,7 +1,5 @@
 'use client'
 
-import Balance from '@/app/_components/balance/balance'
-import { cn } from '@/lib/utils/tailwind'
 import { useBalance } from 'wagmi'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { usePrivy } from '@privy-io/react-auth'
