@@ -14,7 +14,7 @@ export default function ActionBar() {
             <div className='absolute left-0 top-0 flex w-12 flex-col items-center gap-[10px]'>
                 <Link href='/qr' className='flex flex-col items-center gap-[10px]'>
                     <Image className='size-8' src={qrIcon as StaticImport} alt='QR Code' />
-                    <span className='text-[11px] font-semibold text-white'>QR Code</span>
+                    <span className='text-[11px] font-semibold text-white'>Pay/Request</span>
                 </Link>
             </div>
 
