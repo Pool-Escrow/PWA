@@ -22,10 +22,18 @@ export default function NextUserPool() {
                 <h1 className='pl-[6px] text-lg font-semibold'>Your Pools</h1>
                 {ready && authenticated && (
                     <Link href='/my-pools' className='inline-flex h-[30px] items-center gap-1 pr-[6px]'>
-                        <div className='text-[11px] font-semibold text-[#4078FA]'>View All</div>
-                        <div className='flex size-[30px] items-center justify-center rounded-full bg-white'>
+                        <motion.div
+                            className='text-[11px] font-semibold text-[#4078FA]'
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}>
+                            View All
+                        </motion.div>
+                        <motion.div
+                            className='flex size-[30px] items-center justify-center rounded-full bg-white'
+                            whileHover={{ scale: 1.05, backgroundColor: '#f0f0f0' }}
+                            whileTap={{ scale: 0.95, backgroundColor: '#e5e5e5' }}>
                             <ChevronRightIcon className='size-6 text-[#4078FA]' />
-                        </div>
+                        </motion.div>
                     </Link>
                 )}
             </div>
