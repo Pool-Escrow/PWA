@@ -19,7 +19,7 @@ export default function PoolsPage() {
                                 scrollbarWidth: 'none', // Hide scrollbar in Firefox
                                 WebkitOverflowScrolling: 'touch',
                             }}>
-                            <div className='mt-4 space-y-4 pb-safe'>
+                            <div className='mt-4 space-y-4 px-1 pb-safe'>
                                 <NextUserPool />
                                 <UpcomingPools />
                             </div>

@@ -12,7 +12,7 @@ export default function UpcomingPools() {
     }
 
     return (
-        <div className={'detail_card rounded-[2rem] bg-[#F6F6F6] p-3 pt-[18px]'}>
+        <div className={'detail_card_bg rounded-[2rem] p-3 pt-[18px]'}>
             <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
             <div className='mt-4'>
                 {isLoading ? <PoolsSkeleton length={8} /> : <PoolList pools={pools} name='feed' />}
