@@ -54,6 +54,11 @@
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
+
+        /* New Pool blue colors */
+        --pool-blue: #4078f4;
+        --pool-blue-hover: #4078f4cc; /* 90% opacity */
+        --pool-blue-active: #3567dd;
     }
 
     .dark {
@@ -177,6 +182,14 @@
 
     .dropdown-backdrop {
         @apply fixed left-0 top-0 z-50 h-full w-full bg-white/30 backdrop-blur-sm;
+    }
+
+    .pool-button {
+        @apply bg-[#4078F4] text-white hover:bg-[#4078F4]/90 active:bg-[#3567DD] !important;
+    }
+
+    .pool-text {
+        @apply text-[#4078F4];
     }
 }
 

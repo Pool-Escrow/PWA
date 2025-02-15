@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { useEffect, useState } from 'react'
@@ -39,7 +40,7 @@ export default function AmountSection() {
             setBottomBarContent(
                 <Button
                     onClick={() => onWithdrawButtonClicked(amount, withdrawAddress)}
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    className='pool-button mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal shadow-button active:shadow-button-push'>
                     <span>Withdraw</span>
                 </Button>,
             )
@@ -60,13 +61,13 @@ export default function AmountSection() {
                 <SectionContent>
                     <div className='mx-2 flex flex-col justify-center'>
                         <h3 className='text-[11pt] font-semibold text-black'>Withdraw Amount</h3>
-                        <h3 className='text-[36pt] font-bold text-[#2785EA]'>
+                        <h3 className='text-[36pt] font-bold text-[#4078FA]'>
                             <div className='flex items-center'>
-                                <span className={`mr-[1px] ${amount ? 'text-black' : 'text-gray-400'}`}>$</span>
+                                <span className={`mr-1px ${amount ? 'text-black' : 'text-gray-400'}`}>$</span>
                                 <Input
                                     value={amount}
                                     onChange={handleAmountInputChange}
-                                    className='rounded-none border-none bg-transparent p-0 text-[36pt] font-bold caret-[#2785EA] outline-none ring-0 focus:border-none focus:outline-none focus:ring-0'
+                                    className='rounded-none border-none bg-transparent p-0 text-[36pt] font-bold caret-[#4078FA] outline-none ring-0 focus:border-none focus:outline-none focus:ring-0'
                                     type='number'
                                     placeholder='0'
                                 />
@@ -79,8 +80,8 @@ export default function AmountSection() {
                 <SectionContent>
                     <div className='mx-2 flex flex-col justify-center'>
                         <h3 className='text-[11pt] font-semibold text-black'>Address to send amount to</h3>
-                        <div className='mt-2 border-b border-gray-200'></div>
-                        <h3 className='mb-[18px] text-[36pt] font-bold text-[#2785EA]'>
+                        <div className='mt-2 border-b border-gray-200' />
+                        <h3 className='mb-[18px] text-[36pt] font-bold text-[#4078FA]'>
                             <Input
                                 value={withdrawAddress}
                                 onChange={handleWithdrawAddressInputChange}

@@ -22,9 +22,9 @@ export default function ProfileBalanceSection() {
     return (
         <Container>
             <SectionContent>
-                <div className='mx-2 flex flex-col justify-center'>
+                <div className='mx-2 flex flex-col  justify-center'>
                     <h3 className='text-[11pt] font-semibold text-black'>Total Balance</h3>
-                    <h3 className='text-[36pt] font-bold text-[#2785EA]'>
+                    <h3 className='text-[36pt] font-bold text-[#4078FA]'>
                         <span>{'$' + tokenBalance + ` `}</span>
                         <span className='text-[14pt]'>USDC</span>
                     </h3>
