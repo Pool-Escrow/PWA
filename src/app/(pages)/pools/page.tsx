@@ -4,6 +4,7 @@ import RenderBottomBar from './_components/render-bottom-bar'
 import PageWrapper from '@/components/page-wrapper'
 import PullToRefresh from '@/app/_components/pull-to-refresh'
 import TopSection from '@/components/top-section'
+import MainPageLoginButton from '@/components/main-page-login-button'
 
 export default function PoolsPage() {
     return (
@@ -27,6 +28,7 @@ export default function PoolsPage() {
                     </PullToRefresh>
                 </div>
             </div>
+            <MainPageLoginButton />
             <RenderBottomBar />
         </PageWrapper>
     )
