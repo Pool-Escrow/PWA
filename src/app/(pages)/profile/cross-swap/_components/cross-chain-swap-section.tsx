@@ -45,13 +45,10 @@ import { chain, get, set, toNumber } from 'lodash'
 import { wait } from '@testing-library/user-event/dist/cjs/utils/index.js'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/app/_components/ui/dialog'
 import { Input } from '@/app/_components/ui/input'
-import { ScrollArea } from '@radix-ui/react-scroll-area'
-import { hash } from 'crypto'
 import { BridgeInfoCard } from './bridge-card'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/app/_components/ui/sheet'
-import { tokenAddress } from '@/types/contracts'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/_components/ui/sheet'
 import { TransactionHistory } from './tx-history'
-import { chains } from './chains'
+import { loadChains } from '../_utils/chainsLoader'
 import WalletAccountSection from './wallet-account-section'
 
 // TEMPLATE NETWORK AND TOKEN ARRAY
@@ -102,6 +99,7 @@ const CrossChainSwapSection = () => {
     const isDraggingRef = React.useRef(false)
     const animationFrameRef = React.useRef<number>()
     const dragThreshold = 150
+    const chains = loadChains()
 
     const updateSheetPosition = (deltaY: number) => {
         if (sheetRef.current) {
