@@ -2,20 +2,41 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import qrIcon from '@/public/app/icons/svg/qr-icon.svg'
 import walletIcon from '@/public/app/icons/svg/wallet-icon.svg'
 import withdrawIcon from '@/public/app/icons/svg/withdraw.svg'
+import { useAuth } from '@/app/_client/hooks/use-auth'
 
 export default function ActionBar() {
+    const router = useRouter()
+    const { login, authenticated } = useAuth()
+
+    const handleWithdraw = () => {
+        if (!authenticated) {
+            login()
+            return
+        }
+        router.push('/profile/send')
+    }
+
+    const handlePayRequest = () => {
+        if (!authenticated) {
+            login()
+            return
+        }
+        router.push('/qr')
+    }
+
     return (
         <div className='relative mx-auto h-[55px] w-[296px]'>
             {/* QR Code Section */}
             <div className='absolute left-0 top-0 flex w-12 flex-col items-center gap-[10px]'>
-                <Link href='/qr' className='flex flex-col items-center gap-[10px]'>
+                <button onClick={handlePayRequest} className='flex flex-col items-center gap-[10px]'>
                     <Image className='size-8' src={qrIcon as StaticImport} alt='QR Code' />
                     <span className='text-[11px] font-semibold text-white'>Pay/Request</span>
-                </Link>
+                </button>
             </div>
 
             {/* First Divider */}
@@ -34,10 +55,10 @@ export default function ActionBar() {
 
             {/* Withdraw Section */}
             <div className='absolute left-[248px] top-0 flex w-12 flex-col items-center gap-[10px]'>
-                <Link href='/withdraw' className='flex flex-col items-center gap-[10px]'>
+                <button onClick={handleWithdraw} className='flex flex-col items-center gap-[10px]'>
                     <Image className='size-8' src={withdrawIcon as StaticImport} alt='Withdraw' />
                     <span className='text-[11px] font-semibold text-white'>Withdraw</span>
-                </Link>
+                </button>
             </div>
         </div>
     )
