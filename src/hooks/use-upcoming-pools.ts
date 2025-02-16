@@ -1,17 +1,27 @@
-import { useQuery } from '@tanstack/react-query'
+import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { PoolItem } from '@/app/_lib/entities/models/pool-item'
-import { getContractPools } from '@/app/_server/persistence/pools/blockchain/get-contract-pools'
-import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { transformContractPoolToUIPool } from '@/app/_lib/utils/pool-transforms'
+import { getContractPools } from '@/app/_server/persistence/pools/blockchain/get-contract-pools'
+import { useQuery } from '@tanstack/react-query'
 
 const fetchUpcomingPools = async (): Promise<PoolItem[]> => {
     const supabase = getSupabaseBrowserClient()
     const contractPools = await getContractPools()
     const { data: dbPools } = await supabase.from('pools').select('*')
 
+    // Log pools that exist in contract but not in DB
+    const poolsNotInDb = contractPools.filter(
+        contractPool => !dbPools?.some(dp => dp.contract_id === parseInt(contractPool.id))
+    )
+    if (poolsNotInDb.length > 0) {
+        // console.warn('Found pools in contract that do not exist in DB:', 
+            // poolsNotInDb.map(pool => `Pool ID: ${pool.id}`))
+    }
+
     return contractPools
         .filter(pool => pool.status <= POOLSTATUS.DEPOSIT_ENABLED)
+        .filter(contractPool => dbPools?.some(dp => dp.contract_id === parseInt(contractPool.id))) // Filter out pools not in DB
         .map(contractPool => {
             const dbPool = dbPools?.find(dp => dp.contract_id === parseInt(contractPool.id))
             return transformContractPoolToUIPool(contractPool, dbPool)
