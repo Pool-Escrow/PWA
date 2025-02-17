@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import {
     Command,
     CommandInput,
@@ -20,6 +20,7 @@ type ComboboxContentProps = {
     value: string
     isMobile: boolean
     isSearching: boolean
+    onKeyboardChange?: (height: number) => void
 }
 
 export function ComboboxContent({
@@ -31,24 +32,54 @@ export function ComboboxContent({
     value,
     isMobile,
     isSearching,
+    onKeyboardChange,
 }: ComboboxContentProps) {
     const inputRef = useRef<HTMLInputElement>(null)
+    const [keyboardVisible, setKeyboardVisible] = useState(false)
 
     useEffect(() => {
         if (inputRef.current) {
             inputRef.current.focus()
         }
-    }, [])
+
+        if (typeof window !== 'undefined' && window.visualViewport) {
+            const handleResize = () => {
+                const viewport = window.visualViewport!
+                const heightDiff = window.innerHeight - viewport.height
+                const isKeyboardVisible = heightDiff > 150
+
+                console.log('Viewport metrics:', {
+                    viewportHeight: viewport.height,
+                    windowHeight: window.innerHeight,
+                    heightDiff,
+                    isKeyboardVisible,
+                })
+
+                setKeyboardVisible(isKeyboardVisible)
+                onKeyboardChange?.(isKeyboardVisible ? heightDiff : 0)
+            }
+
+            window.visualViewport.addEventListener('resize', handleResize)
+            handleResize() // Initial check
+            return () => window.visualViewport?.removeEventListener('resize', handleResize)
+        }
+    }, [onKeyboardChange])
 
     return (
-        <Command className={cn(isMobile && 'h-[calc(100vh-10rem)]')}>
+        <Command className={cn('flex h-full flex-col', isMobile && 'h-full')}>
             <CommandInput
                 ref={inputRef}
                 placeholder='Search city...'
                 value={searchTerm}
                 onValueChange={setSearchTerm}
+                className='sticky top-0 z-10 bg-white'
+                onFocus={() => console.log('CommandInput focused')}
+                onBlur={() => console.log('CommandInput blurred')}
             />
-            <CommandList className={cn('max-h-[300px] overflow-y-auto', isMobile && 'max-h-[calc(100%-3rem)]')}>
+            <div className='px-2 py-1 text-xs text-gray-500'>
+                {keyboardVisible ? 'Keyboard is visible' : 'Keyboard is hidden'}
+            </div>
+            <CommandList className={cn('flex-1 overflow-y-auto px-1', isMobile && 'h-full')}>
                 {isSearching ? (
                     <div className='flex items-center justify-center py-6'>
                         <Loader2 className='h-6 w-6 animate-spin text-gray-500' />

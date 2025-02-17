@@ -134,7 +134,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                 <div className='inline-flex flex-row flex-nowrap gap-1'>
                     <div className='relative'>
                         <Input
-                            className='cursor-pointer bg-transparent px-0 text-center text-xs font-medium'
+                            className='min-w-[130px] cursor-pointer bg-transparent px-3 text-center text-xs font-medium sm:min-w-[140px]'
                             type='date'
                             value={formatDateTimeForInput(localValue.start).date}
                             onChange={e => updateValue('start', 'date', e.target.value)}
@@ -144,7 +144,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                     </div>
                     <div className='relative'>
                         <Input
-                            className='cursor-pointer bg-white text-center text-xs font-medium'
+                            className='min-w-[90px] cursor-pointer bg-white text-center text-xs font-medium sm:min-w-[100px]'
                             type='time'
                             value={formatDateTimeForInput(localValue.start).time}
                             onChange={e => updateValue('start', 'time', e.target.value)}
@@ -159,7 +159,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                 <div className='inline-flex flex-row flex-nowrap gap-1'>
                     <div className='relative'>
                         <Input
-                            className='cursor-pointer bg-transparent px-0 text-center text-xs font-medium'
+                            className='min-w-[130px] cursor-pointer bg-transparent px-3 text-center text-xs font-medium sm:min-w-[140px]'
                             type='date'
                             value={formatDateTimeForInput(localValue.end).date}
                             onChange={e => updateValue('end', 'date', e.target.value)}
@@ -169,7 +169,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                     </div>
                     <div className='relative'>
                         <Input
-                            className='cursor-pointer bg-white text-center text-xs font-medium'
+                            className='min-w-[90px] cursor-pointer bg-white text-center text-xs font-medium sm:min-w-[100px]'
                             type='time'
                             value={formatDateTimeForInput(localValue.end).time}
                             onChange={e => updateValue('end', 'time', e.target.value)}

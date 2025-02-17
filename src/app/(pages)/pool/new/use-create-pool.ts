@@ -200,7 +200,7 @@ export function useCreatePool() {
                 })
                 .finally(() => {
                     setPoolUpdated(false)
-                    setTransactionProcessed(false)
+                    setTransactionProcessed(false) 
                     setHasAttemptedChainCreation(false) // Reset this here as well
                 })
         } else {

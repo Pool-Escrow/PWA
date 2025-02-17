@@ -21,8 +21,14 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
     const isDesktop = useMediaQuery('(min-width: 768px)')
     const [selectedValue, setSelectedValue] = useState(value)
     const [selectedCityObject, setSelectedCityObject] = useState<(typeof allCities)[0] | null>(null)
+    const [keyboardHeight, setKeyboardHeight] = useState(0)
 
     const { results: filteredCities, isSearching } = useCitySearch(searchTerm)
+
+    const handleKeyboardChange = useCallback((height: number) => {
+        console.log('Keyboard height changed:', height)
+        setKeyboardHeight(height)
+    }, [])
 
     useEffect(() => {
         if (!selectedValue) {
@@ -116,6 +122,7 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
                 value={selectedValue}
                 isMobile={!isDesktop}
                 isSearching={isSearching}
+                onKeyboardChange={handleKeyboardChange}
             />
         </>
     )
@@ -138,8 +145,14 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
             <DrawerTrigger asChild>
                 <ComboboxButton />
             </DrawerTrigger>
-            <DrawerContent className='max-h-3/5 h-3/5 bg-white'>
-                <div className='mt-4 h-full border-t'>
+            <DrawerContent
+                className='bg-white'
+                style={{
+                    height: keyboardHeight ? `calc(100vh - ${keyboardHeight}px)` : '40vh',
+                    transition: 'height 0.2s ease-out',
+                    willChange: 'height',
+                }}>
+                <div className='mt-4 flex h-full flex-col border-t'>
                     <VisuallyHidden.Root>
                         <DrawerTitle>Search city</DrawerTitle>
                         <DrawerDescription>Set the city to find its timezone</DrawerDescription>
