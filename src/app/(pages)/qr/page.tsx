@@ -29,13 +29,6 @@ export default function QRPage() {
 
     return (
         <PageWrapper fullScreen>
-            {/* <PoolQrScanner
-                onDecode={handleDecode}
-                onError={handleError}
-                enableCallback={true}
-                startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-                stopButtonText='Stop'
-            /> */}
             {currentMode === 'scan' ? (
                 <ScannerPageLayout title='' className='top-0'>
                     <PoolQrScanner
@@ -60,22 +53,6 @@ export default function QRPage() {
             <div className='absolute left-0 right-0 top-20 w-full'>
                 <QRToggle onToggle={handleToggle} />
             </div>
-            {/* <div className='flex flex-col items-center pt-6'>
-                <QRToggle onToggle={handleToggle} />
-                <div className='mt-[38px] flex w-full flex-1'>
-                    {currentMode === 'scan' ? (
-                        <PoolQrScanner
-                            onDecode={handleDecode}
-                            onError={handleError}
-                            enableCallback={true}
-                            startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
-                            stopButtonText='Stop'
-                        />
-                    ) : (
-                        <PayMeView />
-                    )}
-                </div>
-            </div> */}
         </PageWrapper>
     )
 }
