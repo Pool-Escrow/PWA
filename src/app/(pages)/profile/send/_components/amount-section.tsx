@@ -1,20 +1,22 @@
 'use client'
 
-import * as React from 'react'
+import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { useSearchParams } from 'next/navigation'
+import * as React from 'react'
 import { useEffect, useState } from 'react'
 import type { Address } from 'viem'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
 import { useTokenDecimals } from './use-token-decimals'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useTransferToken } from './use-transfer-tokens'
 
 export default function AmountSection() {
     const [amount, setAmount] = useState('')
     const [withdrawAddress, setWithdrawAddress] = useState('')
+    const searchParams = useSearchParams()
 
     const handleAmountInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAmount(event.target.value)
@@ -27,6 +29,13 @@ export default function AmountSection() {
 
     const { tokenDecimalsData } = useTokenDecimals(currentTokenAddress)
     const { transferToken, isSuccess, setIsSuccess } = useTransferToken()
+
+    useEffect(() => {
+        const addressParam = searchParams?.get('address')
+        if (addressParam) {
+            setWithdrawAddress(addressParam)
+        }
+    }, [searchParams])
 
     const onWithdrawButtonClicked = (amount: string, withdrawAddress: string) => {
         void transferToken(

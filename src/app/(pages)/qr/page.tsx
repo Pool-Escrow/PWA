@@ -3,7 +3,9 @@
 import BackCircleButton from '@/components/back-circle-button'
 import PageWrapper from '@/components/page-wrapper'
 import ScannerPageLayout from '@/components/scanner-page-layout'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
+import { isAddress } from 'viem'
 import PoolQrScanner from '../pool/[pool-id]/_components/qr-scanner'
 import PayMeView from './_components/pay-me-view'
 import QRToggle from './_components/qr-toggle'
@@ -11,19 +13,27 @@ import QRToggle from './_components/qr-toggle'
 export default function QRPage() {
     const [currentMode, setCurrentMode] = useState<'scan' | 'pay'>('scan')
     const [isScanning, setIsScanning] = useState(true)
+    const router = useRouter()
 
     const handleToggle = (mode: 'scan' | 'pay') => {
         console.log('QR Page - Current mode:', mode)
         setCurrentMode(mode)
     }
 
-    const handleDecode = useCallback((result: string) => {
-        console.log('Scanned result:', result)
-        // Handle the scanned QR code result here
-    }, [])
+    const handleDecode = useCallback(
+        (result: string) => {
+            console.log('Scanned result:', result)
+            if (!isAddress(result)) {
+                console.error('Not a valid address')
+                return
+            }
+            router.push(`/profile/send?address=${result}`)
+        },
+        [router],
+    )
 
     const handleError = useCallback((error: Error | string) => {
-        console.error('Scan error:', error)
+        // console.error('Scan error:', error)
         // Handle any scanning errors here
     }, [])
 
