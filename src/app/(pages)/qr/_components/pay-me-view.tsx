@@ -1,14 +1,26 @@
 'use client'
 
-import { Info, ArrowDownToLine, Copy, ExternalLink } from 'lucide-react'
+import { useWallets } from '@privy-io/react-auth'
+import { ArrowDownToLine, Copy, ExternalLink, Info } from 'lucide-react'
+import QRCode from 'react-qr-code'
 
 export default function PayMeView() {
+    const { wallets } = useWallets()
+    const address = wallets[0]?.address
+
     const handleSave = () => {
         console.log('Save button clicked')
     }
 
     const handleCopy = () => {
-        console.log('Copy button clicked')
+        if (address) {
+            try {
+                void navigator.clipboard.writeText(address)
+                // You might want to add a toast notification here
+            } catch (error) {
+                console.error('Failed to copy:', error)
+            }
+        }
     }
 
     const handleShare = () => {
@@ -21,15 +33,19 @@ export default function PayMeView() {
             <div className='w-[345px] overflow-hidden rounded-[32px] bg-[#4078F4] p-8 text-center text-white'>
                 <h2 className='mb-7 text-[18px] font-bold'>Pool Wallet</h2>
 
-                {/* Placeholder QR Code - replace with actual QR code component later */}
+                {/* QR Code */}
                 <div className='mx-auto mb-6 size-[246px] bg-white p-4'>
-                    {/* This is just a placeholder, we'll replace it with real QR code */}
-                    <div className='size-full bg-[url("/qr-placeholder.png")] bg-contain bg-center bg-no-repeat' />
+                    <QRCode
+                        size={214}
+                        style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
+                        value={address || ''}
+                        viewBox={`0 0 256 256`}
+                    />
                 </div>
 
                 {/* Wallet Address with Etherscan Icon */}
                 <div className='relative'>
-                    <p className='mx-auto w-3/5 break-all text-center text-sm'>0xl927afweh92398ufsa993298Fds</p>
+                    <p className='mx-auto w-3/5 break-all text-center text-sm'>{address}</p>
                 </div>
             </div>
 
