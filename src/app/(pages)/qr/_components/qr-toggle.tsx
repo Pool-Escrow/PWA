@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils/tailwind'
+import { useState } from 'react'
 
 type QRToggleProps = {
     onToggle?: (mode: 'scan' | 'pay') => void

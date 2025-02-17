@@ -1,36 +1,81 @@
 'use client'
 
-import { useState } from 'react'
+import BackCircleButton from '@/components/back-circle-button'
 import PageWrapper from '@/components/page-wrapper'
-import QRToggle from './_components/qr-toggle'
+import ScannerPageLayout from '@/components/scanner-page-layout'
+import { useCallback, useState } from 'react'
+import PoolQrScanner from '../pool/[pool-id]/_components/qr-scanner'
 import PayMeView from './_components/pay-me-view'
+import QRToggle from './_components/qr-toggle'
 
 export default function QRPage() {
     const [currentMode, setCurrentMode] = useState<'scan' | 'pay'>('scan')
+    const [isScanning, setIsScanning] = useState(true)
 
     const handleToggle = (mode: 'scan' | 'pay') => {
         console.log('QR Page - Current mode:', mode)
         setCurrentMode(mode)
     }
 
+    const handleDecode = useCallback((result: string) => {
+        console.log('Scanned result:', result)
+        // Handle the scanned QR code result here
+    }, [])
+
+    const handleError = useCallback((error: Error | string) => {
+        console.error('Scan error:', error)
+        // Handle any scanning errors here
+    }, [])
+
     return (
-        <PageWrapper
-            topBarProps={{
-                backButton: true,
-                title: '',
-            }}>
-            <div className='flex flex-col items-center pt-6'>
+        <PageWrapper fullScreen>
+            {/* <PoolQrScanner
+                onDecode={handleDecode}
+                onError={handleError}
+                enableCallback={true}
+                startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                stopButtonText='Stop'
+            /> */}
+            {currentMode === 'scan' ? (
+                <ScannerPageLayout title='' className='top-0'>
+                    <PoolQrScanner
+                        onDecode={handleDecode}
+                        onError={handleError}
+                        enableCallback={true}
+                        startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                        stopButtonText='Stop'
+                    />
+                </ScannerPageLayout>
+            ) : (
+                <div className='flex flex-col items-center pt-6'>
+                    <div className='ml-2 w-4 self-start sm:ml-4 sm:w-6'>
+                        <BackCircleButton />
+                    </div>
+                    <div className='mt-[84px] flex w-full flex-1'>
+                        <PayMeView />
+                    </div>
+                </div>
+            )}
+
+            <div className='absolute left-0 right-0 top-20 w-full'>
+                <QRToggle onToggle={handleToggle} />
+            </div>
+            {/* <div className='flex flex-col items-center pt-6'>
                 <QRToggle onToggle={handleToggle} />
                 <div className='mt-[38px] flex w-full flex-1'>
                     {currentMode === 'scan' ? (
-                        <div className='flex flex-1 items-center justify-center'>
-                            <div className='text-center text-gray-500'>QR scanner coming soon</div>
-                        </div>
+                        <PoolQrScanner
+                            onDecode={handleDecode}
+                            onError={handleError}
+                            enableCallback={true}
+                            startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                            stopButtonText='Stop'
+                        />
                     ) : (
                         <PayMeView />
                     )}
                 </div>
-            </div>
+            </div> */}
         </PageWrapper>
     )
 }
