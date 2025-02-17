@@ -6,8 +6,10 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function RenderBottomBar() {
+    const { authenticated } = usePrivy()
     const setBottomBar = useAppStore(state => state.setBottomBarContent)
     const isRouting = useAppStore(state => state.isRouting)
     const { data: isAdmin, isLoading } = useQuery({
@@ -16,7 +18,7 @@ export default function RenderBottomBar() {
     })
 
     useEffect(() => {
-        if (isAdmin && !isRouting) {
+        if (isAdmin && !isRouting && authenticated) {
             setBottomBar(
                 <Button
                     data-testid='create-pool-button'
@@ -29,7 +31,7 @@ export default function RenderBottomBar() {
         return () => {
             setBottomBar(null)
         }
-    }, [isAdmin, setBottomBar, isRouting])
+    }, [isAdmin, setBottomBar, isRouting, authenticated])
 
     if (isLoading) return null
 

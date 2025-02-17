@@ -52,6 +52,7 @@ export function useAuth() {
     const handleLogout = async () => {
         try {
             await privyLogout()
+            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
             console.log('[use-auth] navigation after logout')
             router.replace('/')
             router.refresh()
