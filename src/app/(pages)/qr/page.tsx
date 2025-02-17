@@ -27,7 +27,7 @@ export default function QRPage() {
                 console.error('Not a valid address')
                 return
             }
-            router.push(`/profile/send?address=${result}`)
+            router.push(`/pay-other-player?address=${result}`)
         },
         [router],
     )
