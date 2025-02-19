@@ -20,10 +20,11 @@ interface Token {
 interface TokenSelectorProps {
     defaultToken?: string
     onTokenSelectAction: (tokenSymbol: string, tokenAddress: `0x${string}`) => Promise<void>
+    onMaxClick?: (amount: string) => void
     tokenBalances?: Record<`0x${string}`, string>
 }
 
-export default function TokenSelector({ onTokenSelectAction }: TokenSelectorProps) {
+export default function TokenSelector({ onTokenSelectAction, onMaxClick }: TokenSelectorProps) {
     const [isOpen, setIsOpen] = useState(false)
 
     const chainId = useChainId()
@@ -124,7 +125,7 @@ export default function TokenSelector({ onTokenSelectAction }: TokenSelectorProp
                     <button
                         onClick={e => {
                             e.stopPropagation()
-                            // TODO: Implement max functionality
+                            onMaxClick?.(currentToken.balance)
                         }}
                         className='rounded-full bg-[#F3F4F6] px-4 py-2 text-sm font-medium text-[#6993FF]'>
                         Max

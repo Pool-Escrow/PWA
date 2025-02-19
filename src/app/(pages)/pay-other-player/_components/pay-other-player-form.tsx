@@ -77,6 +77,10 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({ recipientAddres
         setSelectedToken({ symbol: token, address })
     }
 
+    const handleMaxClick = (amount: string) => {
+        setInputValue(amount)
+    }
+
     return (
         <>
             <div className='flex h-16 w-full flex-row justify-center'>
@@ -133,7 +137,7 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({ recipientAddres
                 </div>
             </div>
             <div className='fixed inset-x-0 bottom-0 flex w-full flex-col items-center justify-center space-y-2 bg-white px-6 pb-4'>
-                <TokenSelector onTokenSelectAction={handleTokenSelectAction} />
+                <TokenSelector onTokenSelectAction={handleTokenSelectAction} onMaxClick={handleMaxClick} />
                 <Button
                     disabled={inputValue === ''}
                     onClick={handlePayButtonClick}
