@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/app/_components/ui/button'
 import { cn } from '@/lib/utils/tailwind'
 import { useState } from 'react'
 
@@ -16,36 +17,29 @@ export default function QRToggle({ onToggle }: QRToggleProps) {
         onToggle?.(newMode)
     }
 
+    const ToggleButton = ({ buttonMode, label }: { buttonMode: 'scan' | 'pay'; label: string }) => (
+        <Button
+            onClick={() => handleToggle(buttonMode)}
+            className={cn(
+                'flex h-[42px] flex-1 items-center justify-center rounded-[32px] transition-all duration-200',
+                mode === buttonMode
+                    ? 'bg-white hover:bg-white focus:bg-white'
+                    : 'bg-[#eeeeee] hover:bg-white/10 focus:bg-[#eeeeee]',
+            )}>
+            <span
+                className={cn(
+                    'text-base font-semibold leading-normal',
+                    mode === buttonMode ? 'text-black' : 'text-[#6b6e76]',
+                )}>
+                {label}
+            </span>
+        </Button>
+    )
+
     return (
         <div className='mx-auto flex h-[54px] w-[345px] items-center rounded-[42px] bg-[#eeeeee] p-1.5 backdrop-blur-sm'>
-            <button
-                onClick={() => handleToggle('scan')}
-                className={cn(
-                    'flex h-[42px] flex-1 items-center justify-center rounded-[32px] transition-all duration-200',
-                    mode === 'scan' ? 'bg-white' : 'hover:bg-white/10',
-                )}>
-                <span
-                    className={cn(
-                        'text-base font-semibold leading-normal',
-                        mode === 'scan' ? 'text-black' : 'text-[#6b6e76]',
-                    )}>
-                    Scan QR
-                </span>
-            </button>
-            <button
-                onClick={() => handleToggle('pay')}
-                className={cn(
-                    'flex h-[42px] flex-1 items-center justify-center rounded-[32px] transition-all duration-200',
-                    mode === 'pay' ? 'bg-white' : 'hover:bg-white/10',
-                )}>
-                <span
-                    className={cn(
-                        'text-base font-semibold leading-normal',
-                        mode === 'pay' ? 'text-black' : 'text-[#6b6e76]',
-                    )}>
-                    Pay Me
-                </span>
-            </button>
+            <ToggleButton buttonMode='scan' label='Scan QR' />
+            <ToggleButton buttonMode='pay' label='Pay Me' />
         </div>
     )
 }
