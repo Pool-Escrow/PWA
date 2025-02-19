@@ -12,7 +12,7 @@ import PayOtherPlayerForm from './_components/pay-other-player-form'
 
 const PayOtherPlayerPage = () => {
     const searchParams = useSearchParams()
-    const address = searchParams.get('address') as Address
+    const address = searchParams?.get('address') as Address
     const [userDetails, setUserDetails] = useState<{ avatar?: string; displayName?: string } | null>(null)
 
     // TODO: Replace with actual user details fetch
@@ -44,12 +44,11 @@ const PayOtherPlayerPage = () => {
                     </div>
                     <div className='flex flex-row'>
                         <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
-                            {displayName}
+                            {address}
                         </h3>
                     </div>
                     <div className='flex flex-row justify-center'>
-                        {/* Needs to be wired up to say users name*/}
-                        <p className='text-[#6993FF]'>Users name</p>
+                        <p className='text-[#6993FF]'>{displayName}</p>
                     </div>
                     <PayOtherPlayerForm
                         recipientAddress={address}
