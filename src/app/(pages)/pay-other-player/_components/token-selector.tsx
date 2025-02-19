@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/app/_components/ui/button'
 import { usdcDeployments } from '@/app/_lib/blockchain/constants'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { cn } from '@/lib/utils/tailwind'
@@ -72,10 +73,10 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
                 {isOpen && (
                     <div className='absolute bottom-full left-0 right-0 mb-2 rounded-[32px] border border-[#E5E7EB] bg-white shadow-lg'>
                         {tokens.map(token => (
-                            <button
+                            <Button
                                 key={token.symbol}
                                 onClick={() => handleTokenSelect(token.symbol)}
-                                className='flex h-16 w-full items-center space-x-3 px-6 first:rounded-t-[32px] last:rounded-b-[32px] hover:bg-gray-50'>
+                                className='flex h-16 w-full items-center space-x-3 bg-white px-6 text-black first:rounded-t-[32px] last:rounded-b-[32px] hover:bg-gray-50 focus:bg-gray-50'>
                                 <div className='flex h-9 w-9 items-center justify-center'>
                                     <Image
                                         src={token.icon}
@@ -85,7 +86,7 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
                                         className='h-9 w-9'
                                     />
                                 </div>
-                                <div className='flex flex-col items-start'>
+                                <div className='flex w-28 flex-col items-start'>
                                     <div className='flex items-center gap-2'>
                                         <span className='text-[14px] font-semibold'>{token.symbol}</span>
                                     </div>
@@ -93,7 +94,7 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
                                         {token.balance} available
                                     </span>
                                 </div>
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 )}
@@ -122,14 +123,14 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
                             </span>
                         </div>
                     </div>
-                    <button
+                    <Button
                         onClick={e => {
                             e.stopPropagation()
                             onMaxClick?.(currentToken.balance)
                         }}
-                        className='rounded-full bg-[#F3F4F6] px-4 py-2 text-sm font-medium text-[#6993FF]'>
+                        className='rounded-full bg-[#F3F4F6] px-4 py-2 text-sm font-medium text-[#6993FF] hover:bg-[#F3F4F6] focus:bg-[#F3F4F6]'>
                         Max
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>
