@@ -43,7 +43,7 @@ const PayOtherPlayerPage = () => {
                     </div>
                     <div className='flex flex-row'>
                         <h3 className='flex h-10 flex-1 flex-row items-center justify-center font-semibold'>
-                            {address}
+                            {formatAddress(address)}
                         </h3>
                     </div>
                     <div className='flex flex-row justify-center'>
