@@ -96,9 +96,9 @@ export default function TokenSelector({ onTokenSelectAction }: TokenSelectorProp
                         ))}
                     </div>
                 )}
-                <button
+                <div
                     onClick={() => setIsOpen(!isOpen)}
-                    className='flex h-16 w-full items-center justify-between rounded-full border border-[#E5E7EB] bg-white px-[14px]'>
+                    className='flex h-16 w-full cursor-pointer items-center justify-between rounded-full border border-[#E5E7EB] bg-white px-[14px]'>
                     <div className='flex items-center gap-3'>
                         <div className='flex h-9 w-9 items-center justify-center'>
                             <Image
@@ -129,7 +129,7 @@ export default function TokenSelector({ onTokenSelectAction }: TokenSelectorProp
                         className='rounded-full bg-[#F3F4F6] px-4 py-2 text-sm font-medium text-[#6993FF]'>
                         Max
                     </button>
-                </button>
+                </div>
             </div>
         </div>
     )
