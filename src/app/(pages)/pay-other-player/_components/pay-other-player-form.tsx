@@ -1,15 +1,16 @@
 'use client'
 
-import * as React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
+import { useTransferToken } from '@/app/(pages)/profile/send/_components/use-transfer-tokens'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
-import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
+import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Address, formatUnits, parseUnits } from 'viem'
-import TokenSelector from './token-selector'
+import { Address, parseUnits } from 'viem'
 import { PaymentConfirmationDialog } from './payment-confirmation-dialog'
+import TokenSelector from './token-selector'
 
 interface PayOtherPlayerFormProps {
     recipientAddress: Address
@@ -29,19 +30,40 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({
     const [inputValue, setInputValue] = useState<string>('')
     const [selectedToken, setSelectedToken] = useState('USDC')
     const [showConfirmation, setShowConfirmation] = useState(false)
+    const { transferToken, isConfirming, isSuccess, setIsSuccess } = useTransferToken()
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value)
     }
 
     const handlePayButtonClick = () => {
+        setIsSuccess(false)
         setShowConfirmation(true)
     }
 
-    const handleConfirmPayment = () => {
-        // TODO: Implement actual payment functionality
-        setShowConfirmation(false)
-        toast.success('Payment functionality will be implemented here')
+    useEffect(() => {
+        if (isSuccess) {
+            setShowConfirmation(false)
+            setInputValue('')
+            toast.success('Payment sent successfully!')
+        }
+    }, [isSuccess])
+
+    const handleConfirmPayment = async () => {
+        if (!inputValue || !tokenDecimalsData?.tokenDecimals) {
+            toast.error('Invalid amount')
+            setShowConfirmation(false)
+            return
+        }
+
+        try {
+            const amount = parseUnits(inputValue, tokenDecimalsData.tokenDecimals)
+            await transferToken(recipientAddress, amount)
+        } catch (error) {
+            console.error('Payment failed:', error)
+            toast.error('Payment failed. Please try again.')
+            setShowConfirmation(false)
+        }
     }
 
     const clearInput = () => {
@@ -120,15 +142,12 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({
             <PaymentConfirmationDialog
                 isOpen={showConfirmation}
                 onCloseAction={async () => setShowConfirmation(false)}
-                onConfirmAction={async () => {
-                    // TODO: Implement actual payment functionality
-                    setShowConfirmation(false)
-                    toast.success('Payment functionality will be implemented here')
-                }}
+                onConfirmAction={handleConfirmPayment}
                 avatar={avatar}
                 displayName={displayName}
                 amount={inputValue}
                 tokenSymbol={selectedToken}
+                isPending={isConfirming}
             />
             <style jsx>{`
                 @keyframes caret-blink {

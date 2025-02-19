@@ -13,6 +13,7 @@ interface PaymentConfirmationDialogProps {
     displayName: string
     amount: string
     tokenSymbol: string
+    isPending: boolean
 }
 
 export function PaymentConfirmationDialog({
@@ -23,6 +24,7 @@ export function PaymentConfirmationDialog({
     displayName,
     amount,
     tokenSymbol,
+    isPending,
 }: PaymentConfirmationDialogProps) {
     const [mounted, setMounted] = useState(false)
 
@@ -60,8 +62,9 @@ export function PaymentConfirmationDialog({
                     </Button>
                     <Button
                         onClick={onConfirmAction}
+                        disabled={isPending}
                         className='h-[46px] flex-1 rounded-full bg-[#4078F4] text-base font-semibold text-white hover:bg-[#4078F4] active:bg-[#4078F4]'>
-                        Pay
+                        {isPending ? 'Processing...' : 'Pay'}
                     </Button>
                 </div>
             </div>
