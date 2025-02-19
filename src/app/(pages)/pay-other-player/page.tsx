@@ -2,7 +2,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
 import { formatAddress } from '@/app/_lib/utils/addresses'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import PageWrapper from '@/components/page-wrapper'
 import { blo } from 'blo'
 import { useSearchParams } from 'next/navigation'
@@ -50,12 +49,7 @@ const PayOtherPlayerPage = () => {
                     <div className='flex flex-row justify-center'>
                         <p className='text-[#6993FF]'>{displayName}</p>
                     </div>
-                    <PayOtherPlayerForm
-                        recipientAddress={address}
-                        tokenAddress={currentTokenAddress}
-                        avatar={avatar}
-                        displayName={displayName}
-                    />
+                    <PayOtherPlayerForm recipientAddress={address} avatar={avatar} displayName={displayName} />
                 </div>
             </div>
         </PageWrapper>

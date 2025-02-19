@@ -1,17 +1,17 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { Address, getAbiItem, Hash } from 'viem'
-import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
-import { toast } from 'sonner'
-import { tokenAbi } from '@/types/contracts'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import useTransactions from '@/app/_client/hooks/use-transactions'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { tokenAbi } from '@/types/contracts'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { Address, getAbiItem, Hash } from 'viem'
+import { useBalance, useWaitForTransactionReceipt } from 'wagmi'
 
-export function useTransferToken() {
+export function useTransferToken(tokenAddress?: Address) {
     const { executeTransactions, result } = useTransactions()
     const { refetch: refetchBalance } = useBalance({
-        address: currentTokenAddress,
+        address: tokenAddress ?? currentTokenAddress,
     })
     const clearPoolPayouts = usePayoutStore(state => state.clearPoolPayouts)
     const queryClient = useQueryClient()
@@ -37,7 +37,7 @@ export function useTransferToken() {
                 await executeTransactions(
                     [
                         {
-                            address: currentTokenAddress,
+                            address: tokenAddress ?? currentTokenAddress,
                             abi: [TransferFunction],
                             functionName: TransferFunction.name,
                             args: [withdrawToAddress, amount],
@@ -55,7 +55,7 @@ export function useTransferToken() {
                 toast.error('Failed to transfer token')
             }
         },
-        [executeTransactions],
+        [executeTransactions, tokenAddress],
     )
 
     useEffect(() => {

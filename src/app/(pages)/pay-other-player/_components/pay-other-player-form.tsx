@@ -4,6 +4,7 @@ import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-tok
 import { useTransferToken } from '@/app/(pages)/profile/send/_components/use-transfer-tokens'
 import { Button } from '@/app/_components/ui/button'
 import { Input } from '@/app/_components/ui/input'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { cn } from '@/lib/utils/tailwind'
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
@@ -14,23 +15,24 @@ import TokenSelector from './token-selector'
 
 interface PayOtherPlayerFormProps {
     recipientAddress: Address
-    tokenAddress: Address
     avatar: string
     displayName: string
 }
 
-const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({
-    recipientAddress,
-    tokenAddress,
-    avatar,
-    displayName,
-}) => {
-    const { tokenDecimalsData } = useTokenDecimals(tokenAddress)
+const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({ recipientAddress, avatar, displayName }) => {
     const inputRef = useRef<HTMLInputElement | null>(null)
     const [inputValue, setInputValue] = useState<string>('')
-    const [selectedToken, setSelectedToken] = useState('USDC')
+    const [selectedToken, setSelectedToken] = useState<{
+        symbol: string
+        address: `0x${string}`
+    }>({
+        symbol: 'DROP',
+        address: currentTokenAddress,
+    })
+
     const [showConfirmation, setShowConfirmation] = useState(false)
-    const { transferToken, isConfirming, isSuccess, setIsSuccess } = useTransferToken()
+    const { transferToken, isConfirming, isSuccess, setIsSuccess } = useTransferToken(selectedToken.address)
+    const { tokenDecimalsData } = useTokenDecimals(selectedToken.address)
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value)
@@ -71,8 +73,8 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({
         inputRef.current?.focus()
     }
 
-    const handleTokenSelectAction = async (token: string) => {
-        setSelectedToken(token)
+    const handleTokenSelectAction = async (token: string, address: `0x${string}`) => {
+        setSelectedToken({ symbol: token, address })
     }
 
     return (
@@ -146,7 +148,7 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({
                 avatar={avatar}
                 displayName={displayName}
                 amount={inputValue}
-                tokenSymbol={selectedToken}
+                tokenSymbol={selectedToken.symbol}
                 isPending={isConfirming}
             />
             <style jsx>{`

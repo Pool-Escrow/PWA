@@ -1,43 +1,67 @@
 'use client'
 
+import { usdcDeployments } from '@/app/_lib/blockchain/constants'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { cn } from '@/lib/utils/tailwind'
+import { useWallets } from '@privy-io/react-auth'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { Address } from 'viem'
+import { useBalance, useChainId } from 'wagmi'
 
 interface Token {
     symbol: string
     icon: string
     balance: string
+    address: `0x${string}`
 }
 
 interface TokenSelectorProps {
     defaultToken?: string
-    onTokenSelectAction: (token: string) => Promise<void>
+    onTokenSelectAction: (tokenSymbol: string, tokenAddress: `0x${string}`) => Promise<void>
+    tokenBalances?: Record<`0x${string}`, string>
 }
 
-const tokens: Token[] = [
-    {
-        symbol: 'USDC',
-        icon: '/app/icons/svg/usdc-icon.png',
-        balance: '295.00',
-    },
-    {
-        symbol: 'DROP',
-        icon: '/app/icons/svg/drop-token.png',
-        balance: '1000.00',
-    },
-]
-
-export default function TokenSelector({ defaultToken = 'USDC', onTokenSelectAction }: TokenSelectorProps) {
+export default function TokenSelector({ onTokenSelectAction }: TokenSelectorProps) {
     const [isOpen, setIsOpen] = useState(false)
-    const [selectedToken, setSelectedToken] = useState(defaultToken)
+
+    const chainId = useChainId()
+    const { wallets } = useWallets()
+
+    const tokens = [
+        {
+            symbol: 'DROP',
+            icon: '/app/icons/svg/drop-token.png',
+            address: currentTokenAddress,
+            balance:
+                useBalance({
+                    address: wallets[0]?.address as Address,
+                    token: currentTokenAddress,
+                }).data?.formatted || '0',
+        },
+        {
+            symbol: 'USDC',
+            icon: '/app/icons/svg/usdc-icon.png',
+            address: usdcDeployments[chainId as keyof typeof usdcDeployments],
+            balance:
+                useBalance({
+                    address: wallets[0]?.address as Address,
+                    token: usdcDeployments[chainId as keyof typeof usdcDeployments],
+                }).data?.formatted || '0',
+        },
+    ]
+    const [selectedToken, setSelectedToken] = useState('DROP')
+
     const currentToken = tokens.find(t => t.symbol === selectedToken) || tokens[0]
 
     const handleTokenSelect = async (symbol: string) => {
+        const token = tokens.find(t => t.symbol === symbol)
+        if (!token) return
+
         setSelectedToken(symbol)
         setIsOpen(false)
-        await onTokenSelectAction(symbol)
+        await onTokenSelectAction(symbol, token.address)
     }
 
     return (
