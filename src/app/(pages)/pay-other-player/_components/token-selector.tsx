@@ -33,7 +33,7 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
     const tokens = [
         {
             symbol: 'DROP',
-            icon: '/app/icons/svg/drop-token.png',
+            icon: '/app/images/drop-token.png',
             address: currentTokenAddress,
             balance:
                 useBalance({
@@ -43,7 +43,7 @@ export default function TokenSelector({ onTokenSelectAction, onMaxClick }: Token
         },
         {
             symbol: 'USDC',
-            icon: '/app/icons/svg/usdc-icon.png',
+            icon: '/app/images/usdc-icon.png',
             address: usdcDeployments[chainId as keyof typeof usdcDeployments],
             balance:
                 useBalance({
