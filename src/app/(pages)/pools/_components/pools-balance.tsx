@@ -20,7 +20,6 @@ const zeroBalance = {
 export default function PoolsBalance() {
     const { user } = usePrivy()
     const address = user?.wallet?.address as Address
-
     const { data: balance, isLoading } = useBalance({
         token: currentTokenAddress,
         address,

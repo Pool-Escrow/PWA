@@ -1,6 +1,8 @@
+
 import NextUserPool from './_components/next-user-pool'
 import UpcomingPools from './_components/upcoming-pools'
 import RenderBottomBar from './_components/render-bottom-bar'
+import ClaimButton from './_components/claim-button'
 import PageWrapper from '@/components/page-wrapper'
 import PullToRefresh from '@/app/_components/pull-to-refresh'
 import TopSection from '@/components/top-section'
@@ -21,6 +23,7 @@ export default function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
+                                <ClaimButton />
                                 <NextUserPool />
                                 <UpcomingPools />
                             </div>
