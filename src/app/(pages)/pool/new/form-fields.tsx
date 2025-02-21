@@ -21,6 +21,7 @@ export const formFields = [
         name: 'bannerImage',
         label: 'Choose Image',
         description: 'Update a banner photo; ideal aspect ratio is 2:1',
+        required: true,
         component: ImageUploader,
     },
     {
@@ -28,6 +29,7 @@ export const formFields = [
         name: 'name',
         label: 'Name of Pool',
         description: 'Enter a name for your Pool',
+        required: true,
         component: Text,
     },
     {
@@ -35,6 +37,7 @@ export const formFields = [
         name: 'dateRange',
         label: 'Date of Event',
         description: 'Select the start and end date and time of the Pool',
+        required: true,
         component: DateTimeRange,
     },
     {
@@ -42,6 +45,7 @@ export const formFields = [
         name: 'description',
         label: 'Description',
         description: 'Enter a description for your Pool',
+        required: true,
         component: TextArea,
     },
     {
@@ -49,6 +53,7 @@ export const formFields = [
         name: 'price',
         label: 'Buy in',
         description: 'What is the price to participate in the Pool?',
+        required: true,
         component: CurrencyAmount,
     },
     {
@@ -56,6 +61,7 @@ export const formFields = [
         name: 'softCap',
         label: 'Soft Cap',
         description: 'Enter the max amount of paid entries allowed to join',
+        required: true,
         component: NumberControl,
     },
     {
@@ -63,6 +69,7 @@ export const formFields = [
         name: 'termsURL',
         label: 'Link to T&C, rules, or Code of Conduct',
         description: 'Paste a link to the pool terms document',
+        required: false,
         component: Text,
     },
     {
@@ -70,6 +77,7 @@ export const formFields = [
         name: 'requiredAcceptance',
         label: 'Required Acceptance',
         description: 'Select if participants must accept the rules, terms, and conditions',
+        required: false,
         component: Switch,
     },
 ] as const

@@ -19,6 +19,7 @@ type UsePoolActionsProps = {
     tokenDecimals: number
     openOnRampDialog: () => void
     onSuccessfulJoin: () => void
+    onStatusUpdatedByAdmin: (isUpdated: boolean) => void
 }
 
 export function usePoolActions({
@@ -27,6 +28,7 @@ export function usePoolActions({
     tokenDecimals,
     openOnRampDialog,
     onSuccessfulJoin,
+    onStatusUpdatedByAdmin
 }: UsePoolActionsProps) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
@@ -84,6 +86,7 @@ export function usePoolActions({
             },
         )
             .then(() => {
+                onStatusUpdatedByAdmin(true)
                 console.log('🔄 [usePoolActions] Deposits enabled successfully!')
             })
             .catch(error => {
@@ -113,6 +116,7 @@ export function usePoolActions({
             },
         )
             .then(() => {
+                onStatusUpdatedByAdmin(true)
                 console.log('🔄 [usePoolActions] Pool started successfully!')
             })
             .catch(error => {
@@ -154,6 +158,7 @@ export function usePoolActions({
             },
         )
             .then(() => {
+                onStatusUpdatedByAdmin(true)
                 console.log('🔄 [usePoolActions] Pool ended successfully!')
             })
             .catch(error => {

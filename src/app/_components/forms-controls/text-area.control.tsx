@@ -4,10 +4,11 @@ import { useState } from 'react'
 import { Textarea } from '../ui/textarea'
 
 interface TextAreaProps {
-    name: string
+    name: string,
+    required?: boolean
 }
 
-export default function TextArea({ name }: TextAreaProps) {
+export default function TextArea({ name, required }: TextAreaProps) {
     const [value, setValue] = useState('')
     const maxLength = 500
 
@@ -18,6 +19,7 @@ export default function TextArea({ name }: TextAreaProps) {
     return (
         <div className='relative'>
             <Textarea
+                required={required}
                 className='content-size resize-y rounded-[20px] p-6 pb-10 font-normal leading-tight text-black backdrop-blur-[2px]'
                 maxLength={maxLength}
                 value={value}

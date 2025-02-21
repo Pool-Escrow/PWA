@@ -11,7 +11,6 @@ type Props = {
 
 export default function PoolDetailsPage({ params: { 'pool-id': poolId } }: Props) {
     const queryClient = new QueryClient()
-
     queryClient.prefetchQuery({
         queryKey: ['pool-details', poolId],
         queryFn: getPoolDetailsById,

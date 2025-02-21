@@ -3,6 +3,7 @@ import type { Address } from 'viem'
 import { db } from '../../../database/db'
 
 export async function getUserPools(userAddress: Address) {
+    console.log('-- getUserPools --- ')
     const { data: userPools, error } = await db
         .from('pool_participants')
         .select('pool_id')

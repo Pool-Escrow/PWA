@@ -14,10 +14,11 @@ export type DateTimeRangeValue = {
 }
 
 interface DateTimeRangeProps {
-    name: string
+    name: string,
+    required?: boolean
 }
 
-export default function DateTimeRange({ name }: DateTimeRangeProps) {
+export default function DateTimeRange({ name, required }: DateTimeRangeProps) {
     const [selectedCity, setSelectedCity] = useState('')
     const [timezone, setTimezone] = useState('')
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>({ start: '', end: '' })
@@ -159,6 +160,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                 <div className='inline-flex flex-row flex-nowrap gap-1'>
                     <div className='relative'>
                         <Input
+                            required={required}
                             className='cursor-pointer bg-transparent px-0 text-center text-xs font-medium'
                             type='date'
                             value={formatDateTimeForInput(localValue.end).date}
@@ -169,6 +171,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
                     </div>
                     <div className='relative'>
                         <Input
+                            required={required}
                             className='cursor-pointer bg-white text-center text-xs font-medium'
                             type='time'
                             value={formatDateTimeForInput(localValue.end).time}

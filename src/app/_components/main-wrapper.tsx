@@ -56,7 +56,7 @@ export default function MainWrapper({ children }: { children: React.ReactNode })
     return (
         <main
             className={cn(
-                'relative mx-auto flex w-dvw max-w-screen-md flex-1 flex-col overflow-hidden px-safe-or-2',
+                'relative mx-auto flex w-dvw max-w-screen-md flex-1 flex-col overflow-hidden px-safe-or-2 overflow-y-auto',
                 'pb-safe-offset',
                 isBottomBarVisible ? 'mb-safe-or-24' : 'mb-safe',
             )}>

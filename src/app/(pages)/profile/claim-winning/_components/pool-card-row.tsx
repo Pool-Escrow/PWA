@@ -13,7 +13,7 @@ interface PoolCardRowProps {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PoolCardRow = ({ poolId }: PoolCardRowProps) => {
     const { wallets } = useWallets()
-
+    console.log('refetch PoolCardRow - getPoolDetailsById', poolId)
     const {
         data: pool,
         isPending: isPoolPending,

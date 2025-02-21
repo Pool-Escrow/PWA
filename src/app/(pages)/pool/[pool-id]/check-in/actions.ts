@@ -131,7 +131,7 @@ export async function checkParticipantStatusAction(poolId: string, address: Addr
             .eq('user_id', userData.id)
             .eq('pool_id', poolId)
             .maybeSingle()
-
+            console.log('-- userPoolError check status  --- ')
         if (userPoolError) {
             throw new Error('Error checking participant status')
         }

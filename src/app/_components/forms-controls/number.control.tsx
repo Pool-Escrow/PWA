@@ -5,10 +5,11 @@ import { Input } from '../ui/input'
 
 interface NumberProps {
     name: string
-    defaultValue?: string
+    defaultValue?: string,
+    required: boolean
 }
 
-export default function Number({ name, defaultValue = '' }: NumberProps) {
+export default function Number({ name, defaultValue = '', required }: NumberProps) {
     const [value, setValue] = useState(defaultValue)
     const max = 99999
     const isMax = parseFloat(value) > max
@@ -36,6 +37,7 @@ export default function Number({ name, defaultValue = '' }: NumberProps) {
 
     return (
         <Input
+            required={required}
             className='bg-transparent'
             inputMode='numeric'
             onChange={handleChange}

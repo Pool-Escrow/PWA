@@ -171,7 +171,7 @@ export async function updatePoolStatus(
         .eq('pool_id', contract_id)
         .eq('user_id', user.id)
         .single()
-
+        console.log('-- get user pools  --- ')
     if (participantCheckError && participantCheckError.code !== 'PGRST116') {
         console.error('Error checking existing participant:', participantCheckError)
         throw participantCheckError
@@ -246,7 +246,7 @@ export async function addParticipantToPool(poolId: string, userAddress: string):
         .eq('pool_id', poolId)
         .eq('user_id', user.id)
         .single()
-
+     console.log('-- participantCheckError --- ')
     if (participantCheckError && participantCheckError.code !== 'PGRST116') {
         console.error('Error checking existing participant:', participantCheckError)
         throw participantCheckError

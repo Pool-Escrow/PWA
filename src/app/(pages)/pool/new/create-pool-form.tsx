@@ -145,6 +145,7 @@ export default function CreatePoolForm() {
                 action={formAction}
                 onSubmit={handleSubmit}
                 onChange={() => {
+                    console.log('< [[ onChange state]] >', state)
                     setFormErrors({})
                     setIsSubmitting(false)
                 }}
@@ -154,9 +155,11 @@ export default function CreatePoolForm() {
 
                     return (
                         <section key={field.key} className='flex flex-1 flex-col'>
+                           <div className='flex gap-1'>{field.required && <div className='text-red-500'>*</div>}
                             <Label className='text-base font-medium text-[#090909]'>{field.label}</Label>
+                            </div>
                             <p className='mb-4 mt-1.5 text-xs font-medium text-[#b2b2b2]'>{field.description}</p>
-                            <field.component name={field.name} />
+                            <field.component name={field.name} required={field.required} />
                             {errors.length > 0 && <p className='mt-1 text-xs text-red-500'>{errors.join(', ')}</p>}
                         </section>
                     )

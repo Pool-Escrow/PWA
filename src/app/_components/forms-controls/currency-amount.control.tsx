@@ -4,11 +4,12 @@ import { Input } from '../ui/input'
 import { useState } from 'react'
 
 interface CurrencyAmountProps {
-    name: string
+    name: string,
+    required?: boolean
 }
 
-export default function CurrencyAmount({ name }: CurrencyAmountProps) {
-    const [value, setValue] = useState('')
+export default function CurrencyAmount({ name, required }: CurrencyAmountProps) {
+    const [value, setValue] = useState('0.00')
     const max = 9999.99
     const isMax = parseFloat(value) > max
 
@@ -36,6 +37,7 @@ export default function CurrencyAmount({ name }: CurrencyAmountProps) {
 
     return (
         <Input
+            required={required}
             className='no-spinner bg-transparent'
             inputMode='decimal'
             onBlur={handleBlur}

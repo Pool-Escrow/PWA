@@ -49,7 +49,6 @@ export default function PoolListCard({
 }: PoolItem) {
     const [dateString, setDateString] = useState<string>('Date information unavailable')
     const queryClient = useQueryClient()
-
     const prefetch = () => {
         void queryClient.prefetchQuery({
             queryKey: ['pool-details', id],
@@ -74,7 +73,7 @@ export default function PoolListCard({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}>
                 <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
-                    <Image src={resolvedImage} alt='Pool Image' fill priority sizes='72px' className='object-cover' />
+                    <Image src={resolvedImage} alt='Pool Image' fill  priority={status === POOLSTATUS.DEPOSIT_ENABLED || status === POOLSTATUS.STARTED } sizes='72px' className='object-cover' />
                     {status !== POOLSTATUS.ENDED && status in POOL_STATUSES_CONFIGS && (
                         <div className='absolute bottom-0 z-10 flex w-full items-center bg-black/40 backdrop-blur-md'>
                             <div

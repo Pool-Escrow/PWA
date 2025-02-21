@@ -271,6 +271,9 @@ export default function useTransactions() {
                     transactionInProgressRef.current = false
                     setTransactionInProgress(false)
                     setCurrentTransaction(null)
+                    if ( config?.onSuccess) {
+                        config.onSuccess()
+                    }
                 }, 500)
             }
         },

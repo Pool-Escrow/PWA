@@ -42,7 +42,6 @@ type PoolDetails = z.infer<typeof PoolDetailsSchema>
 export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: string[] }) {
     const address = await getUserAddressAction()
     const contractInfo = await getContractPoolInfo(poolId)
-
     if (!contractInfo) {
         // TODO: handle when the pool does not exist in the contract
         console.log('[getPoolDetailsById] Pool not found in contract with id:', poolId)
@@ -173,6 +172,7 @@ export async function getPool(poolId: string) {
 }
 
 export async function getHostName(poolId: string) {
+    console.log('-- getHostName --- ')
     return db
         .from('pool_participants')
         .select('users(displayName, walletAddress)')

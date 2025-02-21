@@ -6,7 +6,7 @@ import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participa
 
 const fetchUserInfo = async (privyId?: string) => {
     if (!privyId) return null
-
+    console.log('fetchUserInfo')
     const supabase = getSupabaseBrowserClient()
     const { data } = await supabase.from('users').select('avatar, displayName').eq('privyId', privyId).maybeSingle()
 
@@ -21,8 +21,10 @@ export const useUserInfo = () => {
         queryFn: async () => await fetchUserInfo(user?.id),
         enabled: Boolean(user?.id),
         select: data => {
+            console.log('select ++')
             const address = user?.wallet?.address as Address | undefined
             const avatarFallback = address && blo(address)
+            console.log('address-----', address)
             return {
                 avatar: data?.avatar ?? avatarFallback,
                 displayName: data?.displayName,

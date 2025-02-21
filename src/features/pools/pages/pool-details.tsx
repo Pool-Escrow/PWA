@@ -21,7 +21,9 @@ import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect } from 'react'
 import PullToRefresh from '@/app/_components/pull-to-refresh'
 
+
 export default function PoolDetails({ poolId }: { poolId: string }) {
+    console.log('refetch PoolDetails 222 - getPoolDetailsById', poolId)
     const {
         data: pool,
         isPending: isPoolPending,
@@ -41,6 +43,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     })
 
     console.log('🔄 [PoolDetails] Rendering with poolId:', poolId)
+    console.log('[PoolDetails] POOL', pool)
 
     useEffect(() => {
         console.log('👀 [PoolDetails] Effect: Pool data changed', {

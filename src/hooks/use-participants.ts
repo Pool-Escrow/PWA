@@ -28,6 +28,7 @@ interface Participant {
 }
 
 const fetchUserDetails = async (address: Address) => {
+    console.log('-- fetchUserDetails --- ')
     const supabase = getSupabaseBrowserClient()
     const { data } = await supabase
         .from('users')
@@ -38,6 +39,7 @@ const fetchUserDetails = async (address: Address) => {
 }
 
 const fetchPoolParticipants = async (userId: number, poolId: string) => {
+    console.log('-- fetchPoolParticipants --- ')
     const supabase = getSupabaseBrowserClient()
     const { data, error } = await supabase
         .from('pool_participants')
@@ -54,7 +56,7 @@ const fetchPoolParticipants = async (userId: number, poolId: string) => {
 
 export const useParticipants = (poolId: string) => {
     const { poolDetails } = usePoolDetails(poolId)
-
+    console.log('-- useParticipants --- ')
     return useQuery({
         queryKey: ['participants', poolId],
         queryFn: async () => {

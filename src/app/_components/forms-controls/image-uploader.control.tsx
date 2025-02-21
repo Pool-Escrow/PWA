@@ -8,10 +8,11 @@ import { useState, ChangeEvent } from 'react'
 
 export interface ImageUploaderProps {
     name: string
-    onChange?: (file: File | null) => void
+    onChange?: (file: File | null) => void,
+    required?: boolean
 }
 
-export default function ImageUploader({ name, onChange }: ImageUploaderProps) {
+export default function ImageUploader({ name, onChange, required }: ImageUploaderProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null)
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,6 +38,7 @@ export default function ImageUploader({ name, onChange }: ImageUploaderProps) {
     return (
         <>
             <input
+                required={required}
                 placeholder='Choose an image'
                 title='Choose an image'
                 id={name}

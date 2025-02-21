@@ -7,19 +7,26 @@ import { Skeleton } from '@/app/_components/ui/skeleton'
 import { blo } from 'blo'
 import { useUserInfo } from '@/hooks/use-user-info'
 import { explorerUrl } from '@/app/_server/blockchain/server-config'
+import { useMemo } from 'react'
 
 export default function UserInfo() {
     const { data: userInfo, isLoading } = useUserInfo()
     const address = userInfo?.address
     const truncatedAddress = address?.slice(0, 6) + '...' + address?.slice(-4)
 
+    // Memoize the avatar URL
+    const avatarUrl = useMemo(() => userInfo?.avatar || (address ? blo(address) : ''), [userInfo?.avatar, address]);
+
+    console.log("UserInfo Render:", userInfo);
+    
+    console.log('isLoading', isLoading)
     return (
         <section className='detail_card inline-flex w-full gap-[0.69rem] rounded-3xl p-6'>
             <Avatar className='size-14 cursor-pointer' aria-label='User Avatar'>
                 {isLoading ? (
                     <Skeleton className='size-14 rounded-full' />
                 ) : (
-                    <AvatarImage alt='user avatar' src={userInfo?.avatar || blo(address || '0x')} />
+                    <AvatarImage alt='user avatar' src={avatarUrl} />
                 )}
             </Avatar>
             <div className='flex-1 space-y-1'>
