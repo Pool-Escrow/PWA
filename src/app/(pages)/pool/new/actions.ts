@@ -24,7 +24,7 @@ type FormState = {
     }
     internalPoolId?: string
     poolData?: {
-        name: string 
+        name: string
         startDate: number
         endDate: number
         price: string

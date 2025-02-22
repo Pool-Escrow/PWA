@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { Input } from '../ui/input'
-import { format, addHours } from 'date-fns'
+import { ComboboxCities } from '@/components/combobox-cities'
+import { addHours, format, parseISO } from 'date-fns'
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
 import locationTimezone from 'node-location-timezone'
-import { ComboboxCities } from '@/components/combobox-cities'
-import { parseISO } from 'date-fns'
+import { useCallback, useEffect, useState } from 'react'
+import { Input } from '../ui/input'
 
 export type DateTimeRangeValue = {
     start: string
@@ -23,9 +22,14 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     const [localValue, setLocalValue] = useState<DateTimeRangeValue>({ start: '', end: '' })
     const [, setUtcTime] = useState<DateTimeRangeValue>({ start: '', end: '' })
 
+    const handleCityChange = useCallback((city: string, countryCode: string, newTimezone: string) => {
+        setSelectedCity(`${city}-${countryCode}`)
+        updateTimezone(city, newTimezone)
+    }, [])
+
     useEffect(() => {
         const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-        const [continent, cityName] = userTimezone.split('/')
+        const [, /*continent*/ cityName] = userTimezone.split('/')
         const locations = locationTimezone.findLocationsByCountryName(cityName, true)
         const defaultCity = locations.find(loc => loc.timezone === userTimezone)
         if (defaultCity) {
@@ -48,12 +52,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
             start: now.toISOString(),
             end: oneHourLater.toISOString(),
         })
-    }, [])
-
-    const handleCityChange = useCallback((city: string, countryCode: string, newTimezone: string) => {
-        setSelectedCity(`${city}-${countryCode}`)
-        updateTimezone(city, newTimezone)
-    }, [])
+    }, [handleCityChange])
 
     const updateTimezone = (city: string, newTimezone: string) => {
         if (!newTimezone) {
@@ -79,7 +78,7 @@ export default function DateTimeRange({ name }: DateTimeRangeProps) {
     }
 
     const updateValue = (field: 'start' | 'end', type: 'date' | 'time', newValue: string) => {
-        let updatedDate = toZonedTime(localValue[field], timezone)
+        const updatedDate = toZonedTime(localValue[field], timezone)
 
         if (type === 'date') {
             const [year, month, day] = newValue.split('-').map(Number)

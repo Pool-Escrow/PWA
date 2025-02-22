@@ -25,7 +25,7 @@ export default function UserMenu() {
     }
 
     return (
-        <Button className='pool-button rounded-mini h-[30px] w-[46px] px-[10px] py-[5px] text-[10px]' onClick={login}>
+        <Button className='pool-button h-[30px] w-[46px] rounded-mini px-[10px] py-[5px] text-[10px]' onClick={login}>
             Login
         </Button>
     )

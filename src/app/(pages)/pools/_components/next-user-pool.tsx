@@ -1,13 +1,13 @@
-"use client"
+'use client'
 
-import { ChevronRightIcon } from "lucide-react"
-import Link from "next/link"
+import { ChevronRightIcon } from 'lucide-react'
+import Link from 'next/link'
 
-import { useAuth } from "@/app/_client/hooks/use-auth"
-import { useUserNextPool } from "@/hooks/use-user-next-pool"
-import { usePrivy } from "@privy-io/react-auth"
-import { motion } from "motion/react"
-import Image from "next/image"
+import { useAuth } from '@/app/_client/hooks/use-auth'
+import { useUserNextPool } from '@/hooks/use-user-next-pool'
+import { usePrivy } from '@privy-io/react-auth'
+import { motion } from 'motion/react'
+import Image from 'next/image'
 
 export default function NextUserPool() {
     const { ready, authenticated } = usePrivy()
@@ -29,8 +29,8 @@ export default function NextUserPool() {
                         </motion.div>
                         <motion.div
                             className='flex size-[30px] items-center justify-center rounded-full bg-white'
-                            whileHover={{ scale: 1.05, backgroundColor: "#f0f0f0" }}
-                            whileTap={{ scale: 0.95, backgroundColor: "#e5e5e5" }}>
+                            whileHover={{ scale: 1.05, backgroundColor: '#f0f0f0' }}
+                            whileTap={{ scale: 0.95, backgroundColor: '#e5e5e5' }}>
                             <ChevronRightIcon className='size-6 text-[#4078FA]' />
                         </motion.div>
                     </Link>
@@ -61,7 +61,7 @@ export default function NextUserPool() {
                                         whileTap={{ scale: 0.95 }}>
                                         <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
                                             <Image
-                                                src={pool.image || "/app/images/frog.png"}
+                                                src={pool.image || '/app/images/frog.png'}
                                                 alt='Pool Image'
                                                 fill
                                                 priority

@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
 import QrScanner from 'qr-scanner'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 type QrScannerOptions = {
     onDecodeError?: (error: Error | string) => void
     calculateScanRegion?: (video: HTMLVideoElement) => QrScanner.ScanRegion
-    preferredCamera?: QrScanner.FacingMode | QrScanner.DeviceId
+    preferredCamera?: QrScanner.FacingMode
     maxScansPerSecond?: number
     highlightScanRegion?: boolean
     highlightCodeOutline?: boolean

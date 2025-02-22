@@ -21,7 +21,7 @@ export const usePayoutStore = create<PayoutStore>()(
                 set(state => {
                     const poolIdString = poolId.toString()
                     const currentPayouts = state.payouts[poolIdString] || []
-                    let updatedPayouts = currentPayouts.filter(
+                    const updatedPayouts = currentPayouts.filter(
                         p => p.participantAddress !== payoutData.participantAddress,
                     )
                     if (payoutData.amount !== '0') {

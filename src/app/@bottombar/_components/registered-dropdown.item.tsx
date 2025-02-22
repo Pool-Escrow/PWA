@@ -51,7 +51,7 @@ export default function RegisteredDropdownItem({
     const menuItem = (
         <DropdownMenuLabel
             onClick={onClick}
-            className='pointer-events-auto z-10 flex items-center gap-[6px] text-xs leading-tight font-normal text-black'>
+            className='pointer-events-auto z-10 flex items-center gap-[6px] text-xs font-normal leading-tight text-black'>
             {icon}
             <span>{label}</span>
         </DropdownMenuLabel>

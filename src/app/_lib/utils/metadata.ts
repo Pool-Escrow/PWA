@@ -1,4 +1,4 @@
-import type { Metadata, Metadata as NextMetadata, Viewport } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 export const viewport: Viewport = {
     userScalable: false,
@@ -15,19 +15,6 @@ const APP_NAME = 'Pool'
 const APP_DEFAULT_TITLE = 'Pool App'
 const APP_TITLE_TEMPLATE = '%s - Pool'
 const APP_DESCRIPTION = 'Pool Party! 🏖️'
-
-interface CustomMetadata extends NextMetadata {
-    twitter: {
-        card: string
-        title: {
-            default: string
-            template: string
-        }
-        description: string
-        site: string
-        creator: string
-    }
-}
 
 export const metadata: Metadata = {
     metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),

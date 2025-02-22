@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils/tailwind'
 
 type WithClassNameDivOptions = {
-	className?: string | string[]
+    className?: string | string[]
 }
 
 /**
@@ -13,18 +13,13 @@ type WithClassNameDivOptions = {
  * @example
  * const DialogFooter = withClassNameDiv({ className: "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2" });
  */
-function withClassNameDiv({
-	className: defaultClassName,
-}: WithClassNameDivOptions) {
-	const Component = ({
-		className,
-		...props
-	}: React.HTMLAttributes<HTMLDivElement>) => {
-		const combinedClassName = cn(defaultClassName, className)
-		return <div className={combinedClassName} {...props} />
-	}
+function withClassNameDiv({ className: defaultClassName }: WithClassNameDivOptions) {
+    const Component = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
+        const combinedClassName = cn(defaultClassName, className)
+        return <div className={combinedClassName} {...props} />
+    }
 
-	return Component
+    return Component
 }
 
 export default withClassNameDiv

@@ -8,7 +8,9 @@ import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 import { useParticipants } from '@/hooks/use-participants'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import { blo } from 'blo'
+import type { StaticImageData } from 'next/image'
 import Image from 'next/image'
+import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import type { Address } from 'viem'
@@ -16,14 +18,13 @@ import { useWriteContract } from 'wagmi'
 import { usePoolDetails } from '../../ticket/_components/use-pool-details'
 import { useUserDetails } from '../_components/use-user-details'
 import PayoutForm from './_components/payout-form'
-import { useParams } from 'next/navigation'
 
 type Params = {
     'participant-id': Address
     'pool-id': string
 }
 
-const ParticipantPayout = async () => {
+const ParticipantPayout = () => {
     const { 'participant-id': participantId, 'pool-id': poolId } = useParams<Params>()
 
     const { data: userDetails } = useUserDetails(participantId)
@@ -40,7 +41,7 @@ const ParticipantPayout = async () => {
     const amountClaimed = userPoolData?.amountClaimed ?? 0
     const amountWon = userPoolData?.amountWon ?? 0
     useEffect(() => {
-        getUserAdminStatusActionWithCookie()
+        void getUserAdminStatusActionWithCookie()
             .then(isUserAdmin => {
                 setIsAdmin(isUserAdmin)
             })
@@ -57,7 +58,7 @@ const ParticipantPayout = async () => {
 
     const avatar = userDetails?.avatar ?? blo(participantId)
     const displayName = userDetails?.displayName ?? formatAddress(participantId)
-    const { data: participants, isLoading, error } = useParticipants(poolId)
+    const { data: participants } = useParticipants(poolId)
 
     const currentParticipant = participants?.find(participant => participant.address === participantId)
     const isCheckedIn = currentParticipant?.checkedInAt != null
@@ -81,11 +82,11 @@ const ParticipantPayout = async () => {
                                 <AvatarFallback className='bg-[#d9d9d9]' />
                             </Avatar>
                             {amountClaimed > 0 ? (
-                                <span className='absolute top-0 left-0 z-50 size-[20px] rounded-full bg-white'>
-                                    <Image src={circleTickIcon} alt='paid' width={20} height={20} />
+                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-white'>
+                                    <Image src={circleTickIcon as StaticImageData} alt='paid' width={20} height={20} />
                                 </span>
                             ) : amountWon > 0 ? (
-                                <span className='absolute top-0 left-0 z-50 size-[20px] rounded-full bg-[#5572E9]'></span>
+                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-[#5572E9]' />
                             ) : (
                                 <></>
                             )}

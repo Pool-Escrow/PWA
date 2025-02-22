@@ -1,7 +1,7 @@
-import type { ERROR_CODES } from "./_components/utils/errors"
+import type { ERROR_CODES } from './_components/utils/errors'
 
 // Base API Types
-export type HTTPMethod = "GET" | "POST"
+export type HTTPMethod = 'GET' | 'POST'
 
 export type APIEndpoint = {
     path: string
@@ -244,7 +244,7 @@ export interface TransactionStatusRequest {
     hash: string
 }
 
-export type TransactionStatus = "PENDING" | "COMPLETED" | "FAILED" | "INVALID"
+export type TransactionStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'INVALID'
 
 export interface TransactionStatusResponse {
     status: TransactionStatus
@@ -285,13 +285,13 @@ export interface OKXSwapStatus {
     crossChainInfo: [object]
     destinationChainGasfee: string
     detailStatus:
-        | "WAITING"
-        | "BRIDGE_PENDING"
-        | "FROM_SUCCESS"
-        | "FROM_FAILURE"
-        | "BRIDGE_SUCCESS"
-        | "REFUND"
-        | "SUCCESS"
+        | 'WAITING'
+        | 'BRIDGE_PENDING'
+        | 'FROM_SUCCESS'
+        | 'FROM_FAILURE'
+        | 'BRIDGE_SUCCESS'
+        | 'REFUND'
+        | 'SUCCESS'
     errorMsg: string
     fromAmount: string
     fromChainId: string
@@ -301,21 +301,21 @@ export interface OKXSwapStatus {
     refundTokenAddress: string
     refundTxHash: string
     sourceChainGasfee: string
-    status: "SUCCESS" | "PENDING" | "FAILURE"
+    status: 'SUCCESS' | 'PENDING' | 'FAILURE'
     toAmount: string
     toChainId: string
     toTokenAddress: string
     toTxHash: string
 }
 export type SwapAction =
-    | { type: "SET_FROM_NETWORK"; payload: OKXNetwork }
-    | { type: "SET_FROM_TOKEN"; payload: OKXToken | null }
-    | { type: "SET_FROM_AMOUNT"; payload: string }
-    | { type: "SET_RECEIVED_AMOUNT"; payload: string }
-    | { type: "SET_APPROVAL_STATUS"; payload: boolean }
-    | { type: "SET_ROUTER_INFO"; payload: BridgeInfo | null }
-    | { type: "SET_LOADING"; payload: boolean }
-    | { type: "SET_HISTORY"; payload: Transaction[] }
+    | { type: 'SET_FROM_NETWORK'; payload: OKXNetwork }
+    | { type: 'SET_FROM_TOKEN'; payload: OKXToken | null }
+    | { type: 'SET_FROM_AMOUNT'; payload: string }
+    | { type: 'SET_RECEIVED_AMOUNT'; payload: string }
+    | { type: 'SET_APPROVAL_STATUS'; payload: boolean }
+    | { type: 'SET_ROUTER_INFO'; payload: BridgeInfo | null }
+    | { type: 'SET_LOADING'; payload: boolean }
+    | { type: 'SET_HISTORY'; payload: Transaction[] }
 
 // Route Calculation Types
 export interface RouteCalculationProps {

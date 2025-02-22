@@ -5,11 +5,11 @@ import { formatAddress } from '@/app/_lib/utils/addresses'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useParticipants } from '@/hooks/use-participants'
 import frog from '@/public/app/images/frog.png'
+import { useParams } from 'next/navigation'
 import type { Address } from 'viem'
 import { usePoolDetails } from '../../../ticket/_components/use-pool-details'
 import { useUserDetails } from '../../_components/use-user-details'
 import PayoutForm from './payout-form'
-import { useParams } from 'next/navigation'
 
 type Params = {
     'pool-id': string
@@ -20,7 +20,7 @@ function ClientParticipantPayout() {
     const params = useParams<Params>()
     const { data: userDetails } = useUserDetails(params['participant-id'])
     const { poolDetails } = usePoolDetails(params?.['pool-id'])
-    const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])
+    const { data: participants } = useParticipants(params?.['pool-id'])
 
     const tokenAddress = poolDetails?.poolDetailFromSC?.[4] ?? currentTokenAddress
     const avatar = userDetails?.avatar ?? frog.src

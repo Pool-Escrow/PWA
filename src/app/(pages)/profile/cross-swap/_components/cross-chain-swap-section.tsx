@@ -1,30 +1,30 @@
-"use client"
+'use client'
 
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/app/_components/ui/sheet"
-import { useWallets } from "@privy-io/react-auth"
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/app/_components/ui/sheet'
+import { useWallets } from '@privy-io/react-auth'
 // import { toNumber } from 'lodash'
-import dynamic from "next/dynamic"
-import { useState } from "react"
-import { toast } from "sonner"
-import UserInfo from "../../_components/user-info/user-info"
-import { useSwapContext } from "../context/SwapContext"
-import type { OKXToken } from "../types"
-import { ActionButton } from "./ActionButton"
-import type { BridgeInfoCardProps } from "./bridge-card"
-import { FromSection } from "./FromSection"
-import { useNetworkFetching } from "./hooks/useNetworkFetching"
-import { useRouteCalculation } from "./hooks/useRouteCalculation"
-import { useSheetDrag } from "./hooks/useSheetDrag"
-import { useSwapExecution } from "./hooks/useSwapExecution"
-import { useTokenSelection } from "./hooks/useTokenSelection"
-import { useTransactionHistory } from "./hooks/useTransactionHistory"
-import type { TokenSelectorProps } from "./TokenSelector"
-import { ToSection } from "./ToSection"
-import { TransactionHistory } from "./tx-history"
+import dynamic from 'next/dynamic'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import UserInfo from '../../_components/user-info/user-info'
+import { useSwapContext } from '../context/SwapContext'
+import type { OKXToken } from '../types'
+import { ActionButton } from './ActionButton'
+import type { BridgeInfoCardProps } from './bridge-card'
+import { FromSection } from './FromSection'
+import { useNetworkFetching } from './hooks/useNetworkFetching'
+import { useRouteCalculation } from './hooks/useRouteCalculation'
+import { useSheetDrag } from './hooks/useSheetDrag'
+import { useSwapExecution } from './hooks/useSwapExecution'
+import { useTokenSelection } from './hooks/useTokenSelection'
+import { useTransactionHistory } from './hooks/useTransactionHistory'
+import type { TokenSelectorProps } from './TokenSelector'
+import { ToSection } from './ToSection'
+import { TransactionHistory } from './tx-history'
 
 // Componentes dinámicos con tipos correctos
 const TokenSelectorDynamic = dynamic<TokenSelectorProps>(
-    () => import("./TokenSelector").then(mod => mod.TokenSelector),
+    () => import('./TokenSelector').then(mod => mod.TokenSelector),
     {
         loading: () => <div>Loading...</div>,
         ssr: false,
@@ -32,7 +32,7 @@ const TokenSelectorDynamic = dynamic<TokenSelectorProps>(
 )
 
 const BridgeInfoCardDynamic = dynamic<BridgeInfoCardProps>(
-    () => import("./bridge-card").then(mod => mod.BridgeInfoCard),
+    () => import('./bridge-card').then(mod => mod.BridgeInfoCard),
     {
         loading: () => <div>Loading...</div>,
         ssr: false,
@@ -77,25 +77,25 @@ const CrossChainSwapSection = () => {
         fromNetwork: state.fromNetwork,
         fromToken: state.fromToken,
         fromAmount: state.fromAmount,
-        onSwapComplete: () => toast.message("Transaction submitted"),
+        onSwapComplete: () => toast.message('Transaction submitted'),
     })
 
     const { sheetRef, handleDragStart, handleDrag, handleDragEnd } = useSheetDrag(() => setIsSelectOpen(false))
 
     const handleFromTokenSelect = (token: OKXToken) => {
-        dispatch({ type: "SET_FROM_TOKEN", payload: token })
+        dispatch({ type: 'SET_FROM_TOKEN', payload: token })
         setIsSelectOpen(false)
     }
 
     const handleFromAmountChange = (amount: string) => {
-        dispatch({ type: "SET_FROM_AMOUNT", payload: amount })
+        dispatch({ type: 'SET_FROM_AMOUNT', payload: amount })
     }
 
     const handleApprove = () => {
         try {
             approve()
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Approval failed")
+            toast.error(error instanceof Error ? error.message : 'Approval failed')
         }
     }
 
@@ -104,27 +104,27 @@ const CrossChainSwapSection = () => {
             setIsSwapping(true)
             swap()
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Swap failed")
+            toast.error(error instanceof Error ? error.message : 'Swap failed')
         } finally {
             setIsSwapping(false)
         }
     }
 
     const handleNetworkSelect = (networkId: string) => {
-        if (networkId === "all") {
+        if (networkId === 'all') {
             return
         }
 
         const selectedNetwork = fetchedNetworks.find(n => n.chainId === networkId)
         if (selectedNetwork) {
-            dispatch({ type: "SET_FROM_NETWORK", payload: selectedNetwork })
+            dispatch({ type: 'SET_FROM_NETWORK', payload: selectedNetwork })
             // Reset token-related states when network changes
-            dispatch({ type: "SET_FROM_TOKEN", payload: state.fromToken }) // Reset token selection
-            dispatch({ type: "SET_FROM_AMOUNT", payload: "0.0" })
-            dispatch({ type: "SET_RECEIVED_AMOUNT", payload: "0.0" })
-            dispatch({ type: "SET_APPROVAL_STATUS", payload: false })
-            dispatch({ type: "SET_ROUTER_INFO", payload: null })
-            dispatch({ type: "SET_HISTORY", payload: transactionHistory.transactions })
+            dispatch({ type: 'SET_FROM_TOKEN', payload: state.fromToken }) // Reset token selection
+            dispatch({ type: 'SET_FROM_AMOUNT', payload: '0.0' })
+            dispatch({ type: 'SET_RECEIVED_AMOUNT', payload: '0.0' })
+            dispatch({ type: 'SET_APPROVAL_STATUS', payload: false })
+            dispatch({ type: 'SET_ROUTER_INFO', payload: null })
+            dispatch({ type: 'SET_HISTORY', payload: transactionHistory.transactions })
             setSelectedNetwork(networkId)
         }
     }

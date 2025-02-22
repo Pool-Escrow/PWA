@@ -102,7 +102,7 @@
     }
 
     body {
-        @apply bg-background text-foreground flex flex-col antialiased;
+        @apply flex flex-col bg-background text-foreground antialiased;
         /* PWA enhancements */
         -webkit-overflow-scrolling: touch;
         -webkit-tap-highlight-color: transparent;
@@ -115,8 +115,8 @@
         min-width: 0;
     }
 
-    input[type="date"]::-webkit-calendar-picker-indicator,
-    input[type="time"]::-webkit-calendar-picker-indicator {
+    input[type='date']::-webkit-calendar-picker-indicator,
+    input[type='time']::-webkit-calendar-picker-indicator {
         position: absolute;
         top: 0;
         left: 0;
@@ -176,7 +176,7 @@
     }
 
     .dropdown-backdrop {
-        @apply fixed top-0 left-0 z-50 h-full w-full bg-white/30 backdrop-blur-xs;
+        @apply backdrop-blur-xs fixed left-0 top-0 z-50 h-full w-full bg-white/30;
     }
 
     .pool-button {

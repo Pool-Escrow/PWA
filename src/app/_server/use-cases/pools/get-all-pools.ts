@@ -25,7 +25,7 @@ const statusMap: Record<number, string> = {
 export const getAllPoolsUseCase = async (): Promise<PoolItem[]> => {
     const [contractPools, dbPools] = await Promise.all([getContractPools(), getDbPools()])
 
-    let invalidPools: string[] = []
+    const invalidPools: string[] = []
 
     const validPools = contractPools
         .filter(

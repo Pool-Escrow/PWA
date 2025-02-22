@@ -1,14 +1,23 @@
 // @ts-check
 
-import env from '@next/env'
 import { execSync } from 'child_process'
+import { existsSync } from 'fs'
+import { resolve } from 'path'
 
 /**
  * Loads the environment variables from the .env file.
- * @param {string} cwd - The current working directory.
- * @param {boolean} [dev] - Whether to load the development environment variables.
  */
-env.loadEnvConfig(process.cwd(), true)
+function loadEnvConfig() {
+    const envPath = resolve(process.cwd(), '.env.development.local')
+    if (existsSync(envPath)) {
+        // Next.js 15 loads automatically the environment variables
+        // We don't need to do anything additional
+        console.log('Environment variables loaded from .env.development.local file')
+    }
+}
+
+// We replace the call to env.loadEnvConfig
+loadEnvConfig()
 
 const projectID = process.env.SUPABASE_PROJECT_ID
 

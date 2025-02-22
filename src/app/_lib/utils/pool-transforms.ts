@@ -1,5 +1,5 @@
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
-import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import type { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import type { ContractPool } from '@/app/_server/persistence/pools/blockchain/get-contract-pools'
 
 export function transformContractPoolToUIPool(

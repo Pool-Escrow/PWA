@@ -14,7 +14,7 @@ const ReceiveDialog = () => {
                 <Button
                     type='button'
                     title='Share with Friends'
-                    className='btn-cta shadow-button active:shadow-button-push h-10 w-20 rounded-[2rem] text-center text-xs leading-normal font-semibold text-white'>
+                    className='btn-cta h-10 w-20 rounded-[2rem] text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Receive
                 </Button>
             </Dialog.Trigger>

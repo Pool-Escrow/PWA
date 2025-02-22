@@ -1,5 +1,4 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog'
-import { XIcon } from 'lucide-react'
 import withClassNameDiv from '../hocs/with-classname-div'
 import withForwardRef from '../hocs/with-forward-ref'
 
@@ -55,4 +54,4 @@ Dialog.Title = DialogTitle
 Dialog.Description = DialogDescription
 Dialog.Footer = DialogFooter
 
-export { Dialog, DialogOverlay, DialogContent, DialogHeader, DialogFooter, DialogTitle, DialogDescription }
+export { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogTitle }

@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { ChevronRightIcon } from 'lucide-react'
-import Avatars from './avatars'
 import Link from 'next/link'
-import { Address } from 'viem'
+import type { Address } from 'viem'
+import Avatars from './avatars'
 
 interface PoolDetailsParticipantsProps {
     numParticipants: number

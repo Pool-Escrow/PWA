@@ -22,7 +22,7 @@ export default function useCamera(): UseCameraResult {
             }
         }
 
-        setupCamera()
+        void setupCamera()
     }, [])
 
     useEffect(() => {

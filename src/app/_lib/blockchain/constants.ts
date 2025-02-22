@@ -1,5 +1,6 @@
 import { cache } from 'react'
-import { Address, keccak256, toHex } from 'viem'
+import type { Address } from 'viem'
+import { keccak256, toHex } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
 
 export const adminRole = cache(() => keccak256(toHex('WHITELISTED_HOST')))
