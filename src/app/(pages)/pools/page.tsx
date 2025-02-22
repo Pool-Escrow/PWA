@@ -3,6 +3,7 @@ import AuthModal from '@/components/auth-modal'
 import MainPageLoginButton from '@/components/main-page-login-button'
 import PageWrapper from '@/components/page-wrapper'
 import TopSection from '@/components/top-section'
+import { Suspense } from 'react'
 import NextUserPool from './_components/next-user-pool'
 import RenderBottomBar from './_components/render-bottom-bar'
 import UpcomingPools from './_components/upcoming-pools'
@@ -10,7 +11,9 @@ import UpcomingPools from './_components/upcoming-pools'
 export default function PoolsPage() {
     return (
         <PageWrapper>
-            <AuthModal />
+            <Suspense fallback={null}>
+                <AuthModal />
+            </Suspense>
             <div className='flex h-full flex-1 flex-col'>
                 <TopSection topBarProps={{ backButton: false }} />
                 <div className='relative flex-1 overflow-hidden'>
