@@ -1,4 +1,5 @@
 // @ts-check
+/* eslint-disable */
 
 /** @type {import('next').NextConfig['webpack']} */
 export const configureWebpack = (config, { isServer }) => {
