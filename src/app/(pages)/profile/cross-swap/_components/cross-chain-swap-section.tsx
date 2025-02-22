@@ -132,11 +132,7 @@ const CrossChainSwapSection = () => {
     return (
         <div className='relative min-h-screen overflow-y-scroll [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             <div className='mx-auto w-full max-w-md space-y-4 overflow-y-scroll px-3 pb-24 pt-3'>
-                <UserInfo
-                    variant='cross-swap'
-                    onHistoryClick={() => setHistory(true)}
-                    hasTransactions={!!transactionHistory.transactions.length}
-                />
+                <UserInfo variant='cross-swap' onHistoryClick={() => setHistory(true)} />
 
                 <Sheet open={isSelectOpen} onOpenChange={setIsSelectOpen}>
                     <SheetContent ref={sheetRef} side='bottom' className='h-[85vh] touch-none rounded-t-[24px] p-4'>

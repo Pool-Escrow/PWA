@@ -51,5 +51,3 @@ export const config = {
         '/((?!api|_next/static|_next/image|favicon.ico|public|.*\\..*|privy).*)',
     ],
 }
-
-// export const runtime = 'nodejs' // Force Node.js runtime
