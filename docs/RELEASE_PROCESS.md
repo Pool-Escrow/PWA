@@ -101,27 +101,47 @@ git merge staging
 git push origin main
 ```
 
-## 5. Tagging & Releasing
+## 5. Tagging & Deployment
 
-After merging into `main`, create a version tag and publish the release.
+After merging into `main`, create a version tag to mark the release point:
 
 ```sh
 git tag v1.2.0
 git push origin v1.2.0
 ```
 
-Then, create a GitHub Release:
+The deployment will be handled automatically by our CI/CD pipeline when changes are pushed to `main`. Monitor the deployment status in GitHub's "Deployments" section.
 
-1. Go to **GitHub Repository** > **Releases** > **New Release**.
-2. Select the tag (e.g., `v1.2.0`).
-3. Copy-paste the changelog.
-4. Click **Publish Release**.
+### Post-Deployment Verification:
+
+1. Monitor the deployment progress in GitHub's "Deployments" tab
+2. Verify the application is working correctly in production
+3. Check key functionality and features
+4. Monitor error reporting systems
 
 ## 6. Post-Release Actions
 
-- Announce the release in Slack/Telegram/Discord.
-- Monitor production for any issues.
-- Begin planning the next development cycle.
+- Document the deployment in the team's communication channels (Slack/Telegram/Discord)
+- Monitor production metrics and error rates
+- Begin planning the next development cycle
+
+### Synchronize Branches
+
+After a successful release, update the other branches to prevent divergence:
+
+```sh
+# Update staging branch
+git checkout staging
+git pull origin main
+git push origin staging
+
+# Update dev branch
+git checkout dev
+git pull origin main
+git push origin dev
+```
+
+This ensures all branches are aligned with the latest release and prevents potential conflicts in future development cycles.
 
 ---
 
