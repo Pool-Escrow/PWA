@@ -1,7 +1,7 @@
 import 'server-only'
 
-import { cookies } from 'next/headers'
 import { PrivyClient } from '@privy-io/server-auth'
+import { cookies } from 'next/headers'
 
 import type { User } from '@privy-io/server-auth'
 import type { Address } from 'viem'
