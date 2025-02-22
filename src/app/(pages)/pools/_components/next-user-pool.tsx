@@ -51,7 +51,7 @@ export default function NextUserPool() {
                         </div>
                     </motion.div>
                 ) : (
-                    <div className='space-y-2'>
+                    <div className='flex flex-col space-y-2'>
                         {hasNextPool &&
                             pools?.map(pool => (
                                 <Link key={pool.id} href={`/pool/${pool.id}`}>
