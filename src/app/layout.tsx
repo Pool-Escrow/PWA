@@ -26,9 +26,6 @@ export default async function RootLayout({ children, bottombar, modal, transacti
 
     return (
         <html lang='en' className={inter.variable}>
-            <head>
-                <link rel='preload' href='/_next/static/css/app/layout.css' as='style' crossOrigin='anonymous' />
-            </head>
             <body className='flex min-h-dvh flex-col antialiased'>
                 <Suspense fallback={<div>Loading app...</div>}>
                     <Providers cookie={wagmiCookie}>
