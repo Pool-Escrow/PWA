@@ -17,9 +17,10 @@ export const experimentalConfig = {
         bodySizeLimit: '2mb',
     },
     webVitalsAttribution: ['CLS', 'LCP', 'FID', 'INP', 'TTFB'],
-    optimizeCss: {
-        cssModules: true,
-        preload: 'intent',
-        resourceBehavior: 'balanced',
-    },
+    // TODO: disable as it requires deprecated package critters
+    // optimizeCss: {
+    //     cssModules: true,
+    //     preload: 'intent',
+    //     resourceBehavior: 'balanced',
+    // },
 }
