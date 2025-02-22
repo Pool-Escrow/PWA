@@ -25,14 +25,39 @@ export async function middleware(request: NextRequest) {
     }
 
     // Protected routes that require authentication
-    const PROTECTED_ROUTES = ['/profile', '/dashboard', '/my-pools']
+    const PROTECTED_ROUTES = ['/profile', '/my-pools']
     const isProtectedRoute = PROTECTED_ROUTES.some(route => request.nextUrl.pathname.startsWith(route))
 
     if (isProtectedRoute) {
-        const payload = await verifyAuthInEdge()
+        try {
+            const payload = await verifyAuthInEdge()
 
-        if (!payload) {
-            return NextResponse.redirect(new URL('/', request.url))
+            if (process.env.NODE_ENV !== 'production') {
+                console.info('[middleware]', '🔒 Auth check:', {
+                    path: request.nextUrl.pathname,
+                    isAuthenticated: !!payload,
+                })
+            }
+
+            if (!payload) {
+                if (process.env.NODE_ENV !== 'production') {
+                    console.info('[middleware]', '🚫 Redirecting to auth required')
+                }
+                const url = new URL('/', request.url)
+                url.searchParams.set('auth', 'required')
+                return NextResponse.redirect(url)
+            }
+
+            // Si está autenticado, permitimos el acceso
+            if (process.env.NODE_ENV !== 'production') {
+                console.info('[middleware]', '✅ Auth verified, allowing access')
+            }
+            return response
+        } catch (error) {
+            console.error('[middleware]', '❌ Auth error:', error)
+            const url = new URL('/', request.url)
+            url.searchParams.set('auth', 'required')
+            return NextResponse.redirect(url)
         }
     }
 

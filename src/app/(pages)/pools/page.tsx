@@ -1,4 +1,5 @@
 import PullToRefresh from '@/app/_components/pull-to-refresh'
+import AuthModal from '@/components/auth-modal'
 import MainPageLoginButton from '@/components/main-page-login-button'
 import PageWrapper from '@/components/page-wrapper'
 import TopSection from '@/components/top-section'
@@ -9,6 +10,7 @@ import UpcomingPools from './_components/upcoming-pools'
 export default function PoolsPage() {
     return (
         <PageWrapper>
+            <AuthModal />
             <div className='flex h-full flex-1 flex-col'>
                 <TopSection topBarProps={{ backButton: false }} />
                 <div className='relative flex-1 overflow-hidden'>
