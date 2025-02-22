@@ -1,8 +1,8 @@
+import { useEncryptStore } from '@/app/_stores/encrypt'
 import { cn } from '@/lib/utils/tailwind'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import React, { useMemo } from 'react'
 import { generateChars } from './generate-encoded-text'
-import { useEncryptStore } from '@/app/_stores/encrypt'
 
 interface EncryptTextProps {
     children: React.ReactNode
@@ -29,7 +29,11 @@ const charVariants = {
         opacity: 0,
         y: '-200%',
         skew: custom % 2 === 0 ? 50 : -50,
-        transition: { delay: custom * 0.05 },
+        transition: {
+            delay: custom * 0.05,
+            type: 'spring',
+            bounce: 0.2,
+        },
     }),
 }
 
@@ -75,7 +79,13 @@ const EncryptText: React.FC<EncryptTextProps> = ({ children, balance, symbol = '
                 <div className={childrenVisible ? 'opacity-0' : 'opacity-100'}>
                     <AnimatePresence mode='popLayout' initial={false}>
                         {!isEncoded && (
-                            <motion.div key='visible' className='absolute'>
+                            <motion.div
+                                key='visible'
+                                className='absolute'
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ type: 'spring', bounce: 0.2 }}>
                                 {renderText('$')}
                                 {renderText(formattedInteger, 'inline-block text-4xl tabular-nums')}
                                 {renderText('.')}
@@ -85,7 +95,13 @@ const EncryptText: React.FC<EncryptTextProps> = ({ children, balance, symbol = '
                         )}
 
                         {isEncoded && (
-                            <motion.div key='encoded' className='absolute blur-sm'>
+                            <motion.div
+                                key='encoded'
+                                className='blur-xs absolute'
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ type: 'spring', bounce: 0.2 }}>
                                 {renderText('$')}
                                 {renderText(encodedText?.integer || '', 'inline-block text-4xl tabular-nums')}
                                 {renderText('.')}

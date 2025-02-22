@@ -1,4 +1,4 @@
-import type { Metadata as NextMetadata, Viewport } from 'next'
+import type { Metadata, Metadata as NextMetadata, Viewport } from 'next'
 
 export const viewport: Viewport = {
     userScalable: false,
@@ -29,8 +29,8 @@ interface CustomMetadata extends NextMetadata {
     }
 }
 
-export const metadata: CustomMetadata = {
-    ...(process.env.NODE_ENV === 'production' ? { metadataBase: new URL('https://app.poolparty.cc') } : {}),
+export const metadata: Metadata = {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
     icons: {
         icon: '/app/assets/favicon.png',
         apple: '/app/assets/icon-maskable-512.png',

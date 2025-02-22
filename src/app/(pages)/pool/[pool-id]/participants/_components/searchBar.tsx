@@ -29,7 +29,7 @@ const SearchBar = ({
             value={query}
             onChange={onChange}
             placeholder='Search'
-            className='mb-2 h-[38px] rounded-full px-[37px] placeholder:text-sm placeholder:font-normal placeholder:text-black focus:outline-none'
+            className='mb-2 h-[38px] rounded-full px-[37px] placeholder:text-sm placeholder:font-normal placeholder:text-black focus:outline-hidden'
         />
     </div>
 )

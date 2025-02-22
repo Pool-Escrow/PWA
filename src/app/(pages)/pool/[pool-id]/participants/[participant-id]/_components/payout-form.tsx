@@ -1,7 +1,7 @@
 'use client'
 
-import * as React from 'react'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/app/_components/ui/button'
@@ -13,7 +13,8 @@ import useTransactions from '@/app/_client/hooks/use-transactions'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { toast } from 'sonner'
-import { Address, formatUnits, getAbiItem, parseUnits } from 'viem'
+import type { Address } from 'viem'
+import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 
 interface PayoutFormProps {
@@ -41,7 +42,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
         toast.success('Payout saved successfully')
     }
 
-    const onPayoutButtonClicked = () => {
+    const _onPayoutButtonClicked = () => {
         const SetWinnerFunction = getAbiItem({
             abi: poolAbi,
             name: 'setWinner',
@@ -57,16 +58,14 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
             },
         ]
 
-        try {
-            executeTransactions(args, {
-                type: 'SET_WINNER',
-                onSuccess: () => {
-                    toast.success('Payout Successful', { description: `Transaction: ${hash}` })
-                },
-            })
-        } catch (error) {
+        executeTransactions(args, {
+            type: 'SET_WINNER',
+            onSuccess: () => {
+                toast.success('Payout Successful', { description: `Transaction: ${hash}` })
+            },
+        }).catch(error => {
             console.log('setWinner Error', error)
-        }
+        })
     }
 
     const clearInput = () => {
@@ -96,7 +95,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
                         <div className='relative'>
                             <Input
                                 className={cn(
-                                    'h-24 border-none bg-transparent text-center text-6xl font-bold focus:outline-none focus:ring-0',
+                                    'focus:outline-hidden h-24 border-none bg-transparent text-center text-6xl font-bold focus:ring-0',
                                     inputValue === '' ? 'text-gray-300' : 'text-black',
                                 )}
                                 placeholder='0'
@@ -146,13 +145,13 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
                 {/* <Button
                     disabled={inputValue === ''}
                     onClick={onPayoutButtonClicked}
-                    className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:bg-cta-active active:shadow-button-push'>
+                    className='btn-cta active:btn-cta-active mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Payout
                 </Button> */}
                 <Button
                     disabled={inputValue === ''}
                     onClick={onSaveButtonClicked}
-                    className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:bg-cta-active active:shadow-button-push'>
+                    className='btn-cta active:btn-cta-active mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Save
                 </Button>
             </div>

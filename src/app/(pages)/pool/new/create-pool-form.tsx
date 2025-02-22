@@ -1,15 +1,16 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useCreatePool } from './use-create-pool'
-import { FormFieldKey, formFields } from './form-fields'
+import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { Button } from '@/app/_components/ui/button'
 import { Label } from '@/app/_components/ui/label'
-import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { useFormStatus } from 'react-dom'
+import { appActions, appStore$ } from '@/app/stores/app.store'
+import { use$ } from '@legendapp/state/react'
 import { Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import RetryDialog from './_components/retry-dialog'
+import { formFields } from './form-fields'
+import { useCreatePool } from './use-create-pool'
 
 export default function CreatePoolForm() {
     const {
@@ -25,11 +26,8 @@ export default function CreatePoolForm() {
         poolUpdated,
         hasAttemptedChainCreation,
     } = useCreatePool()
-    const { setBottomBarContent, setTransactionInProgress, isRouting } = useAppStore(s => ({
-        setBottomBarContent: s.setBottomBarContent,
-        setTransactionInProgress: s.setTransactionInProgress,
-        isRouting: s.isRouting,
-    }))
+
+    const isRouting = use$(appStore$.settings.isRouting)
     const hasCreatedPool = useRef(false)
 
     const { setStep, showToast } = usePoolCreationStore(state => ({
@@ -78,12 +76,12 @@ export default function CreatePoolForm() {
     useEffect(() => {
         console.log('Effect: Setting up bottom bar content')
         if (!isRouting) {
-            setBottomBarContent(
+            appActions.setBottomBarContent(
                 <Button
                     type='submit'
                     form='pool-form'
                     disabled={isButtonDisabled}
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    className='btn-cta mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     {isProcessing ? <Loader2 className='mr-2 h-4 w-4 animate-spin' /> : null}
                     {isProcessing
                         ? isPending
@@ -97,21 +95,12 @@ export default function CreatePoolForm() {
                 </Button>,
             )
         }
-        setTransactionInProgress(isPending || isConfirming)
+        appActions.setTransactionInProgress(isPending || isConfirming)
 
         return () => {
-            setBottomBarContent(null)
+            appActions.setBottomBarContent(null)
         }
-    }, [
-        setBottomBarContent,
-        setTransactionInProgress,
-        isPending,
-        isConfirming,
-        isButtonDisabled,
-        isProcessing,
-        hasErrors,
-        isRouting,
-    ])
+    }, [isPending, isConfirming, isButtonDisabled, isProcessing, hasErrors, isRouting])
 
     useEffect(() => {
         console.log('Effect: Checking pool creation status', {
@@ -150,7 +139,7 @@ export default function CreatePoolForm() {
                 }}
                 className='flex size-full flex-col gap-6 overflow-y-auto pb-[90px] pt-6'>
                 {formFields.map(field => {
-                    const errors = formErrors[field.key as FormFieldKey] || []
+                    const errors = formErrors[field.key] || []
 
                     return (
                         <section key={field.key} className='flex flex-1 flex-col'>
@@ -168,7 +157,10 @@ export default function CreatePoolForm() {
             <RetryDialog
                 open={showRetryDialog}
                 onOpenChange={open => {
-                    if (!open) handleRetryDialogClose()
+                    if (!open)
+                        handleRetryDialogClose().catch(error => {
+                            console.error('Error closing retry dialog', error)
+                        })
                 }}
                 onRetry={handleRetry}
                 onCancel={handleRetryDialogClose}

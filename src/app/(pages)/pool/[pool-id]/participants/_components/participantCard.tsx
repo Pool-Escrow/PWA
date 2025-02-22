@@ -1,13 +1,15 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { cn } from '@/lib/utils/tailwind'
-import Link from 'next/link'
-import { formatUnits, type Address } from 'viem'
-import Image from 'next/image'
-import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
-import { formatAddress } from '@/app/_lib/utils/addresses'
-import { TabValue } from './participants'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
+import { formatAddress } from '@/app/_lib/utils/addresses'
+import { cn } from '@/lib/utils/tailwind'
+import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import type { StaticImageData } from 'next/image'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import type { Address } from 'viem'
+import { formatUnits } from 'viem'
+import { TabValue } from './participants'
 
 interface ParticipantCardProps {
     address: Address
@@ -30,7 +32,7 @@ export default function ParticipantCard({
     avatar,
     displayName,
     poolId,
-    status = 'Registered',
+    // status = 'Registered',
     isLoading,
     error,
     isAdmin,
@@ -88,7 +90,13 @@ export default function ParticipantCard({
             {wonAmount > 0 && isAdmin && tabValue === TabValue.Winners && (
                 <div className='flex flex-row items-center'>
                     {claimedAmount === wonAmount && (
-                        <Image src={circleTickIcon} alt='paid' width={12} height={12} className='mr-[6px]' />
+                        <Image
+                            src={circleTickIcon as StaticImageData}
+                            alt='paid'
+                            width={12}
+                            height={12}
+                            className='mr-[6px]'
+                        />
                     )}
                     <div className='flex h-[30px] w-[61px] items-center justify-center rounded-[9px] bg-[#6993FF40] text-center text-[10px] font-medium text-[#6993FF]'>
                         {`${formatUnits(BigInt(wonAmount ?? 0), tokenDecimals)} USD`}

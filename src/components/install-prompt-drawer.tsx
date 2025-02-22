@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Drawer } from '@/app/_components/ui/drawer'
 import { Button } from '@/app/_components/ui/button'
+import { Drawer } from '@/app/_components/ui/drawer'
+import { useEffect, useState } from 'react'
 
 export default function InstallPromptDrawer() {
     const [isOpen, setIsOpen] = useState(false)
@@ -72,7 +72,7 @@ export default function InstallPromptDrawer() {
                     ) : (
                         <Button
                             onClick={handleInstall}
-                            className='w-full rounded-[2rem] bg-cta text-center font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            className='btn-cta shadow-button active:shadow-button-push w-full rounded-[2rem] text-center leading-normal font-semibold text-white'>
                             Add to Home Screen
                         </Button>
                     )}

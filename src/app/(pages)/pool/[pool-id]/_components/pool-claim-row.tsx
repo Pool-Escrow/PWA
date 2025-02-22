@@ -4,18 +4,6 @@
 import { Button } from '@/app/_components/ui/button'
 import { CircleCheckIcon } from 'lucide-react'
 
-// import { useWinnerDetail } from '@/app/_client/hooks/use-winner-detail'
-// import { useWallets } from '@privy-io/react-auth'
-// import { useEffect } from 'react'
-// import { toast } from 'sonner'
-// import type { Address } from 'viem'
-// import { getAbiItem } from 'viem'
-// import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
-// // import { useAdmin } from '@/app/_client/hooks/use-admin'
-// import { wagmi } from '@/app/_client/providers/configs'
-
-// const avatarUrls = new Array(4).fill(frog.src)
-
 interface PoolDetailsProps {
     poolId: string
 }
@@ -93,7 +81,7 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
             </div>
             <Button
                 onClick={onClaimButtonClicked}
-                className='active:bg-cta-active mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                className='active:btn-cta-active btn-cta shadow-button active:shadow-button-push mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] px-6 py-[11px] text-center align-middle leading-normal font-semibold text-white'>
                 Claim winnings
             </Button>
         </div>

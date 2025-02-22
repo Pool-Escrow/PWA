@@ -6,17 +6,17 @@ import { useQuery } from '@tanstack/react-query'
 import { blo } from 'blo'
 import type { Address } from 'viem'
 
-interface UserDetails {
-    avatar: string | null
-    displayName: string | null
-    walletAddress: string
-}
+// interface UserDetails {
+//     avatar: string | null
+//     displayName: string | null
+//     walletAddress: string
+// }
 
-interface ParticipantStatus {
-    status: string
-    checked_in_at: string | null
-    users: UserDetails | null
-}
+// interface ParticipantStatus {
+//     status: string
+//     checked_in_at: string | null
+//     users: UserDetails | null
+// }
 
 interface Participant {
     address: Address
@@ -43,7 +43,7 @@ const fetchPoolParticipants = async (userId: number, poolId: string) => {
         .from('pool_participants')
         .select('user_id, pool_id, checked_in_at, status')
         .eq('user_id', userId)
-        .eq('pool_id', poolId)
+        .eq('pool_id', Number(poolId))
         .maybeSingle()
 
     if (error) {
@@ -56,7 +56,7 @@ export const useParticipants = (poolId: string) => {
     const { poolDetails } = usePoolDetails(poolId)
 
     return useQuery({
-        queryKey: ['participants', poolId],
+        queryKey: ['participants', poolId, poolDetails?.poolDetailFromSC?.[5]],
         queryFn: async () => {
             const participants = poolDetails?.poolDetailFromSC?.[5] || []
 
@@ -67,8 +67,8 @@ export const useParticipants = (poolId: string) => {
                     const winnerDetails = await fetchWinnerDetail({
                         queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
                     })
-                    let amountWon = winnerDetails.winnerDetailFromSC.amountWon
-                    let amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
+                    const amountWon = winnerDetails.winnerDetailFromSC.amountWon
+                    const amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
 
                     let checkedInAt = undefined
                     let status = undefined

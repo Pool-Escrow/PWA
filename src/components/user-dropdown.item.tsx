@@ -38,7 +38,7 @@ interface UserDropdownItemProps {
 /**
  * UserDropdownItem component for user dropdowns.
  * @param {UserDropdownItemProps} props - The properties for the component.
- * @returns {JSX.Element} The rendered menu item.
+ * @returns {React.JSX.Element} The rendered menu item.
  */
 export default function UserDropdownItem({
     href,
@@ -46,11 +46,11 @@ export default function UserDropdownItem({
     label,
     onClick,
     showSeparator = true,
-}: UserDropdownItemProps): JSX.Element {
+}: UserDropdownItemProps): React.JSX.Element {
     const menuItem = (
         <DropdownMenuLabel
             onClick={onClick}
-            className='pointer-events-auto z-10 flex border-separate items-center gap-[6px] p-3 text-xs font-normal leading-tight text-black'>
+            className='pointer-events-auto z-10 flex border-separate items-center gap-[6px] p-3 text-xs leading-tight font-normal text-black'>
             {icon}
             <span>{label}</span>
         </DropdownMenuLabel>

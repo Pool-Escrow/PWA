@@ -1,48 +1,32 @@
 // @ts-check
 
 /** @type {import('next').NextConfig['webpack']} */
-export const configureWebpack = (config, options) => {
-    // const { dev, isServer } = options
-
-    // if (!config.module) config.module = { rules: [] }
-    // if (!config.optimization) config.optimization = {}
-    // if (!config.plugins) config.plugins = []
-
-    // if (!dev) {
-    //     config.optimization = {
-    //         ...config.optimization,
-    //         moduleIds: 'deterministic',
-    //         runtimeChunk: 'single',
-    //         splitChunks: {
-    //             chunks: 'all',
-    //             cacheGroups: {
-    //                 vendor: {
-    //                     test: /[\\/]node_modules[\\/]/,
-    //                     name: 'vendors',
-    //                     chunks: 'all',
-    //                     priority: 20,
-    //                 },
-    //                 common: {
-    //                     name: 'common',
-    //                     minChunks: 2,
-    //                     chunks: 'all',
-    //                     priority: 10,
-    //                     reuseExistingChunk: true,
-    //                     enforce: true,
-    //                 },
-    //             },
-    //         },
-    //     }
-    // }
-
+export const configureWebpack = (config, { isServer }) => {
+    // Ignore test files
     config.module.rules.push({
         test: /\.test\.tsx?$/,
         loader: 'ignore-loader',
     })
 
-    // if (isServer) {
-    //     config.externals = [...(config.externals || []), 'react', 'react-dom']
-    // }
+    // Specific configuration for the server
+    if (isServer) {
+        // Alias to prevent server-side bundling of coinbase-wallet-sdk
+        config.resolve.alias = {
+            ...config.resolve.alias,
+            '@coinbase/wallet-sdk': false, // Map to false (empty module)
+        }
+    }
+
+    // Fallback configuration for compatibility
+    config.resolve.fallback = {
+        ...config.resolve?.fallback,
+        'fs': false,
+        'net': false,
+        'tls': false,
+        'encoding': false,
+        'bufferutil': false,
+        'utf-8-validate': false,
+    }
 
     return config
 }

@@ -9,8 +9,15 @@ import type { Address } from 'viem'
 import { usePoolDetails } from '../../../ticket/_components/use-pool-details'
 import { useUserDetails } from '../../_components/use-user-details'
 import PayoutForm from './payout-form'
+import { useParams } from 'next/navigation'
 
-function ClientParticipantPayout({ params }: { params: { 'pool-id': string; 'participant-id': Address } }) {
+type Params = {
+    'pool-id': string
+    'participant-id': Address
+}
+
+function ClientParticipantPayout() {
+    const params = useParams<Params>()
     const { data: userDetails } = useUserDetails(params['participant-id'])
     const { poolDetails } = usePoolDetails(params?.['pool-id'])
     const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])

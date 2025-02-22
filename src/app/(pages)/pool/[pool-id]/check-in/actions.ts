@@ -5,7 +5,7 @@ import { verifyToken } from '@/app/_server/auth/privy'
 import { db } from '@/app/_server/database/db'
 import { isAdminUseCase } from '@/app/_server/use-cases/users/is-admin'
 import { isParticipantUseCase } from '@/app/_server/use-cases/users/is-participant'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 export async function checkInAction(poolId: string, address: Address) {
     try {
@@ -51,7 +51,7 @@ export async function checkInAction(poolId: string, address: Address) {
             .from('pool_participants')
             .select('status')
             .eq('user_id', userData.id)
-            .eq('pool_id', poolId)
+            .eq('pool_id', Number(poolId))
             .maybeSingle()
 
         console.log('user pool data', userPoolData)
@@ -129,7 +129,7 @@ export async function checkParticipantStatusAction(poolId: string, address: Addr
             .from('pool_participants')
             .select('status')
             .eq('user_id', userData.id)
-            .eq('pool_id', poolId)
+            .eq('pool_id', Number(poolId))
             .maybeSingle()
 
         if (userPoolError) {

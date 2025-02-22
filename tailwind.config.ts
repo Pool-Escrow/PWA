@@ -3,7 +3,7 @@ import plugin from 'tailwindcss/plugin'
 
 const config: Config = {
     content: ['./src/**/*.tsx'],
-    darkMode: ['class'],
+    darkMode: ['class', '[data-mode="dark"]'],
     // prefix: '',
     theme: {
         container: {
@@ -20,8 +20,7 @@ const config: Config = {
                 'skeleton-pulse': 'skeleton-fade-in 0.8s ease-out forwards, skeleton-shimmer 2s infinite linear',
             },
             backgroundImage: {
-                'cta': 'linear-gradient(180deg, #36a0f7, #1364da)',
-                'cta-active': 'linear-gradient(180deg, #2b80c5, #0f50af)',
+                // Remove the gradient definitions from backgroundImage
             },
             borderRadius: {
                 lg: 'var(--radius)',
@@ -143,6 +142,14 @@ const config: Config = {
                 128: '32rem',
                 256: '64rem',
             },
+            gradientColorStops: ({ theme }) =>
+                ({
+                    ...theme('colors'),
+                    'cta-start': '#36a0f7',
+                    'cta-end': '#1364da',
+                    'cta-active-start': '#2b80c5',
+                    'cta-active-end': '#0f50af',
+                }) as Record<string, string>,
         },
     },
     plugins: [
@@ -154,13 +161,12 @@ const config: Config = {
             addUtilities,
         }: {
             addUtilities: (utilities: Record<string, Record<string, string>>) => void
-        }) {
-            const newUtilities = {
+        }): void {
+            addUtilities({
                 '.overflow-scrolling-touch': {
                     '-webkit-overflow-scrolling': 'touch',
                 },
-            }
-            addUtilities(newUtilities)
+            })
         }),
     ],
 }

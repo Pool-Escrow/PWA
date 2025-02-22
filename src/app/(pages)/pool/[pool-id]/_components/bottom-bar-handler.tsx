@@ -1,22 +1,23 @@
 'use client'
 
-import * as React from 'react'
-import { Button } from '@/app/_components/ui/button'
-import { poolAbi } from '@/types/contracts'
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
-import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
-import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { useReadContract } from 'wagmi'
-import { getAbiItem } from 'viem'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import HybridRegistration from './terms-acceptance-dialog'
-import { addParticipantToPool } from '../../new/actions'
 import { useOnRamp } from '@/app/_client/hooks/use-onramp'
+import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
+import { Button } from '@/app/_components/ui/button'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { appActions, appStore$ } from '@/app/stores/app.store'
 import { useUserInfo } from '@/hooks/use-user-info'
+import { poolAbi } from '@/types/contracts'
+import { use$ } from '@legendapp/state/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import * as React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { getAbiItem } from 'viem'
+import { useReadContract } from 'wagmi'
+import { addParticipantToPool } from '../../new/actions'
+import HybridRegistration from './terms-acceptance-dialog'
 
 type ButtonConfig = {
     label: string
@@ -57,9 +58,7 @@ export default function BottomBarHandler({
     const [localIsParticipant, setLocalIsParticipant] = useState(false)
     const updateBottomBarContentRef = useRef<NodeJS.Timeout | null>(null)
     const router = useRouter()
-    const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
-    const setTransactionInProgress = useAppStore(state => state.setTransactionInProgress)
-    const isRouting = useAppStore(state => state.isRouting)
+    const isRouting = use$(appStore$.settings.isRouting)
 
     const { data: user } = useUserInfo()
     const address = user?.address
@@ -99,7 +98,6 @@ export default function BottomBarHandler({
     }
 
     const handleSuccessfulJoin = () => {
-        // console.log('🎯 [BottomBarHandler] Executing onSuccessfulJoin callback')
         if (address === undefined) {
             console.error('❌ [BottomBarHandler] User address not found')
             throw new Error('User address not found')
@@ -205,7 +203,7 @@ export default function BottomBarHandler({
             return (
                 <Button
                     key={key}
-                    className='pool-button mb-3 h-[46px] w-full rounded-[2rem] px-4 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    className='btn-cta active:btn-cta-active shadow-button active:shadow-button-push mx-4 mb-3 h-[46px] w-full rounded-[2rem] px-4 py-[11px] text-center text-base leading-normal font-semibold text-white'
                     onClick={() => {
                         setIsLoading(true)
                         config.action()
@@ -226,14 +224,6 @@ export default function BottomBarHandler({
     )
 
     const updateBottomBarContent = useCallback(() => {
-        // console.log('🔄 [BottomBarHandler] Updating bottom bar content:', {
-        //     isParticipantLoading,
-        //     isParticipant,
-        //     localIsParticipant,
-        //     isAdmin,
-        //     poolStatus,
-        // })
-
         let content: React.ReactNode = null
 
         if (isParticipantLoading) {
@@ -245,7 +235,6 @@ export default function BottomBarHandler({
         } else {
             const statusConfig = buttonConfig[poolStatus]
             const role = isAdmin ? 'admin' : 'user'
-            // console.log('🔍 [BottomBarHandler] Determining button config:', { role, poolStatus })
             const config = statusConfig[role]
 
             if (config && (!isParticipant || isAdmin)) {
@@ -253,9 +242,8 @@ export default function BottomBarHandler({
             }
         }
 
-        // console.log('✅ [BottomBarHandler] Setting bottom bar content:', content)
         if (!isRouting) {
-            setBottomBarContent(content)
+            appActions.setBottomBarContent(content)
         }
     }, [
         isParticipantLoading,
@@ -267,7 +255,6 @@ export default function BottomBarHandler({
         renderButton,
         handleViewTicket,
         buttonConfig,
-        setBottomBarContent,
     ])
 
     useEffect(() => {
@@ -288,23 +275,13 @@ export default function BottomBarHandler({
                     console.error('❌ [BottomBarHandler] Error refetching query:', error)
                 })
             })
-            setBottomBarContent(renderButton({ label: 'View My Ticket', action: handleViewTicket }, 'view-ticket'))
+            appActions.setBottomBarContent(
+                renderButton({ label: 'View My Ticket', action: handleViewTicket }, 'view-ticket'),
+            )
         }
-    }, [
-        handleViewTicket,
-        isParticipant,
-        isParticipantLoading,
-        keysToRefetch,
-        queryClient,
-        renderButton,
-        setBottomBarContent,
-    ])
+    }, [handleViewTicket, isParticipant, isParticipantLoading, keysToRefetch, queryClient, renderButton])
 
     useEffect(() => {
-        // console.log('✨ [BottomBarHandler] Confirmation status:', {
-        //     isConfirmed,
-        //     transactionProcessed,
-        // })
         if (isConfirmed && !transactionProcessed) {
             console.log('🔄 [BottomBarHandler] Processing confirmed transaction')
             setIsLoading(false)
@@ -317,11 +294,6 @@ export default function BottomBarHandler({
     }, [isConfirmed, transactionProcessed, router, resetConfirmation, refetchParticipantStatus, updateBottomBarContent])
 
     useEffect(() => {
-        // console.log('🔄 [BottomBarHandler] Transaction status effect:', {
-        //     ready,
-        //     isParticipantLoading,
-        //     transactionProcessed,
-        // })
         if (ready && !isParticipantLoading && !transactionProcessed) {
             if (updateBottomBarContentRef.current) {
                 clearTimeout(updateBottomBarContentRef.current)
@@ -335,13 +307,13 @@ export default function BottomBarHandler({
             if (updateBottomBarContentRef.current) {
                 clearTimeout(updateBottomBarContentRef.current)
             }
-            setBottomBarContent(null)
+            appActions.setBottomBarContent(null)
         }
-    }, [ready, isParticipantLoading, updateBottomBarContent, setBottomBarContent, transactionProcessed])
+    }, [ready, isParticipantLoading, updateBottomBarContent, transactionProcessed])
 
     useEffect(() => {
-        setTransactionInProgress(isPending || isConfirming)
-    }, [setTransactionInProgress, isPending, isConfirming])
+        appActions.setTransactionInProgress(isPending || isConfirming)
+    }, [isPending, isConfirming])
 
     useEffect(() => {
         console.log('🔄 [BottomBarHandler] Transaction status changed:', { isPending, isConfirming, isConfirmed })

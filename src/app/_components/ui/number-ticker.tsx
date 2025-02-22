@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils/tailwind'
-import { useInView, useMotionValue, useSpring } from 'framer-motion'
+import { useMotionValue, useSpring } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 
 export default function NumberTicker({
@@ -16,7 +16,10 @@ export default function NumberTicker({
     const ref = useRef<HTMLSpanElement>(null)
     const [prevValue, setPrevValue] = useState(value)
     const motionValue = useMotionValue(value)
-    const springValue = useSpring(motionValue, { duration: 500 })
+    const springValue = useSpring(motionValue, {
+        duration: 500,
+        bounce: 0.2,
+    })
 
     useEffect(() => {
         if (value !== prevValue) {

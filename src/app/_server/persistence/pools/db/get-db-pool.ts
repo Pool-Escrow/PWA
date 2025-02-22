@@ -14,7 +14,7 @@ export async function getDbPool(poolId: string): Promise<PoolItem | null> {
     const { data: poolData, error } = await db
         .from('pools')
         .select('termsURL, description, softCap, bannerImage, required_acceptance')
-        .eq('contract_id', poolId)
+        .eq('contract_id', Number(poolId))
         .single()
 
     if (error) {
@@ -47,7 +47,7 @@ export async function getDbPoolHostName(poolId: string): Promise<string> {
             )
         `,
         )
-        .eq('pool_id', poolId)
+        .eq('pool_id', Number(poolId))
         .eq('poolRole', 'mainHost')
         .single()
 

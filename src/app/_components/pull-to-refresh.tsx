@@ -1,8 +1,8 @@
 'use client'
 
 import { useQueryClient } from '@tanstack/react-query'
-import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { motion, useAnimation, useMotionValue, useTransform } from 'motion/react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface PullToRefreshProps {
     keysToRefetch: string[] // Array of tanstack query keys to refetch
@@ -80,8 +80,8 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
                 y: LOADING_HEIGHT,
                 transition: {
                     type: 'spring',
-                    stiffness: 400,
-                    damping: 40,
+                    bounce: 0.2,
+                    duration: 0.4,
                 },
             })
 
@@ -89,10 +89,10 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
 
             Promise.all(keysToRefetch.map(key => queryClient.refetchQueries({ queryKey: [key] })))
                 .then(() => {
-                    console.log('✅ All pools data refreshed')
+                    console.log('✅ All data refreshed')
                 })
                 .catch(error => {
-                    console.error('Failed to refresh pools:', error)
+                    console.error('Failed to refresh:', error)
                 })
                 .finally(() => {
                     // Animate back to start after loading
@@ -100,8 +100,8 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
                         y: 0,
                         transition: {
                             type: 'spring',
-                            stiffness: 400,
-                            damping: 30,
+                            bounce: 0.2,
+                            duration: 0.4,
                             delay: 0.2, // Small delay to show completion
                         },
                     })
@@ -113,8 +113,8 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
                 y: 0,
                 transition: {
                     type: 'spring',
-                    stiffness: 400,
-                    damping: 40,
+                    bounce: 0.2,
+                    duration: 0.4,
                 },
             })
         }
@@ -166,8 +166,8 @@ export default function PullToRefresh({ keysToRefetch, children, className = '' 
                 className='size-full'
                 transition={{
                     type: 'spring',
-                    stiffness: 400,
-                    damping: 40,
+                    bounce: 0.2,
+                    duration: 0.4,
                 }}>
                 {children}
             </motion.div>

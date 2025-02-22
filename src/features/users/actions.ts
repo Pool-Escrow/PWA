@@ -26,7 +26,8 @@ async function checkAdminStatus(token: string): Promise<boolean> {
 }
 
 export async function getUserAdminStatusActionWithCookie(): Promise<boolean> {
-    const token = cookies().get('privy-token')?.value
+    const cookieStore = await cookies()
+    const token = cookieStore.get('privy-token')?.value
     if (!token) return false
     return checkAdminStatus(token)
 }

@@ -1,19 +1,22 @@
 'use client'
 
-import Lottie from 'lottie-react'
+import { appStore$ } from '@/app/stores/app.store'
 import animationData from '@/public/app/animations/loading.json'
+import { use$ } from '@legendapp/state/react'
+import dynamic from 'next/dynamic'
 import {
-    DrawerContent,
-    DrawerHeader,
     Drawer,
-    DrawerTrigger,
-    DrawerTitle,
+    DrawerContent,
     DrawerDescription,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
 } from '../_components/ui/drawer'
-import { useAppStore } from '../_client/providers/app-store.provider'
+
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
 
 export default function TransactionProgressModal() {
-    const open = useAppStore(s => s.transactionInProgress)
+    const open = use$(appStore$.settings.transactionInProgress)
 
     const defaultOptions = {
         loop: true,
@@ -26,7 +29,7 @@ export default function TransactionProgressModal() {
 
     return (
         <Drawer open={open}>
-            <DrawerTrigger asChild></DrawerTrigger>
+            <DrawerTrigger asChild />
             <DrawerContent className='bg-white'>
                 <DrawerHeader className='text-left'>
                     <DrawerTitle className='mb-6 text-center text-xl'>Transaction in Progress</DrawerTitle>

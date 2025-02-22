@@ -5,7 +5,6 @@ import { formatAddress } from '@/app/_lib/utils/addresses'
 import Section from '@/components/section'
 import { inter } from '@/lib/utils/fonts'
 import { useWallets } from '@privy-io/react-auth'
-import _ from 'lodash'
 import Image from 'next/image'
 import Link from 'next/link'
 import OnRampCoinbaseButton from '../../_components/onramps/onramp-coinbase'
@@ -36,7 +35,7 @@ const Send = () => {
                                 height={160}
                             />
                         )}
-                        {!_.isEmpty(wallets?.[0]?.address) && (
+                        {wallets?.[0]?.address && (
                             <h3 className='font-medium'>{formatAddress(wallets?.[0]?.address)}</h3>
                         )}
                     </div>
@@ -63,7 +62,7 @@ const Send = () => {
                 <button
                     type='button'
                     // TODO: "focus:shadow-outline" was added but it does not exist
-                    className='h-12 w-full rounded-full px-4 py-2 font-bold text-white focus:outline-none md:h-16 md:text-2xl'
+                    className='h-12 w-full rounded-full px-4 py-2 font-bold text-white focus:outline-hidden md:h-16 md:text-2xl'
                     onClick={onClaimAllButtonClicked}>
                     Claim All
                 </button>

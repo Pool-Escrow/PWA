@@ -1,26 +1,38 @@
 'use client'
 
-import type { Variants } from 'framer-motion'
-import { motion } from 'framer-motion'
+import { useAuth } from '@/app/_client/hooks/use-auth'
+import { useOnRamp } from '@/app/_client/hooks/use-onramp'
+import type { Variants } from 'motion/react'
+import { motion } from 'motion/react'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import UserDropdownItem from './user-dropdown.item'
 import type { DropdownItemConfig } from './user-dropdown.list.config'
 import { dropdownItemsConfig } from './user-dropdown.list.config'
-import { useAuth } from '@/app/_client/hooks/use-auth'
-import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 
 /**
- * Variants for the dropdown menu animation using framer-motion.
+ * Variants for the dropdown menu animation using motion/react.
  */
 const menuVariants: Variants = {
     closed: {
         opacity: 0.3,
-        transition: { when: 'afterChildren', staggerChildren: 0.06, duration: 0.1 },
+        transition: {
+            when: 'afterChildren',
+            staggerChildren: 0.06,
+            duration: 0.1,
+            type: 'spring',
+            bounce: 0.2,
+        },
     },
     open: {
         opacity: 1,
-        transition: { when: 'beforeChildren', staggerChildren: 0.06, duration: 0.1 },
+        transition: {
+            when: 'beforeChildren',
+            staggerChildren: 0.06,
+            duration: 0.1,
+            type: 'spring',
+            bounce: 0.2,
+        },
     },
 }
 
@@ -29,7 +41,7 @@ const itemVariants: Variants = {
     open: { opacity: 1, y: 0 },
 }
 
-const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setOpen }): JSX.Element => {
+const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setOpen }): React.JSX.Element => {
     const { logout } = useAuth()
     const [hoveredItemIndex, setHoveredItemIndex] = useState<number | null>(null)
     const dropdownListRef = useRef<HTMLDivElement | null>(null)

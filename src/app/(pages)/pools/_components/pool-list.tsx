@@ -1,8 +1,8 @@
 'use client'
 
 import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import { motion } from 'motion/react'
 import PoolListCard from './pool-list-card'
-import { motion } from 'framer-motion'
 
 const poolMessages = {
     upcoming: {
@@ -43,7 +43,12 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
             <motion.div
                 className='flex h-24 items-center justify-center rounded-3xl bg-white p-4'
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}>
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                    type: 'spring',
+                    bounce: 0.2,
+                    duration: 0.3,
+                }}>
                 <div className='flex flex-col items-center gap-1'>
                     <h2 className='text-sm font-semibold'>{title}</h2>
                     <p className='text-xs text-gray-600'>{message}</p>

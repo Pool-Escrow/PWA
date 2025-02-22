@@ -1,9 +1,10 @@
 import { User2Icon } from 'lucide-react'
 import type { LinkProps } from 'next/link'
+import React from 'react'
 
 interface RegisteredDropdownItemConfig {
     href?: LinkProps<unknown>['href']
-    icon: JSX.Element
+    icon: React.JSX.Element
     label: string
     onClick?: () => Promise<void> | void
     showSeparator?: boolean

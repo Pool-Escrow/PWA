@@ -10,7 +10,10 @@ type PageWrapperProps = {
 }
 
 export default function PageWrapper({ children, topBarProps, fullScreen }: PageWrapperProps) {
-    if (fullScreen) {
+    // Do not render the wrapper for modal routes
+    const isModal = typeof window !== 'undefined' && window.location.pathname.includes('@modal')
+
+    if (fullScreen || isModal) {
         return <>{children}</>
     }
 

@@ -1,16 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useFormState } from 'react-dom'
-import { useRouter } from 'next/navigation'
-import type { Hash } from 'viem'
-import { parseEventLogs, ContractFunctionExecutionError, parseUnits } from 'viem'
-import { createPoolAction, deletePool, updatePoolStatus } from './actions'
-import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import { useWaitForTransactionReceipt } from 'wagmi'
-import { useQueryClient } from '@tanstack/react-query'
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { poolAbi } from '@/types/contracts'
 import useMediaQuery from '@/app/_client/hooks/use-media-query'
+import useTransactions from '@/app/_client/hooks/use-transactions'
+import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
+import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+import { useActionState, useCallback, useEffect, useRef, useState } from 'react'
+import type { Hash } from 'viem'
+import { ContractFunctionExecutionError, parseEventLogs, parseUnits } from 'viem'
+import { useWaitForTransactionReceipt } from 'wagmi'
+import { createPoolAction, deletePool, updatePoolStatus } from './actions'
 
 const initialState = {
     message: '',
@@ -29,7 +28,7 @@ const initialState = {
 }
 
 export function useCreatePool() {
-    const [state, formAction] = useFormState(createPoolAction, initialState)
+    const [state, formAction] = useActionState(createPoolAction, initialState)
     const router = useRouter()
     const { executeTransactions, result: txResult } = useTransactions()
     const { setStep, setOnChainPoolId, setError, showToast } = usePoolCreationStore(state => ({
@@ -187,7 +186,9 @@ export function useCreatePool() {
                         type: 'success',
                         message: 'Pool created successfully',
                     })
-                    void queryClient.invalidateQueries({ queryKey: ['upcoming-pools'] })
+                    void queryClient.invalidateQueries({ queryKey: ['upcoming-pools'] }).catch(error => {
+                        console.error('Error invalidating upcoming pools', error)
+                    })
                     router.push(`/pool/${latestPoolId}`)
                 })
                 .catch(error => {
@@ -253,7 +254,9 @@ export function useCreatePool() {
 
     useEffect(() => {
         if (state.message === 'Pool created successfully' && state.internalPoolId) {
-            void updatePool(state.internalPoolId, 'unconfirmed', 0)
+            updatePool(state.internalPoolId, 'unconfirmed', 0).catch(error => {
+                console.error('Error updating pool status:', error)
+            })
         }
     }, [state, updatePool])
 

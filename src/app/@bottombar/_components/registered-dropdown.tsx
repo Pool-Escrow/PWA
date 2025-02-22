@@ -18,9 +18,9 @@ import RegisteredDropdownList from './registered-dropdown.list'
  * UserDropdown component that renders the full dropdown menu for the user.
  *
  * @component
- * @returns {JSX.Element} The rendered user dropdown menu.
+ * @returns {React.JSX.Element} The rendered user dropdown menu.
  */
-const RegisteredDropdown: React.FC<{ poolId: string }> = ({ poolId }): JSX.Element => {
+const RegisteredDropdown: React.FC<{ poolId: string }> = ({ poolId }): React.JSX.Element => {
     const [open, setOpen] = useState(false)
     const [container, setContainer] = useState<HTMLElement | null>(null)
 

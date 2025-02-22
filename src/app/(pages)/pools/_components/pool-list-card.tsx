@@ -1,17 +1,17 @@
 'use client'
 
-import { getStatusString } from '@/app/_lib/utils/get-relative-date'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import { Skeleton } from '@/app/_components/ui/skeleton'
 import { POOL_STATUSES_CONFIGS } from '@/app/_lib/consts/pool.consts'
+import { getStatusString } from '@/app/_lib/utils/get-relative-date'
+import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { cn } from '@/lib/utils/tailwind'
-import { motion } from 'framer-motion'
+import frog from '@/public/app/images/frog.png'
+import { useQueryClient } from '@tanstack/react-query'
+import { motion } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
-import frog from '@/public/app/images/frog.png'
-import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 
 interface PoolItem {
     id: string
@@ -72,14 +72,18 @@ export default function PoolListCard({
             <motion.div
                 className='flex h-24 items-center gap-[14px] rounded-3xl bg-white p-3 pr-4'
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}>
+                whileTap={{ scale: 0.95 }}
+                transition={{
+                    type: 'spring',
+                    bounce: 0.2,
+                    duration: 0.3,
+                }}>
                 <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
                     <Image src={resolvedImage} alt='Pool Image' fill priority sizes='72px' className='object-cover' />
                     {status !== POOLSTATUS.ENDED && status in POOL_STATUSES_CONFIGS && (
                         <div className='absolute bottom-0 z-10 flex w-full items-center bg-black/40 backdrop-blur-md'>
                             <div
                                 style={{ backgroundColor: POOL_STATUSES_CONFIGS[status as POOLSTATUS].color }}
-                                // eslint-disable-next-line tailwindcss/no-custom-classname
                                 className={'mr-0.4 mb-0.5 ml-2 size-[5px] animate-pulse rounded-full'}
                             />
                             <div

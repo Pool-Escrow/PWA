@@ -1,11 +1,11 @@
 'use client'
 
-import { QrCode, EditIcon } from 'lucide-react'
+import { Button } from '@/app/_components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { EditIcon, QrCode } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useParams, useRouter } from 'next/navigation'
 import ShareDialog from '../dialogs/share'
-import { Button } from '@/app/_components/ui/button'
-import { motion } from 'framer-motion'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type BannerButtonProps = {
     onClick?: () => void
@@ -21,7 +21,7 @@ function BannerButton({ onClick, icon: Icon, tooltip }: BannerButtonProps) {
                     <Button
                         onClick={onClick}
                         size='icon'
-                        className='rounded-full bg-black/40 transition-colors duration-200 hover:bg-black/60 focus:ring-2 focus:ring-white/50 active:bg-black/80'>
+                        className='focus: -white/50 rounded-full bg-black/40 transition-colors duration-200 hover:bg-black/60 focus:ring-2 active:bg-black/80'>
                         {Icon && <Icon className='size-5 text-white' />}
                     </Button>
                 </TooltipTrigger>
@@ -74,7 +74,12 @@ export default function PoolDetailsBannerButtons({ isAdmin }: PoolDetailsBannerB
                 <motion.div
                     key={index}
                     whileTap={{ scale: 0.95 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}>
+                    transition={{
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 17,
+                        bounce: 0.2,
+                    }}>
                     <ButtonData.element {...ButtonData.props} />
                 </motion.div>
             ))}

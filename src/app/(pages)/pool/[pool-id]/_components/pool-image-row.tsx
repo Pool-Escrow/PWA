@@ -20,7 +20,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                 <div className='relative size-full object-contain object-center'>
                     <Image src={props?.poolImage ?? frog.src} alt='Pool Image' width={500} height={400} />
                 </div>
-                {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity-60 text-white backdrop-blur-sm backdrop-filter md:space-y-6'>
+                {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity/60 text-white backdrop-blur-xs backdrop-filter md:space-y-6'>
                                 {timeLeft != undefined && timeLeft > 0 && (
                                     <div>
                                         <h4 className='text-xs md:text-2xl'>Starts in</h4>
@@ -30,7 +30,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                                     </div>
                                 )}
                             </div> */}
-                <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
+                <div className='absolute top-0 right-2 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
                     {props.admin && (
                         <Link
                             href={`/pool/${props.poolId}/check-in`}

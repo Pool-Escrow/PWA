@@ -54,6 +54,7 @@ export default {
         // },
         embeddedWallets: {
             createOnLogin: 'users-without-wallets',
+            showWalletUIs: true,
             priceDisplay: {
                 primary: 'native-token',
                 secondary: null,

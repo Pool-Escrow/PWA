@@ -1,26 +1,23 @@
 'use client'
 
-import * as React from 'react'
-import { useSearchParams } from 'next/navigation'
-import { useCallback, useEffect, useRef } from 'react'
-import MyPoolsTabs from './my-pools.tabs'
-import type { MyPoolsTab } from './my-pools.tabs.config'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { useServerActionQuery } from '@/app/_client/hooks/server-action-hooks'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import { appActions, appStore$ } from '@/app/stores/app.store'
+import { use$ } from '@legendapp/state/react'
+import { useSearchParams } from 'next/navigation'
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
 import { getUserPastPoolsAction, getUserUpcomingPoolsAction } from '../actions'
+import MyPoolsTabs from './my-pools.tabs'
 
 interface MyPoolsProps {
     initialUpcomingPools: PoolItem[] | null
     initialPastPools: PoolItem[] | null
 }
 
-const MyPools: React.FC<MyPoolsProps> = ({ initialUpcomingPools, initialPastPools }): JSX.Element => {
+const MyPools: React.FC<MyPoolsProps> = ({ initialUpcomingPools, initialPastPools }): React.JSX.Element => {
     const searchParams = useSearchParams()
-    const { myPoolsTab, setMyPoolsTab } = useAppStore(state => ({
-        myPoolsTab: state.myPoolsTab,
-        setMyPoolsTab: state.setMyPoolsTab,
-    }))
+    const myPoolsTab = use$(appStore$.settings.myPoolsTab)
     const initialLoadRef = useRef(true)
 
     const { data: upcomingPools } = useServerActionQuery(getUserUpcomingPoolsAction, {
@@ -40,13 +37,13 @@ const MyPools: React.FC<MyPoolsProps> = ({ initialUpcomingPools, initialPastPool
 
         if (initialLoadRef.current) {
             if (tabFromUrl && ['active', 'past'].includes(tabFromUrl)) {
-                setMyPoolsTab(tabFromUrl)
+                appActions.setMyPoolsTab(tabFromUrl)
             } else {
                 updateSearchParam(myPoolsTab)
             }
             initialLoadRef.current = false
         }
-    }, [searchParams, setMyPoolsTab, myPoolsTab])
+    }, [searchParams, myPoolsTab])
 
     const updateSearchParam = (tab: string) => {
         const params = new URLSearchParams(window.location.search)
@@ -54,23 +51,7 @@ const MyPools: React.FC<MyPoolsProps> = ({ initialUpcomingPools, initialPastPool
         window.history.replaceState(null, '', `?${params.toString()}`)
     }
 
-    const handleChangeTab = useCallback(
-        (tabId: string) => {
-            setMyPoolsTab(tabId as MyPoolsTab['id'])
-            updateSearchParam(tabId)
-        },
-        [setMyPoolsTab],
-    )
-
-    return (
-        <MyPoolsTabs
-            currentTab={myPoolsTab}
-            onChangeTab={handleChangeTab}
-            initialLoad={initialLoadRef.current}
-            upcomingPools={upcomingPools}
-            pastPools={pastPools}
-        />
-    )
+    return <MyPoolsTabs initialLoad={initialLoadRef.current} upcomingPools={upcomingPools} pastPools={pastPools} />
 }
 
 export default MyPools

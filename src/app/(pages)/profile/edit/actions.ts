@@ -2,8 +2,8 @@
 
 import { authenticatedProcedure } from '@/app/_server/procedures/authenticated'
 import { updateProfileUseCase } from '@/app/_server/use-cases/users/update-profile'
-import { CreateProfileFormSchema } from './_lib/definitions'
 import { z } from 'zod'
+import { CreateProfileFormSchema } from './_lib/definitions'
 
 type FormState = {
     message?: string
@@ -54,7 +54,8 @@ export async function validateProfileAction(_prevState: FormState, formData: For
         return {
             message: 'Profile updated successfully',
         }
-    } catch (error) {
+    } catch (error: unknown) {
+        console.error('Error updating profile:', error)
         return {
             message: 'Error updating profile',
         }

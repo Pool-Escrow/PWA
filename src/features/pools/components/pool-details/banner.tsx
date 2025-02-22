@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 
 interface PoolDetailsCardBannerProps {
@@ -22,7 +22,11 @@ export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: P
                         scale: isLoaded ? 1 : 1.1,
                     }}
                     exit={{ opacity: 0, scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{
+                        duration: 0.5,
+                        type: 'spring',
+                        bounce: 0.2,
+                    }}
                     className='relative h-full w-full'>
                     <Image
                         src={imageUrl}
