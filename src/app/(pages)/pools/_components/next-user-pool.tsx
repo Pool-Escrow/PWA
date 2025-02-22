@@ -1,13 +1,12 @@
 'use client'
 
-import * as React from 'react'
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 
+import { useAuth } from '@/app/_client/hooks/use-auth'
 import { useUserNextPool } from '@/hooks/use-user-next-pool'
 import { usePrivy } from '@privy-io/react-auth'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/app/_client/hooks/use-auth'
 import Image from 'next/image'
 
 export default function NextUserPool() {
