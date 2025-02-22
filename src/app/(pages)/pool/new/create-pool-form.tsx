@@ -148,7 +148,7 @@ export default function CreatePoolForm() {
                     setFormErrors({})
                     setIsSubmitting(false)
                 }}
-                className='flex h-full w-full flex-col gap-6 overflow-y-auto pb-[90px] pt-6'>
+                className='flex size-full flex-col gap-6 overflow-y-auto pb-[90px] pt-6'>
                 {formFields.map(field => {
                     const errors = formErrors[field.key as FormFieldKey] || []
 

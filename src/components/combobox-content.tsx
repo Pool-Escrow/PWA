@@ -9,7 +9,7 @@ import {
 } from '@/app/_components/ui/command'
 import { Check, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils/tailwind'
-import { City } from '@/lib/utils/cities'
+import type { City } from '@/lib/utils/cities'
 
 type ComboboxContentProps = {
     searchTerm: string
@@ -82,7 +82,7 @@ export function ComboboxContent({
             <CommandList className={cn('flex-1 overflow-y-auto px-1', isMobile && 'h-full')}>
                 {isSearching ? (
                     <div className='flex items-center justify-center py-6'>
-                        <Loader2 className='h-6 w-6 animate-spin text-gray-500' />
+                        <Loader2 className='size-6 animate-spin text-gray-500' />
                     </div>
                 ) : filteredCities.length === 0 ? (
                     <CommandEmpty>No city found.</CommandEmpty>

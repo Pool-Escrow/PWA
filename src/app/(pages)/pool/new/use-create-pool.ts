@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { Hash, parseEventLogs, ContractFunctionExecutionError, parseUnits } from 'viem'
+import type { Hash } from 'viem'
+import { parseEventLogs, ContractFunctionExecutionError, parseUnits } from 'viem'
 import { createPoolAction, deletePool, updatePoolStatus } from './actions'
 import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { useWaitForTransactionReceipt } from 'wagmi'
@@ -45,7 +46,6 @@ export function useCreatePool() {
         hash: txResult.hash as Hash | undefined,
     })
     const isCreatingPool = useRef(false)
-    const isPoolUpdated = useRef(false)
     const queryClient = useQueryClient()
     const [showCancelDialog, setShowCancelDialog] = useState(false)
     const [showRetryDialog, setShowRetryDialog] = useState(false)
@@ -187,7 +187,7 @@ export function useCreatePool() {
                         type: 'success',
                         message: 'Pool created successfully',
                     })
-                    queryClient.invalidateQueries({ queryKey: ['upcoming-pools'] })
+                    void queryClient.invalidateQueries({ queryKey: ['upcoming-pools'] })
                     router.push(`/pool/${latestPoolId}`)
                 })
                 .catch(error => {
@@ -200,7 +200,7 @@ export function useCreatePool() {
                 })
                 .finally(() => {
                     setPoolUpdated(false)
-                    setTransactionProcessed(false) 
+                    setTransactionProcessed(false)
                     setHasAttemptedChainCreation(false) // Reset this here as well
                 })
         } else {
@@ -253,7 +253,7 @@ export function useCreatePool() {
 
     useEffect(() => {
         if (state.message === 'Pool created successfully' && state.internalPoolId) {
-            updatePool(state.internalPoolId, 'unconfirmed', 0)
+            void updatePool(state.internalPoolId, 'unconfirmed', 0)
         }
     }, [state, updatePool])
 
