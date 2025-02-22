@@ -1,10 +1,11 @@
 'use client'
 
 import { Button } from '@/app/_components/ui/button'
-import Image from 'next/image'
-import AvatarUploadIcon from './avatar-upload-icon'
 import { CameraIcon, Trash2Icon } from 'lucide-react'
-import { useState, ChangeEvent } from 'react'
+import Image from 'next/image'
+import type { ChangeEvent } from 'react'
+import { useState } from 'react'
+import AvatarUploadIcon from './avatar-upload-icon'
 
 export interface AvatarUploaderProps {
     name: string
@@ -55,7 +56,7 @@ export default function AvatarUploader({ name, defaultValue, onChange }: AvatarU
                         priority
                     />
                     <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100'>
-                        <div className='absolute inset-0 rounded-full bg-black opacity-50'></div>
+                        <div className='absolute inset-0 rounded-full bg-black opacity-50' />
                         <Button
                             size='icon'
                             variant='outline'

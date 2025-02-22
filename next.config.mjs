@@ -17,7 +17,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 /** @type {import('next').NextConfig} */
 const baseConfig = {
     compiler: compilerConfig,
-    eslint: { ignoreDuringBuilds: true },
+    eslint: {
+        // dirs: ['app', 'components', 'lib', 'pages', 'utils'],
+        ignoreDuringBuilds: false,
+    },
     experimental: experimentalConfig,
     headers: getSecurityHeaders,
     images: imageConfig,

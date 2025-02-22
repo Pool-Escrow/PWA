@@ -2,10 +2,10 @@
 
 import { poolAbi } from '@/types/contracts'
 import { multicall } from '@wagmi/core'
-import { getAbiItem } from 'viem'
 import type { Address } from 'viem'
+import { getAbiItem } from 'viem'
 import { currentPoolAddress, serverConfig } from '../../../blockchain/server-config'
-import { ContractPool } from './get-contract-pools'
+import type { ContractPool } from './get-contract-pools'
 
 const GetPoolsCreatedBy = getAbiItem({
     abi: poolAbi,

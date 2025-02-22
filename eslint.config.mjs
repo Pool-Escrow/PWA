@@ -1,18 +1,23 @@
+// @ts-check
+
 import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
-// Comment temporarily until Tailwind 4 support is added
+
+// TODO: Uncomment when Tailwind 4 support is added
 // import tailwind from 'eslint-plugin-tailwindcss'
 
 const compat = new FlatCompat({
     baseDirectory: import.meta.dirname,
 })
 
-const tsFiles = ['**/*.{ts,tsx}']
+const tsFiles = ['**/*.{ts,tsx,mjs}']
 
 const languageOptions = {
     parserOptions: {
         project: './tsconfig.eslint.json',
+        ecmaVersion: 'latest',
+        sourceType: 'module',
     },
     globals: {
         React: 'readonly',
@@ -21,15 +26,18 @@ const languageOptions = {
 }
 
 const config = [
-    { ignores: ['node_modules', '.next', 'dist'] },
+    { ignores: ['node_modules', '.next', 'dist', '.git'] },
     js.configs.recommended,
     ...tseslint.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
     {
         files: tsFiles,
         languageOptions,
+        rules: {
+            '@typescript-eslint/await-thenable': 'error',
+        },
     },
-    // Comment temporarily until Tailwind 4 support is added
+    // TODO: Uncomment when Tailwind 4 support is added
     // ...tailwind.configs['flat/recommended'],
     // {
     // settings: {
@@ -47,7 +55,9 @@ const config = [
     // },
     ...compat.config({
         extends: [
+            'plugin:@next/next/recommended',
             'next/core-web-vitals',
+            'next/typescript',
             'plugin:@tanstack/eslint-plugin-query/recommended',
             'plugin:storybook/recommended',
             'prettier',

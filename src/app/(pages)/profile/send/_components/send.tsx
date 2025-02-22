@@ -62,7 +62,7 @@ const Send = () => {
                 <button
                     type='button'
                     // TODO: "focus:shadow-outline" was added but it does not exist
-                    className='h-12 w-full rounded-full px-4 py-2 font-bold text-white focus:outline-hidden md:h-16 md:text-2xl'
+                    className='focus:outline-hidden h-12 w-full rounded-full px-4 py-2 font-bold text-white md:h-16 md:text-2xl'
                     onClick={onClaimAllButtonClicked}>
                     Claim All
                 </button>

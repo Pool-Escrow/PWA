@@ -1,6 +1,6 @@
-import type { Tables } from '@/types/db';
-import 'server-only';
-import { db } from '../../../database/db';
+import type { Tables } from '@/types/db'
+import 'server-only'
+import { db } from '../../../database/db'
 
 interface PoolItem {
     name: string

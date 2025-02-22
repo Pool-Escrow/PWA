@@ -53,7 +53,7 @@ const OnRampForm = ({ className, balance, decimalPlaces }: OnRampFormProps) => {
                         <div className='font-semibold'>Buy USDC</div>
                         <div className='text-sm text-gray-500'>Using cards, banks and international options</div>
                     </div>
-                    <Button className='btn-cta shadow-button active:shadow-button-push h-10 w-20 rounded-[2rem] text-center text-xs leading-normal font-semibold text-white'>
+                    <Button className='btn-cta h-10 w-20 rounded-[2rem] text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         Buy
                     </Button>
                 </div>
@@ -62,7 +62,7 @@ const OnRampForm = ({ className, balance, decimalPlaces }: OnRampFormProps) => {
                         <div className='font-semibold'>External Wallet</div>
                         <div className='text-sm text-gray-500'>Receive from Coinbase, Rainbow or Metamask</div>
                     </div>
-                    <Button className='btn-cta shadow-button active:shadow-button-push h-10 w-20 rounded-[2rem] text-center text-xs leading-normal font-semibold text-white'>
+                    <Button className='btn-cta h-10 w-20 rounded-[2rem] text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                         Receive
                     </Button>
                 </div>

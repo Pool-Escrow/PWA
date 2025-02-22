@@ -1,4 +1,5 @@
-import { allCities, City, commonCities, featuredCities } from '@/lib/utils/cities'
+import type { City } from '@/lib/utils/cities'
+import { allCities, commonCities, featuredCities } from '@/lib/utils/cities'
 import Fuse from 'fuse.js'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -7,7 +8,7 @@ const fuse = new Fuse(allCities, {
     threshold: 0.3,
 })
 
-function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+function debounce<T extends (...args: string[]) => unknown>(func: T, wait: number): (...args: Parameters<T>) => void {
     let timeout: NodeJS.Timeout | null = null
 
     return (...args: Parameters<T>) => {

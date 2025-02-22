@@ -1,3 +1,4 @@
+import { Button } from '@/app/_components/ui/button'
 import { Dialog } from '@/app/_components/ui/dialog'
 import {
     Drawer,
@@ -8,13 +9,12 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from '@/app/_components/ui/drawer'
-import { Button } from '@/app/_components/ui/button'
 
 interface RetryDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     onRetry: () => void
-    onCancel: () => Promise<void>
+    onCancel: () => void
     isDesktop: boolean
 }
 

@@ -1,7 +1,7 @@
-import crypto from "crypto"
-import querystring from "querystring"
-import { CONFIG } from "../../config"
-import { APIError } from "../../utils/errors"
+import crypto from 'crypto'
+import querystring from 'querystring'
+import { CONFIG } from '../../config'
+import { APIError } from '../../utils/errors'
 
 /**
  * OKX API signature generation utilities
@@ -18,15 +18,15 @@ import { APIError } from "../../utils/errors"
  */
 export function preHash(
     timestamp: string,
-    method: "GET" | "POST",
+    method: 'GET' | 'POST',
     requestPath: string,
     params?: Record<string, unknown> | null,
 ): string {
-    let queryString = ""
-    if (method === "GET" && params) {
-        queryString = "?" + querystring.stringify(params as Record<string, string>)
+    let queryString = ''
+    if (method === 'GET' && params) {
+        queryString = '?' + querystring.stringify(params as Record<string, string>)
     }
-    if (method === "POST" && params) {
+    if (method === 'POST' && params) {
         queryString = JSON.stringify(params)
     }
     return timestamp + method + requestPath + queryString
@@ -39,9 +39,9 @@ export function preHash(
  * @returns {string} The base64-encoded signature
  */
 export function sign(message: string, secretKey: string): string {
-    const hmac = crypto.createHmac("sha256", secretKey)
+    const hmac = crypto.createHmac('sha256', secretKey)
     hmac.update(message)
-    return hmac.digest("base64")
+    return hmac.digest('base64')
 }
 
 /**
@@ -52,13 +52,13 @@ export function sign(message: string, secretKey: string): string {
  * @returns {{ signature: string; timestamp: string }} The signature and timestamp
  */
 export function createSignature(
-    method: "GET" | "POST",
+    method: 'GET' | 'POST',
     requestPath: string,
     params?: Record<string, unknown>,
 ): { signature: string; timestamp: string } {
-    const timestamp = new Date().toISOString().slice(0, -5) + "Z"
+    const timestamp = new Date().toISOString().slice(0, -5) + 'Z'
     const message = preHash(timestamp, method, requestPath, params || null)
-    const signature = sign(message, CONFIG.API.HEADERS["OK-ACCESS-SECRET"] || "")
+    const signature = sign(message, CONFIG.API.HEADERS['OK-ACCESS-SECRET'] || '')
     return { signature, timestamp }
 }
 
@@ -71,19 +71,19 @@ export function createSignature(
  */
 export function createHeaders(signature: string, timestamp: string): Record<string, string> {
     if (
-        !CONFIG.API.HEADERS["OK-ACCESS-KEY"] ||
-        !CONFIG.API.HEADERS["OK-ACCESS-PASSPHRASE"] ||
-        !CONFIG.API.HEADERS["OK-ACCESS-PROJECT"]
+        !CONFIG.API.HEADERS['OK-ACCESS-KEY'] ||
+        !CONFIG.API.HEADERS['OK-ACCESS-PASSPHRASE'] ||
+        !CONFIG.API.HEADERS['OK-ACCESS-PROJECT']
     ) {
-        throw new APIError("UNKNOWN", "Missing required API configuration")
+        throw new APIError('UNKNOWN', 'Missing required API configuration')
     }
 
     return {
-        "Content-Type": "application/json",
-        "OK-ACCESS-KEY": CONFIG.API.HEADERS["OK-ACCESS-KEY"],
-        "OK-ACCESS-SIGN": signature,
-        "OK-ACCESS-TIMESTAMP": timestamp,
-        "OK-ACCESS-PASSPHRASE": CONFIG.API.HEADERS["OK-ACCESS-PASSPHRASE"],
-        "OK-ACCESS-PROJECT": CONFIG.API.HEADERS["OK-ACCESS-PROJECT"],
+        'Content-Type': 'application/json',
+        'OK-ACCESS-KEY': CONFIG.API.HEADERS['OK-ACCESS-KEY'],
+        'OK-ACCESS-SIGN': signature,
+        'OK-ACCESS-TIMESTAMP': timestamp,
+        'OK-ACCESS-PASSPHRASE': CONFIG.API.HEADERS['OK-ACCESS-PASSPHRASE'],
+        'OK-ACCESS-PROJECT': CONFIG.API.HEADERS['OK-ACCESS-PROJECT'],
     }
 }

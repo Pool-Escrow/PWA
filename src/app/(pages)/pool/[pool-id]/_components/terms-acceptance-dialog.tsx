@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import Link from 'next/link'
+import { Button } from '@/app/_components/ui/button'
+import { Dialog } from '@/app/_components/ui/dialog'
+import { Drawer, DrawerDescription, DrawerTitle } from '@/app/_components/ui/drawer'
 import { Label } from '@/app/_components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/app/_components/ui/button'
 import { cn } from '@/lib/utils/tailwind'
-import { Drawer, DrawerDescription, DrawerTitle } from '@/app/_components/ui/drawer'
-import { Dialog } from '@/app/_components/ui/dialog'
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 
 type CheckboxState = {
     terms: boolean
@@ -45,7 +45,7 @@ const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabl
         <form
             onSubmit={e => {
                 e.preventDefault()
-                handleSubmit()
+                void handleSubmit()
             }}
             className='space-y-4'>
             <div className='flex items-center space-x-2'>
@@ -86,14 +86,14 @@ const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabl
     </div>
 )
 
-interface HybridRegistrationProps {
+interface TermsAcceptanceDialogProps {
     open: boolean
-    onOpenChange: (open: boolean) => void
-    onAccept: () => void
+    onOpenChange?: (open: boolean) => void
+    onAccept?: () => void
     termsUrl: string
 }
 
-export default function HybridRegistration({ open, onOpenChange, onAccept, termsUrl }: HybridRegistrationProps) {
+export default function TermsAcceptanceDialog({ open, onOpenChange, onAccept, termsUrl }: TermsAcceptanceDialogProps) {
     const [checkboxes, setCheckboxes] = useState<CheckboxState>({
         terms: false,
     })
@@ -112,8 +112,8 @@ export default function HybridRegistration({ open, onOpenChange, onAccept, terms
             // Simulating an API call
             await new Promise(resolve => setTimeout(resolve, 1000))
             console.log('Terms accepted')
-            onAccept()
-            onOpenChange(false)
+            onAccept?.()
+            onOpenChange?.(false)
             // Reset checkbox after successful submission
             setCheckboxes({ terms: false })
         } catch (error) {
@@ -141,8 +141,8 @@ export default function HybridRegistration({ open, onOpenChange, onAccept, terms
 
     useEffect(() => {
         // Close the dialog/drawer when switching between desktop and mobile
-        onOpenChange(false)
-    }, [isDesktop])
+        onOpenChange?.(false)
+    }, [isDesktop, onOpenChange])
 
     if (isDesktop) {
         return (

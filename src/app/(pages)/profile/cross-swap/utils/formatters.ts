@@ -1,4 +1,4 @@
-import { OKXNetwork, OKXToken } from '../types'
+import type { OKXNetwork, OKXToken } from '../types'
 
 export function formatCurrency(value: number, decimals = 6): string {
     if (isNaN(value)) return '0.00'

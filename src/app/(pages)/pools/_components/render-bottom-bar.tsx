@@ -21,7 +21,7 @@ export default function RenderBottomBar() {
                 <Button
                     data-testid='create-pool-button'
                     asChild
-                    className='btn-cta shadow-button active:bg-cta-active active:shadow-button-push mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base leading-normal font-semibold text-white'>
+                    className='btn-cta active:bg-cta-active mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     <Link href='/pool/new'>Create Pool</Link>
                 </Button>,
             )

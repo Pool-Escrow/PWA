@@ -22,7 +22,7 @@ export default function ScannerPageLayout({ children, title, className }: Scanne
                     <div className='text-center'>
                         <div className='w-full text-center text-sm font-semibold'>{title}</div>
                     </div>
-                    <div className='justify-self-end'></div>
+                    <div className='justify-self-end' />
                 </nav>
             </header>
         </div>

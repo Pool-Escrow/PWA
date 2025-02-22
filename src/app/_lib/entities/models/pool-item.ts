@@ -1,4 +1,4 @@
-import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
+import type { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 export type PoolItem = {
     id: string

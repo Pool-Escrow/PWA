@@ -12,7 +12,6 @@ import QRToggle from './_components/qr-toggle'
 
 export default function QRPage() {
     const [currentMode, setCurrentMode] = useState<'scan' | 'pay'>('scan')
-    const [isScanning, setIsScanning] = useState(true)
     const router = useRouter()
 
     const handleToggle = (mode: 'scan' | 'pay') => {
@@ -33,8 +32,7 @@ export default function QRPage() {
     )
 
     const handleError = useCallback((error: Error | string) => {
-        // console.error('Scan error:', error)
-        // Handle any scanning errors here
+        console.error('Scan error:', error)
     }, [])
 
     return (
@@ -45,7 +43,7 @@ export default function QRPage() {
                         onDecode={handleDecode}
                         onError={handleError}
                         enableCallback={true}
-                        startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}
+                        startButtonText='Scanning...'
                         stopButtonText='Stop'
                     />
                 </ScannerPageLayout>

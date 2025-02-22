@@ -1,8 +1,8 @@
 // needs server only because it uses node:child_process and that is not supported in the browser
 import 'server-only'
 
-import sharp from 'sharp'
 import imageType from 'image-type'
+import sharp from 'sharp'
 
 export async function processImage(
     input: string | File | Buffer,
@@ -41,7 +41,7 @@ export async function processImage(
 // Process the image in the server
 
 export async function processImage2(base64String: string): Promise<{ buffer: Buffer; mimeType: string }> {
-    // Extraer el tipo MIME y el contenido base64
+    // Extract the MIME type and base64 content
     const match = base64String.match(/^data:(.+);base64,(.*)$/)
 
     if (!match) {
@@ -50,22 +50,22 @@ export async function processImage2(base64String: string): Promise<{ buffer: Buf
 
     const [, mimeType, base64Content] = match
 
-    // Decodificar el string base64 a un buffer
+    // Decode the base64 string to a buffer
     const buffer = Buffer.from(base64Content, 'base64')
 
     try {
-        // Intentar procesar la imagen con sharp
+        // Try to process the image with sharp
         const image = sharp(buffer)
-        const metadata = await image.metadata()
+        // const metadata = await image.metadata()
 
-        // Si sharp puede leer la imagen, la devolvemos sin cambios
+        // If sharp can read the image, return it without changes
         return { buffer: await image.toBuffer(), mimeType }
     } catch (error) {
         console.error('Error processing image with sharp:', error)
 
-        // Si falla el procesamiento con sharp, intentamos un enfoque más básico
+        // If the processing with sharp fails, try a more basic approach
         try {
-            // Verificar si el buffer es una imagen válida
+            // Check if the buffer is a valid image
             const type = await imageType(buffer)
 
             if (type) {

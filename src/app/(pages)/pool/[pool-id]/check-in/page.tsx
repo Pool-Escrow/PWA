@@ -1,6 +1,5 @@
 'use client'
 
-import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 import { Avatar, AvatarImage } from '@/app/_components/ui/avatar'
 import { Button } from '@/app/_components/ui/button'
 import { formatAddress } from '@/app/_lib/utils/addresses'
@@ -8,8 +7,9 @@ import PageWrapper from '@/components/page-wrapper'
 import ScannerPageLayout from '@/components/scanner-page-layout'
 import circleErrorIcon from '@/public/app/icons/svg/circle-error-icon.svg'
 import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
-import { QrCodeCheckInData } from '@/types/qr'
+import type { QrCodeCheckInData } from '@/types/qr'
 import { blo } from 'blo'
+import type { StaticImageData } from 'next/image'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -30,8 +30,6 @@ enum CheckInState {
 }
 
 export default function PayoutScanPage() {
-    const [result, setResult] = useState<string | null>(null)
-    const [error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
     const [showDialog, setShowDialog] = useState(false)
     const [scannedAddress, setScannedAddress] = useState<Address | null>(null)
@@ -46,74 +44,14 @@ export default function PayoutScanPage() {
     // Fetch user details using the hook
     const { data: userDetails } = useUserDetails(scannedAddress as Address)
 
-    const { showToast } = usePoolCreationStore(state => ({
-        showToast: state.showToast,
-    }))
-
     const resetQrDialog = () => {
         setShowDialog(false)
         setCheckInState(CheckInState.PROCESSING_CHECK_IN)
         setCheckInStatus(null)
     }
-    const handleDecode = async (decodedResult: string) => {
-        if (isProcessing.current || showDialog) return
-
-        try {
-            isProcessing.current = true
-            const parsedQrData: QrCodeCheckInData = JSON.parse(decodedResult)
-            if (parsedQrData.poolId !== params?.['pool-id']) {
-                setCheckInStatus({ success: false, message: 'This QR code is for a different pool' })
-                setCheckInState(CheckInState.ERROR)
-                setShowDialog(true)
-
-                return
-            }
-
-            // Store QR data in state
-            setQrData(parsedQrData)
-            setResult(parsedQrData.address)
-            setError(null)
-            stopScanning()
-
-            // Check participant status first
-            const statusResponse = await checkParticipantStatusAction(
-                params['pool-id'] as string,
-                parsedQrData.address as Address,
-            )
-
-            if (!statusResponse.success || statusResponse.status === 'NOT_REGISTERED') {
-                setCheckInStatus({
-                    success: false,
-                    message: statusResponse.message || 'User is not registered for this pool',
-                })
-                setCheckInState(CheckInState.ERROR)
-            } else if (statusResponse.status === 'CHECKED_IN') {
-                setCheckInStatus({
-                    success: true,
-                    message: statusResponse.message || 'User is already checked in',
-                })
-                setCheckInState(CheckInState.ALREADY_CHECKED_IN)
-            } else if (statusResponse.status === 'REGISTERED') {
-                setCheckInState(CheckInState.REGISTERED)
-            }
-
-            setScannedAddress(parsedQrData.address as Address)
-            setShowDialog(true)
-        } catch (err) {
-            console.error(err)
-            setCheckInStatus({
-                success: false,
-                message: err instanceof Error ? err.message : 'Failed to process QR code',
-            })
-            setCheckInState(CheckInState.ERROR)
-        } finally {
-            isProcessing.current = false
-        }
-    }
 
     const handleError = (err: Error | string) => {
-        setError(typeof err === 'string' ? err : err.message)
-        setResult(null)
+        console.error(err)
     }
 
     const startScanning = useCallback(() => {
@@ -126,6 +64,63 @@ export default function PayoutScanPage() {
             clearInterval(timerRef.current)
         }
     }, [])
+
+    const handleDecode = useCallback(
+        async (decodedResult: string) => {
+            if (isProcessing.current || showDialog) return
+
+            try {
+                isProcessing.current = true
+                const parsedQrData: QrCodeCheckInData = JSON.parse(decodedResult) as QrCodeCheckInData
+                if (parsedQrData.poolId !== params?.['pool-id']) {
+                    setCheckInStatus({ success: false, message: 'This QR code is for a different pool' })
+                    setCheckInState(CheckInState.ERROR)
+                    setShowDialog(true)
+
+                    return
+                }
+
+                // Store QR data in state
+                setQrData(parsedQrData)
+                stopScanning()
+
+                // Check participant status first
+                const statusResponse = await checkParticipantStatusAction(
+                    params['pool-id'],
+                    parsedQrData.address as Address,
+                )
+
+                if (!statusResponse.success || statusResponse.status === 'NOT_REGISTERED') {
+                    setCheckInStatus({
+                        success: false,
+                        message: statusResponse.message || 'User is not registered for this pool',
+                    })
+                    setCheckInState(CheckInState.ERROR)
+                } else if (statusResponse.status === 'CHECKED_IN') {
+                    setCheckInStatus({
+                        success: true,
+                        message: statusResponse.message || 'User is already checked in',
+                    })
+                    setCheckInState(CheckInState.ALREADY_CHECKED_IN)
+                } else if (statusResponse.status === 'REGISTERED') {
+                    setCheckInState(CheckInState.REGISTERED)
+                }
+
+                setScannedAddress(parsedQrData.address as Address)
+                setShowDialog(true)
+            } catch (err) {
+                console.error(err)
+                setCheckInStatus({
+                    success: false,
+                    message: err instanceof Error ? err.message : 'Failed to process QR code',
+                })
+                setCheckInState(CheckInState.ERROR)
+            } finally {
+                isProcessing.current = false
+            }
+        },
+        [params, showDialog, stopScanning],
+    )
 
     useEffect(() => {
         startScanning()
@@ -159,7 +154,7 @@ export default function PayoutScanPage() {
         }
     }
 
-    const handlePayout = async () => {
+    const handlePayout = () => {
         if (!qrData || !params?.['pool-id']) return
 
         setCheckInState(CheckInState.PROCESSING_PAYOUT)
@@ -177,7 +172,7 @@ export default function PayoutScanPage() {
                     <DialogContent
                         avatar={
                             <div className='relative size-16 rounded-full border-2 border-white bg-white md:size-24'>
-                                <Image src={circleErrorIcon} alt='Error Image' fill />
+                                <Image src={circleErrorIcon as StaticImageData} alt='Error Image' fill />
                             </div>
                         }
                         title='Check in failed'
@@ -220,7 +215,7 @@ export default function PayoutScanPage() {
                                 </Button>
                                 <Button
                                     className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
-                                    onClick={handleCheckIn}>
+                                    onClick={() => void handleCheckIn()}>
                                     Check In
                                 </Button>
                             </>
@@ -256,7 +251,7 @@ export default function PayoutScanPage() {
                     <DialogContent
                         avatar={
                             <div className='relative size-16 rounded-full border-2 border-white bg-white md:size-24'>
-                                <Image src={circleTickIcon} alt='Checked In Image' fill />
+                                <Image src={circleTickIcon as StaticImageData} alt='Checked In Image' fill />
                             </div>
                         }
                         title='Checked in'
@@ -333,7 +328,7 @@ export default function PayoutScanPage() {
         <PageWrapper fullScreen>
             <ScannerPageLayout title='Manage Participants'>
                 <PoolQrScanner
-                    onDecode={handleDecode}
+                    onDecode={result => void handleDecode(result)}
                     onError={handleError}
                     enableCallback={!showDialog}
                     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}

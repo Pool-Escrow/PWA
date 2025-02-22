@@ -1,14 +1,14 @@
 'use client'
 
 import { formatBalance } from '@/app/_lib/utils/balance'
-import FormattedBalance from './formatted-balance'
-import { useBalance } from 'wagmi'
-import BalanceSkeleton from './balance-skeleton'
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { cn } from '@/lib/utils/tailwind'
-import EncryptText from './encrypt-text'
 import { usePrivy } from '@privy-io/react-auth'
-import { Address } from 'viem'
+import type { Address } from 'viem'
+import { useBalance } from 'wagmi'
+import BalanceSkeleton from './balance-skeleton'
+import EncryptText from './encrypt-text'
+import FormattedBalance from './formatted-balance'
 
 // Add this after the imports
 const zeroBalance = {

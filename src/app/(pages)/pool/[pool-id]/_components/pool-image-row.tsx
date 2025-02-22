@@ -30,7 +30,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                                     </div>
                                 )}
                             </div> */}
-                <div className='absolute top-0 right-2 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
+                <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-0 md:w-20 md:space-y-5 md:py-6'>
                     {props.admin && (
                         <Link
                             href={`/pool/${props.poolId}/check-in`}

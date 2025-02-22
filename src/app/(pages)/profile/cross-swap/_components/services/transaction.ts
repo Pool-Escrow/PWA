@@ -35,7 +35,7 @@ export class TransactionService extends BaseService {
                 return 'INVALID'
             }
 
-            return status as TransactionStatus
+            return status
         } catch (error) {
             throw handleAPIError(error)
         }

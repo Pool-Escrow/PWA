@@ -1,8 +1,8 @@
-import { useWallets } from "@privy-io/react-auth"
-import { useQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
-import { toast } from "sonner"
-import { useSwapContext } from "../../context/SwapContext"
+import { useWallets } from '@privy-io/react-auth'
+import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
+import { useSwapContext } from '../../context/SwapContext'
 import type {
     APIResponse,
     OKXHistoryResponse,
@@ -11,9 +11,9 @@ import type {
     OKXSwapStatus,
     OKXToken,
     Transaction,
-} from "../../types"
-import { chainIdToName, tokenAddressToLogo, tokenAddressToName } from "../../utils/formatters"
-import { CONFIG } from "../config"
+} from '../../types'
+import { chainIdToName, tokenAddressToLogo, tokenAddressToName } from '../../utils/formatters'
+import { CONFIG } from '../config'
 
 interface UseTransactionHistoryProps {
     fetchedNetworks: OKXNetwork[]
@@ -31,7 +31,7 @@ export const useTransactionHistory = ({
     const { wallets } = useWallets()
     const { state, dispatch } = useSwapContext()
     const { data: transactions, refetch } = useQuery({
-        queryKey: ["transactionHistory", walletAddress, wallets[0]],
+        queryKey: ['transactionHistory', walletAddress, wallets[0]],
         queryFn: async () => {
             if (!walletAddress || !wallets[0]) return []
             const results: Transaction[] = []
@@ -40,21 +40,21 @@ export const useTransactionHistory = ({
                     address: wallets[0].address,
                     chains: [
                         state.fromNetwork.chainId,
-                        "1",
-                        "42161",
-                        "10",
-                        "59144",
-                        "100",
-                        "324",
-                        "534352",
-                        "1",
-                        "8453",
+                        '1',
+                        '42161',
+                        '10',
+                        '59144',
+                        '100',
+                        '324',
+                        '534352',
+                        '1',
+                        '8453',
                     ],
                 }
                 const res = await fetch(`/api/cross-swap`, {
-                    method: "POST",
+                    method: 'POST',
                     headers: {
-                        "Content-Type": "application/json",
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(params),
                 })
@@ -65,17 +65,17 @@ export const useTransactionHistory = ({
                 }
 
                 const txns = data.data[0].transactionList.filter(
-                    (txn: OKXHistoryTransaction) => txn.txStatus === "success" && txn.itype === "2",
+                    (txn: OKXHistoryTransaction) => txn.txStatus === 'success' && txn.itype === '2',
                 )
-                toast.message("Fetching transaction history... Please wait")
+                toast.message('Fetching transaction history... Please wait')
 
                 for (const txn of txns) {
                     try {
-                        console.log("txn", txn)
+                        console.log('txn', txn)
                         const res = await fetch(`/api/swap-status`, {
-                            method: "POST",
+                            method: 'POST',
                             headers: {
-                                "Content-Type": "application/json",
+                                'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({
                                 hash: txn.txHash,
@@ -84,7 +84,7 @@ export const useTransactionHistory = ({
 
                         const statusData: OKXSwapStatus = ((await res.json()) as APIResponse<OKXSwapStatus[]>).data[0]
                         if (
-                            (statusData.status === "SUCCESS" || statusData.status === "PENDING") &&
+                            (statusData.status === 'SUCCESS' || statusData.status === 'PENDING') &&
                             results.length < 6
                         ) {
                             await new Promise(resolve => setTimeout(resolve, 1000))
@@ -93,7 +93,7 @@ export const useTransactionHistory = ({
                                 date: new Date(parseInt(txn.txTime)).toISOString(),
                                 fromChain: {
                                     chainId: statusData.fromChainId,
-                                    name: chainIdToName(statusData.fromChainId, fetchedNetworks) || "Unknown",
+                                    name: chainIdToName(statusData.fromChainId, fetchedNetworks) || 'Unknown',
                                 },
                                 toChain: {
                                     chainId: statusData.toChainId,
@@ -104,8 +104,8 @@ export const useTransactionHistory = ({
                                 amount: statusData.fromAmount,
                                 toAmount: statusData.toAmount,
                                 fromToken: {
-                                    name: tokenAddressToName(statusData.fromTokenAddress, fetchedTokens) || "Unknown",
-                                    logo: tokenAddressToLogo(statusData.fromTokenAddress, fetchedTokens) || "",
+                                    name: tokenAddressToName(statusData.fromTokenAddress, fetchedTokens) || 'Unknown',
+                                    logo: tokenAddressToLogo(statusData.fromTokenAddress, fetchedTokens) || '',
                                 },
                                 toToken: {
                                     name: CONFIG.CHAIN.BASE.tokens.USDC.tokenSymbol,
@@ -123,11 +123,11 @@ export const useTransactionHistory = ({
                     }
                 }
             } catch (error) {
-                console.error("Error fetching transaction history:", error)
-                toast.error("Failed to fetch transaction history")
+                console.error('Error fetching transaction history:', error)
+                toast.error('Failed to fetch transaction history')
             }
-            dispatch({ type: "SET_HISTORY", payload: results })
-            toast.success("Transaction history fetched successfully")
+            dispatch({ type: 'SET_HISTORY', payload: results })
+            toast.success('Transaction history fetched successfully')
             return results
         },
         enabled: !!walletAddress && !!fetchedNetworks.length && !!fetchedTokens.length,

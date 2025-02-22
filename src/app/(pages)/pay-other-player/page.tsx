@@ -137,7 +137,7 @@ const PayOtherPlayerForm: React.FC<PayOtherPlayerFormProps> = ({ recipientAddres
                 <Button
                     disabled={inputValue === ''}
                     onClick={handlePayButtonClick}
-                    className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:bg-cta-active active:shadow-button-push'>
+                    className='bg-cta active:bg-cta-active mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     Pay
                 </Button>
             </div>

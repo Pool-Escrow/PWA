@@ -1,5 +1,5 @@
 import { getStatusString } from '@/app/_lib/utils/get-relative-date'
-import { POOLSTATUS } from '../_lib/definitions'
+import type { POOLSTATUS } from '../_lib/definitions'
 
 interface PoolDetailsHeadingProps {
     name: string

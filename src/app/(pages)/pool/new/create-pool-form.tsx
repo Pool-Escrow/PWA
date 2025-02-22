@@ -157,13 +157,10 @@ export default function CreatePoolForm() {
             <RetryDialog
                 open={showRetryDialog}
                 onOpenChange={open => {
-                    if (!open)
-                        handleRetryDialogClose().catch(error => {
-                            console.error('Error closing retry dialog', error)
-                        })
+                    if (!open) void handleRetryDialogClose()
                 }}
                 onRetry={handleRetry}
-                onCancel={handleRetryDialogClose}
+                onCancel={() => void handleRetryDialogClose()}
                 isDesktop={isDesktop}
             />
         </>

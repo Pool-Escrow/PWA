@@ -16,7 +16,7 @@ const UserDropdown: React.FC = (): React.JSX.Element => {
 
     return (
         <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger className='cursor-pointer rounded-full p-2 text-neutral-900 hover:bg-gray-200 focus:outline-hidden active:scale-90 active:bg-gray-300'>
+            <DropdownMenuTrigger className='focus:outline-hidden cursor-pointer rounded-full p-2 text-neutral-900 hover:bg-gray-200 active:scale-90 active:bg-gray-300'>
                 <EllipsisIcon size={24} />
             </DropdownMenuTrigger>
             {open && <div className='dropdown-backdrop' />}

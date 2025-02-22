@@ -11,12 +11,11 @@ const ACCEPTED_IMAGE_TYPES = ['image/avif', 'image/jpeg', 'image/jpg', 'image/pn
 // const price = formData.get('price') as string
 // const tokenAddress = formData.get('tokenAddress') as string
 
-const dateTimeSchema = z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Invalid date-time format. Expected format: YYYY-MM-DDTHH:MM')
+// const dateTimeSchema = z
+//     .string()
+//     .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/, 'Invalid date-time format. Expected format: YYYY-MM-DDTHH:MM')
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ethereumAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/, 'Invalid Token address format')
+// const ethereumAddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Invalid Token address format")
 
 export const CreatePoolFormSchema = z
     .object({

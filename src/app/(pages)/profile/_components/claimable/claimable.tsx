@@ -1,17 +1,15 @@
 'use client'
 
-import { useAccount } from 'wagmi'
-import { useClaimablePools } from '../../claim-winning/_components/use-claimable-pools'
-import PoolCardRow from '../../claim-winning/_components/pool-card-row'
-import { Button } from '@/app/_components/ui/button'
 import useTransactions from '@/app/_client/hooks/use-transactions'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
+import { Button } from '@/app/_components/ui/button'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { useConfetti } from '@/hooks/use-confetti'
+import { useUserInfo } from '@/hooks/use-user-info'
+import { poolAbi } from '@/types/contracts'
 import { toast } from 'sonner'
 import { getAbiItem } from 'viem'
-import { useConfetti } from '@/hooks/use-confetti'
-import { poolAbi } from '@/types/contracts'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import { useUserInfo } from '@/hooks/use-user-info'
+import PoolCardRow from '../../claim-winning/_components/pool-card-row'
+import { useClaimablePools } from '../../claim-winning/_components/use-claimable-pools'
 
 export default function ClaimablePrizes() {
     const { data: user } = useUserInfo()
@@ -76,7 +74,7 @@ export default function ClaimablePrizes() {
                         <PoolCardRow key={poolId.toString()} poolId={poolId.toString()} />
                     ))}
                 </div>
-                <Button onClick={handleClaimAll} className='mt-4 w-full'>
+                <Button onClick={() => void handleClaimAll()} className='mt-4 w-full'>
                     Claim All
                 </Button>
             </section>
