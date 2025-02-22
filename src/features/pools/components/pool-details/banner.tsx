@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 
 interface PoolDetailsCardBannerProps {
@@ -11,7 +11,6 @@ interface PoolDetailsCardBannerProps {
 
 export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: PoolDetailsCardBannerProps) {
     const [isLoaded, setIsLoaded] = useState(false)
-
     return (
         <div className='detail_card_banner relative overflow-hidden'>
             <AnimatePresence mode='wait'>
@@ -23,7 +22,11 @@ export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: P
                         scale: isLoaded ? 1 : 1.1,
                     }}
                     exit={{ opacity: 0, scale: 1.1 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{
+                        duration: 0.5,
+                        type: 'spring',
+                        bounce: 0.2,
+                    }}
                     className='relative h-full w-full'>
                     <Image
                         src={imageUrl}
@@ -36,7 +39,7 @@ export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: P
                 </motion.div>
             </AnimatePresence>
             {buttons}
-            {/* <div className='detail_card_banner_status'>{status}</div> */}
+            <div className='detail_card_banner_status'>{status}</div>
         </div>
     )
 }

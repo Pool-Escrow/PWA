@@ -20,7 +20,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                 <div className='relative size-full object-contain object-center'>
                     <Image src={props?.poolImage ?? frog.src} alt='Pool Image' width={500} height={400} />
                 </div>
-                {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity-60 text-white backdrop-blur-sm backdrop-filter md:space-y-6'>
+                {/* <div className='absolute bottom-0 flex h-full w-full flex-col items-center justify-center space-y-3 bg-black bg-opacity/60 text-white backdrop-blur-xs backdrop-filter md:space-y-6'>
                                 {timeLeft != undefined && timeLeft > 0 && (
                                     <div>
                                         <h4 className='text-xs md:text-2xl'>Starts in</h4>

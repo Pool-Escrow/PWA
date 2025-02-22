@@ -42,7 +42,7 @@ export default function ShineBorder({
                 } as React.CSSProperties
             }
             className={cn('relative rounded-[--border-radius] p-[--border-width]', className)}>
-            <div className='absolute inset-0 rounded-[--border-radius] [background-image:--background-radial-gradient] [background-size:300%_300%] motion-safe:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear]'></div>
+            <div className='absolute inset-0 rounded-[--border-radius] [background-image:--background-radial-gradient] [background-size:300%_300%] motion-safe:animate-[shine-pulse_var(--shine-pulse-duration)_infinite_linear]' />
             <div className='relative z-10 rounded-[--border-radius] bg-background'>{children}</div>
         </div>
     )

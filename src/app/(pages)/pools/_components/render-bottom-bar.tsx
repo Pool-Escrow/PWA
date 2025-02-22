@@ -1,15 +1,15 @@
 'use client'
 
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { Button } from '@/app/_components/ui/button'
+import { appActions, appStore$ } from '@/app/stores/app.store'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { use$ } from '@legendapp/state/react'
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 
 export default function RenderBottomBar() {
-    const setBottomBar = useAppStore(state => state.setBottomBarContent)
-    const isRouting = useAppStore(state => state.isRouting)
+    const isRouting = use$(appStore$.settings.isRouting)
     const { data: isAdmin, isLoading } = useQuery({
         queryKey: ['userAdminStatus'],
         queryFn: () => getUserAdminStatusActionWithCookie(),
@@ -17,19 +17,19 @@ export default function RenderBottomBar() {
 
     useEffect(() => {
         if (isAdmin && !isRouting) {
-            setBottomBar(
+            appActions.setBottomBarContent(
                 <Button
                     data-testid='create-pool-button'
                     asChild
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                    className='btn-cta active:bg-cta-active mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                     <Link href='/pool/new'>Create Pool</Link>
                 </Button>,
             )
         }
         return () => {
-            setBottomBar(null)
+            appActions.setBottomBarContent(null)
         }
-    }, [isAdmin, setBottomBar, isRouting])
+    }, [isAdmin, isRouting])
 
     if (isLoading) return null
 

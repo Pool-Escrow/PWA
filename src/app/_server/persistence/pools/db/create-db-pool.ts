@@ -1,7 +1,6 @@
 import 'server-only'
 
 import { db } from '@/app/_server/database/db'
-import { processImage } from '@/app/_server/lib/utils/process-image'
 import type { Address } from 'viem'
 import { uploadBannerImageToStorage } from '../storage/upload-banner-image'
 
@@ -50,7 +49,7 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
     let bannerImageUrl: string | undefined
 
     if (data.bannerImage) {
-        const processedBuffer = await processImage(data.bannerImage, 1024, 512)
+        // const processedBuffer = await processImage(data.bannerImage, 1024, 512)
         bannerImageUrl = await uploadBannerImageToStorage(poolId, data.bannerImage)
     }
 
@@ -58,7 +57,7 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
     const { error: updateError } = await db
         .from('pools')
         .update({ bannerImage: bannerImageUrl })
-        .eq('internal_id', poolId)
+        .eq('internal_id', Number(poolId))
 
     if (updateError) {
         throw new Error(`Error updating bannerImage in database: ${updateError.message}`)

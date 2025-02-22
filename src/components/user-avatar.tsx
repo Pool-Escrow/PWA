@@ -2,16 +2,16 @@
 
 import { Avatar, AvatarImage } from '@/app/_components/ui/avatar'
 import { useUserInfo } from '@/hooks/use-user-info'
-import { User, Loader2 } from 'lucide-react'
+import { Loader2, User } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
 
 export default function UserAvatar() {
     const { data: userInfo, isLoading } = useUserInfo()
 
     return (
-        <Avatar className='relative size-10 cursor-pointer overflow-hidden' aria-label='Go to Profile' asChild>
-            <Link href={'/profile'}>
+        <Avatar className='relative size-8 cursor-pointer overflow-hidden' aria-label='Go to Profile' asChild>
+            <Link href='/profile' prefetch>
                 <AnimatePresence mode='wait'>
                     {isLoading ? (
                         <motion.div
@@ -19,7 +19,11 @@ export default function UserAvatar() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
+                            transition={{
+                                type: 'spring',
+                                bounce: 0.2,
+                                duration: 0.2,
+                            }}
                             className='absolute inset-0 flex items-center justify-center bg-neutral-200'>
                             <Loader2 className='animate-spin text-blue-500' />
                         </motion.div>
@@ -29,7 +33,11 @@ export default function UserAvatar() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{
+                                type: 'spring',
+                                bounce: 0.2,
+                                duration: 0.3,
+                            }}
                             className='absolute inset-0'>
                             <AvatarImage
                                 alt='user avatar'
@@ -44,7 +52,11 @@ export default function UserAvatar() {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.8 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{
+                                type: 'spring',
+                                bounce: 0.2,
+                                duration: 0.3,
+                            }}
                             className='absolute inset-0 flex items-center justify-center bg-neutral-100'>
                             <User className='text-blue-500' />
                         </motion.div>

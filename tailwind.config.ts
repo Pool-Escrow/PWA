@@ -1,8 +1,9 @@
 import type { Config } from 'tailwindcss'
+import plugin from 'tailwindcss/plugin'
 
 const config: Config = {
     content: ['./src/**/*.tsx'],
-    darkMode: ['class'],
+    darkMode: ['class', '[data-mode="dark"]'],
     // prefix: '',
     theme: {
         container: {
@@ -19,7 +20,7 @@ const config: Config = {
                 'skeleton-pulse': 'skeleton-fade-in 0.8s ease-out forwards, skeleton-shimmer 2s infinite linear',
             },
             backgroundImage: {
-                cta: 'linear-gradient(180deg, #36a0f7, #1364da)',
+                // Remove the gradient definitions from backgroundImage
             },
             borderRadius: {
                 lg: 'var(--radius)',
@@ -141,9 +142,33 @@ const config: Config = {
                 128: '32rem',
                 256: '64rem',
             },
+            gradientColorStops: ({ theme }) =>
+                ({
+                    ...theme('colors'),
+                    'cta-start': '#36a0f7',
+                    'cta-end': '#1364da',
+                    'cta-active-start': '#2b80c5',
+                    'cta-active-end': '#0f50af',
+                }) as Record<string, string>,
         },
     },
-    plugins: [require('tailwindcss-animate'), require('tailwindcss-safe-area')],
+    plugins: [
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require('tailwindcss-animate'),
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        require('tailwindcss-safe-area'),
+        plugin(function ({
+            addUtilities,
+        }: {
+            addUtilities: (utilities: Record<string, Record<string, string>>) => void
+        }): void {
+            addUtilities({
+                '.overflow-scrolling-touch': {
+                    '-webkit-overflow-scrolling': 'touch',
+                },
+            })
+        }),
+    ],
 }
 
 export default config

@@ -1,14 +1,14 @@
 'use server'
 
+import { verifyToken } from '@/app/_server/auth/privy'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { verifyParticipantInContract } from '@/app/_server/blockchain/verify-participant'
 import { db } from '@/app/_server/database/db'
 import { createPoolUseCase } from '@/app/_server/use-cases/pools/create-pool'
-import { CreatePoolFormSchema } from './_lib/definitions'
-import { verifyToken } from '@/app/_server/auth/privy'
-import { getUserAddressAction } from '../../pools/actions'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { fromZonedTime } from 'date-fns-tz'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
-import { verifyParticipantInContract } from '@/app/_server/blockchain/verify-participant'
+import { fromZonedTime } from 'date-fns-tz'
+import { getUserAddressAction } from '../../pools/actions'
+import { CreatePoolFormSchema } from './_lib/definitions'
 
 type FormState = {
     message?: string
@@ -152,7 +152,7 @@ export async function updatePoolStatus(
         throw new Error('User is not authorized to delete pools')
     }
 
-    const { error } = await db.from('pools').update({ status, contract_id }).eq('internal_id', poolId)
+    const { error } = await db.from('pools').update({ status, contract_id }).eq('internal_id', Number(poolId))
 
     if (error) throw error
 
@@ -203,14 +203,14 @@ export async function deletePool(poolId: string) {
         throw new Error('User is not authorized to delete pools')
     }
 
-    const { error: deleteError } = await db.from('pools').delete().eq('internal_id', poolId)
+    const { error: deleteError } = await db.from('pools').delete().eq('internal_id', Number(poolId))
 
     if (deleteError) {
         console.error('Error deleting pool:', deleteError)
         throw new Error('Failed to delete pool')
     }
 
-    const { error: participantDeleteError } = await db.from('pool_participants').delete().eq('pool_id', poolId)
+    const { error: participantDeleteError } = await db.from('pool_participants').delete().eq('pool_id', Number(poolId))
 
     if (participantDeleteError) {
         console.error('Error deleting pool participants:', participantDeleteError)
@@ -243,7 +243,7 @@ export async function addParticipantToPool(poolId: string, userAddress: string):
     const { data: existingParticipant, error: participantCheckError } = await db
         .from('pool_participants')
         .select('*')
-        .eq('pool_id', poolId)
+        .eq('pool_id', Number(poolId))
         .eq('user_id', user.id)
         .single()
 

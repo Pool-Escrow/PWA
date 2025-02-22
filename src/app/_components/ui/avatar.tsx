@@ -5,7 +5,7 @@ import * as AvatarPrimitive from '@radix-ui/react-avatar'
 import { forwardRef } from 'react'
 
 const Avatar = forwardRef<
-    React.ElementRef<typeof AvatarPrimitive.Root>,
+    React.ComponentRef<typeof AvatarPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
 >(({ className, ...props }, ref) => (
     <AvatarPrimitive.Root
@@ -17,7 +17,7 @@ const Avatar = forwardRef<
 Avatar.displayName = AvatarPrimitive.Root.displayName
 
 const AvatarImage = forwardRef<
-    React.ElementRef<typeof AvatarPrimitive.Image>,
+    React.ComponentRef<typeof AvatarPrimitive.Image>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>
 >(({ className, ...props }, ref) => (
     <AvatarPrimitive.Image ref={ref} className={cn('aspect-square h-full w-full object-cover', className)} {...props} />
@@ -25,7 +25,7 @@ const AvatarImage = forwardRef<
 AvatarImage.displayName = AvatarPrimitive.Image.displayName
 
 const AvatarFallback = forwardRef<
-    React.ElementRef<typeof AvatarPrimitive.Fallback>,
+    React.ComponentRef<typeof AvatarPrimitive.Fallback>,
     React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>
 >(({ className, ...props }, ref) => (
     <AvatarPrimitive.Fallback

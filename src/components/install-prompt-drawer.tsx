@@ -1,26 +1,33 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Drawer } from '@/app/_components/ui/drawer'
 import { Button } from '@/app/_components/ui/button'
+import { Drawer } from '@/app/_components/ui/drawer'
+import { useEffect, useState } from 'react'
+
+// Definir la interfaz para el evento BeforeInstallPromptEvent
+interface BeforeInstallPromptEvent extends Event {
+    prompt: () => Promise<void>
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+}
 
 export default function InstallPromptDrawer() {
     const [isOpen, setIsOpen] = useState(false)
     const [isIOS, setIsIOS] = useState(false)
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
     const [isStandalone, setIsStandalone] = useState(false)
 
     useEffect(() => {
-        const handleBeforeInstallPrompt = (e: Event) => {
+        const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
             e.preventDefault()
             setDeferredPrompt(e)
             setIsOpen(true)
         }
 
-        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream)
+        // Usar una verificación más moderna para iOS
+        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !('standalone' in navigator))
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
 
-        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener)
 
         // Trigger for desktop browsers that don't support beforeinstallprompt
         if (!isStandalone && !isIOS && !deferredPrompt) {
@@ -28,21 +35,29 @@ export default function InstallPromptDrawer() {
         }
 
         return () => {
-            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener)
         }
     }, [isStandalone, isIOS, deferredPrompt])
 
-    const handleInstall = () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt()
-            deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+    const handleInstall = async () => {
+        try {
+            if (deferredPrompt) {
+                await deferredPrompt.prompt()
+                const choiceResult = await deferredPrompt.userChoice
                 if (choiceResult.outcome === 'accepted') {
                     console.log('User accepted the install prompt')
                 }
                 setDeferredPrompt(null)
-            })
+            }
+            setIsOpen(false)
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('Error handling install prompt:', error.message)
+            } else {
+                console.error('Error handling install prompt: Unknown error')
+            }
+            setIsOpen(false)
         }
-        setIsOpen(false)
     }
 
     if (isStandalone) return null
@@ -62,7 +77,7 @@ export default function InstallPromptDrawer() {
                                 {' '}
                                 ⎋{' '}
                             </span>
-                            and then "Add to Home Screen"
+                            and then &quot;Add to Home Screen&quot;
                             <span role='img' aria-label='plus icon'>
                                 {' '}
                                 ➕{' '}
@@ -71,8 +86,8 @@ export default function InstallPromptDrawer() {
                         </p>
                     ) : (
                         <Button
-                            onClick={handleInstall}
-                            className='w-full rounded-[2rem] bg-cta text-center font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                            onClick={() => void handleInstall()}
+                            className='btn-cta w-full rounded-[2rem] text-center font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                             Add to Home Screen
                         </Button>
                     )}

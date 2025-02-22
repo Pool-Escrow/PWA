@@ -15,7 +15,6 @@ import {
 
 import { Input } from '@/app/_components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
-import _ from 'lodash'
 import { ShareIcon } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -106,7 +105,7 @@ function ShareForm({ className }: React.ComponentProps<'form'>) {
     return (
         <div className={cn('my-8 flex flex-col space-y-10', className)}>
             <div className='flex h-60 w-full flex-col items-center justify-center'>
-                {!_.isEmpty(poolId) && (
+                {poolId !== '0' && (
                     <QRCode
                         size={256}
                         style={{ height: 'auto', maxWidth: '100%', width: '100%' }}

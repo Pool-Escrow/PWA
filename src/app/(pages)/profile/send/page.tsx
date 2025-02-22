@@ -9,7 +9,7 @@ export default function ProfileLayout() {
                 backButton: true,
                 title: 'Send',
             }}>
-            <div className='flex flex-1 flex-col gap-3'>
+            <div className='flex flex-1 flex-col gap-3 pt-4'>
                 <ProfileBalanceSection />
                 <AmountSection />
             </div>

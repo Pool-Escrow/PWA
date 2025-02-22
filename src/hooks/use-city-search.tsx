@@ -1,12 +1,21 @@
-import { useState, useEffect, useMemo } from 'react'
-import { debounce } from 'lodash'
+import type { City } from '@/lib/utils/cities'
+import { allCities, commonCities, featuredCities } from '@/lib/utils/cities'
 import Fuse from 'fuse.js'
-import { allCities, commonCities, featuredCities, City } from '@/lib/utils/cities'
+import { useEffect, useMemo, useState } from 'react'
 
 const fuse = new Fuse(allCities, {
     keys: ['label', 'country', 'countryCode'],
     threshold: 0.3,
 })
+
+function debounce<T extends (...args: string[]) => unknown>(func: T, wait: number): (...args: Parameters<T>) => void {
+    let timeout: NodeJS.Timeout | null = null
+
+    return (...args: Parameters<T>) => {
+        if (timeout) clearTimeout(timeout)
+        timeout = setTimeout(() => func(...args), wait)
+    }
+}
 
 export function useCitySearch(searchTerm: string) {
     const [results, setResults] = useState<City[]>([...featuredCities, ...commonCities])
@@ -39,7 +48,8 @@ export function useCitySearch(searchTerm: string) {
         debouncedSearch(searchTerm)
 
         return () => {
-            debouncedSearch.cancel()
+            // Cambiar el .cancel() por una función vacía ya que nuestra implementación no necesita cancel
+            // debouncedSearch.cancel()
         }
     }, [searchTerm, debouncedSearch])
 

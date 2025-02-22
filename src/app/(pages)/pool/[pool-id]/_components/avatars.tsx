@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar
 import { formatNumberToMetric } from '@/app/_lib/utils/numbers'
 import { cn } from '@/lib/utils/tailwind'
 import { blo } from 'blo'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 interface AvatarsProps {
     className?: string

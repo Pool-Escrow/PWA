@@ -1,10 +1,10 @@
 import 'server-only'
 
-import { cookies } from 'next/headers'
 import { PrivyClient } from '@privy-io/server-auth'
+import { cookies } from 'next/headers'
 
 import type { User } from '@privy-io/server-auth'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
 const privyAppSecret = process.env.PRIVY_APP_SECRET
@@ -22,7 +22,8 @@ export const getPrivyVerificationKey = async () => {
 export const verifyToken = async (): Promise<User | undefined> => {
     try {
         // 1. Get the token from the cookies
-        const accessToken = cookies().get('privy-token')?.value
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get('privy-token')?.value
         if (!accessToken) {
             console.log('No privy-token cookie found')
             return undefined

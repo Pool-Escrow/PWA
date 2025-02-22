@@ -13,7 +13,7 @@ const network = process.env.NEXT_PUBLIC_NETWORK || 'development'
 const chainConfig = {
     mainnet: base,
     testnet: baseSepolia,
-    development: baseSepolia,
+    development: base,
 }
 
 const chain = chainConfig[network as keyof typeof chainConfig]
@@ -52,14 +52,14 @@ export default {
         //     getCustomAccessToken: async () => '',
         //     isLoading: false
         // },
-        // embeddedWallets: {
-        //     createOnLogin: 'users-without-wallets',
-        //     noPromptOnSignature: true,
-        //     priceDisplay: {
-        //         primary: 'native-token',
-        //         secondary: '',
-        //     },
-        // },
+        embeddedWallets: {
+            createOnLogin: 'users-without-wallets',
+            showWalletUIs: true,
+            priceDisplay: {
+                primary: 'native-token',
+                secondary: null,
+            },
+        },
         loginMethodsAndOrder: {
             primary: [
                 'coinbase_wallet',

@@ -9,7 +9,13 @@ interface UserItem {
 }
 
 export async function updateUserInDb(userPrivyId: string, data: UserItem) {
-    const updateData: any = {}
+    // Define correct types for database update
+    interface DbUpdateData {
+        displayName?: string | null
+        avatar?: string | null
+    }
+
+    const updateData: DbUpdateData = {}
 
     if (data.displayName !== undefined) {
         updateData.displayName = data.displayName
@@ -17,15 +23,17 @@ export async function updateUserInDb(userPrivyId: string, data: UserItem) {
 
     if (data.avatar !== undefined) {
         if (data.avatar instanceof File) {
-            updateData.avatar = await uploadAvatarToStorage(userPrivyId, data.avatar)
+            // Upload avatar and store URL
+            const avatarUrl = await uploadAvatarToStorage(userPrivyId, data.avatar)
+            updateData.avatar = avatarUrl
         } else if (data.avatar === null) {
+            // Clear avatar
             updateData.avatar = null
         }
-        // If data.avatar is undefined, we don't update the avatar field
     }
 
     if (Object.keys(updateData).length > 0) {
-        const { error } = await db.from('users').update(updateData).eq('privyId', userPrivyId)
+        const { error } = await db.from('users').update(updateData).eq('privyId', userPrivyId).single()
 
         if (error) {
             throw new Error(`Error updating user in database: ${error.message}`)

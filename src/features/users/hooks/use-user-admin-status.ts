@@ -1,7 +1,3 @@
-import { usePrivy } from '@privy-io/react-auth'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getUserAdminStatusActionWithToken } from '../actions'
-
 export function useUserAdminStatus() {
     // const { getAccessToken, authenticated, ready } = usePrivy()
     // const queryClient = useQueryClient()

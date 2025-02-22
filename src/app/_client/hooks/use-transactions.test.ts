@@ -1,8 +1,4 @@
-import { renderHook, act } from '@testing-library/react-hooks'
-import { useAccount } from 'wagmi'
-import { useWriteContracts, useCapabilities } from 'wagmi/experimental'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import useTransactions from './use-transactions'
+import { beforeEach, describe, it, vi } from 'vitest'
 
 // Mock the dependencies
 vi.mock('wagmi')

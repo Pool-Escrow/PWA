@@ -1,9 +1,9 @@
 import 'server-only'
 
+import type { TokenBalance } from '@/app/_lib/entities/models/token-balance'
 import { getBalance } from '@wagmi/core'
 import type { Address } from 'viem'
 import { currentPoolAddress, serverConfig } from '../../../blockchain/server-config'
-import { TokenBalance } from '@/app/_lib/entities/models/token-balance'
 
 export async function getAddressBalance(address: string): Promise<TokenBalance | undefined> {
     try {

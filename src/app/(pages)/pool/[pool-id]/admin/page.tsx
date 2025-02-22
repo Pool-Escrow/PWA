@@ -197,7 +197,7 @@ const AdminPoolPage = () => {
         //                                 <Image src={defaultPoolImage.src} alt='Pool Image' fill />
         //                             )}
         //                         </div>
-        //                         <div className='absolute bottom-0 flex size-full flex-col items-center justify-center space-y-3 bg-black bg-opacity-60 text-white backdrop-blur-sm md:space-y-6'>
+        //                         <div className='absolute bottom-0 flex size-full flex-col items-center justify-center space-y-3 bg-black bg-opacity/60 text-white backdrop-blur-xs md:space-y-6'>
         //                             {timeLeft != undefined && timeLeft > 0 && (
         //                                 <div>
         //                                     <h4 className='text-xs md:text-2xl'>Starts in</h4>
@@ -210,7 +210,7 @@ const AdminPoolPage = () => {
         //                         <div className='absolute right-2 top-0 flex h-full w-10 flex-col items-center space-y-3 py-4 text-white md:right-4 md:w-20 md:space-y-5 md:py-6'>
         //                             <Link
         //                                 href={`${pageUrl}/checkin-scan` as any}
-        //                                 className='size-8 rounded-full bg-black bg-opacity-40 p-2 md:size-14 md:p-3'>
+        //                                 className='size-8 rounded-full bg-black bg-opacity/40 p-2 md:size-14 md:p-3'>
         //                                 <Image
         //                                     className='flex size-full'
         //                                     src={qrCodeIcon.src}
@@ -223,7 +223,7 @@ const AdminPoolPage = () => {
         //                             <button
         //                                 title='Edit Pool'
         //                                 type='button'
-        //                                 className='size-8 rounded-full bg-black bg-opacity-40 p-2 md:size-14 md:p-3'>
+        //                                 className='size-8 rounded-full bg-black bg-opacity/40 p-2 md:size-14 md:p-3'>
         //                                 <Image className='flex size-full' src={editIcon.src} fill alt='Edit Icon' />
         //                             </button>
         //                         </div>
@@ -284,7 +284,7 @@ const AdminPoolPage = () => {
         //                         <button
         //                             title='Enable Deposit'
         //                             type='button'
-        //                             className={`focus:shadow-outline flex h-12 flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-center font-bold text-white focus:outline-none`}
+        //                             className={`focus:shadow-outline flex h-12 flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-center font-bold text-white focus:outline-hidden`}
         //                             onClick={onEnableDepositButtonClicked}>
         //                             Enable Deposit
         //                         </button>
@@ -295,7 +295,7 @@ const AdminPoolPage = () => {
         //                         <button
         //                             title='Start Pool'
         //                             type='button'
-        //                             className={`focus:shadow-outline flex h-12 flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-center font-bold text-white focus:outline-none`}
+        //                             className={`focus:shadow-outline flex h-12 flex-1 items-center justify-center rounded-full bg-black px-4 py-2 text-center font-bold text-white focus:outline-hidden`}
         //                             onClick={onStartPoolButtonClicked}>
         //                             Start Pool
         //                         </button>
@@ -306,7 +306,7 @@ const AdminPoolPage = () => {
         //                         <button
         //                             title='End Pool'
         //                             type='button'
-        //                             className={`focus:shadow-outline h-12 w-full rounded-full bg-black px-4 py-2 font-bold text-white focus:outline-none`}
+        //                             className={`focus:shadow-outline h-12 w-full rounded-full bg-black px-4 py-2 font-bold text-white focus:outline-hidden`}
         //                             onClick={onEndPoolButtonClicked}>
         //                             End Pool
         //                         </button>

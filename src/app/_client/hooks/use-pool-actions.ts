@@ -1,27 +1,33 @@
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { useAuth } from './use-auth'
 import useTransactions from '@/app/_client/hooks/use-transactions'
+import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
+import { approve } from '@/app/_lib/blockchain/functions/token/approve'
+import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
-import type { Address, Hash } from 'viem'
-import { getAbiItem, parseUnits } from 'viem'
-import { toast } from 'sonner'
-import { approve } from '@/app/_lib/blockchain/functions/token/approve'
-import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
-import { useReadContract } from 'wagmi'
-import { useWaitForTransactionReceipt } from 'wagmi'
-import { useState, useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import type { Address, Hash } from 'viem'
+import { parseUnits } from 'viem'
+import { useReadContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAuth } from './use-auth'
 
-export function usePoolActions(
-    poolId: string,
-    poolPrice: number,
-    tokenDecimals: number,
-    openOnRampDialog: () => void,
-    onSuccessfulJoin: () => void,
-) {
-    // console.log('🔄 [usePoolActions] Initializing with poolId:', poolId)
+type UsePoolActionsProps = {
+    poolId: string
+    poolPrice: number
+    tokenDecimals: number
+    openOnRampDialog: () => void
+    onSuccessfulJoin: () => void
+}
 
+export function usePoolActions({
+    poolId,
+    poolPrice,
+    tokenDecimals,
+    openOnRampDialog,
+    onSuccessfulJoin,
+}: UsePoolActionsProps) {
     const { login, authenticated } = useAuth()
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
     const { wallets } = useWallets()
@@ -77,6 +83,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Deposits enabled successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error enabling deposits:', error)
+            })
     }
 
     const handleStartPool = () => {
@@ -100,6 +112,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Pool started successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error starting pool:', error)
+            })
     }
 
     const handleEndPool = () => {
@@ -135,6 +153,12 @@ export function usePoolActions(
                 },
             },
         )
+            .then(() => {
+                console.log('🔄 [usePoolActions] Pool ended successfully!')
+            })
+            .catch(error => {
+                console.error('❌ [usePoolActions] Error ending pool:', error)
+            })
     }
 
     useEffect(() => {
@@ -149,7 +173,7 @@ export function usePoolActions(
         }
     }, [result.error])
 
-    const handleJoinPool = async () => {
+    const handleJoinPool = () => {
         console.log('🎯 [usePoolActions] Join pool button clicked')
 
         if (!isReady) {
@@ -167,9 +191,8 @@ export function usePoolActions(
             console.error('❌ [usePoolActions] No wallet address available')
             return
         }
-
         console.log('💰 [usePoolActions] Checking funds...')
-        const bigIntPrice = parseUnits(poolPrice.toString(), tokenDecimals)
+        const bigIntPrice = parseUnits(poolPrice.toFixed(20), tokenDecimals)
         console.log('💵 [usePoolActions] Required amount:', bigIntPrice.toString())
         console.log('💵 [usePoolActions] User balance:', userBalance?.toString())
 
@@ -195,9 +218,11 @@ export function usePoolActions(
             ]
             console.log('📝 [usePoolActions] Transaction payload:', transactions)
 
-            await executeTransactions(transactions, {
+            executeTransactions(transactions, {
                 type: 'JOIN_POOL',
                 onSuccess: onSuccessfulJoin,
+            }).catch(error => {
+                console.error('❌ [usePoolActions] Error joining pool:', error)
             })
 
             if (result.hash) {

@@ -1,6 +1,6 @@
 // src/app/pwa/_client/stores/pool-creation-store.ts
-import { create } from 'zustand'
 import { toast } from 'sonner'
+import { create } from 'zustand'
 
 export enum Steps {
     Initial = 'initial',
@@ -39,7 +39,7 @@ interface PoolCreationState {
     showToast: (options: ToastOptions) => void
 }
 
-export const usePoolCreationStore = create<PoolCreationState>((set, get) => ({
+export const usePoolCreationStore = create<PoolCreationState>((set, _get) => ({
     step: Steps.Initial,
     internalPoolId: null,
     onChainPoolId: null,

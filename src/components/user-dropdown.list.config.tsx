@@ -1,9 +1,9 @@
-import { LogOutIcon, PlusIcon, SendIcon, UndoIcon, UserIcon } from 'lucide-react'
+import { ArrowLeftRight, LogOutIcon, PlusIcon, SendIcon, UndoIcon, UserIcon } from 'lucide-react'
 import type { LinkProps } from 'next/link'
 
 interface DropdownItemConfig {
     href?: LinkProps<unknown>['href']
-    icon: JSX.Element
+    icon: React.JSX.Element
     label: string
     onClick?: () => Promise<void> | void
     showSeparator?: boolean
@@ -18,6 +18,11 @@ export const dropdownItemsConfig: DropdownItemConfig[] = [
     {
         icon: <PlusIcon />,
         label: 'Deposit',
+    },
+    {
+        label: 'Cross-swap',
+        icon: <ArrowLeftRight />,
+        href: '/profile/cross-swap',
     },
     {
         icon: <SendIcon />,

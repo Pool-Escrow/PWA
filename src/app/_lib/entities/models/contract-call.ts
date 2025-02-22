@@ -1,4 +1,4 @@
-import { Abi, Address } from 'viem'
+import type { Abi, Address } from 'viem'
 
 export type ContractCall = {
     address: Address

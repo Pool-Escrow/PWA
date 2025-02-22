@@ -1,13 +1,14 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { getAbiItem, Hash } from 'viem'
-import { useWaitForTransactionReceipt } from 'wagmi'
-import { toast } from 'sonner'
-import { poolAbi } from '@/types/contracts'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import useTransactions from '@/app/_client/hooks/use-transactions'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
+import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import type { Hash } from 'viem'
+import { getAbiItem } from 'viem'
+import { useWaitForTransactionReceipt } from 'wagmi'
 
 export function useSetWinners(poolId: string) {
     const { executeTransactions, result } = useTransactions()
@@ -59,8 +60,14 @@ export function useSetWinners(poolId: string) {
         if (isConfirmed && result.hash && result.hash !== lastConfirmedHash) {
             toast.success('Successfully set payouts')
             clearPoolPayouts(poolId)
-            queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
-            queryClient.invalidateQueries({ queryKey: ['poolDetails', poolId, getConfig().state.chainId] })
+            queryClient.invalidateQueries({ queryKey: ['participants', poolId] }).catch(error => {
+                console.error('Error invalidating participants', error)
+            })
+            queryClient
+                .invalidateQueries({ queryKey: ['poolDetails', poolId, getConfig().state.chainId] })
+                .catch(error => {
+                    console.error('Error invalidating pool details', error)
+                })
             setLastConfirmedHash(result.hash)
         }
 

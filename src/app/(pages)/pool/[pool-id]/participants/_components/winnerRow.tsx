@@ -11,7 +11,6 @@ export default function WinnerRow() {
 // import { fetchUserDisplayForAddress } from '@/lib/api/clientAPI'
 // import { useQuery } from '@tanstack/react-query'
 // import { ethers } from 'ethers'
-// import * as _ from 'lodash'
 // import Image from 'next/image'
 // import Link from 'next/link'
 // import { ParticipantStatus } from './participantRow'

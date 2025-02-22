@@ -4,13 +4,13 @@
  */
 
 export interface MyPoolsTab {
-    id: 'upcoming' | 'past'
-    name: 'Upcoming' | 'Past'
+    id: 'active' | 'past'
+    name: 'Active' | 'Past'
 }
 
 export type MyPoolsTabsConfig = MyPoolsTab[]
 
 export const myPoolsTabsConfig: MyPoolsTabsConfig = [
-    { id: 'upcoming', name: 'Upcoming' },
+    { id: 'active', name: 'Active' },
     { id: 'past', name: 'Past' },
 ]

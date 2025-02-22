@@ -6,29 +6,38 @@
 
 'use client'
 
-import type { Variants } from 'framer-motion'
-import { motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+import useTransactions from '@/app/_client/hooks/use-transactions'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
+import { motion, type Variants } from 'motion/react'
+import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { getAbiItem } from 'viem'
 import RegisteredDropdownItem from './registered-dropdown.item'
 import type { RegisteredDropdownItemConfig } from './registered-dropdown.list.config'
 import { dropdownItemsConfig } from './registered-dropdown.list.config'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { poolAbi } from '@/types/contracts'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 
 /**
- * Variants for the dropdown menu animation using framer-motion.
+ * Variants for the dropdown menu animation using motion/react.
  */
 const menuVariants: Variants = {
     closed: {
         opacity: 0,
-        transition: { when: 'afterChildren', staggerChildren: 0.1 },
+        transition: {
+            when: 'afterChildren',
+            staggerChildren: 0.1,
+            type: 'spring',
+            bounce: 0.2,
+        },
     },
     open: {
         opacity: 1,
-        transition: { when: 'beforeChildren', staggerChildren: 0.1 },
+        transition: {
+            when: 'beforeChildren',
+            staggerChildren: 0.1,
+            type: 'spring',
+            bounce: 0.2,
+        },
     },
 }
 
@@ -41,12 +50,12 @@ const itemVariants: Variants = {
  * UserDropdownList component renders a list of dropdown items in the user menu.
  *
  * @component
- * @returns {JSX.Element} The rendered user dropdown list.
+ * @returns {React.JSX.Element} The rendered user dropdown list.
  */
 const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolId: string }> = ({
     setOpen,
     poolId,
-}): JSX.Element => {
+}): React.JSX.Element => {
     const [hoveredItemIndex, setHoveredItemIndex] = useState<number | null>(null)
     const dropdownListRef = useRef<HTMLDivElement | null>(null)
     const { executeTransactions, isPending, isConfirmed } = useTransactions()
@@ -74,7 +83,9 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
                     console.log('Successfully unregistered from pool')
                 },
             },
-        )
+        ).catch(error => {
+            console.log('unregisterPool Error', error)
+        })
     }
 
     /**

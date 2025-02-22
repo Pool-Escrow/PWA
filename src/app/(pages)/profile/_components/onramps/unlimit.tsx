@@ -36,7 +36,7 @@ export default function Unlimit(props: UnlimitProps) {
         if (overlayInstance.current) {
             overlayInstance.current?.destroy()
             if (!isOverlayVisible) {
-                setOpen && setOpen(false)
+                setOpen?.(false)
                 overlayInstance.current?.show()
                 setIsOverlayVisible(true)
             }
@@ -56,7 +56,7 @@ export default function Unlimit(props: UnlimitProps) {
                     amount: amount || '0',
                 },
             })
-            setOpen && setOpen(false)
+            setOpen?.(false)
             overlayInstance.current?.show()
             setIsOverlayVisible(true)
         }

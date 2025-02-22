@@ -1,11 +1,12 @@
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { getUserAddressAction } from '@/app/(pages)/pools/actions'
+import { getPoolDateOverride } from '@/app/_lib/utils/get-pool-date-override'
 import { getPoolInfo, getWinnerDetail } from '@/lib/contract/pool'
 import { getTokenDecimals, getTokenSymbol } from '@/lib/contract/token'
 import { fromUnixTime } from 'date-fns'
-import { Address, formatUnits } from 'viem'
-import { getPoolDateOverride } from '@/app/_lib/utils/get-pool-date-override'
+import type { Address } from 'viem'
+import { formatUnits } from 'viem'
 import { z } from 'zod'
 
 const PoolDetailsSchema = z.object({
@@ -37,7 +38,7 @@ const PoolDetailsSchema = z.object({
     poolBalance: z.number(),
 })
 
-type PoolDetails = z.infer<typeof PoolDetailsSchema>
+// type PoolDetails = z.infer<typeof PoolDetailsSchema>
 
 export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: string[] }) {
     const address = await getUserAddressAction()
@@ -76,7 +77,7 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
     let claimableAmount = '0'
 
     if (address && contractInfo.participants.includes(address)) {
-        if (contractInfo.status === POOLSTATUS.ENDED) {
+        if (contractInfo.status === Number(POOLSTATUS.ENDED)) {
             const winnerDetail = (await getWinnerDetail(poolId, address)) || {
                 amountWon: BigInt(0),
                 amountClaimed: BigInt(0),
@@ -116,7 +117,7 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
         tokenDecimals: contractInfo.tokenDecimals,
         status: contractInfo.status,
         imageUrl: poolInfo.bannerImage,
-        winnerTitle: contractInfo.status === POOLSTATUS.ENDED ? 'Winner' : undefined,
+        winnerTitle: contractInfo.status === Number(POOLSTATUS.ENDED) ? 'Winner' : undefined,
         softCap: poolInfo.softCap,
         description: poolInfo.description,
         termsUrl: poolInfo.termsURL || undefined,
@@ -140,7 +141,7 @@ export async function getContractPoolInfo(poolId: string) {
     }
 
     // TODO: fetch host name from poolAdmin address instead of pool_participants
-    const [poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
+    const [, /*poolAdmin,*/ poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
 
     const tokenDecimals = await getTokenDecimals(poolToken)
     const tokenSymbol = await getTokenSymbol(poolToken)
@@ -168,7 +169,7 @@ export async function getPool(poolId: string) {
     return db
         .from('pools')
         .select('termsURL, description, softCap, bannerImage, required_acceptance')
-        .eq('contract_id', poolId)
+        .eq('contract_id', Number(poolId))
         .single()
 }
 
@@ -176,7 +177,7 @@ export async function getHostName(poolId: string) {
     return db
         .from('pool_participants')
         .select('users(displayName, walletAddress)')
-        .eq('pool_id', poolId)
+        .eq('pool_id', Number(poolId))
         .eq('poolRole', 'mainHost')
         .single()
 }

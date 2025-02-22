@@ -1,10 +1,10 @@
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import 'server-only'
 import { getContractPools } from '../../persistence/pools/blockchain/get-contract-pools'
 import { getDbPools } from '../../persistence/pools/db/get-db-pools'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
 
 const statusMap: Record<number, string> = {
-    0: 'INACTIVE',
+    0: 'UPCOMING',
     1: 'DEPOSIT_ENABLED',
     2: 'STARTED',
     3: 'ENDED',

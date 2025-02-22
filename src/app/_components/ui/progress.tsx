@@ -5,7 +5,7 @@ import * as ProgressPrimitive from '@radix-ui/react-progress'
 import { forwardRef } from 'react'
 
 const Progress = forwardRef<
-    React.ElementRef<typeof ProgressPrimitive.Root>,
+    React.ComponentRef<typeof ProgressPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & { indicatorClassName?: string }
 >(({ className, value, indicatorClassName, ...props }, ref) => (
     <ProgressPrimitive.Root

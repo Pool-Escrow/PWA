@@ -12,9 +12,11 @@ export default function UpcomingPools() {
     }
 
     return (
-        <>
-            <h1 className='mb-4 text-lg font-semibold'>Upcoming Pools</h1>
-            {isLoading ? <PoolsSkeleton length={8} /> : <PoolList pools={pools} name='feed' />}
-        </>
+        <div className={'detail_card_bg rounded-[2rem] p-3 pt-[18px]'}>
+            <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
+            <div className='mt-4'>
+                {isLoading ? <PoolsSkeleton length={8} /> : <PoolList pools={pools} name='feed' />}
+            </div>
+        </div>
     )
 }

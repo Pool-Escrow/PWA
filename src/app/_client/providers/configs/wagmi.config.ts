@@ -1,14 +1,14 @@
-import { cookieStorage, createStorage, http } from 'wagmi'
-import { base, baseSepolia } from 'viem/chains'
 import { createConfig } from '@privy-io/wagmi'
-import { Transport } from 'viem'
+import type { Transport } from 'viem'
+import { base, baseSepolia } from 'viem/chains'
+import { cookieStorage, createStorage, http } from 'wagmi'
 
 const network = process.env.NEXT_PUBLIC_NETWORK || 'development'
 
 const chainConfig = {
     mainnet: base,
     testnet: baseSepolia,
-    development: baseSepolia,
+    development: base,
 }
 
 const chain = chainConfig[network as keyof typeof chainConfig]

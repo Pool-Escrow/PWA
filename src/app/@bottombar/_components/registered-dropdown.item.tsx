@@ -7,6 +7,7 @@ import { DropdownMenuLabel, DropdownMenuSeparator } from '@/app/_components/ui/d
 import type { LinkProps } from 'next/link'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
+import React from 'react'
 
 /**
  * Props for UserDropdownItem component.
@@ -38,7 +39,7 @@ interface RegisteredDropdownItemProps {
 /**
  * UserDropdownItem component for user dropdowns.
  * @param {RegisteredDropdownItemProps} props - The properties for the component.
- * @returns {JSX.Element} The rendered menu item.
+ * @returns {React.JSX.Element} The rendered menu item.
  */
 export default function RegisteredDropdownItem({
     href,
@@ -46,7 +47,7 @@ export default function RegisteredDropdownItem({
     label,
     onClick,
     showSeparator = true,
-}: RegisteredDropdownItemProps): JSX.Element {
+}: RegisteredDropdownItemProps): React.JSX.Element {
     const menuItem = (
         <DropdownMenuLabel
             onClick={onClick}

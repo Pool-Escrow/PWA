@@ -38,7 +38,7 @@ interface UserDropdownItemProps {
 /**
  * UserDropdownItem component for user dropdowns.
  * @param {UserDropdownItemProps} props - The properties for the component.
- * @returns {JSX.Element} The rendered menu item.
+ * @returns {React.JSX.Element} The rendered menu item.
  */
 export default function UserDropdownItem({
     href,
@@ -46,7 +46,7 @@ export default function UserDropdownItem({
     label,
     onClick,
     showSeparator = true,
-}: UserDropdownItemProps): JSX.Element {
+}: UserDropdownItemProps): React.JSX.Element {
     const menuItem = (
         <DropdownMenuLabel
             onClick={onClick}

@@ -2,11 +2,12 @@
 
 import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { Button } from '@/app/_components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
+import { appActions, appStore$ } from '@/app/stores/app.store'
 import { useParticipants } from '@/hooks/use-participants'
+import { use$ } from '@legendapp/state/react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { formatUnits } from 'viem'
@@ -27,10 +28,7 @@ export enum TabValue {
 }
 
 const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
-    const { setBottomBarContent, isRouting } = useAppStore(s => ({
-        setBottomBarContent: s.setBottomBarContent,
-        isRouting: s.isRouting,
-    }))
+    const isRouting = use$(appStore$.settings.isRouting)
     const [query, setQuery] = useState('')
     const { data: participants, isLoading, error } = useParticipants(poolId)
     const poolData = usePoolDetails(poolId)
@@ -38,10 +36,11 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
-    const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
+    const { setWinners, isPending, isConfirming } = useSetWinners(poolId)
     const [totalSavedPayout, setTotalSavedPayout] = useState<string>('0')
     const tokenAddress = poolData?.poolDetails?.poolDetailFromSC?.[4]
     const tokenDecimals = useTokenDecimals(tokenAddress || '16').tokenDecimalsData.tokenDecimals
+
     const filteredParticipants = useMemo(() => {
         return (
             participants?.filter(
@@ -65,14 +64,16 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     useEffect(() => {
         if (isAdmin && currentTab === TabValue.Winners && !isRouting) {
-            setBottomBarContent(
+            appActions.setBottomBarContent(
                 <Button
-                    className='mb-3 h-[46px] w-full rounded-[2rem] bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
+                    className='btn-cta mb-3 h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push'
                     onClick={() => {
                         if (payoutAddresses.length === 0) {
                             toast('No payout saved.')
                         } else {
-                            setWinners(payoutAddresses, payoutAmounts)
+                            setWinners(payoutAddresses, payoutAmounts).catch(error => {
+                                console.log('setWinner Error', error)
+                            })
                         }
                     }}
                     disabled={isPending || isConfirming}>
@@ -80,8 +81,8 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                 </Button>,
             )
         }
-        return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isRouting])
+        return () => appActions.setBottomBarContent(null)
+    }, [isAdmin, currentTab, payoutAddresses, payoutAmounts, isRouting, isPending, isConfirming, setWinners])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
@@ -96,30 +97,37 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     return (
         <div className='overflow-hidden rounded-lg bg-white'>
-            <div className='p-4'>
+            <div className='p-4 pt-0'>
                 <SearchBar query={query} onChange={handleChange} poolId={poolId} isAdmin={isAdmin} />
                 <Tabs
                     defaultValue={TabValue.Registered}
                     className='w-full'
                     onValueChange={(value: string) => handleTabChange(value as TabValue)}>
                     {isAdmin && (
-                        <TabsList className='z-10 flex w-full justify-start space-x-0 rounded-none bg-white p-0 md:space-x-8'>
-                            <TabsTrigger className='font-semibold' value={TabValue.Registered}>
-                                Registered
-                            </TabsTrigger>
-                            <TabsTrigger className='font-semibold' value={TabValue.CheckedIn}>
-                                Checked in
-                            </TabsTrigger>
-                            <TabsTrigger className='font-semibold' value={TabValue.Winners}>
-                                Winners
-                            </TabsTrigger>
-                            {/* <TabsTrigger value='refunded'>Refunded</TabsTrigger> */}
-                        </TabsList>
+                        <>
+                            <TabsList className='fixed left-0 right-0 z-10 flex justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Registered}>
+                                    Registered
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.CheckedIn}>
+                                    Checked in
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    value={TabValue.Winners}>
+                                    Winners
+                                </TabsTrigger>
+                            </TabsList>
+                            <div className='h-[48px]' />
+                        </>
                     )}
-                    <TabsContent value='registered'></TabsContent>
-                    <TabsContent value='checkedIn'></TabsContent>
-                    <TabsContent value='winners'></TabsContent>
-                    {/* <TabsContent value='refunded'>Refunded</TabsContent> */}
+                    <TabsContent value='registered' />
+                    <TabsContent value='checkedIn' />
+                    <TabsContent value='winners' />
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
                             <PoolBalanceProgress
@@ -135,7 +143,8 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                                         BigInt(poolData?.poolDetails?.poolDetailFromSC?.[2]?.totalDeposits ?? 0),
                                         tokenDecimals,
                                     ),
-                                )}></PoolBalanceProgress>
+                                )}
+                            />
                         </div>
                     )}
                     <ParticipantList

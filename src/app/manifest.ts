@@ -33,10 +33,10 @@ export default function manifest(): MetadataRoute.Manifest {
                 url: '/?poolId=%s',
             },
         ],
-        serviceworker: {
-            src: '/sw.js',
-            scope: '/',
-        },
+        // serviceworker: {
+        //     src: '/sw.js',
+        //     scope: '/',
+        // },
         icons: [
             {
                 src: '/app/assets/icon-192.png',

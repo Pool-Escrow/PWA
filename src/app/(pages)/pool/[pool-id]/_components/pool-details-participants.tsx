@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from 'lucide-react'
-import Avatars from './avatars'
 import Link from 'next/link'
-import { Address } from 'viem'
+import type { Address } from 'viem'
+import Avatars from './avatars'
 
 interface PoolDetailsParticipantsProps {
     numParticipants: number
@@ -19,10 +19,12 @@ export default function PoolDetailsParticipants({
             {numParticipants > 0 ? (
                 <>
                     <Link href={`/pool/${poolId}/participants`}>
-                        <div className='text-xs'>Participants</div>
+                        <div className='pb-2 text-xs'>Participants</div>
                         <div className='inline-flex w-full items-center justify-between'>
                             <Avatars avatarUrls={avatarUrls} numPeople={numParticipants} />
-                            <ChevronRightIcon className='size-3.5' />
+                            <div className='rounded-full p-1 active:bg-white'>
+                                <ChevronRightIcon className='size-3.5' />
+                            </div>
                         </div>
                     </Link>
                 </>

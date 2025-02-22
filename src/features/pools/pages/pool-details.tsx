@@ -1,8 +1,10 @@
 'use client'
 
+import * as React from 'react'
 import { useQuery } from '@tanstack/react-query'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
+import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
@@ -17,6 +19,7 @@ import PoolDetailsInfo from '@/app/(pages)/pool/[pool-id]/_components/pool-detai
 import BottomBarHandler from '@/app/(pages)/pool/[pool-id]/_components/bottom-bar-handler'
 import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect } from 'react'
+import PullToRefresh from '@/app/_components/pull-to-refresh'
 
 export default function PoolDetails({ poolId }: { poolId: string }) {
     const {
@@ -47,7 +50,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
             isAdmin,
         })
     }, [pool, isAdmin, isPoolPending, isUserInfoPending])
-
+    console.log(pool, '<<POOL>>')
     if (isPoolPending || isUserInfoPending)
         return (
             <div className='flex flex-col space-y-3 bg-white p-2'>
@@ -82,59 +85,75 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     }))
 
     return (
-        <div className='space-y-3 bg-white p-2'>
-            <PoolDetailsCard>
-                <PoolDetailsBanner
-                    name={pool.name}
-                    imageUrl={pool.imageUrl || ''}
-                    buttons={<PoolDetailsBannerButtons isAdmin={isAdmin} />}
-                    // status={<PoolDetailsBannerStatus />}
-                />
-                <PoolDetailsHeading
-                    name={pool.name}
-                    startDate={pool.startDate}
-                    endDate={pool.endDate}
-                    hostName={pool.hostName || 'No host'}
-                />
-                {/* <PoolDetailsClaimableWinnings // <--- TANSTACK QUERY ERROR
+        <PullToRefresh keysToRefetch={['pool-details', 'userAdminStatus']}>
+            <div
+                className='h-full space-y-3 overflow-y-auto overscroll-y-contain bg-white p-2 overflow-scrolling-touch'
+                style={{
+                    msOverflowStyle: 'none', // Hide scrollbar in IE/Edge
+                    scrollbarWidth: 'none', // Hide scrollbar in Firefox
+                    WebkitOverflowScrolling: 'touch',
+                }}>
+                {/* Hide scrollbar in Chrome/Safari/Webkit */}
+                <style jsx>{`
+                    div::-webkit-scrollbar {
+                        display: none;
+                    }
+                `}</style>
+                <PoolDetailsCard>
+                    <PoolDetailsBanner
+                        name={pool.name}
+                        imageUrl={pool.imageUrl || ''}
+                        buttons={<PoolDetailsBannerButtons isAdmin={isAdmin} />}
+                        status={<PoolDetailsBannerStatus status={pool.status} />}
+                    />
+                    <PoolDetailsHeading
+                        status={pool.status}
+                        name={pool.name}
+                        startDate={pool.startDate}
+                        endDate={pool.endDate}
+                        hostName={pool.hostName || 'No host'}
+                    />
+                    {/* <PoolDetailsClaimableWinnings // <--- TANSTACK QUERY ERROR
                     claimableAmount={pool.claimableAmount}
                     tokenSymbol={pool.tokenSymbol}
                     poolId={pool.contractId}
                 /> */}
-                <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5'>
-                    {pool.status != POOLSTATUS.ENDED && (
-                        <PoolDetailsProgress
-                            data-testid='pool-details-progress'
-                            current={pool.poolBalance}
-                            goal={pool.goal}
+                    <div className='space-y-3 rounded-[2rem] bg-[#F4F4F4] p-5 pb-4'>
+                        {pool.status != Number(POOLSTATUS.ENDED) && (
+                            <PoolDetailsProgress
+                                data-testid='pool-details-progress'
+                                current={pool.poolBalance}
+                                goal={pool.goal}
+                            />
+                        )}
+                        <PoolDetailsParticipants
+                            poolId={pool.contractId}
+                            numParticipants={pool.numParticipants}
+                            avatarUrls={avatarUrls as { url?: string; address: `0x${string}` }[]}
                         />
-                    )}
-                    <PoolDetailsParticipants
-                        poolId={pool.contractId}
-                        numParticipants={pool.numParticipants}
-                        avatarUrls={avatarUrls as { url?: string; address: `0x${string}` }[]}
+                    </div>
+                </PoolDetailsCard>
+                <PoolDetailsCard className='space-y-6 py-6'>
+                    <PoolDetailsInfo
+                        description={pool.description || ''}
+                        price={pool.price}
+                        tokenSymbol={pool.tokenSymbol}
+                        termsUrl={pool.termsUrl || ''}
                     />
-                </div>
-            </PoolDetailsCard>
-            <PoolDetailsCard className='space-y-6 py-6'>
-                <PoolDetailsInfo
-                    description={pool.description || ''}
-                    price={pool.price}
-                    tokenSymbol={pool.tokenSymbol}
+                </PoolDetailsCard>
+
+                <BottomBarHandler
+                    keysToRefetch={['pool-details', 'userAdminStatus']}
+                    poolId={pool.contractId}
+                    isAdmin={isAdmin || false}
+                    poolStatus={pool.status}
+                    poolPrice={pool.price}
+                    poolTokenSymbol={pool.tokenSymbol}
+                    tokenDecimals={pool.tokenDecimals}
+                    requiredAcceptance={pool.requiredAcceptance || false}
                     termsUrl={pool.termsUrl || ''}
                 />
-            </PoolDetailsCard>
-
-            <BottomBarHandler
-                poolId={pool.contractId}
-                isAdmin={isAdmin || false}
-                poolStatus={pool.status}
-                poolPrice={pool.price}
-                poolTokenSymbol={pool.tokenSymbol}
-                tokenDecimals={pool.tokenDecimals}
-                requiredAcceptance={pool.requiredAcceptance || false}
-                termsUrl={pool.termsUrl || ''}
-            />
-        </div>
+            </div>
+        </PullToRefresh>
     )
 }

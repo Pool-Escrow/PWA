@@ -1,9 +1,8 @@
 import { Inter } from 'next/font/google'
 
-const inter = Inter({
+export const inter = Inter({
     subsets: ['latin'],
-    display: 'fallback',
+    display: 'swap',
+    preload: true,
     variable: '--font-body',
 })
-
-export { inter }

@@ -1,13 +1,8 @@
-import { Metadata } from 'next'
 import Balance from '@/app/_components/balance/balance'
+import PageWrapper from '@/components/page-wrapper'
+import UserDropdown from '@/components/user-dropdown'
 import UserInfo from './_components/user-info/user-info'
 import { ClaimablePrizes } from './claim-winning/_components'
-import UserDropdown from '@/components/user-dropdown'
-import PageWrapper from '@/components/page-wrapper'
-
-export const metadata: Metadata = {
-    title: 'User Profile',
-}
 
 export default function ProfilePage() {
     return (

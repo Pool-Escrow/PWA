@@ -1,6 +1,6 @@
 'use client'
 
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import PoolListCard from '../../pools/_components/pool-list-card'
 
 const poolMessages = {

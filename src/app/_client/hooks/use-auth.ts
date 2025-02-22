@@ -1,17 +1,16 @@
 'use client'
 
+import { createUserAction } from '@/server/actions/create-user.action'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useDisconnect } from 'wagmi'
 import { useServerActionMutation } from './server-action-hooks'
-import { createUserAction } from '@/server/actions/create-user.action'
-import { useQueryClient } from '@tanstack/react-query'
 
 export function useAuth() {
     const router = useRouter()
     const queryClient = useQueryClient()
-    const { user } = usePrivy()
 
     const { mutate: createNewUser } = useServerActionMutation(createUserAction, {
         onSuccess: () => {
@@ -40,7 +39,7 @@ export function useAuth() {
     const { logout: privyLogout } = useLogout({
         onSuccess: () => {
             console.log('[use-auth] logout success')
-            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
+            void queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
             if (connectors.length > 0) {
                 console.log('[use-auth] disconnecting connectors', connectors)
                 disconnect()
@@ -52,6 +51,7 @@ export function useAuth() {
     const handleLogout = async () => {
         try {
             await privyLogout()
+            void queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
             console.log('[use-auth] navigation after logout')
             router.replace('/')
             router.refresh()
@@ -63,9 +63,9 @@ export function useAuth() {
     }
 
     const { login } = useLogin({
-        async onComplete(user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount) {
+        onComplete({ user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount }) {
             console.log('[use-auth] auth complete')
-            queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
+            void queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
 
             if (isNewUser) {
                 router.replace('/profile/new')
@@ -84,20 +84,18 @@ export function useAuth() {
             console.log('[use-auth] user', user)
         },
         onError(error) {
-            if (error === 'exited_auth_flow') {
+            if (error.toString() === 'exited_auth_flow') {
                 return console.log('[use-auth] exited auth flow')
             }
 
-            if (error === 'generic_connect_wallet_error') {
+            if (error.toString() === 'generic_connect_wallet_error') {
                 // search for the close button and simulate a click
                 setTimeout(() => {
                     console.log('[use-auth] generic connect wallet error, attempting to close modal')
 
-                    const closeButton = document.querySelector(
-                        'button[aria-label="close modal"]',
-                    ) as HTMLButtonElement | null
+                    const closeButton = document.querySelector('button[aria-label="close modal"]')
                     if (closeButton) {
-                        closeButton.click()
+                        ;(closeButton as HTMLButtonElement).click()
                         console.log('[use-auth] close button clicked')
 
                         // try to restart the login process

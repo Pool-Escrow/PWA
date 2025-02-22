@@ -1,7 +1,7 @@
 import { headers } from 'next/headers'
 
-export default function Sitemap() {
-    const headersList = headers()
+export default async function Sitemap() {
+    const headersList = await headers()
     const domain = headersList.get('host')?.replace('.localhost:3000', `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`)
 
     return [

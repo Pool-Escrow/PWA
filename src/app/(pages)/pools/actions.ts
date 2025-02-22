@@ -1,13 +1,13 @@
 'use server'
 
-import { authenticatedProcedure } from '../../_server/procedures/authenticated'
+// import { authenticatedProcedure } from '../../_server/procedures/authenticated'
 import { getAllPoolsUseCase } from '../../_server/use-cases/pools/get-all-pools'
-import { getUserNextPoolUseCase } from '../../_server/use-cases/pools/get-user-next-pool'
-import { unauthenticatedProcedure } from '../../_server/procedures/unauthenticated'
+// import { getUserNextPoolUseCase } from '../../_server/use-cases/pools/get-user-next-pool'
+// import { unauthenticatedProcedure } from '../../_server/procedures/unauthenticated'
 import { getAddressBalanceUseCase } from '../../_server/use-cases/users/get-user-balance'
-import { isAdminUseCase } from '../../_server/use-cases/users/is-admin'
+// import { isAdminUseCase } from '../../_server/use-cases/users/is-admin'
 import type { Address } from 'viem'
-import type { PoolItem } from '../../_lib/entities/models/pool-item'
+// import type { PoolItem } from '../../_lib/entities/models/pool-item'
 import { verifyToken } from '../../_server/auth/privy'
 
 export const getUpcomingPoolsAction = async () => {

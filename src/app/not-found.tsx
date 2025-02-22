@@ -1,11 +1,11 @@
 'use client'
 
-import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { motion, useMotionValue, useTransform } from 'framer-motion'
-import { useEffect, useState } from 'react'
 import frog from '@/public/app/images/frog.png'
+import { motion, useMotionValue, useTransform } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const GRID_SIZE = 10
 
@@ -37,10 +37,7 @@ export default function NotFound() {
         }
 
         window.addEventListener('mousemove', handleMouseMove)
-
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove)
-        }
+        return () => window.removeEventListener('mousemove', handleMouseMove)
     }, [mouseX, mouseY])
 
     return (
@@ -48,11 +45,16 @@ export default function NotFound() {
             {/* Background tiles */}
             <div className='fixed inset-0 grid grid-cols-10 grid-rows-10 gap-x-2 opacity-10'>
                 {tiles.map((active, index) => (
-                    <div
+                    <motion.div
                         key={index}
-                        className={`aspect-square transition-opacity duration-500 ${
-                            !active ? 'opacity-100' : 'opacity-0'
-                        }`}>
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: active ? 0 : 1 }}
+                        transition={{
+                            type: 'tween',
+                            duration: 0.5,
+                            ease: 'easeOut',
+                        }}
+                        className='aspect-square'>
                         <div className='relative h-full w-full'>
                             <Image
                                 src={frog.src}
@@ -63,7 +65,7 @@ export default function NotFound() {
                                 fill
                             />
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
 
@@ -78,17 +80,35 @@ export default function NotFound() {
                     className='mb-4 bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-6xl font-bold text-transparent md:text-9xl'
                     initial={{ opacity: 0, y: -50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}>
+                    transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 30,
+                    }}>
                     404
                 </motion.h1>
             </motion.div>
 
             <motion.div
                 className='z-10 flex flex-col items-center gap-6'
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}>
-                <div className='relative h-48 w-48'>
+                variants={{
+                    initial: { opacity: 0, y: 50 },
+                    animate: { opacity: 1, y: 0 },
+                }}
+                initial='initial'
+                animate='animate'
+                transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 30,
+                    delay: 0.2,
+                }}>
+                <motion.div
+                    className='relative h-48 w-48'
+                    whileHover={{
+                        scale: 1.05,
+                        transition: { type: 'spring', stiffness: 400, damping: 10 },
+                    }}>
                     <Image
                         src={frog.src}
                         alt='Frog'
@@ -97,16 +117,36 @@ export default function NotFound() {
                         priority
                         fill
                     />
-                </div>
-                <p className='mb-4 text-center text-xl md:text-2xl'>Oops! The page you're looking for doesn't exist.</p>
-                <p className='mb-8 text-center text-base text-gray-400 md:text-lg'>
-                    You tried to access: <span className='rounded bg-gray-700 px-2 py-1 font-mono'>{pathname}</span>
-                </p>
-                <Link
-                    href='/'
-                    className='transform rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-semibold text-white transition duration-300 ease-in-out hover:scale-105 hover:from-purple-600 hover:to-pink-600'>
-                    Go Back Home
-                </Link>
+                </motion.div>
+                <motion.p
+                    className='mb-4 text-center text-xl md:text-2xl'
+                    variants={{
+                        initial: { opacity: 0, x: -20 },
+                        animate: { opacity: 1, x: 0 },
+                    }}
+                    initial='initial'
+                    animate='animate'
+                    transition={{ delay: 0.4 }}>
+                    Oops! The page you&apos;re looking for doesn&apos;t exist.
+                </motion.p>
+                <motion.p
+                    className='mb-8 text-center text-base text-gray-400 md:text-lg'
+                    variants={{
+                        initial: { opacity: 0, x: 20 },
+                        animate: { opacity: 1, x: 0 },
+                    }}
+                    initial='initial'
+                    animate='animate'
+                    transition={{ delay: 0.6 }}>
+                    You tried to access: <span className='rounded-sm bg-gray-700 px-2 py-1 font-mono'>{pathname}</span>
+                </motion.p>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Link
+                        href='/'
+                        className='transform rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-semibold text-white transition duration-300 ease-in-out hover:from-purple-600 hover:to-pink-600'>
+                        Go Back Home
+                    </Link>
+                </motion.div>
             </motion.div>
         </div>
     )
