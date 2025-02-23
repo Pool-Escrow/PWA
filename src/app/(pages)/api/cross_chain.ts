@@ -1,26 +1,33 @@
 import 'server-only'
 
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { API_paths, sendGetRequest } from `../profile/cross-swap/_components/utils.ts`
-export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== "GET") {
-        return res.status(405).json({ error: "Method not allowed" });
-      }
+import { HttpClient } from '../profile/cross-swap/_components/api/http-client'
+import { CONFIG } from '../profile/cross-swap/_components/config'
 
-      try {
-        const { address } = req.query;
-        const { path, call } = API_paths['history']
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== 'GET') {
+        return res.status(405).json({ error: 'Method not allowed' })
+    }
 
-        const response = await sendGetRequest(path, { address: address  });
+    try {
+        const { address } = req.query
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!address || typeof address !== 'string') {
+            return res.status(400).json({ error: 'Address parameter is required' })
         }
 
-        const data = await response.json();
-        res.status(200).json(data);
-      } catch (error) {
-        console.error("Error fetching OKX API:", error);
-        res.status(500).json({ error: "Failed to fetch data" });
-      }
+        const { path } = CONFIG.API.ENDPOINTS['history']
+        const httpClient = HttpClient.getInstance()
+
+        const response = await httpClient.get(path, { address })
+
+        if (!response.data) {
+            throw new Error('No data received from API')
+        }
+
+        res.status(200).json(response.data)
+    } catch (error) {
+        console.error('Error fetching OKX API:', error)
+        res.status(500).json({ error: 'Failed to fetch data' })
+    }
 }

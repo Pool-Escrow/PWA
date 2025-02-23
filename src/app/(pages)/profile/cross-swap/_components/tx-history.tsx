@@ -1,16 +1,12 @@
-'use client'
+"use client"
 
-import * as React from 'react'
-import { ChevronRight, X } from 'lucide-react'
-import { format } from 'date-fns'
-
-import { Card, CardContent } from '@/app/_components/ui/card'
-import { Button } from '@/app/_components/ui/button'
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/app/_components/ui/sheet'
-import { fetchStatus, tokenAddressToName } from './utils'
-import { useState, useEffect, useRef } from 'react'
-import { String } from 'lodash'
-import Image from 'next/image'
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/app/_components/ui/sheet"
+import { format } from "date-fns"
+import { ChevronRight, X } from "lucide-react"
+import Image from "next/image"
+import * as React from "react"
+import { useRef } from "react"
+import type { OKXNetwork, OKXToken } from "../types"
 
 interface Transaction {
     id: string
@@ -39,20 +35,22 @@ interface Transaction {
 
 interface TransactionHistoryProps {
     isOpen: boolean
-    onClose: () => void
+    onOpenChangeAction: (open: boolean) => void
     transactions: Transaction[]
-    networks: string[]
-    tokens: string[]
+    networks: OKXNetwork[]
+    tokens: OKXToken[]
 }
 
-export function TransactionHistory({ isOpen, onClose, transactions, networks, tokens }: TransactionHistoryProps) {
-    const [successfulTransactions, setSuccessfulTransactions] = useState<Transaction[]>([])
-    const txnIds = transactions.map(txn => txn.id)
+export function TransactionHistory({
+    isOpen,
+    onOpenChangeAction,
+    transactions,
+}: TransactionHistoryProps): React.JSX.Element {
     const sheetRef = useRef<HTMLDivElement>(null)
     const dragStartRef = useRef(0)
     const currentDragRef = useRef(0)
     const isDraggingRef = useRef(false)
-    const animationFrameRef = useRef<number>()
+    const animationFrameRef = useRef<number | null>(null)
     const dragThreshold = 150
 
     const updateSheetPosition = (deltaY: number) => {
@@ -68,7 +66,7 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
         currentDragRef.current = 0
 
         if (sheetRef.current) {
-            sheetRef.current.style.transition = 'none'
+            sheetRef.current.style.transition = "none"
         }
 
         e.preventDefault()
@@ -94,10 +92,10 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
         e.currentTarget.releasePointerCapture(e.pointerId)
 
         if (sheetRef.current) {
-            sheetRef.current.style.transition = 'transform 0.3s cubic-bezier(0.19, 1, 0.22, 1)'
+            sheetRef.current.style.transition = "transform 0.3s cubic-bezier(0.19, 1, 0.22, 1)"
 
             if (currentDragRef.current > dragThreshold) {
-                onClose()
+                onOpenChangeAction(false)
             } else {
                 updateSheetPosition(0)
             }
@@ -113,14 +111,14 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
     }, [])
 
     return (
-        <Sheet open={isOpen} onOpenChange={onClose}>
+        <Sheet open={isOpen} onOpenChange={onOpenChangeAction}>
             <SheetContent
                 ref={sheetRef}
                 side='bottom'
                 className='h-[85vh] touch-none rounded-t-[24px] p-4'
                 style={{
-                    transform: 'translateY(0)',
-                    transition: 'transform 0.3s cubic-bezier(0.19, 1, 0.22, 1)',
+                    transform: "translateY(0)",
+                    transition: "transform 0.3s cubic-bezier(0.19, 1, 0.22, 1)",
                 }}>
                 <div
                     className='absolute left-1/2 top-2.5 h-1.5 w-12 -translate-x-1/2 cursor-grab touch-none rounded-full bg-gray-300 active:cursor-grabbing'
@@ -133,80 +131,91 @@ export function TransactionHistory({ isOpen, onClose, transactions, networks, to
                 />
                 <SheetHeader className='flex flex-row items-center justify-between pt-4'>
                     <SheetTitle className='text-[18px] font-bold'>Transaction History</SheetTitle>
-                    <button onClick={onClose} className='absolute right-6 top-4 text-gray-500 hover:text-gray-700'>
+                    <button
+                        className='absolute right-6 top-4 text-gray-500 hover:text-gray-700'
+                        onClick={() => onOpenChangeAction(false)}>
                         <X className='size-6' />
                     </button>
                 </SheetHeader>
 
                 <div className='mt-2 space-y-4'>
-                    {transactions.map(transaction => (
-                        <div key={transaction.id} className='flex items-start justify-between pt-4'>
-                            <div className='flex flex-col'>
-                                <span className='mb-6 text-[11px] font-medium text-[#8F8F8F]'>
-                                    {format(new Date(transaction.date), 'MM/dd/yy')}
-                                </span>
-                                <div className='flex'>
-                                    <div className='flex items-center'>
-                                        <div className='relative flex'>
-                                            <div className='h-6 w-6 overflow-hidden rounded-full'>
-                                                <Image
-                                                    src={transaction.fromToken.logo}
-                                                    alt={transaction.fromToken.name}
-                                                    width={24}
-                                                    height={24}
-                                                    className='h-full w-full object-cover'
-                                                />
+                    {transactions.length === 0 ? (
+                        <div className='flex flex-col items-center justify-center py-8 text-center'>
+                            <span className='text-[16px] font-medium text-[#383838]'>No pending transactions.</span>
+                            <span className='text-[14px] text-[#8F8F8F]'>
+                                Bridge some USDC and get the pool party started!
+                            </span>
+                        </div>
+                    ) : (
+                        transactions.map(transaction => (
+                            <div key={transaction.id} className='flex items-start justify-between pt-4'>
+                                <div className='flex flex-col'>
+                                    <span className='mb-6 text-[11px] font-medium text-[#8F8F8F]'>
+                                        {format(new Date(transaction.date), "MM/dd/yy")}
+                                    </span>
+                                    <div className='flex'>
+                                        <div className='flex items-center'>
+                                            <div className='relative flex'>
+                                                <div className='size-6 overflow-hidden rounded-full'>
+                                                    <Image
+                                                        src={transaction.fromToken.logo}
+                                                        alt={transaction.fromToken.name}
+                                                        width={24}
+                                                        height={24}
+                                                        className='size-full object-cover'
+                                                    />
+                                                </div>
+                                                <div className='-ml-2 size-6 overflow-hidden rounded-full'>
+                                                    <Image
+                                                        src={transaction.toToken.logo}
+                                                        alt={transaction.toToken.name}
+                                                        width={24}
+                                                        height={24}
+                                                        className='size-full object-cover'
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className='-ml-2 h-6 w-6 overflow-hidden rounded-full'>
-                                                <Image
-                                                    src={transaction.toToken.logo}
-                                                    alt={transaction.toToken.name}
-                                                    width={24}
-                                                    height={24}
-                                                    className='h-full w-full object-cover'
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className='ml-3'>
-                                            <div className='flex items-center text-[14px] font-medium text-[#383838]'>
-                                                <span>{transaction.fromToken.name}</span>
-                                                <span className='mx-2'>→</span>
-                                                <span>{transaction.toToken.name}</span>
-                                            </div>
-                                            <div className='text-[12px] text-[#8F8F8F]'>
-                                                {transaction.fromChain.name} to {transaction.toChain.name}
+                                            <div className='ml-3'>
+                                                <div className='flex items-center text-[14px] font-medium text-[#383838]'>
+                                                    <span>{transaction.fromToken.name}</span>
+                                                    <span className='mx-2'>→</span>
+                                                    <span>{transaction.toToken.name}</span>
+                                                </div>
+                                                <div className='text-[12px] text-[#8F8F8F]'>
+                                                    {transaction.fromChain.name} to {transaction.toChain.name}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className='mt-[42px] flex h-8 flex-col items-end justify-center'>
-                                {transaction.status !== 'SUCCESS' ? (
-                                    <div className='flex flex-col items-end'>
-                                        <span className='mb-1 text-[12px] text-[#FF9900]'>In progress</span>
-                                        <div className='flex items-center'>
-                                            <span className='text-[14px] font-medium text-[#8F8F8F]'>21 min</span>
-                                            <ChevronRight className='ml-2 h-4 w-4 text-[#8F8F8F]' />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className='flex flex-col items-end'>
-                                        <div className='flex items-center'>
-                                            <div className='flex flex-col items-end'>
-                                                <span className='text-[14px] font-medium text-[#5FBA6E]'>
-                                                    +{transaction.amount} {transaction.toToken.name}
-                                                </span>
-                                                <span className='text-[12px] text-[#8F8F8F]'>
-                                                    -{transaction.amount} {transaction.fromToken.name}
-                                                </span>
+                                <div className='mt-[42px] flex h-8 flex-col items-end justify-center'>
+                                    {transaction.status !== "SUCCESS" ? (
+                                        <div className='flex flex-col items-end'>
+                                            <span className='mb-1 text-[12px] text-[#FF9900]'>In progress</span>
+                                            <div className='flex items-center'>
+                                                <span className='text-[14px] font-medium text-[#8F8F8F]'>21 min</span>
+                                                <ChevronRight className='ml-2 size-4 text-[#8F8F8F]' />
                                             </div>
-                                            <ChevronRight className='ml-2 h-4 w-4 text-[#8F8F8F]' />
                                         </div>
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div className='flex flex-col items-end'>
+                                            <div className='flex items-center'>
+                                                <div className='flex flex-col items-end'>
+                                                    <span className='text-[14px] font-medium text-[#5FBA6E]'>
+                                                        +{transaction.amount} {transaction.toToken.name}
+                                                    </span>
+                                                    <span className='text-[12px] text-[#8F8F8F]'>
+                                                        -{transaction.amount} {transaction.fromToken.name}
+                                                    </span>
+                                                </div>
+                                                <ChevronRight className='ml-2 size-4 text-[#8F8F8F]' />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </SheetContent>
         </Sheet>
