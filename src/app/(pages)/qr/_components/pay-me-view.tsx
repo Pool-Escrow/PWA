@@ -1,34 +1,49 @@
 'use client'
 
 import { useWallets } from '@privy-io/react-auth'
-import { ArrowDownToLine, Copy, ExternalLink, Info } from 'lucide-react'
+import { Copy, ExternalLink, Info, Share } from 'lucide-react'
 import QRCode from 'react-qr-code'
+import { openEtherscanAddress } from '@/lib/utils/explorer'
+import { toast } from 'sonner'
+
+const actionButtonClasses =
+    'flex size-[60px] items-center justify-center rounded-full bg-[#F3F4F6] transition-all hover:bg-[#E5E7EB] active:bg-[#D1D5DB]'
 
 export default function PayMeView() {
     const { wallets } = useWallets()
     const address = wallets[0]?.address
 
-    const handleSave = () => {
-        console.log('Save button clicked')
+    const handleShare = () => {
+        if (address && navigator.share) {
+            void navigator.share({
+                title: 'Pool Wallet Address',
+                text: address,
+            })
+        }
     }
 
     const handleCopy = () => {
         if (address) {
-            try {
-                void navigator.clipboard.writeText(address)
-                // You might want to add a toast notification here
-            } catch (error) {
-                console.error('Failed to copy:', error)
-            }
+            void (async () => {
+                try {
+                    await navigator.clipboard.writeText(address)
+                    toast.success('Address copied to clipboard')
+                } catch (error) {
+                    console.error('Failed to copy:', error)
+                    toast.error('Failed to copy address')
+                }
+            })()
         }
     }
 
-    const handleShare = () => {
-        console.log('Share button clicked')
+    const handleEtherscanClick = () => {
+        if (address) {
+            openEtherscanAddress(address)
+        }
     }
 
     return (
-        <div className='flex w-full flex-col items-center pt-[36px]'>
+        <div className='flex w-full flex-col items-center pt-[20px]'>
             {/* QR Code Card */}
             <div className='w-[345px] overflow-hidden rounded-[32px] bg-[#4078F4] p-6 text-center text-white sm:p-8'>
                 <h2 className='mb-6 pt-[16px] text-[18px] font-bold sm:mb-7'>Pool Wallet</h2>
@@ -57,20 +72,14 @@ export default function PayMeView() {
 
             {/* Action Buttons */}
             <div className='mt-4 flex gap-4 sm:mt-8'>
-                <button
-                    onClick={handleSave}
-                    className='flex size-[60px] items-center justify-center rounded-full bg-gray-100 transition-all hover:bg-gray-200 active:bg-gray-300 sm:size-[60px]'>
-                    <ArrowDownToLine className='size-8 text-blue-600 sm:size-8' />
+                <button onClick={handleShare} className={actionButtonClasses}>
+                    <Share className='size-8 text-blue-600' />
                 </button>
-                <button
-                    onClick={handleCopy}
-                    className='flex size-[60px] items-center justify-center rounded-full bg-gray-100 transition-all hover:bg-gray-200 active:bg-gray-300 sm:size-[60px]'>
-                    <Copy className='size-8 text-blue-600 sm:size-8' />
+                <button onClick={handleCopy} className={actionButtonClasses}>
+                    <Copy className='size-8 text-blue-600' />
                 </button>
-                <button
-                    onClick={handleShare}
-                    className='flex size-[60px] items-center justify-center rounded-full bg-gray-100 transition-all hover:bg-gray-200 active:bg-gray-300 sm:size-[60px]'>
-                    <ExternalLink className='size-8 text-blue-600 sm:size-8' />
+                <button onClick={handleEtherscanClick} className={actionButtonClasses}>
+                    <ExternalLink className='size-8 text-blue-600' />
                 </button>
             </div>
         </div>
