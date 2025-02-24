@@ -37,11 +37,12 @@ export function ActionButton({ isApproved, onApproveAction, onSwapAction, disabl
                 <button
                     onClick={handleAction}
                     disabled={disabled || isLoading}
-                    className='btn-cta h-[46px] w-full rounded-[2rem] px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-button active:shadow-button-push disabled:opacity-50'>
+                   
+                    className='h-[46px] w-full rounded-[2rem] bg-blue-500 bg-cta px-6 py-[11px] text-center text-base font-semibold leading-normal text-white shadow-md hover:bg-blue-600 active:shadow-lg disabled:opacity-50'>
                     {isLoading ? (
                         <span className='flex items-center justify-center'>
                             <svg
-                                className='-ml-1 mr-3 h-5 w-5 animate-spin text-white'
+                                className='-ml-1 mr-3 size-5 animate-spin text-white'
                                 xmlns='http://www.w3.org/2000/svg'
                                 fill='none'
                                 viewBox='0 0 24 24'>

@@ -98,8 +98,7 @@ export class HttpClient {
             Object.entries(params).forEach(([key, value]) => {
                 if (Array.isArray(value)) {
                     value.forEach(v => {
-                        if (url.searchParams.values().find(x => x === v)) return
-                        url.searchParams.append(key, String(v))
+                        url.searchParams?.append(key, String(v))
                     })
                     return
                 }
