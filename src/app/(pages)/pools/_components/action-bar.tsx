@@ -8,10 +8,12 @@ import withdrawIcon from '@/public/app/icons/svg/withdraw.svg'
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 
 export default function ActionBar() {
     const router = useRouter()
     const { login, authenticated } = useAuth()
+    const { handleOnRamp } = useOnRamp()
 
     const handleWithdraw = () => {
         if (!authenticated) {
@@ -20,12 +22,12 @@ export default function ActionBar() {
         }
         router.push('/profile/send')
     }
-    const handleDeposit = () => {
+    const handleDeposit = async () => {
         if (!authenticated) {
             login()
             return
         }
-        router.push('/deposit')
+        await handleOnRamp()
     }
     const handlePayRequest = () => {
         if (!authenticated) {
