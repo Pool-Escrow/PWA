@@ -48,13 +48,8 @@ export default function UserInfo({ variant, onHistoryClick, hasTransactions }: U
                 </div>
             </div>
             {variant === 'cross-swap' && (
-                <button
-                    onClick={onHistoryClick}
-                    disabled={!hasTransactions}
-                    className={`self-center rounded-full p-2 ${
-                        hasTransactions ? 'cursor-pointer bg-[#f4f4f4]' : 'cursor-not-allowed bg-[#f4f4f4] opacity-40'
-                    }`}>
-                    <History className={`size-6 ${hasTransactions ? 'text-[#383838]' : 'text-gray-400'}`} />
+                <button onClick={onHistoryClick} className='cursor-pointer self-center rounded-full bg-[#f4f4f4] p-2'>
+                    <History className='size-6 text-[#383838]' />
                 </button>
             )}
         </section>
