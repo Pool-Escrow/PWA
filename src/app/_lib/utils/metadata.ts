@@ -136,13 +136,12 @@ export const metadata: CustomMetadata = {
     formatDetection: {
         telephone: false,
     },
-    other: {
-        'apple-mobile-web-app-status-bar-style': 'black-translucent',
-        'mobile-web-app-capable': 'yes',
-        'apple-touch-fullscreen': 'yes',
-        'theme-color': '#4078F4',
-        'msapplication-TileColor': '#4078F4',
-        'msapplication-navbutton-color': '#4078F4',
+    themeColor: '#4078F4',
+    viewport: {
+        width: 'device-width',
+        initialScale: 1,
+        viewportFit: 'cover',
+        userScalable: false,
     },
     openGraph: {
         type: 'website',
