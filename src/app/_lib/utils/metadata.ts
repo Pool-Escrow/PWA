@@ -6,8 +6,8 @@ export const viewport: Viewport = {
     initialScale: 1,
     width: 'device-width',
     themeColor: [
-        { media: '(prefers-color-scheme: dark)', color: '#fff' },
-        { media: '(prefers-color-scheme: light)', color: '#18181b' },
+        { media: '(prefers-color-scheme: dark)', color: '#4078F4' },
+        { media: '(prefers-color-scheme: light)', color: '#4078F4' },
     ],
 }
 
@@ -44,7 +44,7 @@ export const metadata: CustomMetadata = {
     description: APP_DESCRIPTION,
     appleWebApp: {
         capable: true,
-        statusBarStyle: 'default',
+        statusBarStyle: 'black-translucent',
         title: APP_DEFAULT_TITLE,
         startupImage: [
             {
@@ -135,6 +135,14 @@ export const metadata: CustomMetadata = {
     },
     formatDetection: {
         telephone: false,
+    },
+    other: {
+        'apple-mobile-web-app-status-bar-style': 'black-translucent',
+        'mobile-web-app-capable': 'yes',
+        'apple-touch-fullscreen': 'yes',
+        'theme-color': '#4078F4',
+        'msapplication-TileColor': '#4078F4',
+        'msapplication-navbutton-color': '#4078F4',
     },
     openGraph: {
         type: 'website',
