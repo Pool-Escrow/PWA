@@ -22,9 +22,9 @@ const poolMessages = {
     feed: {
         title: 'No Upcoming Pools Yet',
         message: "We're working on bringing exciting pools to you!",
-        cta: 'Want to create or sponsor a pool?',
-        link: 'https://form.asana.com/?k=Qx1HYy3c8KcgfHyWszZnyA&d=1207858482725448',
-        linkText: 'Tell us about it',
+        cta: null,
+        link: 'mailto:info@poolparty.cc',
+        linkText: 'Contact us',
     },
 }
 
@@ -51,7 +51,7 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
                     {link && linkText && (
                         <a
                             href={link}
-                            className='mt-1 text-xs text-blue-500 hover:underline'
+                            className=' text-xs text-blue-500 hover:underline'
                             target='_blank'
                             rel='noopener noreferrer'>
                             {linkText}
