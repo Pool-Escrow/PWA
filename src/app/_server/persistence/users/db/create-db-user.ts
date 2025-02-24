@@ -27,6 +27,10 @@ export async function createUserInDb({ privyId, info }: UserItem) {
 
     if (error) {
         console.error('Error creating user in database:', error)
+        if (error.code === '23505') {
+            console.error('User already exists in database')
+            return
+        }
         throw new Error(`Error creating user in database: ${error.message}`)
     }
 

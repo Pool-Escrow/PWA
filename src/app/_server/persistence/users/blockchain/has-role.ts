@@ -30,10 +30,20 @@ export type Role = (typeof ROLES)[keyof typeof ROLES]
 
 export const hasRole = async ({ role, account }: { role: Role; account: string }): Promise<boolean> => {
     if (!serverClient) return false
-    return serverClient.readContract({
-        address: currentPoolAddress,
-        abi: [HasRoleFunction],
-        functionName: HasRoleFunction.name,
-        args: [role, account as Address],
-    })
+    const result = serverClient
+        .readContract({
+            address: currentPoolAddress,
+            abi: [HasRoleFunction],
+            functionName: HasRoleFunction.name,
+            args: [role, account as Address],
+        })
+        .then(res => {
+            return res
+        })
+        .catch(err => {
+            console.error(err)
+            return false
+        })
+
+    return result
 }
