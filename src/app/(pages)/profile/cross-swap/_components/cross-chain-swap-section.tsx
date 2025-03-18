@@ -2,7 +2,6 @@
 
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/app/_components/ui/sheet'
 import { useWallets } from '@privy-io/react-auth'
-// import { toNumber } from 'lodash'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -18,11 +17,11 @@ import { useSheetDrag } from './hooks/useSheetDrag'
 import { useSwapExecution } from './hooks/useSwapExecution'
 import { useTokenSelection } from './hooks/useTokenSelection'
 import { useTransactionHistory } from './hooks/useTransactionHistory'
+import { ServiceUnavailableMessage } from './ServiceUnavailableMessage'
 import type { TokenSelectorProps } from './TokenSelector'
 import { ToSection } from './ToSection'
 import { TransactionHistory } from './tx-history'
 
-// Componentes dinámicos con tipos correctos
 const TokenSelectorDynamic = dynamic<TokenSelectorProps>(
     () => import('./TokenSelector').then(mod => mod.TokenSelector),
     {
@@ -46,19 +45,34 @@ const CrossChainSwapSection = () => {
     const [isSwapping, setIsSwapping] = useState(false)
     const [isHistoryOpen, setHistory] = useState(false)
     const { fetchedNetworks } = useNetworkFetching(wallets)
-    const { selectedNetwork, searchQuery, setSelectedNetwork, setSearchQuery, filteredTokens } = useTokenSelection({
+    const {
+        selectedNetwork,
+        searchQuery,
+        setSelectedNetwork,
+        setSearchQuery,
+        filteredTokens,
+        isLoading,
+        error,
+        isServiceUnavailable,
+        refetch,
+    } = useTokenSelection({
         fromNetwork: state.fromNetwork,
     })
-    // console.log(
-    //     'd;;;;;;ata',
-    //     state.fromNetwork,
-    //     state.fromToken,
-    //     state.fromAmount,
-    //     wallets[0]?.address,
-    //     selectedNetwork,
-    //     searchQuery,
-    //     filteredTokens,
-    // )
+
+    console.log('[CrossChainSwap] Component state:', {
+        fromNetwork: state.fromNetwork,
+        fromToken: state.fromToken,
+        fromAmount: state.fromAmount,
+        walletAddress: wallets[0]?.address,
+        selectedNetwork,
+        searchQuery,
+        filteredTokensLength: filteredTokens.length,
+        fetchedNetworksLength: fetchedNetworks.length,
+        isLoading,
+        hasError: !!error,
+        isServiceUnavailable,
+    })
+
     useRouteCalculation({
         fromNetwork: state.fromNetwork,
         fromToken: state.fromToken,
@@ -134,60 +148,74 @@ const CrossChainSwapSection = () => {
             <div className='mx-auto w-full max-w-md space-y-4 overflow-y-scroll px-3 pb-24 pt-3'>
                 <UserInfo variant='cross-swap' onHistoryClick={() => setHistory(true)} hasTransactions={true} />
 
-                <Sheet open={isSelectOpen} onOpenChange={setIsSelectOpen}>
-                    <SheetContent ref={sheetRef} side='bottom' className='h-[85vh] touch-none rounded-t-[24px] p-4'>
-                        <div
-                            className='absolute left-1/2 top-2.5 h-1.5 w-12 -translate-x-1/2 cursor-grab touch-none rounded-full bg-gray-300 active:cursor-grabbing'
-                            onPointerDown={handleDragStart}
-                            onPointerMove={handleDrag}
-                            onPointerUp={handleDragEnd}
-                            onPointerCancel={handleDragEnd}
-                            role='button'
-                            aria-label='Drag to close'
-                        />
-                        <SheetTitle className='sr-only'>Select Token</SheetTitle>
-                        <SheetDescription className='sr-only'>
-                            Select a token from the list to use in your transaction
-                        </SheetDescription>
-                        <TokenSelectorDynamic
-                            onClose={() => setIsSelectOpen(false)}
-                            filteredTokens={filteredTokens}
-                            selectedNetwork={selectedNetwork}
-                            searchQuery={searchQuery}
-                            onSearchChange={setSearchQuery}
-                            onNetworkSelect={handleNetworkSelect}
-                            onTokenSelect={handleFromTokenSelect}
+                {isServiceUnavailable ? (
+                    <div className='detail_card mx-auto w-full rounded-[24px] p-4'>
+                        <ServiceUnavailableMessage onRetry={() => void refetch()} />
+                    </div>
+                ) : (
+                    <>
+                        <Sheet open={isSelectOpen} onOpenChange={setIsSelectOpen}>
+                            <SheetContent
+                                ref={sheetRef}
+                                side='bottom'
+                                className='h-[85vh] touch-none rounded-t-[24px] p-4'>
+                                <div
+                                    className='absolute left-1/2 top-2.5 h-1.5 w-12 -translate-x-1/2 cursor-grab touch-none rounded-full bg-gray-300 active:cursor-grabbing'
+                                    onPointerDown={handleDragStart}
+                                    onPointerMove={handleDrag}
+                                    onPointerUp={handleDragEnd}
+                                    onPointerCancel={handleDragEnd}
+                                    role='button'
+                                    aria-label='Drag to close'
+                                />
+                                <SheetTitle className='sr-only'>Select Token</SheetTitle>
+                                <SheetDescription className='sr-only'>
+                                    Select a token from the list to use in your transaction
+                                </SheetDescription>
+                                <TokenSelectorDynamic
+                                    onClose={() => setIsSelectOpen(false)}
+                                    filteredTokens={filteredTokens}
+                                    selectedNetwork={selectedNetwork}
+                                    searchQuery={searchQuery}
+                                    onSearchChange={setSearchQuery}
+                                    onNetworkSelect={handleNetworkSelect}
+                                    onTokenSelect={handleFromTokenSelect}
+                                    networks={fetchedNetworks}
+                                    isLoading={isLoading}
+                                    error={error}
+                                    isServiceUnavailable={isServiceUnavailable}
+                                />
+                            </SheetContent>
+                        </Sheet>
+
+                        <TransactionHistory
+                            isOpen={isHistoryOpen}
+                            onOpenChangeAction={setHistory}
+                            transactions={transactionHistory.transactions}
                             networks={fetchedNetworks}
+                            tokens={filteredTokens}
                         />
-                    </SheetContent>
-                </Sheet>
 
-                <TransactionHistory
-                    isOpen={isHistoryOpen}
-                    onOpenChangeAction={setHistory}
-                    transactions={transactionHistory.transactions}
-                    networks={fetchedNetworks}
-                    tokens={filteredTokens}
-                />
+                        <div className='detail_card mx-auto w-full rounded-[24px]'>
+                            <FromSection
+                                fromNetwork={state.fromNetwork}
+                                fromToken={state.fromToken}
+                                fromAmount={state.fromAmount}
+                                onSelectClick={() => setIsSelectOpen(true)}
+                                onAmountChange={handleFromAmountChange}
+                            />
+                            <ToSection receivedAmount={state.receivedAmount} />
+                        </div>
 
-                <div className='detail_card mx-auto w-full rounded-[24px]'>
-                    <FromSection
-                        fromNetwork={state.fromNetwork}
-                        fromToken={state.fromToken}
-                        fromAmount={state.fromAmount}
-                        onSelectClick={() => setIsSelectOpen(true)}
-                        onAmountChange={handleFromAmountChange}
-                    />
-                    <ToSection receivedAmount={state.receivedAmount} />
-                </div>
-
-                {state.routerInfo && <BridgeInfoCardDynamic bridgeInfo={state.routerInfo} />}
+                        {state.routerInfo && <BridgeInfoCardDynamic bridgeInfo={state.routerInfo} />}
+                    </>
+                )}
             </div>
             <ActionButton
                 isApproved={state.isApproved}
                 onApproveAction={handleApprove}
                 onSwapAction={handleSwap}
-                disabled={!state.fromAmount || Number(state.fromAmount) === 0 || isSwapping}
+                disabled={!state.fromAmount || Number(state.fromAmount) === 0 || isSwapping || isServiceUnavailable}
             />
         </div>
     )
