@@ -1,7 +1,7 @@
 'use client'
 
-import { Input } from '../ui/input'
 import { useState } from 'react'
+import { Input } from '../ui/input'
 
 interface CurrencyAmountProps {
     name: string
@@ -27,9 +27,7 @@ export default function CurrencyAmount({ name }: CurrencyAmountProps) {
 
     const handleBlur = () => {
         // Format the value to two decimal places on blur
-        const formattedValue = parseFloat(value || '0')
-            .toFixed(2)
-            .replace(/\.00$/, '.00') // Ensure two decimals even if trailing zeros
+        const formattedValue = parseFloat(value || '0').toFixed(2) // This already ensures two decimal places
 
         setValue(formattedValue)
     }

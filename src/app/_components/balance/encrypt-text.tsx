@@ -1,8 +1,8 @@
+import { useEncryptStore } from '@/app/_stores/encrypt'
 import { cn } from '@/lib/utils/tailwind'
 import { AnimatePresence, motion } from 'framer-motion'
 import React, { useMemo } from 'react'
 import { generateChars } from './generate-encoded-text'
-import { useEncryptStore } from '@/app/_stores/encrypt'
 
 interface EncryptTextProps {
     children: React.ReactNode
@@ -19,7 +19,7 @@ const formatNumber = (num: number, padLength: number) =>
         .toString()
         .padStart(padLength, '0')
         // replace with commas to add thousand separators
-        .replace(/\B(?=(\d{3})+(?!\d))/g, '')
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 const MotionSpan = motion.span
 
