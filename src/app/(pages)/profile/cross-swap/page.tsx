@@ -7,7 +7,7 @@ export default function ProfileLayout() {
         <PageWrapper
             topBarProps={{
                 backButton: true,
-                title: 'swap',
+                title: 'Bridge Tokens',
             }}>
             <SwapProvider>
                 <div className='flex flex-1 flex-col gap-3'>

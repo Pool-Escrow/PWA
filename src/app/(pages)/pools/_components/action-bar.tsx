@@ -1,14 +1,15 @@
 'use client'
 
 import { useAuth } from '@/app/_client/hooks/use-auth'
+import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 import { Button } from '@/app/_components/ui/button'
+import bridgeIcon from '@/public/app/icons/svg/bridge-icon.svg'
 import qrIcon from '@/public/app/icons/svg/qr-icon.svg'
 import walletIcon from '@/public/app/icons/svg/wallet-icon.svg'
 import withdrawIcon from '@/public/app/icons/svg/withdraw.svg'
 import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 
 export default function ActionBar() {
     const router = useRouter()
@@ -22,13 +23,15 @@ export default function ActionBar() {
         }
         router.push('/profile/send')
     }
-    const handleDeposit = async () => {
+
+    const handleDeposit = () => {
         if (!authenticated) {
             login()
             return
         }
-        await handleOnRamp()
+        void handleOnRamp()
     }
+
     const handlePayRequest = () => {
         if (!authenticated) {
             login()
@@ -37,43 +40,56 @@ export default function ActionBar() {
         router.push('/qr')
     }
 
+    const handleBridge = () => {
+        if (!authenticated) {
+            login()
+            return
+        }
+        router.push('/profile/cross-swap')
+    }
+
     return (
-        <div className='relative mx-auto h-[55px] w-[296px]'>
-            {/* QR Code Section */}
-            <div className='absolute left-0 top-0 flex h-[55px] w-12 flex-col items-center gap-[10px]'>
-                <Button
-                    onClick={handlePayRequest}
-                    className='flex h-full flex-col items-center gap-[10px] bg-[#4078F4] hover:bg-[#4078F4] focus:bg-[#4078F4]'>
-                    <Image className='size-8' src={qrIcon as StaticImport} alt='QR Code' />
-                    <span className='text-[11px] font-semibold text-white'>Pay/Request</span>
-                </Button>
-            </div>
+        <div className='mx-auto flex h-[55px] w-full max-w-[340px] items-center justify-center rounded-[12px] bg-[#4078F4]'>
+            {/* Pay/Request */}
+            <Button
+                onClick={handlePayRequest}
+                className='flex h-full flex-1 flex-col items-center justify-center gap-1 bg-transparent hover:bg-transparent focus:bg-transparent'>
+                <Image className='size-6' src={qrIcon as StaticImport} alt='QR Code' />
+                <span className='text-[10px] font-semibold text-white'>Pay/Request</span>
+            </Button>
 
-            {/* First Divider */}
-            <div className='absolute left-[86px] top-[7px] h-[18px] w-px bg-[#D3D3D3]' />
+            {/* Divider */}
+            <div className='h-[18px] w-px bg-white/30' />
 
-            {/* Deposit Section */}
-            <div className='absolute left-[124px] top-0 flex h-[55px] w-12 flex-col items-center gap-[10px]'>
-                <Button
-                    onClick={handleDeposit}
-                    className='flex h-full flex-col items-center gap-[10px] bg-[#4078F4] hover:bg-[#4078F4] focus:bg-[#4078F4]'>
-                    <Image className='size-8' src={walletIcon as StaticImport} alt='Deposit' />
-                    <span className='text-[11px] font-semibold text-white'>Deposit</span>
-                </Button>
-            </div>
+            {/* Deposit */}
+            <Button
+                onClick={handleDeposit}
+                className='flex h-full flex-1 flex-col items-center justify-center gap-1 bg-transparent hover:bg-transparent focus:bg-transparent'>
+                <Image className='size-6' src={walletIcon as StaticImport} alt='Deposit' />
+                <span className='text-[10px] font-semibold text-white'>Deposit</span>
+            </Button>
 
-            {/* Second Divider */}
-            <div className='absolute left-[210px] top-[7px] h-[18px] w-px bg-[#D3D3D3]' />
+            {/* Divider */}
+            <div className='h-[18px] w-px bg-white/30' />
 
-            {/* Withdraw Section */}
-            <div className='absolute left-[248px] top-0 flex h-[55px] w-12 flex-col items-center gap-[10px]'>
-                <Button
-                    onClick={handleWithdraw}
-                    className='flex h-full flex-col items-center gap-[10px] bg-[#4078F4] hover:bg-[#4078F4] focus:bg-[#4078F4]'>
-                    <Image className='size-8' src={withdrawIcon as StaticImport} alt='Withdraw' />
-                    <span className='text-[11px] font-semibold text-white'>Withdraw</span>
-                </Button>
-            </div>
+            {/* Bridge */}
+            <Button
+                onClick={handleBridge}
+                className='flex h-full flex-1 flex-col items-center justify-center gap-1 bg-transparent hover:bg-transparent focus:bg-transparent'>
+                <Image className='size-6' src={bridgeIcon as StaticImport} alt='Bridge' />
+                <span className='text-[10px] font-semibold text-white'>Bridge</span>
+            </Button>
+
+            {/* Divider */}
+            <div className='h-[18px] w-px bg-white/30' />
+
+            {/* Withdraw */}
+            <Button
+                onClick={handleWithdraw}
+                className='flex h-full flex-1 flex-col items-center justify-center gap-1 bg-transparent hover:bg-transparent focus:bg-transparent'>
+                <Image className='size-6' src={withdrawIcon as StaticImport} alt='Withdraw' />
+                <span className='text-[10px] font-semibold text-white'>Withdraw</span>
+            </Button>
         </div>
     )
 }
