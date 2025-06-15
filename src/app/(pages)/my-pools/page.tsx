@@ -1,7 +1,10 @@
+import PageWrapper from '@/components/page-wrapper'
+import RenderBottomBar from '../pools/_components/render-bottom-bar'
 import MyPools from './_components/my-pools'
 import { getMyPoolsPageAction } from './actions'
-import RenderBottomBar from '../pools/_components/render-bottom-bar'
-import PageWrapper from '@/components/page-wrapper'
+
+// Force dynamic rendering since this page uses authentication and cookies
+export const dynamic = 'force-dynamic'
 
 export default async function MyPoolsPage() {
     const { upcomingPools, pastPools } = await getMyPoolsPageAction()
