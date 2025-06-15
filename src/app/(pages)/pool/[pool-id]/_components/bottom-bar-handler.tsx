@@ -1,22 +1,23 @@
 'use client'
 
-import * as React from 'react'
-import { Button } from '@/app/_components/ui/button'
-import { poolAbi } from '@/types/contracts'
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
-import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
-import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { useReadContract } from 'wagmi'
-import { getAbiItem } from 'viem'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import HybridRegistration from './terms-acceptance-dialog'
-import { addParticipantToPool } from '../../new/actions'
 import { useOnRamp } from '@/app/_client/hooks/use-onramp'
+import { usePoolActions } from '@/app/_client/hooks/use-pool-actions'
+import { useAppStore } from '@/app/_client/providers/app-store.provider'
+import { Button } from '@/app/_components/ui/button'
+import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { useUserInfo } from '@/hooks/use-user-info'
+import { poolAbi } from '@/types/contracts'
 import { useQueryClient } from '@tanstack/react-query'
+import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import * as React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { getAbiItem } from 'viem'
+import { useReadContract } from 'wagmi'
+import { addParticipantToPool } from '../../new/actions'
+import JoinPoolFeedbackDialog from './join-pool-feedback-dialog'
+import HybridRegistration from './terms-acceptance-dialog'
 
 type ButtonConfig = {
     label: string
@@ -38,6 +39,7 @@ interface BottomBarHandlerProps {
     tokenDecimals: number
     requiredAcceptance: boolean
     termsUrl: string
+    poolName?: string
 }
 
 export default function BottomBarHandler({
@@ -50,6 +52,7 @@ export default function BottomBarHandler({
     tokenDecimals,
     requiredAcceptance,
     termsUrl,
+    poolName,
 }: BottomBarHandlerProps) {
     const queryClient = useQueryClient()
     const [isLoading, setIsLoading] = useState(false)
@@ -153,6 +156,11 @@ export default function BottomBarHandler({
     }, [router, poolId])
 
     const [showTermsDialog, setShowTermsDialog] = useState(false)
+    const [showFeedbackDialog, setShowFeedbackDialog] = useState(false)
+
+    useEffect(() => {
+        console.log('🎭 [BottomBarHandler] Feedback dialog state changed:', showFeedbackDialog)
+    }, [showFeedbackDialog])
 
     const handleJoinPoolWithTerms = useCallback(() => {
         if (requiredAcceptance) {
@@ -307,8 +315,10 @@ export default function BottomBarHandler({
         // })
         if (isConfirmed && !transactionProcessed) {
             console.log('🔄 [BottomBarHandler] Processing confirmed transaction')
+            console.log('🎊 [BottomBarHandler] Transaction confirmed - showing feedback dialog')
             setIsLoading(false)
             setTransactionProcessed(true)
+            setShowFeedbackDialog(true) // Show feedback dialog on transaction confirmation
             router.refresh()
             resetConfirmation()
             void refetchParticipantStatus()
@@ -371,6 +381,11 @@ export default function BottomBarHandler({
                     termsUrl={termsUrl}
                 />
             )}
+            <JoinPoolFeedbackDialog
+                open={showFeedbackDialog}
+                onOpenChange={setShowFeedbackDialog}
+                poolName={poolName}
+            />
         </>
     )
 }
