@@ -38,7 +38,19 @@ export const getCspDirectives = () => ({
         'https://*.moonpay.com',
         'https://www.okx.com/api/v5/dex/cross-chain',
         'https://www.okx.com/api/',
-        'https://www.okx.com/'
+        'https://www.okx.com/',
+        // Add Web3Modal and WalletConnect APIs
+        'https://api.web3modal.org',
+        'https://*.web3modal.org',
+        'https://rpc.walletconnect.com',
+        'https://rpc.walletconnect.org',
+        'https://*.walletconnect.com',
+        'https://*.walletconnect.org',
+        // Add additional blockchain RPC endpoints
+        'https://base.gateway.tenderly.co',
+        'https://base-sepolia.gateway.tenderly.co',
+        'wss://base.gateway.tenderly.co',
+        'wss://base-sepolia.gateway.tenderly.co',
     ],
 
     // Content restrictions
@@ -50,13 +62,15 @@ export const getCspDirectives = () => ({
         'https://*.supabase.co',
         'https://explorer-api.walletconnect.com',
         'https://*.poolparty.cc',
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/*",
-        "https://static.okx.com/cdn/web3/currency/token/*",
-        "https://static.okx.com",
+        'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/*',
+        'https://static.okx.com/cdn/web3/currency/token/*',
+        'https://static.okx.com',
     ],
     'font-src': [
         "'self'",
         'https://cdn.privy.io',
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
         'data:', // For base64 encoded fonts
     ],
 
