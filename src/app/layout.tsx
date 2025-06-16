@@ -1,9 +1,9 @@
 import './global.css'
 
-import { Providers } from './_client/providers'
-import MainWrapper from './_components/main-wrapper'
 import { inter } from '@/lib/utils/fonts'
 import { headers } from 'next/headers'
+import { Providers } from './_client/providers/index'
+import MainWrapper from './_components/main-wrapper'
 // import InstallPromptDrawer from '@/components/install-prompt-drawer'
 
 export { metadata, viewport } from './_lib/utils/metadata'

@@ -1,25 +1,24 @@
 'use client'
 
-import * as React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
-import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
+import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
+import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { useQuery } from '@tanstack/react-query'
 
 // import PoolDetailsLoader from '@/app/(pages)/pool/[pool-id]/loading'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
-import PoolDetailsHeading from '@/app/(pages)/pool/[pool-id]/_components/pool-details-heading'
-import PoolDetailsProgress from '@/app/(pages)/pool/[pool-id]/_components/pool-details-progress'
-import PoolDetailsParticipants from '@/app/(pages)/pool/[pool-id]/_components/pool-details-participants'
-import PoolDetailsInfo from '@/app/(pages)/pool/[pool-id]/_components/pool-details-info'
 import BottomBarHandler from '@/app/(pages)/pool/[pool-id]/_components/bottom-bar-handler'
+import PoolDetailsHeading from '@/app/(pages)/pool/[pool-id]/_components/pool-details-heading'
+import PoolDetailsInfo from '@/app/(pages)/pool/[pool-id]/_components/pool-details-info'
+import PoolDetailsParticipants from '@/app/(pages)/pool/[pool-id]/_components/pool-details-participants'
+import PoolDetailsProgress from '@/app/(pages)/pool/[pool-id]/_components/pool-details-progress'
+import PullToRefresh from '@/app/_components/pull-to-refresh'
 import { Skeleton } from '@/app/_components/ui/skeleton'
 import { useEffect } from 'react'
-import PullToRefresh from '@/app/_components/pull-to-refresh'
 
 export default function PoolDetails({ poolId }: { poolId: string }) {
     const {

@@ -1,7 +1,7 @@
-import { cookieStorage, createStorage, http } from 'wagmi'
-import { base, baseSepolia } from 'viem/chains'
 import { createConfig } from '@privy-io/wagmi'
-import { Transport } from 'viem'
+import type { Transport } from 'viem'
+import { base, baseSepolia } from 'viem/chains'
+import { cookieStorage, createStorage, http } from 'wagmi'
 
 const network = process.env.NEXT_PUBLIC_NETWORK || 'development'
 

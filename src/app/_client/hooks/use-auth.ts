@@ -1,13 +1,13 @@
 'use client'
 
+import { createUserAction } from '@/server/actions/create-user.action'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { useDisconnect } from 'wagmi'
 import { useServerActionMutation } from './server-action-hooks'
-import { createUserAction } from '@/server/actions/create-user.action'
-import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
 
 export function useAuth() {
     const router = useRouter()

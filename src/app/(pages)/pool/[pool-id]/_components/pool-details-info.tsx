@@ -1,8 +1,7 @@
-import * as React from 'react'
-import { ExternalLinkIcon } from 'lucide-react'
-import Link from 'next/link'
-import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import { ExternalLinkIcon } from 'lucide-react'
+import { marked } from 'marked'
+import Link from 'next/link'
 
 function PoolDetailsTermsUrl({ termsUrl }: { termsUrl: string }) {
     return (
