@@ -151,6 +151,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                     tokenDecimals={pool.tokenDecimals}
                     requiredAcceptance={pool.requiredAcceptance || false}
                     termsUrl={pool.termsUrl || ''}
+                    poolName={pool.name}
                 />
             </div>
         </PullToRefresh>
