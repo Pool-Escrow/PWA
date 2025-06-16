@@ -10,6 +10,8 @@
     "scripts": {
         "build": "next build",
         "check-types": "tsc --noemit",
+        "db:health:dev": "NODE_ENV=development node --env-file=.env.development.local scripts/database-health-check.mjs",
+        "db:health:prod": "NODE_ENV=production node --env-file=.env.production.local scripts/database-health-check.mjs",
         "dev": "next dev",
         "dev:https": "next dev --experimental-https",
         "dev:turbo": "TURBO=true next dev --turbo",
@@ -23,7 +25,8 @@
         "test": "vitest",
         "test:e2e": "playwright test",
         "storybook": "storybook dev -p 6006",
-        "build-storybook": "storybook build"
+        "build-storybook": "storybook build",
+        "db:health": "echo \"Please run db:health:dev or db:health:prod\" && exit 1"
     },
     "dependencies": {
         "@coinbase/cbpay-js": "2.3.0",

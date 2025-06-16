@@ -1,0 +1,93 @@
+name: Database Keepalive
+
+on:
+    schedule:
+        # Run every 6 hours to keep database active
+        - cron: '0 */6 * * *'
+    workflow_dispatch: # Allow manual triggering
+
+permissions:
+    actions: write
+    contents: read
+
+jobs:
+    database-health-check:
+        name: Database Health Check
+        runs-on: ubuntu-22.04
+        environment: production
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '20'
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: '9.12.1'
+
+            - name: Install dependencies for health check
+              run: pnpm install --prod --frozen-lockfile
+
+            - name: Run Development Database Health Check
+              env:
+                  NODE_ENV: development
+                  NEXT_PUBLIC_SUPABASE_URL: https://gyalvpenhktgsmrrjmxv.supabase.co
+                  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_DEV }}
+              run: node scripts/database-health-check.mjs
+
+            - name: Run Production Database Health Check
+              env:
+                  NODE_ENV: production
+                  NEXT_PUBLIC_SUPABASE_URL: https://ppozqsgozecxmphxinpt.supabase.co
+                  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY_PROD }}
+              run: node scripts/database-health-check.mjs
+
+            - name: Database Activity Summary
+              run: |
+                  echo ""
+                  echo "📅 Next scheduled run: $(date -d '+6 hours' || date -v +6H)"
+
+    workflow-keepalive:
+        name: Workflow Keepalive
+        runs-on: ubuntu-22.04
+        needs: database-health-check
+        if: always() # Run even if database check fails
+        permissions:
+            actions: write
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Keep workflow active
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  echo "🔄 Keeping workflow active to prevent suspension..."
+
+                  # Get the last commit date
+                  LAST_COMMIT_DATE=$(git log -1 --format=%ct)
+                  CURRENT_DATE=$(date +%s)
+                  DAYS_SINCE_LAST_COMMIT=$(( (CURRENT_DATE - LAST_COMMIT_DATE) / 86400 ))
+
+                  echo "📅 Days since last commit: $DAYS_SINCE_LAST_COMMIT"
+
+                  # If it's been more than 25 days since last commit, use GitHub API to keep workflow active
+                  if [ $DAYS_SINCE_LAST_COMMIT -gt 25 ]; then
+                      echo "⚠️ Repository inactive for $DAYS_SINCE_LAST_COMMIT days, using GitHub API to prevent suspension"
+                      
+                      # Enable the workflow via GitHub API to prevent suspension
+                      curl -L \
+                          -X PUT \
+                          -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $GITHUB_TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/workflows/database-keepalive.yml/enable"
+                      
+                      echo "✅ Workflow keepalive signal sent"
+                  else
+                      echo "✅ Repository is active, no keepalive needed"
+                  fi
