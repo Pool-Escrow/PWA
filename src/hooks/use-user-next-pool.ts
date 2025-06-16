@@ -31,5 +31,9 @@ export const useUserNextPool = () => {
         queryFn: () => fetchUserNextPool(userAddress!),
         enabled: Boolean(userAddress),
         select: data => data || undefined,
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+        gcTime: 1000 * 60 * 10, // Garbage collect after 10 minutes
+        refetchOnWindowFocus: false, // Prevent refetch on window focus
+        refetchOnMount: false, // Prevent refetch on component mount if data exists
     })
 }
