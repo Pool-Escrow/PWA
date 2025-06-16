@@ -71,14 +71,19 @@ export function useAuth() {
 
     const { login } = useLogin({
         onComplete({ user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount }) {
-            console.log('[use-auth] auth complete')
+            // Reduce console logging to prevent noise
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[use-auth] auth complete', { isNewUser, wasAlreadyAuthenticated })
+            }
             void queryClient.invalidateQueries({ queryKey: ['userAdminStatus'] })
 
             if (isNewUser) {
                 createNewUser(undefined, {
                     onSuccess: () => {
                         router.replace('/profile/new')
-                        console.log('[use-auth] new user', { loginMethod, loginAccount })
+                        if (process.env.NODE_ENV === 'development') {
+                            console.log('[use-auth] new user created', { loginMethod })
+                        }
                     },
                 })
                 // this mutation does not need any arguments, so we pass undefined
@@ -86,12 +91,14 @@ export function useAuth() {
             }
 
             if (wasAlreadyAuthenticated) {
-                console.log('[use-auth] already authenticated')
+                // Only log in development mode to reduce noise
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('[use-auth] already authenticated')
+                }
                 return
             }
 
             router.refresh()
-            console.log('[use-auth] user', user)
         },
         onError(error) {
             if (error.toString() === 'exited_auth_flow') {
