@@ -15,15 +15,6 @@ export default function NextUserPool() {
     const { data: pools, isLoading, error } = useUserNextPool()
     const hasNextPool = !isLoading && !error && pools && pools.length > 0
 
-    console.log('NextUserPool render:', {
-        ready,
-        authenticated,
-        isLoading,
-        error,
-        poolsLength: pools?.length,
-        hasNextPool,
-    })
-
     return (
         <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
             <div className='flex shrink justify-between'>
