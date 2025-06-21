@@ -19,7 +19,6 @@
         "gen:contracts": "pnpm gen contracts",
         "gen:db": "pnpm gen db",
         "lint": "next lint",
-        "preinstall": "node scripts/check-node-version.js && npx only-allow pnpm",
         "prettify": "prettier -w",
         "start": "next start",
         "test": "vitest",
