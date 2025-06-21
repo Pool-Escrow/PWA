@@ -23,7 +23,7 @@ export default function PoolDetailsBanner({ imageUrl, name, buttons, status }: P
                     }}
                     exit={{ opacity: 0, scale: 1.1 }}
                     transition={{ duration: 0.5 }}
-                    className='relative h-full w-full'>
+                    className='relative size-full'>
                     <Image
                         src={imageUrl}
                         alt={name}

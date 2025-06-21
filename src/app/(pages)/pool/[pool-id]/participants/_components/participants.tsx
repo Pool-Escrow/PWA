@@ -104,24 +104,24 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                     onValueChange={(value: string) => handleTabChange(value as TabValue)}>
                     {isAdmin && (
                         <>
-                            <TabsList className='fixed left-0 right-0 z-10 flex justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
+                            <TabsList className='fixed inset-x-0 z-10 flex justify-start space-x-0 rounded-none border-b border-[#EAECF0] bg-white p-0 md:space-x-8'>
                                 <TabsTrigger
-                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    className='relative font-semibold before:absolute before:-bottom-px before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
                                     value={TabValue.Registered}>
                                     Registered
                                 </TabsTrigger>
                                 <TabsTrigger
-                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    className='relative font-semibold before:absolute before:-bottom-px before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
                                     value={TabValue.CheckedIn}>
                                     Checked in
                                 </TabsTrigger>
                                 <TabsTrigger
-                                    className='relative font-semibold before:absolute before:bottom-[-1px] before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
+                                    className='relative font-semibold before:absolute before:-bottom-px before:left-0 before:hidden before:h-[2px] before:w-full before:bg-black data-[state=active]:text-black data-[state=active]:before:block'
                                     value={TabValue.Winners}>
                                     Winners
                                 </TabsTrigger>
                             </TabsList>
-                            <div className='h-[48px]'></div>
+                            <div className='h-[48px]' />
                         </>
                     )}
                     <TabsContent value='registered'></TabsContent>

@@ -56,7 +56,7 @@ export default function AvatarUploader({ name, defaultValue, onChange }: AvatarU
                         priority
                     />
                     <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100'>
-                        <div className='absolute inset-0 rounded-full bg-black opacity-50'></div>
+                        <div className='absolute inset-0 rounded-full bg-black opacity-50' />
                         <Button
                             size='icon'
                             variant='outline'

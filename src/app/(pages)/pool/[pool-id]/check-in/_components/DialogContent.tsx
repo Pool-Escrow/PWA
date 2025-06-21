@@ -19,8 +19,8 @@ export function DialogContent({
     italicSubtitle = true,
 }: DialogContentProps) {
     return (
-        <div className='flex h-full w-full flex-col'>
-            <div className='flex h-full w-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
+        <div className='flex size-full flex-col'>
+            <div className='flex size-full flex-col items-center justify-center gap-1 pt-[9px] md:gap-2'>
                 {avatar}
                 <h2
                     className={cn('whitespace-pre-line text-center text-[15px] font-medium md:text-[24px]', {

@@ -93,7 +93,7 @@ const PoolClaimRow = (props: PoolDetailsProps) => {
             </div>
             <Button
                 onClick={onClaimButtonClicked}
-                className='active:bg-cta-active mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
+                className='mb-3 h-[46px] w-full flex-1 grow flex-row items-center justify-center rounded-[2rem] bg-cta px-6 py-[11px] text-center align-middle font-semibold leading-normal text-white shadow-button active:bg-cta-active active:shadow-button-push'>
                 Claim winnings
             </Button>
         </div>

@@ -82,7 +82,7 @@ export default function ClaimablePrizesList() {
     if (isPending) {
         return (
             <div className='flex-center p-6'>
-                <Loader2Icon className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2Icon className='mr-2 size-4 animate-spin' />
             </div>
         )
     }

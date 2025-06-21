@@ -186,7 +186,7 @@ export default function PayoutScanPage() {
                         italicSubtitle={false}
                         footer={
                             <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                className='size-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
                                 onClick={resetQrDialog}
                                 disabled={false}
                                 style={{
@@ -242,7 +242,7 @@ export default function PayoutScanPage() {
                         subtitle='Please do not close'
                         footer={
                             <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                className='size-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
                                 onClick={() => {}}
                                 disabled={true}>
                                 Processing...
@@ -264,7 +264,7 @@ export default function PayoutScanPage() {
                         titleColor='primary'
                         footer={
                             <Button
-                                className='h-full w-full rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
+                                className='size-full rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
                                 onClick={resetQrDialog}>
                                 Continue
                             </Button>
@@ -315,7 +315,7 @@ export default function PayoutScanPage() {
                         subtitle='Please do not close'
                         footer={
                             <Button
-                                className='h-full w-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
+                                className='size-full rounded-full bg-[#EEEFF0] text-[16px] font-semibold text-[#787878] hover:bg-[#EEEFF0] active:bg-[#EEEFF0] md:text-[24px]'
                                 onClick={() => {}}
                                 disabled={true}>
                                 Processing...

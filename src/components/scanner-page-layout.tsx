@@ -12,7 +12,7 @@ type ScannerPageLayoutProps = {
 
 export default function ScannerPageLayout({ children, title, className }: ScannerPageLayoutProps) {
     return (
-        <div className={'absolute left-0 top-0 flex h-full w-full'}>
+        <div className={'absolute left-0 top-0 flex size-full'}>
             {children}
             <header className={cn('absolute top-4 w-full text-white', className)}>
                 <nav className='grid h-24 grid-cols-[1fr_auto_1fr] items-center'>
@@ -22,7 +22,7 @@ export default function ScannerPageLayout({ children, title, className }: Scanne
                     <div className='text-center'>
                         <div className='w-full text-center text-sm font-semibold'>{title}</div>
                     </div>
-                    <div className='justify-self-end'></div>
+                    <div className='justify-self-end' />
                 </nav>
             </header>
         </div>

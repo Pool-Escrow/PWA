@@ -85,7 +85,7 @@ const ParticipantPayout = ({ params }: Props) => {
                                     <Image src={circleTickIcon} alt='paid' width={20} height={20} />
                                 </span>
                             ) : amountWon > 0 ? (
-                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-[#5572E9]'></span>
+                                <span className='absolute left-0 top-0 z-50 size-[20px] rounded-full bg-[#5572E9]' />
                             ) : (
                                 <></>
                             )}
