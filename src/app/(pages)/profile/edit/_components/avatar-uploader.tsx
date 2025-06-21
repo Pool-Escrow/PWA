@@ -4,7 +4,8 @@ import { Button } from '@/app/_components/ui/button'
 import Image from 'next/image'
 import AvatarUploadIcon from './avatar-upload-icon'
 import { CameraIcon, Trash2Icon } from 'lucide-react'
-import { useState, ChangeEvent } from 'react'
+import type { ChangeEvent } from 'react';
+import { useState } from 'react'
 
 export interface AvatarUploaderProps {
     name: string

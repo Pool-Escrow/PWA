@@ -1,7 +1,8 @@
 // src/app/pwa/_client/stores/app.store.ts
 
 import { createStore } from 'zustand/vanilla'
-import { createSettingsSlice, SettingsSlice, SettingsState } from './settings.slice'
+import type { SettingsSlice, SettingsState } from './settings.slice';
+import { createSettingsSlice } from './settings.slice'
 
 export type AppState = SettingsState
 

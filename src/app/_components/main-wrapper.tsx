@@ -1,14 +1,14 @@
 'use client'
 
-import * as React from 'react'
-import { cn } from '@/lib/utils/tailwind'
 import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { AnimatePresence, motion } from 'framer-motion'
-import { usePathname, useRouter } from 'next/navigation'
-import { useEffect, useState, useContext, useRef } from 'react'
-import { LayoutRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { getPageTransition } from '@/lib/utils/animations'
+import { cn } from '@/lib/utils/tailwind'
+import { AnimatePresence, motion } from 'framer-motion'
+import { LayoutRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import dynamic from 'next/dynamic'
+import { usePathname, useRouter } from 'next/navigation'
+import * as React from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 
 function FrozenRouter(props: { children: React.ReactNode }) {
     const context = useContext(LayoutRouterContext ?? {})

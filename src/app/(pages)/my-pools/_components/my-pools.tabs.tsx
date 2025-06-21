@@ -9,7 +9,7 @@ import { useSwipeable } from 'react-swipeable'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/app/_components/ui/select';
 import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import PoolList from '../../pools/_components/pool-list'
 import { myPoolsTabsConfig, type MyPoolsTab } from './my-pools.tabs.config'
 

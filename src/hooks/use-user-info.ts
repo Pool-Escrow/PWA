@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { usePrivy } from '@privy-io/react-auth'
 import { blo } from 'blo'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 
 const fetchUserInfo = async (privyId?: string) => {

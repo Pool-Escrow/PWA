@@ -1,8 +1,9 @@
 import { currentPoolAddress, serverConfig } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
-import { Address, getAbiItem } from 'viem'
-import { Role } from './constants'
+import type { Address} from 'viem';
+import { getAbiItem } from 'viem'
+import type { Role } from './constants'
 import { getTokenDecimals, getTokenSymbol } from './token'
 
 const publicClient = getPublicClient(serverConfig)

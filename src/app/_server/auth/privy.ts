@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { PrivyClient } from '@privy-io/server-auth'
 
 import type { User } from '@privy-io/server-auth'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID
 const privyAppSecret = process.env.PRIVY_APP_SECRET

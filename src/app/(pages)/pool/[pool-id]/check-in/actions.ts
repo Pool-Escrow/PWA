@@ -5,7 +5,7 @@ import { verifyToken } from '@/app/_server/auth/privy'
 import { db } from '@/app/_server/database/db'
 import { isAdminUseCase } from '@/app/_server/use-cases/users/is-admin'
 import { isParticipantUseCase } from '@/app/_server/use-cases/users/is-participant'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 export async function checkInAction(poolId: string, address: Address) {
     try {

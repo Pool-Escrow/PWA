@@ -4,7 +4,8 @@ import { getUserAddressAction } from '@/app/(pages)/pools/actions'
 import { getPoolInfo, getWinnerDetail } from '@/lib/contract/pool'
 import { getTokenDecimals, getTokenSymbol } from '@/lib/contract/token'
 import { fromUnixTime } from 'date-fns'
-import { Address, formatUnits } from 'viem'
+import type { Address} from 'viem';
+import { formatUnits } from 'viem'
 import { getPoolDateOverride } from '@/app/_lib/utils/get-pool-date-override'
 import { z } from 'zod'
 

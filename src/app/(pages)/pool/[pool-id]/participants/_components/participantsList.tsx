@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import ParticipantCard from './participantCard'
-import { useParticipants } from '@/hooks/use-participants'
+import type { useParticipants } from '@/hooks/use-participants'
 import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { TabValue } from './participants'
 

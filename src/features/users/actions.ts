@@ -2,7 +2,7 @@
 
 import { hasRole } from '@/lib/contract/pool'
 import { ADMIN_ROLE } from '@/lib/contract/constants'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { cookies } from 'next/headers'
 import { privy, getPrivyVerificationKey } from '@/app/_server/auth/privy'
 

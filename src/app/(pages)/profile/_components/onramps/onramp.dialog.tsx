@@ -8,7 +8,7 @@ import OnRampForm from './onramp.form'
 import ReceiveDialog from '@/app/(pages)/profile/_components/receive/receive.dialog'
 import Unlimit from '@/app/(pages)/profile/_components/onramps/unlimit'
 // import { OnrampWithStripe } from '@/app/(pages)/profile/_components/onramps/onramp-stripe'
-import { MoonpayCurrencyCode, MoonpayPaymentMethod, useFundWallet, useWallets } from '@privy-io/react-auth'
+import type { MoonpayCurrencyCode, MoonpayPaymentMethod} from '@privy-io/react-auth';
 import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useAccount, useBalance } from 'wagmi'
 

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server'
 import { verifyToken } from '@/app/_server/auth/privy'
 
 export async function middleware(request: NextRequest) {

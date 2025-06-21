@@ -13,7 +13,8 @@ import useTransactions from '@/app/_client/hooks/use-transactions'
 import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { toast } from 'sonner'
-import { Address, formatUnits, getAbiItem, parseUnits } from 'viem'
+import type { Address} from 'viem';
+import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 
 interface PayoutFormProps {

@@ -1,8 +1,8 @@
 import 'server-only'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { getUserPools } from '../../persistence/pools/blockchain/get-contract-user-pools'
 import { getDbPools } from '../../persistence/pools/db/get-db-pools'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 
 const statusMap: Record<number, string> = {

@@ -1,18 +1,16 @@
 'use client'
 
-import { useBalance } from 'wagmi'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { usePrivy } from '@privy-io/react-auth'
-import type { Address } from 'viem'
-import { formatBalance } from '@/app/_lib/utils/balance'
 import BalanceSkeleton from '@/app/_components/balance/balance-skeleton'
 import EncryptText from '@/app/_components/balance/encrypt-text'
 import FormattedBalance from '@/app/_components/balance/formatted-balance'
-import { useState } from 'react'
-import { dropTokenAddress } from '@/types/contracts'
 import NumberTicker from '@/app/_components/ui/number-ticker'
+import { formatBalance } from '@/app/_lib/utils/balance'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { dropTokenAddress } from '@/types/contracts'
+import { usePrivy } from '@privy-io/react-auth'
+import type { Address } from 'viem'
+import { useBalance } from 'wagmi'
 
-const zeroBalance = {
     value: BigInt(0),
     decimals: 18,
     symbol: 'USDC',

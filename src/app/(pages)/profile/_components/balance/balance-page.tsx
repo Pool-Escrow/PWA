@@ -1,12 +1,11 @@
 'use client'
 
-import { useBalance } from 'wagmi'
+import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import { useWallets } from '@privy-io/react-auth'
 import type { Address } from 'viem'
+import { useBalance } from 'wagmi'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 
 export default function ProfileBalanceSection() {
     const { wallets } = useWallets()

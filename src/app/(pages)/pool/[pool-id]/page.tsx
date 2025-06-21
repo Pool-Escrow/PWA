@@ -1,9 +1,11 @@
-import * as React from 'react'
-import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
-import { getPoolDetailsById } from '@/features/pools/server/db/pools'
-import PoolDetails from '@/features/pools/pages/pool-details'
-import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+'use client'
+
 import PageWrapper from '@/components/page-wrapper'
+import PoolDetails from '@/features/pools/pages/pool-details'
+import { getPoolDetailsById } from '@/features/pools/server/db/pools'
+import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query'
+import * as React from 'react'
 
 type Props = {
     params: { 'pool-id': string }

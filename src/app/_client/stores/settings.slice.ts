@@ -1,7 +1,7 @@
 // src/app/pwa/_client/stores/settings.slice.ts
 
-import { MyPoolsTab } from '@/app/(pages)/my-pools/_components/my-pools.tabs.config'
-import { StateCreator } from 'zustand'
+import type { MyPoolsTab } from '@/app/(pages)/my-pools/_components/my-pools.tabs.config'
+import type { StateCreator } from 'zustand'
 
 export interface SettingsState {
     bottomBarContent: React.ReactNode | null

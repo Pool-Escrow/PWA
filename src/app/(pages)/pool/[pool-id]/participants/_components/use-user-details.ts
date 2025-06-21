@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getSupabaseBrowserClient } from './db-client'
 import type { Tables } from '@/types/db'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 
 type UserDetails = Pick<Tables<'users'>, 'avatar' | 'displayName' | 'walletAddress'>
 

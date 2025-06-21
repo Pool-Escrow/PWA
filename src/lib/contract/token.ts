@@ -1,7 +1,8 @@
 import { serverConfig } from '@/app/_server/blockchain/server-config'
 import { tokenAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
-import { Address, getAbiItem } from 'viem'
+import type { Address} from 'viem';
+import { getAbiItem } from 'viem'
 
 const publicClient = getPublicClient(serverConfig)
 

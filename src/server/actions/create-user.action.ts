@@ -1,6 +1,6 @@
 'use server'
 
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { authenticatedProcedure } from '@/app/_server/procedures/authenticated'
 import { createProfileUseCase } from '@/app/_server/use-cases/users/create-user'
 import { isAdminUseCase } from '@/app/_server/use-cases/users/is-admin'

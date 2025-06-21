@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { getAbiItem, Hash } from 'viem'
+import type { Hash } from 'viem';
+import { getAbiItem } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
 import { toast } from 'sonner'
 import { poolAbi } from '@/types/contracts'

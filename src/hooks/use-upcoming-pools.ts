@@ -1,6 +1,6 @@
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
-import { PoolItem } from '@/app/_lib/entities/models/pool-item'
+import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 import { transformContractPoolToUIPool } from '@/app/_lib/utils/pool-transforms'
 import { getContractPools } from '@/app/_server/persistence/pools/blockchain/get-contract-pools'
 import { useQuery } from '@tanstack/react-query'
