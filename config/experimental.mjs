@@ -11,19 +11,7 @@ export const experimentalConfig = {
     serverActions: {
         allowedOrigins: ['app.poolparty.cc'],
     },
-    // optimizeCss: true,
-    // optimizeServerReact: true,
-    // turbotrace: {
-    //     logLevel: 'error',
-    //     logDetail: true,
-    //     contextDirectory: process.cwd(),
-    //     memoryLimit: 4096,
-    // },
-    //
-    // optimizePackageImports: [
-    //     'lodash',
-    //     'date-fns',
-    //     'lucide-react', // Added to optimize icons
-    //     '@serwist/next', // Added to optimize PWA
-    // ],
+
+    // Enable performance optimizations
+    optimizeCss: true,
 }

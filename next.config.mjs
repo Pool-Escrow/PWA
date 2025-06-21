@@ -12,13 +12,15 @@ const withBundleAnalyzer = bundleAnalyzer({
 const baseConfig = {
     compiler: config.compiler,
     eslint: { ignoreDuringBuilds: true },
-    experimental: config.experimental,
+    experimental: {
+        ...config.experimental,
+        optimizeCss: true,
+    },
     headers: config.security,
     images: config.images,
     reactStrictMode: true,
     rewrites: config.rewrites,
     webpack: config.webpack,
-
     generateBuildId: () => execSync('git rev-parse HEAD').toString().trim(),
 }
 

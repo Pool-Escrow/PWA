@@ -124,7 +124,7 @@
         "@vitejs/plugin-react": "4.3.3",
         "@wagmi/cli": "2.2.0",
         "autoprefixer": "10.4.20",
-        "critters": "0.0.25",
+        "beasties": "0.3.4",
         "cssnano": "7.0.6",
         "eslint": "8.57.1",
         "eslint-config-next": "14.2.16",
@@ -152,7 +152,7 @@
             "glob": "11.0.0",
             "react": "18.3.1",
             "react-dom": "18.3.1",
-            "rimraf": "6.0.1"
+            "critters": "npm:beasties@^0.3.4",
         },
         "allowedDeprecatedVersions": {
             "@babel/plugin-proposal-class-properties": "7.18.6",
