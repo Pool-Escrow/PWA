@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json.schemastore.org/package",
+    "$schema": "https://www.schemastore.org/package.json",
     "name": "pool-pwa",
     "version": "0.0.0",
     "license": "MIT",
