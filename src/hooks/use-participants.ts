@@ -67,8 +67,8 @@ export const useParticipants = (poolId: string) => {
                     const winnerDetails = await fetchWinnerDetail({
                         queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
                     })
-                    let amountWon = winnerDetails.winnerDetailFromSC.amountWon
-                    let amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
+                    const amountWon = winnerDetails.winnerDetailFromSC.amountWon
+                    const amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
 
                     let checkedInAt = undefined
                     let status = undefined
