@@ -2,11 +2,10 @@ import 'server-only'
 
 import { NextResponse } from 'next/server'
 
-import { generateOnRampURL } from '@coinbase/cbpay-js'
-
 import crypto from 'crypto'
 import type { SignOptions } from 'jsonwebtoken'
 import { sign } from 'jsonwebtoken'
+
 export async function POST(req: Request) {
     console.log('on_ramp_coinbase API Hit')
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -79,6 +78,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: data.message }, { status: 500 })
     } else {
         // Success
+
+        // Dynamic import to prevent client-side bundling of Coinbase's HeartbeatWorker
+        const { generateOnRampURL } = await import('@coinbase/cbpay-js')
 
         const onRampUrl = generateOnRampURL({
             // eslint-disable-next-line
