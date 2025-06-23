@@ -1,12 +1,15 @@
 // @ts-check
 
-import { inProduction } from '../src/app/_lib/utils/environment.mjs'
+// Check if Turbopack is enabled via environment variable
+const isTurbopack = process.env.TURBOPACK === 'true'
 
 /** @type {import('next').NextConfig['compiler']} */
 export const compilerConfig = {
-    removeConsole: inProduction
-        ? {
-              exclude: ['error', 'warn'],
-          }
-        : false,
+    // Disable removeConsole when using Turbopack as it's not supported
+    removeConsole:
+        process.env.NODE_ENV === 'production' && !isTurbopack
+            ? {
+                  exclude: ['error', 'warn'],
+              }
+            : false,
 }

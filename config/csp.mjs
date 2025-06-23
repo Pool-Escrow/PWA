@@ -15,9 +15,16 @@ export const getCspDirectives = () => ({
         "'unsafe-inline'", // Consider removing if possible
         'https://cdn.privy.io',
         'https://*.stripe.com',
+        'https://challenges.cloudflare.com',
         'blob:',
     ],
-    'script-src-elem': ["'self'", "'unsafe-inline'", 'https://cdn.privy.io', 'https://*.stripe.com'],
+    'script-src-elem': [
+        "'self'",
+        "'unsafe-inline'",
+        'https://cdn.privy.io',
+        'https://*.stripe.com',
+        'https://challenges.cloudflare.com',
+    ],
     'worker-src': ["'self'", 'blob:'],
 
     // Resource loading
@@ -51,10 +58,16 @@ export const getCspDirectives = () => ({
         'https://base-sepolia.gateway.tenderly.co',
         'wss://base.gateway.tenderly.co',
         'wss://base-sepolia.gateway.tenderly.co',
+        // Add public node endpoints
+        'https://base.publicnode.com',
+        'https://base-sepolia.publicnode.com',
+        'https://base-rpc.publicnode.com',
+        'https://base-sepolia-rpc.publicnode.com',
+        'https://base.llamarpc.com',
     ],
 
     // Content restrictions
-    'style-src': ["'self'", "'unsafe-inline'", 'https://cdn.privy.io'],
+    'style-src': ["'self'", "'unsafe-inline'", 'https://cdn.privy.io', 'https://fonts.googleapis.com'],
     'img-src': [
         "'self'",
         'blob:',
@@ -88,6 +101,56 @@ export const generateCspString = () => {
         .map(([key, values]) => {
             if (values.length === 0) return key
             return `${key} ${values.join(' ')}`
+        })
+        .join('; ')
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const createContentSecurityPolicy = ({ dev = false, isStorybook = false }) => {
+    const directives = {
+        'default-src': ["'self'"],
+        'script-src': [
+            "'self'",
+            'https://challenges.cloudflare.com',
+            // Allow unsafe-inline for development speed, but should be removed in production if possible
+            ...(dev || isStorybook ? ["'unsafe-eval'", "'unsafe-inline'"] : []),
+        ],
+        'style-src': ["'self'", "'unsafe-inline'"], // unsafe-inline is needed for many UI libraries
+        'img-src': ["'self'", 'data:', 'blob:'],
+        'font-src': ["'self'"],
+        'object-src': ["'none'"],
+        'base-uri': ["'self'"],
+        'form-action': ["'self'"],
+        'frame-ancestors': ["'none'"],
+        'child-src': ['https://auth.privy.io', 'https://verify.walletconnect.com', 'https://verify.walletconnect.org'],
+        'frame-src': [
+            'https://auth.privy.io',
+            'https://verify.walletconnect.com',
+            'https://verify.walletconnect.org',
+            'https://challenges.cloudflare.com',
+        ],
+        'connect-src': [
+            "'self'",
+            'https://auth.privy.io',
+            'wss://relay.walletconnect.com',
+            'wss://relay.walletconnect.org',
+            'wss://www.walletlink.org',
+            'https://*.rpc.privy.systems',
+            'https://explorer-api.walletconnect.com',
+            // Allow connections for local development
+            ...(dev ? ['ws://localhost:*', 'http://localhost:*', 'https://localhost:*'] : []),
+        ],
+        'worker-src': ["'self'"],
+        'manifest-src': ["'self'"],
+        ...(dev ? {} : { 'upgrade-insecure-requests': [] }),
+    }
+
+    return Object.entries(directives)
+        .map(([directive, sources]) => {
+            if (sources.length > 0) {
+                return `${directive} ${sources.join(' ')}`
+            }
+            return directive
         })
         .join('; ')
 }
