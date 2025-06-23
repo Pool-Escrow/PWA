@@ -1,8 +1,8 @@
+import withClassNameDiv from '@/components/hocs/with-classname-div'
+import withForwardRef from '@/components/hocs/with-forward-ref'
 import { cn } from '@/lib/utils/tailwind'
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog'
 import type { DialogProps } from '@radix-ui/react-dialog'
-import withClassNameDiv from '../hocs/with-classname-div'
-import withForwardRef from '../hocs/with-forward-ref'
 import { buttonVariants } from './button'
 
 const AlertDialog: React.FC<DialogProps> & {

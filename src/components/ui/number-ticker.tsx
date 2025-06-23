@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils/tailwind'
-import { useInView, useMotionValue, useSpring } from 'framer-motion'
+import { useMotionValue, useSpring } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
 export default function NumberTicker({

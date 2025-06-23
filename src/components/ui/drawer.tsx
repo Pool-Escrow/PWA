@@ -83,4 +83,4 @@ Drawer.Portal = DrawerPortal
 Drawer.Title = DrawerTitle
 Drawer.Trigger = DrawerTrigger
 
-export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerHeader, DrawerTrigger, DrawerFooter, DrawerTitle }
+export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger }
