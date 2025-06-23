@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { debounce } from 'lodash'
 import Fuse from 'fuse.js'
-import { allCities, commonCities, featuredCities, City } from '@/lib/utils/cities'
+import type { City } from '@/lib/utils/cities';
+import { allCities, commonCities, featuredCities } from '@/lib/utils/cities'
 
 const fuse = new Fuse(allCities, {
     keys: ['label', 'country', 'countryCode'],

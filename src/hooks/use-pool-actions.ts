@@ -1,7 +1,7 @@
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { deposit } from '@/app/_lib/blockchain/functions/pool/deposit'
-import { approve } from '@/app/_lib/blockchain/functions/token/approve'
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import useTransactions from '@/hooks/use-transactions'
+import { deposit } from '@/lib/blockchain/functions/pool/deposit'
+import { approve } from '@/lib/blockchain/functions/token/approve'
+import { currentPoolAddress, currentTokenAddress } from '@/server/blockchain/server-config'
 import { poolAbi, tokenAbi } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 
@@ -12,6 +12,7 @@ import type { Address, Hash } from 'viem'
 import { parseUnits } from 'viem'
 import { useReadContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useAuth } from './use-auth'
+import { useWalletConnectionStatus } from './use-wallet-connection-status'
 
 type UsePoolActionsProps = {
     poolId: string
@@ -31,6 +32,7 @@ export function usePoolActions({
     const { login, authenticated } = useAuth()
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
     const { wallets } = useWallets()
+    const { isStable: isWalletStable } = useWalletConnectionStatus()
     const { data: userBalance, error: balanceError } = useReadContract({
         address: currentTokenAddress,
         abi: tokenAbi,
@@ -178,10 +180,11 @@ export function usePoolActions({
 
         if (!isReady) {
             console.log('⚠️ [usePoolActions] Wallet not ready')
+            toast.error('Wallet not ready. Please wait a moment and try again.')
             return
         }
 
-        if (isReady && !authenticated) {
+        if (!authenticated) {
             console.log('🔑 [usePoolActions] Not authenticated, initiating login')
             login()
             return
@@ -189,8 +192,31 @@ export function usePoolActions({
 
         if (!wallets[0]?.address) {
             console.error('❌ [usePoolActions] No wallet address available')
+            toast.error('Wallet not connected. Please refresh the page and try again.')
             return
         }
+
+        if (!wallets[0]?.connectorType) {
+            console.error('❌ [usePoolActions] Wallet connector not available')
+            toast.error('Wallet connection issue. Please refresh the page and reconnect your wallet.')
+            return
+        }
+
+        if (!isWalletStable) {
+            console.warn('⚠️ [usePoolActions] Wallet connection unstable')
+            toast.error(
+                'Wallet connection is unstable. Please refresh the page to ensure a stable connection before proceeding.',
+                {
+                    action: {
+                        label: 'Refresh',
+                        onClick: () => window.location.reload(),
+                    },
+                    duration: 8000,
+                },
+            )
+            return
+        }
+
         console.log('💰 [usePoolActions] Checking funds...')
         const bigIntPrice = parseUnits(poolPrice.toFixed(20), tokenDecimals)
         console.log('💵 [usePoolActions] Required amount:', bigIntPrice.toString())
@@ -198,6 +224,7 @@ export function usePoolActions({
 
         if (balanceError) {
             console.error('❌ [usePoolActions] Balance check error:', balanceError)
+            toast.error('Unable to check balance. Please refresh the page and try again.')
             return
         }
 
@@ -213,16 +240,35 @@ export function usePoolActions({
             toast('Joining pool...')
 
             const transactions = [
-                ...(bigIntPrice > 0 ? [approve({ spender: currentPoolAddress, amount: bigIntPrice.toString() })] : []),
+                ...(bigIntPrice > 0
+                    ? [approve({ spender: currentPoolAddress, amount: bigIntPrice.toString() })]
+                    : ([] as const)),
                 deposit({ poolId, amount: bigIntPrice.toString() }),
             ]
             console.log('📝 [usePoolActions] Transaction payload:', transactions)
 
             executeTransactions(transactions, {
                 type: 'JOIN_POOL',
-                onSuccess: onSuccessfulJoin,
-            }).catch(error => {
+                onSuccess: () => {
+                    console.log('✅ [usePoolActions] Join pool transaction submitted successfully')
+                },
+            }).catch((error: unknown) => {
                 console.error('❌ [usePoolActions] Error joining pool:', error)
+
+                const errorMessage = error instanceof Error ? error.message : String(error)
+                if (errorMessage.includes('Connector not connected')) {
+                    toast.error('Wallet connection lost. Please refresh the page to reconnect.', {
+                        action: {
+                            label: 'Refresh',
+                            onClick: () => window.location.reload(),
+                        },
+                        duration: 8000,
+                    })
+                } else if (errorMessage.includes('user rejected')) {
+                    toast.error('Transaction was cancelled.')
+                } else {
+                    toast.error('Failed to join pool. Please try again.')
+                }
             })
 
             if (result.hash) {
@@ -231,7 +277,18 @@ export function usePoolActions({
             }
         } catch (error) {
             console.error('❌ [usePoolActions] Transaction failed:', error)
-            toast.error('Failed to join pool. Please try again.')
+
+            if (error instanceof Error && error.message?.includes('Connector not connected')) {
+                toast.error('Wallet connection lost. Please refresh the page to reconnect.', {
+                    action: {
+                        label: 'Refresh',
+                        onClick: () => window.location.reload(),
+                    },
+                    duration: 8000,
+                })
+            } else {
+                toast.error('Failed to join pool. Please try again.')
+            }
         }
     }
 
@@ -245,7 +302,6 @@ export function usePoolActions({
                 onSuccessfulJoin()
             }
 
-            // Handle other transaction types if needed
             router.refresh()
         }
     }, [isConfirmed, result.transactionType, onSuccessfulJoin, router])

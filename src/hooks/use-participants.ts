@@ -1,7 +1,7 @@
 import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participants/_components/db-client'
 import { fetchWinnerDetail } from '@/app/(pages)/pool/[pool-id]/participants/_components/fetch-winner-detail'
 import { usePoolDetails } from '@/app/(pages)/pool/[pool-id]/ticket/_components/use-pool-details'
-import { formatAddress } from '@/app/_lib/utils/addresses'
+import { formatAddress } from '@/lib/utils/addresses'
 import { useQuery } from '@tanstack/react-query'
 import { blo } from 'blo'
 import type { Address } from 'viem'
@@ -12,7 +12,7 @@ interface UserDetails {
     walletAddress: string
 }
 
-interface ParticipantStatus {
+interface _ParticipantStatus {
     status: string
     checked_in_at: string | null
     users: UserDetails | null
@@ -56,7 +56,7 @@ export const useParticipants = (poolId: string) => {
     const { poolDetails } = usePoolDetails(poolId)
 
     return useQuery({
-        queryKey: ['participants', poolId],
+        queryKey: ['participants', poolId, poolDetails?.poolDetailFromSC?.[5]],
         queryFn: async () => {
             const participants = poolDetails?.poolDetailFromSC?.[5] || []
 
@@ -67,8 +67,8 @@ export const useParticipants = (poolId: string) => {
                     const winnerDetails = await fetchWinnerDetail({
                         queryKey: ['fetchWinnerDetail', BigInt(poolId), address],
                     })
-                    const amountWon = winnerDetails.winnerDetailFromSC.amountWon
-                    const amountClaimed = winnerDetails.winnerDetailFromSC.amountClaimed
+                    const amountWon = winnerDetails?.winnerDetailFromSC?.amountWon || 0
+                    const amountClaimed = winnerDetails?.winnerDetailFromSC?.amountClaimed || 0
 
                     let checkedInAt = undefined
                     let status = undefined

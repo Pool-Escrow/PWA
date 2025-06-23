@@ -70,7 +70,13 @@ export function useAuth() {
     }
 
     const { login } = useLogin({
-        onComplete({ user, isNewUser, wasAlreadyAuthenticated, loginMethod, loginAccount }) {
+        onComplete({
+            // user,
+            isNewUser,
+            wasAlreadyAuthenticated,
+            loginMethod,
+            // loginAccount,
+        }) {
             // Reduce console logging to prevent noise
             if (process.env.NODE_ENV === 'development') {
                 console.log('[use-auth] auth complete', { isNewUser, wasAlreadyAuthenticated })

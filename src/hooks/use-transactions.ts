@@ -1,15 +1,14 @@
+import type { ContractCall } from '@/lib/entities/models/contract-call'
 import { useWallets } from '@privy-io/react-auth'
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { ConnectorNotConnectedError, getPublicClient } from '@wagmi/core'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import type { Hash, PublicClient, TransactionReceipt } from 'viem'
+import { waitForTransactionReceipt } from 'viem/actions'
 import { useWaitForTransactionReceipt, useWriteContract } from 'wagmi'
 import { useCallsStatus, useWriteContracts } from 'wagmi/experimental'
-import type { ContractCall } from '@/app/_lib/entities/models/contract-call'
 import { useAppStore } from '../providers/app-store.provider'
-import { waitForTransactionReceipt } from 'viem/actions'
-import { getPublicClient } from '@wagmi/core'
 import { getConfig } from '../providers/configs/wagmi.config'
-import { ConnectorNotConnectedError } from '@wagmi/core'
-import { toast } from 'sonner'
 
 interface SmartTransactionResult {
     hash: Hash | null
@@ -39,7 +38,7 @@ export default function useTransactions() {
     const transactionInProgressRef = useRef(false)
 
     const {
-        data: id,
+        data: paymasterRequest,
         writeContractsAsync,
         isPending: isPaymasterPending,
     } = useWriteContracts({
@@ -61,11 +60,13 @@ export default function useTransactions() {
         error: null,
     })
 
+    const paymasterRequestId = paymasterRequest?.id
+
     const { data: callsStatus } = useCallsStatus({
-        id: id as string,
+        id: paymasterRequestId ?? '',
         query: {
-            enabled: Boolean(id),
-            refetchInterval: data => (data.state.data?.status === 'CONFIRMED' ? false : 1000),
+            enabled: Boolean(paymasterRequestId),
+            refetchInterval: data => ((data.state.data?.status as string) === 'CONFIRMED' ? false : 1000),
         },
     })
 
@@ -80,7 +81,12 @@ export default function useTransactions() {
     const [isConfirmed, setIsConfirmed] = useState(false)
 
     useEffect(() => {
-        if (callsStatus?.status === 'CONFIRMED' && callsStatus.receipts && callsStatus.receipts.length > 0) {
+        if (
+            callsStatus &&
+            (callsStatus.status as string) === 'CONFIRMED' &&
+            callsStatus.receipts &&
+            callsStatus.receipts.length > 0
+        ) {
             const paymasterReceipt = callsStatus.receipts[0]
             console.log('✅ [useTransactions] Paymaster transaction confirmed:', {
                 hash: paymasterReceipt.transactionHash,
@@ -137,12 +143,21 @@ export default function useTransactions() {
                     contracts: contractCalls,
                     capabilities: {
                         paymasterService: {
-                            url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL,
+                            url: process.env.NEXT_PUBLIC_COINBASE_PAYMASTER_URL as string,
                         },
                     },
                 })
                 console.log('✅ [useTransactions] Coinbase transaction response:', response)
-                setResult(prev => ({ ...prev, hash: response as `0x${string}` }))
+
+                const txHash = (
+                    typeof response === 'string'
+                        ? response
+                        : ((response as { hash?: string; id?: string }).hash ??
+                          (response as { hash?: string; id?: string }).id ??
+                          '')
+                ) as `0x${string}`
+
+                setResult(prev => ({ ...prev, hash: txHash }))
             } catch (error) {
                 console.error('❌ [useTransactions] Coinbase transaction error:', error)
                 setResult(prev => ({
@@ -165,70 +180,73 @@ export default function useTransactions() {
 
     const publicClient = getPublicClient(getConfig())
 
-    const executeEoaTransactions = async (contractCalls: ContractCall[]) => {
-        console.log('🔄 [useTransactions] Executing EOA transactions:', contractCalls.length)
-        setTotalTransactions(contractCalls.length)
-        setCurrentTransactionIndex(0)
-        setTransactionInProgress(true)
-
-        try {
-            for (const [index, call] of contractCalls.entries()) {
-                setCurrentTransactionIndex(index)
-
-                console.log(`📝 [useTransactions] Submitting EOA transaction ${index + 1}/${contractCalls.length}`)
-
-                const hash = await writeContractAsync(call)
-
-                // Update result with current transaction hash
-                setResult(prev => ({ ...prev, isLoading: true, isError: false, error: null, hash }))
-
-                // Wait for transaction confirmation before proceeding
-                console.log(`⏳ [useTransactions] Waiting for confirmation of tx ${index + 1}`)
-                const receipt = await waitForTransactionReceipt(publicClient as PublicClient, {
-                    hash,
-                    confirmations: 1,
-                    onReplaced: replacement => {
-                        console.log('🔄 [useTransactions] Transaction replaced:', {
-                            reason: replacement.reason,
-                            oldHash: hash,
-                            newHash: replacement.transaction.hash,
-                        })
-                        // Update hash if transaction was replaced
-                        setResult(prev => ({
-                            ...prev,
-                            hash: replacement.transaction.hash,
-                        }))
-                    },
-                })
-
-                console.log(`✅ [useTransactions] EOA transaction ${index + 1} confirmed:`, {
-                    hash: receipt.transactionHash,
-                    blockNumber: receipt.blockNumber,
-                    gasUsed: receipt.gasUsed.toString(),
-                })
-
-                // Update result with confirmed receipt
-                setResult(prev => ({ ...prev, receipt }))
-
-                // If this was the last transaction, mark as confirmed
-                if (index === contractCalls.length - 1) {
-                    setIsConfirmed(true)
-                }
-            }
-        } catch (error) {
-            console.error('❌ [useTransactions] EOA transaction error:', error)
-            setResult(prev => ({
-                ...prev,
-                isError: true,
-                error: error as Error,
-            }))
-            throw error
-        } finally {
-            setTransactionInProgress(false)
+    const executeEoaTransactions = useCallback(
+        async (contractCalls: ContractCall[]) => {
+            console.log('🔄 [useTransactions] Executing EOA transactions:', contractCalls.length)
+            setTotalTransactions(contractCalls.length)
             setCurrentTransactionIndex(0)
-            setResult(prev => ({ ...prev, isLoading: false }))
-        }
-    }
+            setTransactionInProgress(true)
+
+            try {
+                for (const [index, call] of contractCalls.entries()) {
+                    setCurrentTransactionIndex(index)
+
+                    console.log(`📝 [useTransactions] Submitting EOA transaction ${index + 1}/${contractCalls.length}`)
+
+                    const hash = await writeContractAsync(call)
+
+                    // Update result with current transaction hash
+                    setResult(prev => ({ ...prev, isLoading: true, isError: false, error: null, hash }))
+
+                    // Wait for transaction confirmation before proceeding
+                    console.log(`⏳ [useTransactions] Waiting for confirmation of tx ${index + 1}`)
+                    const receipt = await waitForTransactionReceipt(publicClient as PublicClient, {
+                        hash,
+                        confirmations: 1,
+                        onReplaced: replacement => {
+                            console.log('🔄 [useTransactions] Transaction replaced:', {
+                                reason: replacement.reason,
+                                oldHash: hash,
+                                newHash: replacement.transaction.hash,
+                            })
+                            // Update hash if transaction was replaced
+                            setResult(prev => ({
+                                ...prev,
+                                hash: replacement.transaction.hash,
+                            }))
+                        },
+                    })
+
+                    console.log(`✅ [useTransactions] EOA transaction ${index + 1} confirmed:`, {
+                        hash: receipt.transactionHash,
+                        blockNumber: receipt.blockNumber,
+                        gasUsed: receipt.gasUsed.toString(),
+                    })
+
+                    // Update result with confirmed receipt
+                    setResult(prev => ({ ...prev, receipt }))
+
+                    // If this was the last transaction, mark as confirmed
+                    if (index === contractCalls.length - 1) {
+                        setIsConfirmed(true)
+                    }
+                }
+            } catch (error) {
+                console.error('❌ [useTransactions] EOA transaction error:', error)
+                setResult(prev => ({
+                    ...prev,
+                    isError: true,
+                    error: error as Error,
+                }))
+                throw error
+            } finally {
+                setTransactionInProgress(false)
+                setCurrentTransactionIndex(0)
+                setResult(prev => ({ ...prev, isLoading: false }))
+            }
+        },
+        [writeContractAsync, publicClient, setTransactionInProgress, setCurrentTransactionIndex, setResult],
+    )
 
     const [currentTransaction, setCurrentTransaction] = useState<TransactionConfig | null>(null)
 
@@ -274,7 +292,7 @@ export default function useTransactions() {
                 }, 500)
             }
         },
-        [walletsReady, wallets, executeCoinbaseTransactions, executeEoaTransactions],
+        [walletsReady, wallets, setTransactionInProgress, executeCoinbaseTransactions, executeEoaTransactions],
     )
 
     // Add reset function
@@ -308,33 +326,11 @@ export default function useTransactions() {
         }
 
         if (isConfirmed) {
-            // Dar tiempo para que los toasts de éxito se muestren
             setTimeout(cleanup, 3000)
         }
 
         return cleanup
     }, [isConfirmed, setTransactionInProgress])
-
-    useEffect(() => {
-        console.log('👀 [useTransactions] Effect: Transaction status changed', {
-            isConfirmed,
-            transactionInProgressRef: transactionInProgressRef.current,
-        })
-
-        const cleanup = () => {
-            console.log('🧹 [useTransactions] Cleanup triggered')
-            setTransactionInProgress(false)
-            transactionInProgressRef.current = false
-            setCurrentTransaction(null)
-        }
-
-        if (isConfirmed) {
-            console.log('✅ [useTransactions] Transaction confirmed, scheduling cleanup')
-            setTimeout(cleanup, 3000)
-        }
-
-        return cleanup
-    }, [isConfirmed])
 
     return {
         executeTransactions,
