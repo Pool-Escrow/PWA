@@ -1,5 +1,5 @@
-import { useEncryptStore } from '@/app/_stores/encrypt'
 import { cn } from '@/lib/utils/tailwind'
+import { useEncryptStore } from '@/stores/encrypt'
 import { AnimatePresence, motion } from 'framer-motion'
 import React, { useMemo } from 'react'
 import { generateChars } from './generate-encoded-text'

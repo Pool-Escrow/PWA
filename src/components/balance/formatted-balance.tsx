@@ -1,4 +1,4 @@
-import NumberTicker from '@/app/_components/ui/number-ticker'
+import NumberTicker from '@/components/ui/number-ticker'
 
 export default function FormattedBalance({
     integerPart,
