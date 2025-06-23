@@ -1,7 +1,7 @@
+import { useUserInfo } from '@/hooks/use-user-info'
+import { getConfig } from '@/providers/configs/wagmi.config'
 import { useQuery } from '@tanstack/react-query'
 import { fetchClaimablePools } from './fetch-claimable-pools'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
-import { useUserInfo } from '@/hooks/use-user-info'
 
 export const useClaimablePools = () => {
     const { data: user } = useUserInfo()

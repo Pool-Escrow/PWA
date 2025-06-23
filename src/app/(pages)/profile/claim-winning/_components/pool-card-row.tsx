@@ -1,10 +1,10 @@
 import { useWinnerDetail } from '@/app/(pages)/pool/[pool-id]/_components/use-winner-detail'
-import { useWallets } from '@privy-io/react-auth'
-import { capitalize } from 'lodash'
-import PoolCardRowImage from './pool-card-row-image'
-import { useQuery } from '@tanstack/react-query'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
+import { useWallets } from '@privy-io/react-auth'
+import { useQuery } from '@tanstack/react-query'
+import { capitalize } from 'lodash'
 import { formatUnits } from 'viem'
+import PoolCardRowImage from './pool-card-row-image'
 
 interface PoolCardRowProps {
     poolId: string
@@ -14,15 +14,11 @@ interface PoolCardRowProps {
 const PoolCardRow = ({ poolId }: PoolCardRowProps) => {
     const { wallets } = useWallets()
 
-    const {
-        data: pool,
-        isPending: isPoolPending,
-        isError: isPoolError,
-    } = useQuery({
+    const { data: pool } = useQuery({
         queryKey: ['pool-details', poolId],
         queryFn: getPoolDetailsById,
     })
-    const { winnerDetail, isLoading, error } = useWinnerDetail(poolId, wallets?.[0]?.address)
+    const { winnerDetail } = useWinnerDetail(poolId, wallets?.[0]?.address)
 
     const formatAmount = (num: number): string => {
         if (num < 0.01) {

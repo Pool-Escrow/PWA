@@ -37,14 +37,14 @@ const ClaimablePoolRow: React.FC<ClaimablePoolRowProps> = ({ poolId }) => {
             /> */}
             <div className='flex flex-1 flex-col'>
                 {/* <h4 className='text-lg font-medium'>{poolData?.poolDBInfo?.['pool_name'] ?? ` Pool Id ${poolId}`}</h4> */}
-                <p className={`fontCheckedIn font-semibold`}>Winner</p>
+                <p className={`font-semibold`}>Winner</p>
             </div>
             {
                 <div className='flex flex-row items-center justify-center space-x-2'>
                     <div>
                         {/* <Image className='size-6' src={circleTick.src} alt='circle-tick' height={24} width={24} /> */}
                     </div>
-                    <div className='paidBackground fontCheckedIn rounded-2xl px-6 py-4 font-medium'>
+                    <div className='rounded-2xl px-6 py-4 font-medium'>
                         {/* {ethers.formatEther(totalWinningAmount ?? 0).toString()} USD */}
                     </div>
                 </div>

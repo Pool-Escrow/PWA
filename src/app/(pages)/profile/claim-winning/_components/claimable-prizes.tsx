@@ -1,37 +1,39 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
-import { useEffect } from 'react'
-import type { Address } from 'viem'
+import { Button } from '@/components/ui/button'
+import { useChainAwareContracts } from '@/hooks/use-chain-aware-contracts'
+import { useConfetti } from '@/hooks/use-confetti'
+import useTransactions from '@/hooks/use-transactions'
+import { useUserInfo } from '@/hooks/use-user-info'
+import { useAppStore } from '@/providers/app-store.provider'
+import { poolAbi } from '@/types/contracts'
+import { Loader2Icon } from 'lucide-react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { getAbiItem } from 'viem'
 import Container from './container'
 import PoolCardRow from './pool-card-row'
 import SectionContent from './section-content'
 import SectionTitle from './section-title'
 import { useClaimablePools } from './use-claimable-pools'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import { poolAbi } from '@/types/contracts'
-import { useUserInfo } from '@/hooks/use-user-info'
-import { Loader2Icon } from 'lucide-react'
-import { useConfetti } from '@/hooks/use-confetti'
 
 export default function ClaimablePrizesList() {
     const setBottomBarContent = useAppStore(state => state.setBottomBarContent)
     const isRouting = useAppStore(state => state.isRouting)
 
     const { claimablePools, isPending } = useClaimablePools()
+    const { poolAddress } = useChainAwareContracts()
+
+    // TODO: Apparently this is generating POST requests hitting limits on the RPC endpoint.
     const { executeTransactions } = useTransactions()
     const { data: user } = useUserInfo()
     const { startConfetti } = useConfetti()
 
-    const poolIdsToClaimFrom = claimablePools?.[0] || []
+    const poolIdsToClaimFrom = useMemo(() => claimablePools?.[0] || [], [claimablePools])
 
-    const onClaimFromPoolsButtonClicked = () => {
+    const onClaimFromPoolsButtonClicked = useCallback(() => {
         if (!claimablePools || poolIdsToClaimFrom.length === 0) return
 
-        const userAddress = user?.address as Address | undefined
+        const userAddress = user?.address
         if (!userAddress) return
 
         const walletAddresses = poolIdsToClaimFrom.map(() => userAddress)
@@ -41,10 +43,10 @@ export default function ClaimablePrizesList() {
             name: 'claimWinnings',
         })
 
-        executeTransactions(
+        void executeTransactions(
             [
                 {
-                    address: currentPoolAddress,
+                    address: poolAddress,
                     abi: [ClaimWinningsFunction],
                     functionName: ClaimWinningsFunction.name,
                     args: [poolIdsToClaimFrom, walletAddresses],
@@ -58,7 +60,7 @@ export default function ClaimablePrizesList() {
                 },
             },
         )
-    }
+    }, [claimablePools, poolIdsToClaimFrom, user?.address, executeTransactions, startConfetti, poolAddress])
 
     useEffect(() => {
         if (!claimablePools || poolIdsToClaimFrom?.length === 0) {
@@ -77,7 +79,7 @@ export default function ClaimablePrizesList() {
         return () => {
             setBottomBarContent(undefined)
         }
-    }, [claimablePools])
+    }, [claimablePools, isRouting, onClaimFromPoolsButtonClicked, poolIdsToClaimFrom?.length, setBottomBarContent])
 
     if (isPending) {
         return (
