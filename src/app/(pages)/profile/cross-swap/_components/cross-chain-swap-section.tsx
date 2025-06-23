@@ -1,11 +1,11 @@
 'use client'
 
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/app/_components/ui/sheet'
+import UserInfo from '@/app/(pages)/profile/_components/user-info/user-info'
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { useWallets } from '@privy-io/react-auth'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import UserInfo from '../../_components/user-info/user-info'
 import { useSwapContext } from '../context/SwapContext'
 import type { OKXToken } from '../types'
 import { ActionButton } from './ActionButton'
@@ -146,7 +146,7 @@ const CrossChainSwapSection = () => {
     return (
         <div className='relative min-h-screen overflow-y-scroll [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
             <div className='mx-auto w-full max-w-md space-y-4 overflow-y-scroll px-3 pb-24 pt-3'>
-                <UserInfo variant='cross-swap' onHistoryClick={() => setHistory(true)} hasTransactions={true} />
+                <UserInfo variant='cross-swap' onHistoryClick={() => setHistory(true)} />
 
                 {isServiceUnavailable ? (
                     <div className='detail_card mx-auto w-full rounded-[24px] p-4'>

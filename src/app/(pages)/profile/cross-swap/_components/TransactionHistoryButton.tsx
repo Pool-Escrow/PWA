@@ -1,8 +1,8 @@
-import { Button } from "@/app/_components/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/app/_components/ui/sheet"
-import { useState } from "react"
-import type { OKXNetwork, OKXToken, Transaction } from "../types"
-import { useTransactionHistory } from "./hooks/useTransactionHistory"
+import { Button } from '@/components/ui/button'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
+import { useState } from 'react'
+import type { OKXNetwork, OKXToken, Transaction } from '../types'
+import { useTransactionHistory } from './hooks/useTransactionHistory'
 
 interface TransactionHistoryButtonProps {
     walletAddress?: string
@@ -15,7 +15,7 @@ export const TransactionHistoryButton = ({
     walletAddress,
     fetchedNetworks,
     fetchedTokens,
-    transactions,
+    // transactions,
 }: TransactionHistoryButtonProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const { refetchTransactions } = useTransactionHistory({

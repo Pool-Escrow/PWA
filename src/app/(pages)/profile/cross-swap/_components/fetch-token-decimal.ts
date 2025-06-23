@@ -1,4 +1,4 @@
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
+import { getConfig } from '@/providers/configs/wagmi.config'
 import { tokenAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'

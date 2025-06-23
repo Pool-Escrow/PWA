@@ -1,4 +1,4 @@
-import { Input } from '@/app/_components/ui/input'
+import { Input } from '@/components/ui/input'
 import { Search, X } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'

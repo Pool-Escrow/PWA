@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, CardContent } from '@/app/_components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Info } from 'lucide-react'
 import type { BridgeInfo } from '../types'

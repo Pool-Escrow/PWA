@@ -1,5 +1,3 @@
-'use client'
-
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import type { Network, OKXToken } from '../types'

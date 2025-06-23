@@ -1,8 +1,6 @@
-'use client'
-
+import Container from '@/app/(pages)/profile/claim-winning/_components/container'
+import SectionContent from '@/app/(pages)/profile/claim-winning/_components/section-content'
 import { useWallets } from '@privy-io/react-auth'
-import Container from '../../../claim-winning/_components/container'
-import SectionContent from '../../../claim-winning/_components/section-content'
 
 export default function WalletAccountSection() {
     const { wallets } = useWallets()
