@@ -2,10 +2,12 @@
 
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
 import { useTransferToken } from '@/app/(pages)/profile/send/_components/use-transfer-tokens'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import useTransactions from '@/hooks/use-transactions'
 import { cn } from '@/lib/utils/tailwind'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
+import { dropTokenConfig } from '@/types/contracts'
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -13,8 +15,6 @@ import type { Address } from 'viem'
 import { getAbiItem, parseUnits } from 'viem'
 import { PaymentConfirmationDialog } from './payment-confirmation-dialog'
 import TokenSelector from './token-selector'
-import { dropTokenConfig } from '@/types/contracts'
-import useTransactions from '@/app/_client/hooks/use-transactions'
 
 interface PayOtherPlayerFormProps {
     recipientAddress: Address

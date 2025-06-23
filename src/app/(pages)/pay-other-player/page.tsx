@@ -1,9 +1,8 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { formatAddress } from '@/app/_lib/utils/addresses'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import PageWrapper from '@/components/page-wrapper'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatAddress } from '@/lib/utils/addresses'
 import { blo } from 'blo'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'

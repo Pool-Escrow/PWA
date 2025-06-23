@@ -1,7 +1,7 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { Button } from '@/app/_components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 

@@ -1,14 +1,14 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
-import { currentTokenAddress, serverConfig } from '@/app/_server/blockchain/server-config'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils/tailwind'
+import { currentTokenAddress, serverConfig } from '@/server/blockchain/server-config'
+import { dropTokenAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
+import { getBalance } from '@wagmi/core'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { getBalance } from '@wagmi/core'
-import { dropTokenAddress } from '@/types/contracts'
 import type { Address } from 'viem'
 
 interface Token {
@@ -72,7 +72,7 @@ export default function TokenSelector({ onTokenSelect, onMaxClick }: TokenSelect
                 console.log(newTokens)
             })
             .catch(err => console.log(err))
-    }, [selectedAddress, wallets])
+    }, [selectedAddress, tokens, wallets])
 
     const handleTokenSelect = (address: Address) => {
         const token = tokens.find(t => t.address === address)
