@@ -1,10 +1,10 @@
 'use server'
 
-import { hasRole } from '@/lib/contract/pool'
 import { ADMIN_ROLE } from '@/lib/contract/constants'
-import type { Address } from 'viem'
+import { hasRole } from '@/lib/contract/pool'
+import { getPrivyVerificationKey, privy } from '@/server/auth/privy'
 import { cookies } from 'next/headers'
-import { privy, getPrivyVerificationKey } from '@/app/_server/auth/privy'
+import type { Address } from 'viem'
 
 async function checkAdminStatus(token: string): Promise<boolean> {
     if (!token) return false
