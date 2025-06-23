@@ -1,18 +1,18 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
-import { Label } from '@/app/_components/ui/label'
+import Text from '@/components/forms-controls/text.control'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { useAppStore } from '@/providers/app-store.provider'
+import type { Tables } from '@/types/db'
+import { usePrivy } from '@privy-io/react-auth'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { toast } from 'sonner'
-import type { Tables } from '@/types/db'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import Text from '@/app/_components/forms-controls/text.control'
-import AvatarUploader from './avatar-uploader'
 import { validateProfileAction } from '../actions'
-import { useQueryClient } from '@tanstack/react-query'
-import { usePrivy } from '@privy-io/react-auth'
+import AvatarUploader from './avatar-uploader'
 
 const formFields = [
     {

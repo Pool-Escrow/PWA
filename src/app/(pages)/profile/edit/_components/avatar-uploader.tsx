@@ -1,11 +1,11 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
-import Image from 'next/image'
-import AvatarUploadIcon from './avatar-upload-icon'
+import { Button } from '@/components/ui/button'
 import { CameraIcon, Trash2Icon } from 'lucide-react'
-import type { ChangeEvent } from 'react';
+import Image from 'next/image'
+import type { ChangeEvent } from 'react'
 import { useState } from 'react'
+import AvatarUploadIcon from './avatar-upload-icon'
 
 export interface AvatarUploaderProps {
     name: string
