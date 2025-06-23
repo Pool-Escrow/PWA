@@ -1,7 +1,7 @@
-import type { ContractCall } from '@/app/_lib/entities/models/contract-call'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import type { ContractCall } from '@/lib/entities/models/contract-call'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
-import type { Address, Hex} from 'viem';
+import type { Address, Hex } from 'viem'
 import { getAbiItem } from 'viem'
 
 export const HasRoleFunction = getAbiItem({
