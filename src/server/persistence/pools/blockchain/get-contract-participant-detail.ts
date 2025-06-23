@@ -1,9 +1,9 @@
 import 'server-only'
 
+import { currentPoolAddress, serverClient } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import type { Address } from 'viem'
 import { getAbiItem } from 'viem'
-import { currentPoolAddress, serverClient } from '../../../blockchain/server-config'
 
 const GetParticipantDetail = getAbiItem({
     abi: poolAbi,
@@ -26,12 +26,12 @@ export default async function getContractParticipantDetail(
             return null
         }
 
-        const participantInfo = await serverClient?.readContract({
+        const participantInfo = (await serverClient().readContract({
             address: currentPoolAddress,
             abi: [GetParticipantDetail],
             functionName: 'getParticipantDetail',
             args: [participantAddress as Address, BigInt(poolId)],
-        })
+        })) as { deposit: bigint; refunded: boolean } | null
 
         if (!participantInfo) {
             return null

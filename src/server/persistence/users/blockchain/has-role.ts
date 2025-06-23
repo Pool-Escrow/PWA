@@ -2,10 +2,10 @@
 
 import { adminRole } from '@/lib/blockchain/constants'
 import { HasRoleFunction } from '@/lib/blockchain/functions/pool/has-role'
+import { currentPoolAddress, serverClient, serverConfig } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'
-import { currentPoolAddress, serverClient, serverConfig } from '../../../blockchain/server-config'
 
 export const fetchClaimablePools = async ({ queryKey }: { queryKey: [string, string, number] }) => {
     const [_, address] = queryKey
@@ -29,21 +29,17 @@ export const ROLES = {
 export type Role = (typeof ROLES)[keyof typeof ROLES]
 
 export const hasRole = async ({ role, account }: { role: Role; account: string }): Promise<boolean> => {
-    if (!serverClient) return false
-    const result = serverClient
-        .readContract({
+    try {
+        const result = await serverClient().readContract({
             address: currentPoolAddress,
             abi: [HasRoleFunction],
-            functionName: HasRoleFunction.name,
+            functionName: 'hasRole',
             args: [role, account as Address],
         })
-        .then(res => {
-            return res
-        })
-        .catch(err => {
-            console.error(err)
-            return false
-        })
 
-    return result
+        return Boolean(result)
+    } catch (error) {
+        console.error('Error checking user role:', error)
+        return false
+    }
 }
