@@ -1,9 +1,9 @@
 'use server'
 
+import { authenticatedProcedure } from '@/server/procedures/authenticated'
+import { createProfileUseCase } from '@/server/use-cases/users/create-user'
+import { isAdminUseCase } from '@/server/use-cases/users/is-admin'
 import type { Address } from 'viem'
-import { authenticatedProcedure } from '@/app/_server/procedures/authenticated'
-import { createProfileUseCase } from '@/app/_server/use-cases/users/create-user'
-import { isAdminUseCase } from '@/app/_server/use-cases/users/is-admin'
 
 export const createUserAction = authenticatedProcedure.createServerAction().handler(async ({ ctx: { user } }) => {
     const walletAddress = user.wallet?.address as Address | undefined
