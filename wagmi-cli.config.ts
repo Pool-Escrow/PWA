@@ -1,5 +1,5 @@
 import { defineConfig } from '@wagmi/cli'
-import { foundry, react } from '@wagmi/cli/plugins'
+import { foundry } from '@wagmi/cli/plugins'
 import type { Address } from 'viem'
 import { erc20Abi } from 'viem'
 import { base, baseSepolia } from 'viem/chains'

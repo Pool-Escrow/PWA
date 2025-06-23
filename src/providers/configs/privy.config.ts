@@ -6,8 +6,12 @@ import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 import type { Chain } from 'viem'
 import { defaultChain, supportedChains } from './wagmi.config'
 
-// Only log once in development
-if (process.env.NODE_ENV === 'development' && !globalThis.__privyConfigLogged) {
+// Only log once in development with verbose flag
+if (
+    process.env.NODE_ENV === 'development' &&
+    process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
+    !globalThis.__privyConfigLogged
+) {
     console.log('[privy-config] Imported chains from wagmi:', {
         chains: supportedChains.map((c: Chain) => ({ id: c.id, name: c.name })),
         defaultChain: { id: defaultChain.id, name: defaultChain.name },

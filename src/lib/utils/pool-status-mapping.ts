@@ -45,7 +45,16 @@ export function mapDbStatusToContractStatus(dbStatus: string | null | undefined)
  */
 export function isPoolStatusVisible(dbStatus: string | null | undefined): boolean {
     const contractStatus = mapDbStatusToContractStatus(dbStatus)
-    return contractStatus <= POOLSTATUS.DEPOSIT_ENABLED
+    const isVisible = contractStatus <= POOLSTATUS.DEPOSIT_ENABLED
+
+    // Only enable for debugging, is very noisy
+    // if (process.env.NODE_ENV === 'development') {
+    //     console.log(
+    //         `[isPoolStatusVisible] Status check: "${dbStatus}" -> ${contractStatus} (${POOLSTATUS[contractStatus]}) = ${isVisible ? '✅' : '❌'}`,
+    //     )
+    // }
+
+    return isVisible
 }
 
 /**
@@ -59,9 +68,10 @@ export function getVisibleDbStatuses(): DatabasePoolStatus[] {
 
 /**
  * Development helper: Log status mapping for debugging
+ * Only logs when NEXT_PUBLIC_VERBOSE_LOGS is explicitly enabled
  */
 export function logStatusMapping() {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
         console.log('[pool-status-mapping] Status mapping:')
         Object.entries(DB_STATUS_TO_CONTRACT_STATUS).forEach(([dbStatus, contractStatus]) => {
             const visible = contractStatus <= POOLSTATUS.DEPOSIT_ENABLED

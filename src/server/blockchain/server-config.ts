@@ -10,15 +10,19 @@ import { base, baseSepolia } from 'viem/chains'
 const getChainConfiguration = (): { chains: readonly [Chain, ...Chain[]]; defaultChain: Chain } => {
     const network = env.NEXT_PUBLIC_NETWORK
 
-    // Only log in development and only once per session
-    if (env.NODE_ENV === 'development' && !globalThis.__serverConfigLogged) {
+    // Only log in development with verbose flag and only once per session
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__serverConfigLogged) {
         console.log('[server-config] Chain configuration for network:', network)
         globalThis.__serverConfigLogged = true
     }
 
     switch (network) {
         case 'mainnet':
-            if (env.NODE_ENV === 'development' && !globalThis.__serverConfigLogged) {
+            if (
+                env.NODE_ENV === 'development' &&
+                env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
+                !globalThis.__serverConfigLogged
+            ) {
                 console.log('[server-config] Using MAINNET configuration (Base only)')
             }
             return {
@@ -26,7 +30,11 @@ const getChainConfiguration = (): { chains: readonly [Chain, ...Chain[]]; defaul
                 defaultChain: base,
             }
         case 'testnet':
-            if (env.NODE_ENV === 'development' && !globalThis.__serverConfigLogged) {
+            if (
+                env.NODE_ENV === 'development' &&
+                env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
+                !globalThis.__serverConfigLogged
+            ) {
                 console.log('[server-config] Using TESTNET configuration (Base + Base Sepolia for development)')
             }
             return {
@@ -35,7 +43,11 @@ const getChainConfiguration = (): { chains: readonly [Chain, ...Chain[]]; defaul
             }
         case 'development':
         default:
-            if (env.NODE_ENV === 'development' && !globalThis.__serverConfigLogged) {
+            if (
+                env.NODE_ENV === 'development' &&
+                env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
+                !globalThis.__serverConfigLogged
+            ) {
                 console.log('[server-config] Using DEVELOPMENT configuration (Base + Base Sepolia, default: Sepolia)')
             }
             return {
@@ -58,8 +70,8 @@ const RPC_ENV: Record<number, string | undefined> = {
 }
 
 const getRpcUrlForChain = (chain: Chain): string => {
-    // Only log RPC configuration once per chain per session
-    if (env.NODE_ENV === 'development') {
+    // Only log RPC configuration once per chain per session with verbose flag
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
         if (!globalThis.__rpcConfigLogged) globalThis.__rpcConfigLogged = {}
         if (!globalThis.__rpcConfigLogged[chain.id]) {
             console.log(`[server-config] Getting RPC URL for chain ${chain.name} (ID: ${chain.id})`)
@@ -90,8 +102,12 @@ const getRpcUrlForChain = (chain: Chain): string => {
 const createTransports = () => {
     const transports: Record<number, ReturnType<typeof http>> = {}
 
-    // Only log transport creation once
-    if (env.NODE_ENV === 'development' && !globalThis.__transportConfigLogged) {
+    // Only log transport creation once with verbose flag
+    if (
+        env.NODE_ENV === 'development' &&
+        env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
+        !globalThis.__transportConfigLogged
+    ) {
         console.log(
             '[server-config] Creating transports for chains:',
             chains.map(c => c.name),
@@ -124,7 +140,7 @@ export const serverConfig = createConfig({
     transports: createTransports(),
 })
 
-if (env.NODE_ENV === 'development' && !globalThis.__serverInitLogged) {
+if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__serverInitLogged) {
     console.log('[server-config] Server configuration initialized:', {
         network: env.NEXT_PUBLIC_NETWORK,
         defaultChain: defaultChain.name,
@@ -152,8 +168,8 @@ export const currentDropTokenAddress: Address = dropTokenAddress[
     defaultChain.id as keyof typeof dropTokenAddress
 ] as Address
 
-// Only log contract addresses once in development
-if (env.NODE_ENV === 'development' && !globalThis.__contractAddressLogged) {
+// Only log contract addresses once in development with verbose flag
+if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__contractAddressLogged) {
     console.log('[server-config] Contract addresses:', {
         chain: defaultChain.name,
         poolAddress: currentPoolAddress,
@@ -186,8 +202,8 @@ export const serverClient = getDefaultPublicClient
  */
 export const explorerUrl = defaultChain.blockExplorers?.default?.url || 'https://basescan.org'
 
-// Only log explorer URL once in development
-if (env.NODE_ENV === 'development' && !globalThis.__explorerUrlLogged) {
+// Only log explorer URL once in development with verbose flag
+if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__explorerUrlLogged) {
     console.log('[server-config] Explorer URL:', explorerUrl)
     globalThis.__explorerUrlLogged = true
 }

@@ -2,9 +2,9 @@ import MainPageLoginButton from '@/components/main-page-login-button'
 import PageWrapper from '@/components/page-wrapper'
 import PullToRefresh from '@/components/pull-to-refresh'
 import TopSection from '@/components/top-section'
-import NextUserPool from './_components/next-user-pool'
+import NextUserPoolV2 from './_components/next-user-pool-v2'
 import RenderBottomBar from './_components/render-bottom-bar'
-import UpcomingPools from './_components/upcoming-pools'
+import UpcomingPoolsV2 from './_components/upcoming-pools-v2'
 
 export default function PoolsPage() {
     return (
@@ -12,7 +12,8 @@ export default function PoolsPage() {
             <div className='flex h-full flex-1 flex-col'>
                 <TopSection topBarProps={{ backButton: false }} />
                 <div className='relative flex-1 overflow-hidden'>
-                    <PullToRefresh keysToRefetch={['pools', 'next-user-pool', 'upcoming-pools']}>
+                    <PullToRefresh
+                        keysToRefetch={['pools', 'next-user-pool', 'upcoming-pools-v2', 'user-next-pools-v2']}>
                         <div
                             className='absolute inset-0 overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:hidden'
                             style={{
@@ -21,8 +22,9 @@ export default function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
-                                <NextUserPool />
-                                <UpcomingPools />
+                                <NextUserPoolV2 />
+                                <UpcomingPoolsV2 />
+                                <div className='h-20' />
                             </div>
                         </div>
                     </PullToRefresh>

@@ -63,9 +63,18 @@ export async function getContractPools(chainId?: number): Promise<ContractPool[]
         throw new Error(`[getContractPools] Failed to obtain public client for chainId ${chainId ?? 'default'}`)
     }
 
+    // Get the actual chain ID from the client to ensure consistency
+    const actualChainId = publicClient.chain?.id || chainId
+
     // Resolve pool contract address for the target chain. Fallback to the
     // currentPoolAddress (default chain) if mapping not found.
-    const targetPoolAddress = (chainId && poolAddress[chainId as keyof typeof poolAddress]) || currentPoolAddress
+    const targetPoolAddress =
+        (actualChainId && poolAddress[actualChainId as keyof typeof poolAddress]) || currentPoolAddress
+
+    // Log for debugging only with verbose flag
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
+        console.log(`[getContractPools] Using chain ${actualChainId}, contract: ${targetPoolAddress}`)
+    }
 
     let latestPoolId = 0n
     const MAX_RETRIES = 3
@@ -115,6 +124,8 @@ export async function getContractPools(chainId?: number): Promise<ContractPool[]
     const chunkResults = await Promise.all(
         idChunks.map(chunk =>
             multicall(serverConfig, {
+                // Specify the chainId to ensure we use the correct RPC endpoint
+                chainId: actualChainId,
                 contracts: chunk.map(id => ({
                     address: targetPoolAddress,
                     abi: [GetAllPoolInfo],

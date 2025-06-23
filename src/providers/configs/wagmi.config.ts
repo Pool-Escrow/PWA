@@ -13,8 +13,8 @@ const RPC_ENV: Record<number, string | undefined> = {
     [baseSepolia.id]: env.NEXT_PUBLIC_RPC_BASE_SEPOLIA,
 }
 
-// Only log environment detection once in development
-if (env.NODE_ENV === 'development' && !globalThis.__wagmiEnvLogged) {
+// Only log environment detection once in development with verbose flag
+if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__wagmiEnvLogged) {
     console.log('[wagmi-config] Environment detection:', {
         NEXT_PUBLIC_NETWORK: env.NEXT_PUBLIC_NETWORK,
         NODE_ENV: env.NODE_ENV,
@@ -158,8 +158,8 @@ export const config = createConfig({
     ssr: true,
 })
 
-// Debug logging - only once in development
-if (env.NODE_ENV === 'development' && !globalThis.__wagmiConfigLogged) {
+// Debug logging - only once in development with verbose flag
+if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && !globalThis.__wagmiConfigLogged) {
     console.log('[wagmi-config] Configuration created:', {
         network: env.NEXT_PUBLIC_NETWORK,
         defaultChain: defaultChain.name,

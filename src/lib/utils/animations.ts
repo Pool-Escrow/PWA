@@ -1,17 +1,9 @@
 export const getPageTransition = (pathname: string | null) => {
-    const isProfilePage = pathname === '/profile'
-
-    // Reduce log noise - only log on actual route changes, not repeated calls
-    if (
-        process.env.NODE_ENV === 'development' &&
-        pathname &&
-        !pathname.startsWith('/_next/') &&
-        !pathname.includes('.') &&
-        pathname !== globalThis.__lastLoggedPath
-    ) {
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' && pathname) {
         console.log(`[PageTransition] Generating transition for: ${pathname}`)
-        globalThis.__lastLoggedPath = pathname
     }
+
+    const isProfilePage = pathname === '/profile'
 
     return {
         variants: {

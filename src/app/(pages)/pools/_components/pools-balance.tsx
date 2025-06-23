@@ -34,18 +34,6 @@ export default function PoolsBalance() {
     const { currentChainId, isCorrectNetwork, expectedChain, shouldShowWarning } = useNetworkValidation()
     const { switchChain } = useSwitchChain()
 
-    // Reduce log noise - only log when validation state actually changes
-    const validationKey = `${currentChainId}-${isCorrectNetwork}-${expectedChain.name}-${shouldShowWarning}`
-    if (process.env.NODE_ENV === 'development' && validationKey !== globalThis.__lastPoolsBalanceValidation) {
-        console.log('[PoolsBalance] Network validation:', {
-            currentChainId,
-            isCorrectNetwork,
-            expectedChain: expectedChain.name,
-            shouldShowWarning,
-        })
-        globalThis.__lastPoolsBalanceValidation = validationKey
-    }
-
     // Get chain-specific token addresses
     const currentTokenAddress = currentChainId
         ? (tokenAddress[currentChainId as keyof typeof tokenAddress] as Address)
@@ -116,8 +104,7 @@ export default function PoolsBalance() {
 
     // Auto-switch to correct network if user is on Base mainnet
     if (shouldShowWarning && currentChainId === 8453) {
-        // Base mainnet
-        console.log('[PoolsBalance] Auto-switching from Base mainnet to correct network...')
+        // Base mainnet - silently auto-switch
         handleSwitchToTestnet()
     }
 

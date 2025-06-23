@@ -27,10 +27,10 @@ export function getSupabaseClientConfig() {
             break
     }
 
-    if (env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
         console.log('[supabase] Client configuration:', {
-            network,
-            supabaseUrl: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'undefined',
+            network: env.NEXT_PUBLIC_NETWORK,
+            supabaseUrl: supabaseUrl.substring(0, 30) + '...',
             hasAnonKey: !!supabaseAnonKey,
         })
     }
@@ -67,7 +67,7 @@ export function getSupabaseServerConfig() {
             break
     }
 
-    if (env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
         console.log('[supabase] Server configuration:', {
             network,
             supabaseUrl: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'undefined',
@@ -101,7 +101,9 @@ export function createSupabaseBrowserClient() {
         throw new Error('Missing Supabase configuration for browser client')
     }
 
-    console.log('[supabase] Creating browser client with URL:', supabaseUrl.substring(0, 30) + '...')
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
+        console.log('[supabase] Creating browser client with URL:', supabaseUrl.substring(0, 30) + '...')
+    }
 
     return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 }
@@ -118,7 +120,9 @@ export function createSupabaseServerClient() {
         throw new Error('Missing Supabase configuration for server client')
     }
 
-    console.log('[supabase] Creating server client with URL:', supabaseUrl.substring(0, 30) + '...')
+    if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
+        console.log('[supabase] Creating server client with URL:', supabaseUrl.substring(0, 30) + '...')
+    }
 
     return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
         cookies: {

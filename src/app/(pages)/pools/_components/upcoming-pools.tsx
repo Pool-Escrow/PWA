@@ -5,9 +5,10 @@ import PoolList from './pool-list'
 import PoolsSkeleton from './pools-skeleton'
 
 export default function UpcomingPools() {
-    const { data: pools, isLoading, isFetching, isError } = useUpcomingPools()
+    const { data: pools, isLoading, isFetching, isError, error } = useUpcomingPools()
 
     if (isError) {
+        console.error('[UpcomingPools] Error loading pools:', error)
         return <div>Error loading upcoming pools</div>
     }
 
