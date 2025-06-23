@@ -1,19 +1,30 @@
 'use client'
 
+import { tokenAddress } from '@/types/contracts'
 import { useWallets } from '@privy-io/react-auth'
 import type { Address } from 'viem'
-import { useBalance } from 'wagmi'
+import { useBalance, useChainId } from 'wagmi'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 
 export default function ProfileBalanceSection() {
     const { wallets } = useWallets()
+    const chainId = useChainId()
+
+    // Get chain-specific token address
+    const currentTokenAddress = tokenAddress[chainId as keyof typeof tokenAddress] as Address
 
     const { data: tokenBalanceData } = useBalance({
         address: wallets[0]?.address as Address,
         token: currentTokenAddress,
+        query: {
+            staleTime: 60_000, // Consider data fresh for 1 minute
+            gcTime: 300_000, // Keep in cache for 5 minutes
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchInterval: false, // DISABLE automatic polling
+            enabled: Boolean(wallets[0]?.address && currentTokenAddress),
+        },
     })
 
     const decimals = BigInt(tokenBalanceData?.decimals ?? BigInt(18))
@@ -22,7 +33,7 @@ export default function ProfileBalanceSection() {
     return (
         <Container>
             <SectionContent>
-                <div className='mx-2 flex flex-col  justify-center'>
+                <div className='mx-2 flex flex-col justify-center'>
                     <h3 className='text-[11pt] font-semibold text-black'>Total Balance</h3>
                     <h3 className='text-[36pt] font-bold text-[#4078FA]'>
                         <span>{'$' + tokenBalance + ` `}</span>

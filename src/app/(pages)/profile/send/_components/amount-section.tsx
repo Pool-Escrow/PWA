@@ -1,12 +1,12 @@
 'use client'
 
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useAppStore } from '@/providers/app-store.provider'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
 import { useSearchParams } from 'next/navigation'
 import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Address } from 'viem'
 import Container from '../../claim-winning/_components/container'
 import SectionContent from '../../claim-winning/_components/section-content'
@@ -37,12 +37,15 @@ export default function AmountSection() {
         }
     }, [searchParams])
 
-    const onWithdrawButtonClicked = (amount: string, withdrawAddress: string) => {
-        void transferToken(
-            withdrawAddress as Address,
-            BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
-        )
-    }
+    const onWithdrawButtonClicked = useCallback(
+        (amount: string, withdrawAddress: string) => {
+            void transferToken(
+                withdrawAddress as Address,
+                BigInt(Number(amount) * Math.pow(10, Number(tokenDecimalsData?.tokenDecimals ?? 0))),
+            )
+        },
+        [transferToken, tokenDecimalsData?.tokenDecimals],
+    )
 
     useEffect(() => {
         if (!isRouting) {
@@ -54,7 +57,7 @@ export default function AmountSection() {
                 </Button>,
             )
         }
-    }, [amount, withdrawAddress, isRouting])
+    }, [amount, withdrawAddress, isRouting, onWithdrawButtonClicked, setBottomBarContent])
 
     useEffect(() => {
         if (isSuccess) {
@@ -72,7 +75,7 @@ export default function AmountSection() {
                         <h3 className='text-[11pt] font-semibold text-black'>Withdraw Amount</h3>
                         <h3 className='text-[36pt] font-bold text-[#4078FA]'>
                             <div className='flex items-center'>
-                                <span className={`mr-1px ${amount ? 'text-black' : 'text-gray-400'}`}>$</span>
+                                <span className={`-mr-1 ${amount ? 'text-black' : 'text-gray-400'}`}>$</span>
                                 <Input
                                     value={amount}
                                     onChange={handleAmountInputChange}

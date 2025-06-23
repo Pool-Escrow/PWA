@@ -1,14 +1,13 @@
 'use client'
 
-import Divider from '@/app/_components/divider'
-import { formatAddress } from '@/app/_lib/utils/addresses'
+import Divider from '@/components/divider'
 import Section from '@/components/section'
+import { formatAddress } from '@/lib/utils/addresses'
 import { inter } from '@/lib/utils/fonts'
 import { useWallets } from '@privy-io/react-auth'
 import _ from 'lodash'
 import Image from 'next/image'
 import Link from 'next/link'
-import OnRampCoinbaseButton from '../../_components/onramps/onramp-coinbase'
 import ClaimablePoolRow from '../../claim-winning/_components/claimable-pool-row'
 
 const Send = () => {
@@ -42,15 +41,16 @@ const Send = () => {
                     </div>
                     <div className='flex justify-center'>
                         <Link
-                            className='barForeground w-full rounded-full bg-black px-8 py-2 text-center text-white'
+                            className='w-full rounded-full bg-black px-8 py-2 text-center text-white'
                             href='/profile/edit'>
                             Edit Profile
                         </Link>
                     </div>
                     <div className='flex justify-center'>
-                        <OnRampCoinbaseButton />
+                        {/* <OnRampCoinbaseButton /> */}
+                        Coinbase Onramp button will be here soon
                     </div>
-                    <div className={`cardBackground flex w-full flex-col rounded-3xl p-6 md:space-y-10 md:p-10`}>
+                    <div className={`flex w-full flex-col rounded-3xl p-6 md:space-y-10 md:p-10`}>
                         <h2 className='font-medium'>Claimable</h2>
                         <Divider />
                         {poolIdsToClaimFrom?.map((poolId: string) => {

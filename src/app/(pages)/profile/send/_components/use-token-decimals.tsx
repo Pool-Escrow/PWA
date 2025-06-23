@@ -1,6 +1,6 @@
+import { getConfig } from '@/providers/configs/wagmi.config'
 import { useQuery } from '@tanstack/react-query'
 import { fetchTokenDecimals } from './fetch-token-decimal'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 
 export const useTokenDecimals = (tokenAddress: string) => {
     const {
