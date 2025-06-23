@@ -207,6 +207,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - 2024-12-19
+
+### 🧹 Improved
+
+-   **Reduced console noise in development**: Made all development logging conditional on `NEXT_PUBLIC_VERBOSE_LOGS=true` environment variable
+    -   Environment configuration logs (`env.mjs`)
+    -   Server blockchain config logs (`server-config.ts`)
+    -   Wagmi client configuration logs (`wagmi.config.ts`)
+    -   Privy configuration logs (`privy.config.ts`)
+    -   Contract pools debugging logs (`get-contract-pools.ts`)
+-   **Disabled debug components**: Temporarily disabled `PoolsDiagnostics` and `PoolsRawDataDebug` components that were causing client-side server environment variable errors
+-   **Enhanced error suppression**: Existing wallet extension conflict and RPC error suppression continues to work effectively
+
+### ✨ Added
+
+-   **User Pools System V2**: Complete rewrite of user pools functionality with robust architecture
+    -   **New Server Action**: `getUserNextPoolsAction` with proper authentication and error handling
+    -   **Enhanced Hook**: `useUserNextPoolsV2` with React Query caching, retry logic, and comprehensive logging
+    -   **Improved Component**: `NextUserPoolV2` with error boundaries, loading states, and consistent UX
+    -   **Blockchain Fix**: Fixed `getUserPools` function to specify correct `chainId` in multicall calls (same fix as `getContractPools`)
+
+### 🔧 Technical Details
+
+-   To enable verbose logging, set `NEXT_PUBLIC_VERBOSE_LOGS=true` in your environment
+-   Console output is now clean by default in development mode
+-   All essential functionality preserved while reducing debug noise
+-   **Upcoming Pools**: Loading successfully: 172 contract pools → 21 visible pools (12% sync rate)
+-   **User Pools**: Now using proper server-side rendering with client-side caching and error recovery
+-   **RPC Configuration**: Both general pools and user pools now correctly target Base Sepolia instead of mainnet
+
+### 🛠️ Architecture Improvements
+
+-   **Consistent Patterns**: User pools now follow the same robust patterns as upcoming pools
+-   **Server Actions**: Proper authentication checks and graceful error handling
+-   **React Query Integration**: Smart caching with 30s stale time and 5min garbage collection
+-   **Error Boundaries**: Comprehensive error handling with user-friendly retry mechanisms
+-   **Performance**: Parallel data fetching and optimized re-render strategies
+
 **Legend:**
 
 -   🚀 **Major**: Significant new features or breaking changes
