@@ -6,6 +6,7 @@
     "type": "module",
     "engines": {
         "node": "22.x",
+        "pnpm": "10.x"
     },
     "scripts": {
         "build": "next build",
@@ -147,11 +148,13 @@
         "overrides": {
             "@types/react": "18.3.12",
             "bs58": "6.0.0",
-            "eciesjs": "0.4.10",
-            "glob": "11.0.0",
+            "eciesjs": "0.4.15",
+            "glob": "11.0.3",
             "react": "18.3.1",
             "react-dom": "18.3.1",
+            "rimraf": "6.0.1",
             "critters": "npm:beasties@^0.3.4",
+            "@paulmillr/qr": "npm:qr@0.5.0"
         },
         "allowedDeprecatedVersions": {
             "@babel/plugin-proposal-class-properties": "7.18.6",
@@ -160,11 +163,22 @@
             "@humanwhocodes/config-array": "0.13.0",
             "@humanwhocodes/object-schema": "2.0.3",
             "@motionone/vue": "10.16.4",
+            "@walletconnect/modal": "2.7.0",
             "core-js": "2.6.12",
             "crypto": "1.0.1",
             "eslint": "8.57.1",
             "inflight": "1.0.6"
-        }
+        },
+        "onlyBuiltDependencies": [
+            "bigint-buffer",
+            "bufferutil",
+            "core-js-pure",
+            "esbuild",
+            "keccak",
+            "sharp",
+            "unrs-resolver",
+            "utf-8-validate"
+        ]
     },
     "prettier": {
         "arrowParens": "avoid",
