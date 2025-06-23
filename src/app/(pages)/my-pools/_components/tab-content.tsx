@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { TabsContent } from '@/app/_components/ui/tabs'
+import { TabsContent } from '@/components/ui/tabs'
+import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { motion } from 'framer-motion'
+import * as React from 'react'
 import { useEffect, useRef } from 'react'
 import UserPoolList from './user-pool-list'
-import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
 
 interface TabContentProps {
     tabId: string

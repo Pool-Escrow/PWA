@@ -1,14 +1,14 @@
 'use client'
 
-import * as React from 'react'
+import { useServerActionQuery } from '@/hooks/server-action-hooks'
+import type { PoolItem } from '@/lib/entities/models/pool-item'
+import { useAppStore } from '@/providers/app-store.provider'
 import { useSearchParams } from 'next/navigation'
+import * as React from 'react'
 import { useCallback, useEffect, useRef } from 'react'
+import { getUserPastPoolsAction, getUserUpcomingPoolsAction } from '../actions'
 import MyPoolsTabs from './my-pools.tabs'
 import type { MyPoolsTab } from './my-pools.tabs.config'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
-import { useServerActionQuery } from '@/app/_client/hooks/server-action-hooks'
-import { getUserPastPoolsAction, getUserUpcomingPoolsAction } from '../actions'
 
 interface MyPoolsProps {
     initialUpcomingPools: PoolItem[] | null

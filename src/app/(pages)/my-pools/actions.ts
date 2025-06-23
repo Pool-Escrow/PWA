@@ -1,9 +1,9 @@
 'use server'
 
+import type { PoolItem } from '@/lib/entities/models/pool-item'
+import { authenticatedProcedure } from '@/server/procedures/authenticated'
+import { getUserPastPoolsUseCase, getUserUpcomingPoolsUseCase } from '@/server/use-cases/pools/get-user-pools'
 import type { Address } from 'viem'
-import { authenticatedProcedure } from '../../_server/procedures/authenticated'
-import type { PoolItem } from '../../_lib/entities/models/pool-item'
-import { getUserUpcomingPoolsUseCase, getUserPastPoolsUseCase } from '../../_server/use-cases/pools/get-user-pools'
 
 export const getUserUpcomingPoolsAction = authenticatedProcedure
     .createServerAction()
