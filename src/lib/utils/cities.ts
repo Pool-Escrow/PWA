@@ -1,4 +1,5 @@
-import locationTimezone from 'node-location-timezone'
+import type { Location } from '@/lib/utils/location-timezone'
+import { getLocations } from '@/lib/utils/location-timezone'
 
 export type City = {
     value: string
@@ -8,8 +9,10 @@ export type City = {
 }
 
 export const featuredCities: City[] = [
+    { value: 'Cannes', label: 'Cannes', country: 'France', countryCode: 'FR' },
+    { value: 'New York', label: 'New York', country: 'United States', countryCode: 'US' },
     { value: 'Bangkok', label: 'Bangkok', country: 'Thailand', countryCode: 'TH' },
-    { value: 'Chiang Mai', label: 'Chiang Mai', country: 'Thailand', countryCode: 'TH' },
+    { value: 'Taipei', label: 'Taipei', country: 'Taiwan', countryCode: 'TW' },
 ]
 
 export const commonCities: City[] = [
@@ -19,12 +22,11 @@ export const commonCities: City[] = [
     { value: 'Hong Kong', label: 'Hong Kong', country: 'Hong Kong', countryCode: 'HK' },
 ]
 
-export const allCities: City[] = locationTimezone
-    .getLocations()
-    .map(location => ({
+export const allCities: City[] = getLocations()
+    .map((location: Location) => ({
         value: `${location.city}-${location.country.iso2}`,
         label: location.city,
         country: location.country.name,
         countryCode: location.country.iso2,
     }))
-    .filter((city, index, self) => index === self.findIndex(t => t.value === city.value))
+    .filter((city: City, index: number, self: City[]) => index === self.findIndex((t: City) => t.value === city.value))

@@ -9,7 +9,8 @@ export async function convertToBase64(file: File): Promise<string> {
                 reject(new Error('Failed to convert file to base64'))
             }
         }
-        reader.onerror = error => reject(new Error('Error reading file: ' + error))
+        reader.onerror = error =>
+            reject(new Error(`Error reading file: ${error instanceof Error ? error.message : 'Unknown error'}`))
     })
 }
 
@@ -24,7 +25,11 @@ export async function convertFromBase64(base64String: string, fileName: string, 
             const blob = new Blob([bytes], { type: mimeType })
             resolve(new File([blob], fileName, { type: mimeType }))
         } catch (error) {
-            reject(new Error('Error converting base64 to file: ' + error))
+            reject(
+                new Error(
+                    `Error converting base64 to file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+                ),
+            )
         }
     })
 }
