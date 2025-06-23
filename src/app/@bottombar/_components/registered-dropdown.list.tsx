@@ -6,6 +6,9 @@
 
 'use client'
 
+import useTransactions from '@/hooks/use-transactions'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
 import type { Variants } from 'framer-motion'
 import { motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
@@ -14,9 +17,6 @@ import { getAbiItem } from 'viem'
 import RegisteredDropdownItem from './registered-dropdown.item'
 import type { RegisteredDropdownItemConfig } from './registered-dropdown.list.config'
 import { dropdownItemsConfig } from './registered-dropdown.list.config'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { poolAbi } from '@/types/contracts'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
 
 /**
  * Variants for the dropdown menu animation using framer-motion.
@@ -59,7 +59,7 @@ const RegisteredDropdownList: React.FC<{ setOpen: (open: boolean) => void; poolI
             name: 'selfRefund',
         })
 
-        executeTransactions(
+        void executeTransactions(
             [
                 {
                     address: currentPoolAddress,

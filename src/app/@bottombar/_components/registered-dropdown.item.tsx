@@ -3,7 +3,7 @@
  * @description This file contains the `UserDropdownItem` component that renders an item for the user dropdown menu.
  */
 
-import { DropdownMenuLabel, DropdownMenuSeparator } from '@/app/_components/ui/dropdown-menu'
+import { DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import type { LinkProps } from 'next/link'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
