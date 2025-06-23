@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
+import { Drawer } from '@/components/ui/drawer'
+import useMediaQuery from '@/hooks/use-media-query'
+import { usePoolCreationStore } from '@/stores/pool-creation-store'
 import { useRouter } from 'next/navigation'
-import { Dialog } from '@/app/_components/ui/dialog'
-import { Drawer } from '@/app/_components/ui/drawer'
-import { Button } from '@/app/_components/ui/button'
-import useMediaQuery from '@/app/_client/hooks/use-media-query'
+import { useState } from 'react'
 import { deletePool } from './actions'
-import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
 
 interface CancelPoolDialogProps {
     open: boolean
@@ -52,7 +52,7 @@ export function CancelPoolDialog({ open, onOpenChange, internalPoolId, onRetry }
                     Close
                 </Button>
                 <Button onClick={onRetry}>Retry</Button>
-                <Button variant='destructive' onClick={handleCancel} disabled={isDeleting}>
+                <Button variant='destructive' onClick={() => void handleCancel()} disabled={isDeleting}>
                     {isDeleting ? 'Cancelling...' : 'Cancel Pool'}
                 </Button>
             </div>

@@ -1,4 +1,5 @@
-import { Dialog } from '@/app/_components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
 import {
     Drawer,
     DrawerClose,
@@ -7,8 +8,7 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-} from '@/app/_components/ui/drawer'
-import { Button } from '@/app/_components/ui/button'
+} from '@/components/ui/drawer'
 
 interface RetryDialogProps {
     open: boolean
@@ -30,7 +30,7 @@ const RetryDialog = ({ open, onOpenChange, onRetry, onCancel, isDesktop }: Retry
                         </Dialog.Description>
                     </Dialog.Header>
                     <div className='mt-4 flex justify-end space-x-2'>
-                        <Button variant='outline' onClick={onCancel}>
+                        <Button variant='outline' onClick={() => void onCancel()}>
                             Cancel Creation
                         </Button>
                         <Button onClick={onRetry}>Retry Transaction</Button>
@@ -52,7 +52,7 @@ const RetryDialog = ({ open, onOpenChange, onRetry, onCancel, isDesktop }: Retry
                 <DrawerFooter className='pt-2'>
                     <Button onClick={onRetry}>Retry Transaction</Button>
                     <DrawerClose asChild>
-                        <Button variant='outline' onClick={onCancel}>
+                        <Button variant='outline' onClick={() => void onCancel()}>
                             Cancel Creation
                         </Button>
                     </DrawerClose>

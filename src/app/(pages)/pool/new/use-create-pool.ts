@@ -1,16 +1,18 @@
+import useMediaQuery from '@/hooks/use-media-query'
+import useTransactions from '@/hooks/use-transactions'
+import { currentPoolAddress, currentTokenAddress } from '@/server/blockchain/server-config'
+import { Steps, usePoolCreationStore } from '@/stores/pool-creation-store'
+import { poolAbi } from '@/types/contracts'
+import { useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useFormState } from 'react-dom'
-import { useRouter } from 'next/navigation'
 import type { Hash } from 'viem'
-import { parseEventLogs, ContractFunctionExecutionError, parseUnits } from 'viem'
-import { createPoolAction, deletePool, updatePoolStatus } from './actions'
-import { Steps, usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
+import { ContractFunctionExecutionError, parseEventLogs, parseUnits } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
-import { useQueryClient } from '@tanstack/react-query'
-import { currentPoolAddress, currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { poolAbi } from '@/types/contracts'
-import useMediaQuery from '@/app/_client/hooks/use-media-query'
+import { z } from 'zod'
+import { CreatePoolFormSchema, PoolObjectSchema } from './_lib/definitions'
+import { createPoolAction, deletePool, updatePoolStatus } from './actions'
 
 const initialState = {
     message: '',
@@ -27,6 +29,9 @@ const initialState = {
     internalPoolId: undefined,
     poolData: undefined,
 }
+
+type FormValues = z.infer<typeof PoolObjectSchema>
+type FormErrors = Partial<Record<keyof FormValues, string[]>>
 
 export function useCreatePool() {
     const [state, formAction] = useFormState(createPoolAction, initialState)
@@ -54,7 +59,83 @@ export function useCreatePool() {
     const [transactionProcessed, setTransactionProcessed] = useState(false)
     const [hasAttemptedChainCreation, setHasAttemptedChainCreation] = useState(false)
     const [poolUpdated, setPoolUpdated] = useState(false)
-    const createPoolOnChainRef = useRef<(() => void) | null>(null)
+    const [formData, setFormData] = useState<Partial<FormValues>>({})
+    const [formErrors, setFormErrors] = useState<FormErrors>({})
+
+    const validateField = useCallback(<K extends keyof FormValues>(name: K, value: FormValues[K]) => {
+        const fieldSchema = z.object({ [name]: PoolObjectSchema.shape[name] })
+        const result = fieldSchema.safeParse({ [name]: value })
+
+        if (!result.success) {
+            const fieldErrors = result.error.flatten().fieldErrors as Partial<Record<keyof FormValues, string[]>>
+
+            setFormErrors(prev => ({
+                ...prev,
+                [name]: fieldErrors[name],
+            }))
+        } else {
+            setFormErrors(prev => {
+                const { [name]: _, ...rest } = prev
+                return rest
+            })
+        }
+    }, [])
+
+    const handleFieldChange = useCallback(
+        <K extends keyof FormValues>(name: K, value: FormValues[K] | null) => {
+            if (value === null) return
+            setFormData(prev => ({ ...prev, [name]: value }))
+            validateField(name, value)
+        },
+        [validateField],
+    )
+
+    const validateForm = useCallback(() => {
+        const result = CreatePoolFormSchema.safeParse(formData)
+        if (!result.success) {
+            const flat = result.error.flatten().fieldErrors as Record<string, string[]>
+            const aggregated: FormErrors = {}
+
+            Object.entries(flat).forEach(([k, v]) => {
+                if (k.startsWith('dateRange')) {
+                    // Provide more specific error messages for dateRange
+                    const enhancedMessages = v.map(msg => {
+                        if (msg.includes('Start date')) {
+                            return msg // Keep specific start date messages
+                        } else if (msg.includes('End date') || msg.includes('End time')) {
+                            return msg // Keep specific end date messages
+                        } else if (msg.includes('required')) {
+                            return 'Please select both start and end dates for your event'
+                        } else {
+                            return msg
+                        }
+                    })
+                    aggregated.dateRange = [...(aggregated.dateRange ?? []), ...enhancedMessages]
+                } else if (k === 'description') {
+                    // Provide more specific error messages for description
+                    const enhancedMessages = v.map(msg => {
+                        if (msg.includes('required')) {
+                            return 'Please provide a description for your pool'
+                        } else if (msg.includes('5 characters')) {
+                            return 'Description must be at least 5 characters long'
+                        } else if (msg.includes('500 characters')) {
+                            return 'Description cannot exceed 500 characters'
+                        } else {
+                            return msg
+                        }
+                    })
+                    aggregated.description = enhancedMessages
+                } else {
+                    // Keep other field errors as they are
+                    ;(aggregated as Record<string, string[]>)[k as keyof FormValues] = v
+                }
+            })
+            setFormErrors(aggregated)
+            return false
+        }
+        setFormErrors({})
+        return true
+    }, [formData])
 
     const createPoolOnChain = useCallback(() => {
         if (!state.internalPoolId || !state.poolData || hasAttemptedChainCreation) {
@@ -103,11 +184,8 @@ export function useCreatePool() {
             })
             .finally(() => {
                 isCreatingPool.current = false
-                setHasAttemptedChainCreation(false) // Reset this here
             })
-    }, [state.internalPoolId, state.poolData, executeTransactions, setStep, setError, hasAttemptedChainCreation])
-
-    createPoolOnChainRef.current = createPoolOnChain
+    }, [state.internalPoolId, state.poolData, hasAttemptedChainCreation, setStep, executeTransactions, setError])
 
     const handleCancellation = useCallback(async () => {
         if (!state.internalPoolId) return
@@ -131,8 +209,8 @@ export function useCreatePool() {
     const handleRetry = useCallback(() => {
         setShowRetryDialog(false)
         setIsWaitingForRetry(false)
-        createPoolOnChain()
-    }, [createPoolOnChain])
+        setHasAttemptedChainCreation(false)
+    }, [])
 
     const handleRetryDialogClose = useCallback(async () => {
         setShowRetryDialog(false)
@@ -161,7 +239,7 @@ export function useCreatePool() {
         ) {
             createPoolOnChain()
         }
-    }, [state.internalPoolId, state.poolData, createPoolOnChain, isWaitingForRetry, hasAttemptedChainCreation])
+    }, [state.internalPoolId, state.poolData, isWaitingForRetry, hasAttemptedChainCreation, createPoolOnChain])
 
     useEffect(() => {
         if (!isConfirmed || !receipt || poolUpdated || transactionProcessed) return
@@ -201,7 +279,7 @@ export function useCreatePool() {
                 .finally(() => {
                     setPoolUpdated(false)
                     setTransactionProcessed(false)
-                    setHasAttemptedChainCreation(false) // Reset this here as well
+                    setHasAttemptedChainCreation(false)
                 })
         } else {
             setError('Failed to find pool creation event')
@@ -211,7 +289,7 @@ export function useCreatePool() {
             })
             setTransactionProcessed(false)
             setPoolUpdated(false)
-            setHasAttemptedChainCreation(false) // Reset this here too
+            setHasAttemptedChainCreation(false)
         }
     }, [
         isConfirmed,
@@ -260,7 +338,11 @@ export function useCreatePool() {
     return {
         formAction,
         state,
-        createPoolOnChain: () => createPoolOnChainRef.current?.(),
+        formData,
+        formErrors,
+        handleFieldChange,
+        validateForm,
+        createPoolOnChain: createPoolOnChain,
         isPending: txResult.isLoading,
         isConfirming,
         callsStatus: txResult.callsStatus,

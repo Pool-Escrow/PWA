@@ -1,11 +1,11 @@
 'use server'
 
-import { verifyToken } from '@/app/_server/auth/privy'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { verifyParticipantInContract } from '@/app/_server/blockchain/verify-participant'
-import { db } from '@/app/_server/database/db'
-import { createPoolUseCase } from '@/app/_server/use-cases/pools/create-pool'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { verifyToken } from '@/server/auth/privy'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
+import { verifyParticipantInContract } from '@/server/blockchain/verify-participant'
+import { getDb } from '@/server/database/db'
+import { createPoolUseCase } from '@/server/use-cases/pools/create-pool'
 import { fromZonedTime } from 'date-fns-tz'
 import { getUserAddressAction } from '../../pools/actions'
 import { CreatePoolFormSchema } from './_lib/definitions'
@@ -152,6 +152,7 @@ export async function updatePoolStatus(
         throw new Error('User is not authorized to delete pools')
     }
 
+    const db = getDb()
     const { error } = await db.from('pools').update({ status, contract_id }).eq('internal_id', poolId)
 
     if (error) throw error
@@ -203,73 +204,77 @@ export async function deletePool(poolId: string) {
         throw new Error('User is not authorized to delete pools')
     }
 
-    const { error: deleteError } = await db.from('pools').delete().eq('internal_id', poolId)
+    const db = getDb()
+    const { error } = await db.from('pools').update({ status: 'deleted' }).eq('internal_id', poolId)
 
-    if (deleteError) {
-        console.error('Error deleting pool:', deleteError)
-        throw new Error('Failed to delete pool')
+    if (error) {
+        console.error('Error deleting pool:', error)
+        throw error
     }
 
-    const { error: participantDeleteError } = await db.from('pool_participants').delete().eq('pool_id', poolId)
-
-    if (participantDeleteError) {
-        console.error('Error deleting pool participants:', participantDeleteError)
-    }
-
-    console.log('Pool with id', poolId, 'and related data deleted successfully')
+    console.log(`Pool ${poolId} deleted successfully`)
 }
 
 export async function addParticipantToPool(poolId: string, userAddress: string): Promise<boolean> {
-    const privyUser = await verifyToken()
-    if (!privyUser) {
-        throw new Error('User not authenticated')
-    }
+    try {
+        const privyUser = await verifyToken()
+        if (!privyUser) {
+            throw new Error('User not found trying to add as participant')
+        }
 
-    // Verify if the user is a participant in the smart contract
-    const isParticipant = await verifyParticipantInContract(poolId, userAddress)
-    if (!isParticipant) {
-        throw new Error('User is not a participant in the smart contract')
-    }
+        const db = getDb()
+        const { data: user, error: userError } = await db
+            .from('users')
+            .select('id')
+            .eq('privyId', privyUser?.id)
+            .single()
 
-    // Get the user's ID from the database
-    const { data: user, error: userError } = await db.from('users').select('id').eq('privyId', privyUser.id).single()
+        if (userError) {
+            console.error('Error finding user:', userError)
+            throw userError
+        }
 
-    if (userError) {
-        console.error('Error finding user:', userError)
-        throw userError
-    }
+        // Check if the user is already a participant
+        const { data: existingParticipant, error: participantCheckError } = await db
+            .from('pool_participants')
+            .select('*')
+            .eq('pool_id', parseInt(poolId))
+            .eq('user_id', user.id)
+            .single()
 
-    // Check if the user is already a participant in the database
-    const { data: existingParticipant, error: participantCheckError } = await db
-        .from('pool_participants')
-        .select('*')
-        .eq('pool_id', poolId)
-        .eq('user_id', user.id)
-        .single()
+        if (participantCheckError && participantCheckError.code !== 'PGRST116') {
+            console.error('Error checking existing participant:', participantCheckError)
+            throw participantCheckError
+        }
 
-    if (participantCheckError && participantCheckError.code !== 'PGRST116') {
-        console.error('Error checking existing participant:', participantCheckError)
-        throw participantCheckError
-    }
+        if (existingParticipant) {
+            console.log('User is already a participant in this pool')
+            return true
+        }
 
-    if (existingParticipant) {
-        console.log('User is already a participant')
+        // Check if the user is a participant in the contract
+        const isParticipantInContract = await verifyParticipantInContract(userAddress, poolId)
+        if (!isParticipantInContract) {
+            console.error('User is not a participant in the contract')
+            return false
+        }
+
+        // Add the user as a participant
+        const { error: participantError } = await db.from('pool_participants').insert({
+            user_id: user.id,
+            pool_id: parseInt(poolId),
+            poolRole: 'participant',
+        })
+
+        if (participantError) {
+            console.error('Error adding participant:', participantError)
+            throw participantError
+        }
+
+        console.log(`User ${userAddress} added as participant to pool ${poolId}`)
         return true
+    } catch (error) {
+        console.error('Error in addParticipantToPool:', error)
+        return false
     }
-
-    // Insert the new participant
-    const { error: participantError } = await db.from('pool_participants').insert({
-        user_id: Number(user.id),
-        pool_id: Number(poolId),
-        poolRole: 'participant',
-        status: 'JOINED',
-    })
-
-    if (participantError) {
-        console.error('Error adding participant:', participantError)
-        throw participantError
-    }
-
-    console.log('Participant added successfully')
-    return true
 }
