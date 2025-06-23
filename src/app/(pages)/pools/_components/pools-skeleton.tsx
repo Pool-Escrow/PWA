@@ -1,4 +1,4 @@
-import { Skeleton } from '@/app/_components/ui/skeleton'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function PoolSkeleton({ length }: { length: number }) {
     return (

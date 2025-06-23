@@ -1,12 +1,12 @@
 'use client'
 
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
-import { Badge } from '@/app/_components/ui/badge'
-import { Skeleton } from '@/app/_components/ui/skeleton'
-import { POOL_STATUSES_CONFIGS } from '@/app/_lib/consts/pool.consts'
-import { getStatusString } from '@/app/_lib/utils/get-relative-date'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { useUserPoolRegistration } from '@/hooks/use-user-pool-registration'
+import { POOL_STATUSES_CONFIGS } from '@/lib/consts/pool.consts'
+import { getStatusString } from '@/lib/utils/get-relative-date'
 import { cn } from '@/lib/utils/tailwind'
 import frog from '@/public/app/images/frog.png'
 import { useQueryClient } from '@tanstack/react-query'
@@ -14,7 +14,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 
 interface PoolItem {
     id: string
@@ -50,9 +50,13 @@ export default function PoolListCard({
     numParticipants,
     softCap,
 }: PoolItem) {
-    const [dateString, setDateString] = useState<string>('Date information unavailable')
     const queryClient = useQueryClient()
     const { isRegistered, isLoading: isRegistrationLoading } = useUserPoolRegistration(id)
+
+    // Calculate dateString using useMemo instead of useState + useEffect to avoid setState during render
+    const dateString = useMemo(() => {
+        return getStatusString({ status, startDate, endDate })
+    }, [status, startDate, endDate])
 
     const prefetch = () => {
         void queryClient.prefetchQuery({
@@ -64,10 +68,6 @@ export default function PoolListCard({
 
     // only show ended
     const resolvedImage = image || frog.src
-
-    useEffect(() => {
-        setDateString(getStatusString({ status, startDate, endDate }))
-    }, [status, startDate, endDate])
 
     if (!id) return <PoolCardSkeleton />
 

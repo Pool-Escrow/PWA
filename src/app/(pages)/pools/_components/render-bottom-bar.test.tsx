@@ -1,14 +1,14 @@
+import MainWrapper from '@/components/main-wrapper'
+import { Providers } from '@/providers'
+import '@testing-library/jest-dom'
 import { render } from '@testing-library/react'
 import RenderBottomBar from './render-bottom-bar'
-import { Providers } from '@/app/_client/providers'
-import '@testing-library/jest-dom'
-import MainWrapper from '@/app/_components/main-wrapper'
 
 import BottomBar from '@/app/@bottombar/default'
 
 // TODO: Fix this test, now we get the admin status from the server, so we need to mock the server
 describe('RenderBottomBar', () => {
-    it.todo('should render the "Create Pool" button when user is admin', async () => {
+    it.todo('should render the "Create Pool" button when user is admin', () => {
         const container = render(
             <Providers cookie={null}>
                 <MainWrapper>

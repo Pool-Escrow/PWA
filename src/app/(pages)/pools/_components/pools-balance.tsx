@@ -1,16 +1,18 @@
 'use client'
 
-import BalanceSkeleton from '@/app/_components/balance/balance-skeleton'
-import EncryptText from '@/app/_components/balance/encrypt-text'
-import FormattedBalance from '@/app/_components/balance/formatted-balance'
-import NumberTicker from '@/app/_components/ui/number-ticker'
-import { formatBalance } from '@/app/_lib/utils/balance'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
-import { dropTokenAddress } from '@/types/contracts'
+import BalanceSkeleton from '@/components/balance/balance-skeleton'
+import EncryptText from '@/components/balance/encrypt-text'
+import FormattedBalance from '@/components/balance/formatted-balance'
+import NumberTicker from '@/components/ui/number-ticker'
+import { useNetworkValidation } from '@/hooks/use-network-validation'
+import { formatBalance } from '@/lib/utils/balance'
+import { dropTokenAddress, tokenAddress } from '@/types/contracts'
 import { usePrivy } from '@privy-io/react-auth'
 import type { Address } from 'viem'
-import { useBalance } from 'wagmi'
+import { useBalance, useSwitchChain } from 'wagmi'
 
+// Default/fallback balances for each token
+const zeroUsdcbalance = {
     value: BigInt(0),
     decimals: 18,
     symbol: 'USDC',
@@ -18,36 +20,106 @@ import { useBalance } from 'wagmi'
     fractionalPart: 0,
 }
 
+const zeroDropBalance = {
+    value: BigInt(0),
+    decimals: 18,
+    symbol: 'DROP',
+    integerPart: 0,
+    fractionalPart: 0,
+}
+
 export default function PoolsBalance() {
     const { user } = usePrivy()
     const address = user?.wallet?.address as Address
-    // const [dropBalance, setDropBalance] = useState('0')
+    const { currentChainId, isCorrectNetwork, expectedChain, shouldShowWarning } = useNetworkValidation()
+    const { switchChain } = useSwitchChain()
 
-    const { data: balance, isLoading } = useBalance({
+    // Reduce log noise - only log when validation state actually changes
+    const validationKey = `${currentChainId}-${isCorrectNetwork}-${expectedChain.name}-${shouldShowWarning}`
+    if (process.env.NODE_ENV === 'development' && validationKey !== globalThis.__lastPoolsBalanceValidation) {
+        console.log('[PoolsBalance] Network validation:', {
+            currentChainId,
+            isCorrectNetwork,
+            expectedChain: expectedChain.name,
+            shouldShowWarning,
+        })
+        globalThis.__lastPoolsBalanceValidation = validationKey
+    }
+
+    // Get chain-specific token addresses
+    const currentTokenAddress = currentChainId
+        ? (tokenAddress[currentChainId as keyof typeof tokenAddress] as Address)
+        : undefined
+    const currentDropTokenAddress = currentChainId
+        ? (dropTokenAddress[currentChainId as keyof typeof dropTokenAddress] as Address)
+        : undefined
+
+    // Handle chain switching
+    const handleSwitchToTestnet = () => {
+        switchChain(
+            { chainId: expectedChain.id },
+            {
+                onSuccess: () => {
+                    console.log(`[PoolsBalance] Successfully switched to ${expectedChain.name}`)
+                },
+                onError: error => {
+                    console.error(`[PoolsBalance] Failed to switch to ${expectedChain.name}:`, error)
+                },
+            },
+        )
+    }
+
+    const { data: balanceData, isLoading } = useBalance({
         token: currentTokenAddress,
         address,
         query: {
-            refetchInterval: 20_000,
-            select: data => ({
-                ...data,
-                ...formatBalance(data.value, data.decimals),
-            }),
-            enabled: Boolean(address),
+            staleTime: 60_000, // Consider data fresh for 1 minute
+            gcTime: 300_000, // Keep in cache for 5 minutes
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchInterval: false, // DISABLE automatic polling
+            // Only fetch balance if user is on the correct network
+            enabled: Boolean(address && currentTokenAddress && isCorrectNetwork),
         },
     })
 
-    const { data: dropBalance } = useBalance({
-        token: dropTokenAddress[8453],
+    const { data: dropBalanceData } = useBalance({
+        token: currentDropTokenAddress,
         address,
         query: {
-            refetchInterval: 20_000,
-            select: data => ({
-                ...data,
-                ...formatBalance(data.value, data.decimals),
-            }),
-            enabled: Boolean(address),
+            staleTime: 60_000, // Consider data fresh for 1 minute
+            gcTime: 300_000, // Keep in cache for 5 minutes
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchInterval: false, // DISABLE automatic polling
+            // Only fetch balance if user is on the correct network
+            enabled: Boolean(address && currentDropTokenAddress && isCorrectNetwork),
         },
     })
+
+    // Format balances
+    const balance = balanceData
+        ? {
+              ...balanceData,
+              symbol: 'USDC',
+              ...formatBalance(balanceData.value, balanceData.decimals),
+          }
+        : zeroUsdcbalance
+
+    const dropBalance = dropBalanceData
+        ? {
+              ...dropBalanceData,
+              symbol: 'DROP',
+              ...formatBalance(dropBalanceData.value, dropBalanceData.decimals),
+          }
+        : zeroDropBalance
+
+    // Auto-switch to correct network if user is on Base mainnet
+    if (shouldShowWarning && currentChainId === 8453) {
+        // Base mainnet
+        console.log('[PoolsBalance] Auto-switching from Base mainnet to correct network...')
+        handleSwitchToTestnet()
+    }
 
     return (
         <section className='flex flex-col gap-2'>
@@ -55,14 +127,11 @@ export default function PoolsBalance() {
             <div className='flex items-baseline gap-2 text-[2.5rem] font-bold text-white'>
                 {isLoading && <BalanceSkeleton />}
                 {!isLoading && (
-                    <EncryptText
-                        balance={balance || zeroBalance}
-                        color='white'
-                        symbol={(balance || zeroBalance).symbol}>
+                    <EncryptText balance={balance} color='white' symbol={balance.symbol}>
                         <FormattedBalance
-                            integerPart={(balance || zeroBalance).integerPart}
-                            fractionalPart={(balance || zeroBalance).fractionalPart}
-                            symbol={(balance || zeroBalance).symbol}
+                            integerPart={balance.integerPart}
+                            fractionalPart={balance.fractionalPart}
+                            symbol={balance.symbol}
                         />
                     </EncryptText>
                 )}
@@ -76,18 +145,15 @@ export default function PoolsBalance() {
                 </svg>
                 <span className='text-[12px] text-white'>
                     <span className='text-[12px] text-white'>
-                        <NumberTicker
-                            value={(dropBalance || zeroBalance).integerPart}
-                            className='text-[12px] text-white'
-                        />
+                        <NumberTicker value={dropBalance.integerPart} className='text-[12px] text-white' />
                         <span>.</span>
                         <NumberTicker
-                            value={(dropBalance || zeroBalance).fractionalPart}
+                            value={dropBalance.fractionalPart}
                             className='text-[12px] text-white'
                             padding={2}
                         />
                     </span>
-                    <span className='ml-2 text-sm'>{(dropBalance || zeroBalance).symbol}</span>
+                    <span className='ml-2 text-sm'>{dropBalance.symbol}</span>
                 </span>
             </div>
         </section>

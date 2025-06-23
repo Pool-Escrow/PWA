@@ -1,8 +1,8 @@
 'use client'
 
-import type { PoolItem } from '@/app/_lib/entities/models/pool-item'
-import PoolListCard from './pool-list-card'
+import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { motion } from 'framer-motion'
+import PoolListCard from './pool-list-card'
 
 const poolMessages = {
     upcoming: {
@@ -28,8 +28,20 @@ const poolMessages = {
     },
 }
 
-export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] | null; name?: string }) {
-    if (pools?.length === 0) {
+export default function PoolList({
+    pools,
+    name = 'feed',
+    isLoading,
+}: {
+    pools?: PoolItem[] | null
+    name?: string
+    isLoading?: boolean
+}) {
+    if (isLoading) {
+        return null
+    }
+
+    if (!pools || pools.length === 0) {
         const defaultMessage = {
             title: 'No Pools Available',
             message: 'There are currently no pools to display.',
@@ -51,7 +63,7 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
                     {link && linkText && (
                         <a
                             href={link}
-                            className=' text-xs text-blue-500 hover:underline'
+                            className='text-xs text-blue-500 hover:underline'
                             target='_blank'
                             rel='noopener noreferrer'>
                             {linkText}
@@ -63,7 +75,7 @@ export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] 
     }
 
     return (
-        <section className='flex flex-col gap-2 pb-4'>
+        <section className='flex flex-col gap-2 pb-32'>
             {pools?.length ? pools.map(pool => <PoolListCard key={pool.id} {...pool} />) : null}
         </section>
     )

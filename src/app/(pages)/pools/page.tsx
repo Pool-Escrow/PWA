@@ -1,10 +1,10 @@
-import NextUserPool from './_components/next-user-pool'
-import UpcomingPools from './_components/upcoming-pools'
-import RenderBottomBar from './_components/render-bottom-bar'
-import PageWrapper from '@/components/page-wrapper'
-import PullToRefresh from '@/app/_components/pull-to-refresh'
-import TopSection from '@/components/top-section'
 import MainPageLoginButton from '@/components/main-page-login-button'
+import PageWrapper from '@/components/page-wrapper'
+import PullToRefresh from '@/components/pull-to-refresh'
+import TopSection from '@/components/top-section'
+import NextUserPool from './_components/next-user-pool'
+import RenderBottomBar from './_components/render-bottom-bar'
+import UpcomingPools from './_components/upcoming-pools'
 
 export default function PoolsPage() {
     return (

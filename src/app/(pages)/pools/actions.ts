@@ -1,17 +1,15 @@
 'use server'
 
-import { authenticatedProcedure } from '../../_server/procedures/authenticated'
-import { getAllPoolsUseCase } from '../../_server/use-cases/pools/get-all-pools'
-import { getUserNextPoolUseCase } from '../../_server/use-cases/pools/get-user-next-pool'
-import { unauthenticatedProcedure } from '../../_server/procedures/unauthenticated'
-import { getAddressBalanceUseCase } from '../../_server/use-cases/users/get-user-balance'
-import { isAdminUseCase } from '../../_server/use-cases/users/is-admin'
+import { verifyToken } from '@/server/auth/privy'
+import { getAllPoolsUseCase } from '@/server/use-cases/pools/get-all-pools'
+import { getAddressBalanceUseCase } from '@/server/use-cases/users/get-user-balance'
 import type { Address } from 'viem'
-import type { PoolItem } from '../../_lib/entities/models/pool-item'
-import { verifyToken } from '../../_server/auth/privy'
 
-export const getUpcomingPoolsAction = async () => {
-    // unauthenticatedProcedure.createServerAction().handler(async (): Promise<PoolItem> => {
+/**
+ * Get all pools for the current chain
+ * This action is now chain-aware and will fetch pools based on the chain context
+ */
+export const getPoolsAction = async () => {
     return getAllPoolsUseCase()
 }
 
@@ -25,10 +23,12 @@ export const getUpcomingPoolsAction = async () => {
 // }
 
 export const getTokenBalanceAction = async () => {
-    // authenticatedProcedure.createServerAction().handler(async ({ ctx: { user } }) => {
     const user = await verifyToken()
+    if (!user?.wallet?.address) {
+        return undefined
+    }
 
-    const address = user?.wallet?.address as Address
+    const address = user.wallet.address as Address
     return getAddressBalanceUseCase(address)
 }
 
