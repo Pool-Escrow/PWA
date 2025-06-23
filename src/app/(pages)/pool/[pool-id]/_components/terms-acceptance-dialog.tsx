@@ -1,32 +1,17 @@
-'use client'
-
-import { useState, useCallback, useEffect } from 'react'
-import Link from 'next/link'
-import { Label } from '@/app/_components/ui/label'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/app/_components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
+import { Drawer, DrawerDescription, DrawerTitle } from '@/components/ui/drawer'
+import { Label } from '@/components/ui/label'
+import useMediaQuery from '@/hooks/use-media-query'
 import { cn } from '@/lib/utils/tailwind'
-import { Drawer, DrawerDescription, DrawerTitle } from '@/app/_components/ui/drawer'
-import { Dialog } from '@/app/_components/ui/dialog'
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
+import Link from 'next/link'
+import { useCallback, useEffect, useState } from 'react'
 
 type CheckboxState = {
     terms: boolean
-}
-
-const useMediaQuery = (query: string): boolean => {
-    const [matches, setMatches] = useState(false)
-
-    useEffect(() => {
-        const media = window.matchMedia(query)
-        const updateMatch = () => setMatches(media.matches)
-        updateMatch()
-        media.addEventListener('change', updateMatch)
-        return () => media.removeEventListener('change', updateMatch)
-    }, [query])
-
-    return matches
 }
 
 type ContentProps = {
@@ -45,7 +30,7 @@ const Content = ({ checkboxes, handleCheckboxChange, handleSubmit, isButtonEnabl
         <form
             onSubmit={e => {
                 e.preventDefault()
-                handleSubmit()
+                void handleSubmit()
             }}
             className='space-y-4'>
             <div className='flex items-center space-x-2'>
@@ -142,7 +127,7 @@ export default function HybridRegistration({ open, onOpenChange, onAccept, terms
     useEffect(() => {
         // Close the dialog/drawer when switching between desktop and mobile
         onOpenChange(false)
-    }, [isDesktop])
+    }, [isDesktop, onOpenChange])
 
     if (isDesktop) {
         return (

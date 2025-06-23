@@ -1,19 +1,19 @@
 'use client'
 
+import { usePayoutStore } from '@/stores/payout-store'
 import * as React from 'react'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
 import { useEffect, useRef, useState } from 'react'
 
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
 
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import useTransactions from '@/hooks/use-transactions'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { toast } from 'sonner'
-import type { Address} from 'viem';
+import type { Address } from 'viem'
 import { formatUnits, getAbiItem, parseUnits } from 'viem'
 import { useWriteContract } from 'wagmi'
 
@@ -42,7 +42,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
         toast.success('Payout saved successfully')
     }
 
-    const onPayoutButtonClicked = () => {
+    const _onPayoutButtonClicked = () => {
         const SetWinnerFunction = getAbiItem({
             abi: poolAbi,
             name: 'setWinner',
@@ -59,7 +59,7 @@ const PayoutForm: React.FC<PayoutFormProps> = ({ poolId, participantId, tokenAdd
         ]
 
         try {
-            executeTransactions(args, {
+            void executeTransactions(args, {
                 type: 'SET_WINNER',
                 onSuccess: () => {
                     toast.success('Payout Successful', { description: `Transaction: ${hash}` })

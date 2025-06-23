@@ -1,4 +1,4 @@
-import { Progress } from '@/app/_components/ui/progress'
+import { Progress } from '@/components/ui/progress'
 
 interface PoolDetailsProgressProps {
     current: number

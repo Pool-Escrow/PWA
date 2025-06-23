@@ -25,7 +25,7 @@ interface UseQrScannerProps {
 type QrScannerOptions = {
     onDecodeError?: (error: Error | string) => void
     calculateScanRegion?: (video: HTMLVideoElement) => QrScannerPrimitive.ScanRegion
-    preferredCamera?: QrScannerPrimitive.FacingMode | QrScannerPrimitive.DeviceId
+    preferredCamera?: QrScannerPrimitive.FacingMode
     maxScansPerSecond?: number
     highlightScanRegion?: boolean
     highlightCodeOutline?: boolean
@@ -105,12 +105,12 @@ function useQrScanner({ onDecode, onError, scannerOptions, enableCallback = true
 
 const useCanvasContextOverride = () => {
     useEffect(() => {
-        const originalGetContext = HTMLCanvasElement.prototype.getContext
+        const originalGetContext = HTMLCanvasElement.prototype.getContext.bind(HTMLCanvasElement.prototype)
 
         const customGetContext = function (
             this: HTMLCanvasElement,
             contextId: string,
-            options?: any,
+            options?: CanvasRenderingContext2DSettings,
         ): RenderingContext | null {
             if (contextId === '2d') {
                 options = options || {}
@@ -132,18 +132,25 @@ const useCanvasContextOverride = () => {
 const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
     (
         {
-            className,
+            // className,
             onDecode,
             onError,
             scannerOptions,
-            startButtonText = 'Start Scanning',
-            stopButtonText = 'Stop Scanning',
+            // startButtonText = 'Start Scanning',
+            // stopButtonText = 'Stop Scanning',
             enableCallback = true,
-            ...props
+            // ...props
         },
-        ref,
+        // ref,
     ) => {
-        const { result, error, isScanning, videoRef, startScanner, stopScanner } = useQrScanner({
+        const {
+            // result,
+            //  error,
+            // isScanning,
+            videoRef,
+            startScanner,
+            // stopScanner
+        } = useQrScanner({
             onDecode,
             onError,
             scannerOptions,
@@ -151,24 +158,24 @@ const PoolQrScanner = React.forwardRef<HTMLDivElement, QrScannerProps>(
         })
 
         useEffect(() => {
-            startScanner()
-        }, [])
+            startScanner?.()
+        }, [startScanner])
 
         useCanvasContextOverride()
 
         return (
             <div className='relative'>
-                <video ref={videoRef} className='h-full w-full object-cover' />
+                <video ref={videoRef} className='size-full object-cover' />
                 <div className='absolute inset-0'>
                     {enableCallback ? (
-                        <div className='relative h-full w-full'>
-                            <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-3/4 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:-left-[3px] before:-top-[3px] before:h-8 before:w-8 before:rounded-tl-lg before:border-l-8 before:border-t-8 before:border-[#44DCAF] after:absolute after:-right-[3px] after:-top-[3px] after:h-8 after:w-8 after:rounded-tr-lg after:border-r-8 after:border-t-8 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:-bottom-[3px] [&>*:nth-child(1)]:-left-[3px] [&>*:nth-child(1)]:h-8 [&>*:nth-child(1)]:w-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-8 [&>*:nth-child(1)]:border-l-8 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:-bottom-[3px] [&>*:nth-child(2)]:-right-[3px] [&>*:nth-child(2)]:h-8 [&>*:nth-child(2)]:w-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-8 [&>*:nth-child(2)]:border-r-8 [&>*:nth-child(2)]:border-[#44DCAF]'>
-                                <span></span>
-                                <span></span>
+                        <div className='relative size-full'>
+                            <div className='camera-box absolute left-1/2 top-1/2 aspect-square w-3/4 max-w-[512px] -translate-x-1/2 -translate-y-1/2 before:absolute before:left-[-3px] before:top-[-3px] before:size-8 before:rounded-tl-lg before:border-l-8 before:border-t-8 before:border-[#44DCAF] after:absolute after:right-[-3px] after:top-[-3px] after:size-8 after:rounded-tr-lg after:border-r-8 after:border-t-8 after:border-[#44DCAF] [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:bottom-[-3px] [&>*:nth-child(1)]:left-[-3px] [&>*:nth-child(1)]:size-8 [&>*:nth-child(1)]:rounded-bl-lg [&>*:nth-child(1)]:border-b-8 [&>*:nth-child(1)]:border-l-8 [&>*:nth-child(1)]:border-[#44DCAF] [&>*:nth-child(2)]:absolute [&>*:nth-child(2)]:bottom-[-3px] [&>*:nth-child(2)]:right-[-3px] [&>*:nth-child(2)]:size-8 [&>*:nth-child(2)]:rounded-br-lg [&>*:nth-child(2)]:border-b-8 [&>*:nth-child(2)]:border-r-8 [&>*:nth-child(2)]:border-[#44DCAF]'>
+                                <span />
+                                <span />
                             </div>
                         </div>
                     ) : (
-                        <div className='camera-scanned-overlay relative h-full w-full'></div>
+                        <div className='camera-scanned-overlay relative size-full' />
                     )}
                 </div>
                 <motion.div

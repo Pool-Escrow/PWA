@@ -1,5 +1,5 @@
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
+import { getConfig } from '@/providers/configs/wagmi.config'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 

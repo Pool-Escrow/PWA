@@ -2,11 +2,11 @@
 
 import SearchBar from '@/app/(pages)/pool/[pool-id]/participants/_components/searchBar'
 import { useTokenDecimals } from '@/app/(pages)/profile/send/_components/use-token-decimals'
-import { useAppStore } from '@/app/_client/providers/app-store.provider'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
-import { Button } from '@/app/_components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/_components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useParticipants } from '@/hooks/use-participants'
+import { useAppStore } from '@/providers/app-store.provider'
+import { usePayoutStore } from '@/stores/payout-store'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { formatUnits } from 'viem'
@@ -38,7 +38,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
 
     const [payoutAddresses, setPayoutAddresses] = useState<string[]>([])
     const [payoutAmounts, setPayoutAmounts] = useState<string[]>([])
-    const { setWinners, isPending, isConfirming, isError } = useSetWinners(poolId)
+    const { setWinners, isPending, isConfirming } = useSetWinners(poolId)
     const [totalSavedPayout, setTotalSavedPayout] = useState<string>('0')
     const tokenAddress = poolData?.poolDetails?.poolDetailFromSC?.[4]
     const tokenDecimals = useTokenDecimals(tokenAddress || '16').tokenDecimalsData.tokenDecimals
@@ -72,7 +72,7 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                         if (payoutAddresses.length === 0) {
                             toast('No payout saved.')
                         } else {
-                            setWinners(payoutAddresses, payoutAmounts)
+                            void setWinners(payoutAddresses, payoutAmounts)
                         }
                     }}
                     disabled={isPending || isConfirming}>
@@ -81,7 +81,17 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
             )
         }
         return () => setBottomBarContent(null)
-    }, [setBottomBarContent, isAdmin, currentTab, payoutAddresses, payoutAmounts, isRouting])
+    }, [
+        setBottomBarContent,
+        isAdmin,
+        currentTab,
+        payoutAddresses,
+        payoutAmounts,
+        isRouting,
+        isPending,
+        isConfirming,
+        setWinners,
+    ])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
@@ -124,9 +134,9 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                             <div className='h-[48px]' />
                         </>
                     )}
-                    <TabsContent value='registered'></TabsContent>
-                    <TabsContent value='checkedIn'></TabsContent>
-                    <TabsContent value='winners'></TabsContent>
+                    <TabsContent value='registered' />
+                    <TabsContent value='checkedIn' />
+                    <TabsContent value='winners' />
                     {currentTab === TabValue.Winners && (
                         <div className='my-4'>
                             <PoolBalanceProgress
@@ -142,7 +152,8 @@ const Participants = ({ poolId, isAdmin }: PoolParticipantsProps) => {
                                         BigInt(poolData?.poolDetails?.poolDetailFromSC?.[2]?.totalDeposits ?? 0),
                                         tokenDecimals,
                                     ),
-                                )}></PoolBalanceProgress>
+                                )}
+                            />
                         </div>
                     )}
                     <ParticipantList

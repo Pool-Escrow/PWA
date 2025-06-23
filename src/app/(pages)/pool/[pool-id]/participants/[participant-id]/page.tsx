@@ -1,12 +1,12 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { formatAddress } from '@/app/_lib/utils/addresses'
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
 import PageWrapper from '@/components/page-wrapper'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
 import { useParticipants } from '@/hooks/use-participants'
-import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import { formatAddress } from '@/lib/utils/addresses'
+import * as circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
 import { blo } from 'blo'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -40,7 +40,7 @@ const ParticipantPayout = ({ params }: Props) => {
     const amountClaimed = userPoolData?.amountClaimed ?? 0
     const amountWon = userPoolData?.amountWon ?? 0
     useEffect(() => {
-        getUserAdminStatusActionWithCookie()
+        void getUserAdminStatusActionWithCookie()
             .then(isUserAdmin => {
                 setIsAdmin(isUserAdmin)
             })
@@ -57,7 +57,7 @@ const ParticipantPayout = ({ params }: Props) => {
 
     const avatar = userDetails?.avatar ?? blo(participantId)
     const displayName = userDetails?.displayName ?? formatAddress(participantId)
-    const { data: participants, isLoading, error } = useParticipants(params?.['pool-id'])
+    const { data: participants } = useParticipants(params?.['pool-id'])
 
     const currentParticipant = participants?.find(participant => participant.address === params['participant-id'])
     const isCheckedIn = currentParticipant?.checkedInAt != null

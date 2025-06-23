@@ -1,3 +1,4 @@
+import ShareDialog from '@/features/pools/components/dialogs/share'
 import editIcon from '@/public/app/icons/svg/edit-icon.svg'
 import qrIcon from '@/public/app/icons/svg/qr-code-icon.svg'
 import frog from '@/public/app/images/frog.png'
@@ -5,7 +6,6 @@ import type { StaticImport } from 'next/dist/shared/lib/get-img-props'
 import Image from 'next/image'
 import Link from 'next/link'
 import PoolStatus from './pool-status'
-import ShareDialog from '@/features/pools/components/dialogs/share'
 
 interface PoolImageRowProps {
     poolStatus?: number
@@ -15,7 +15,7 @@ interface PoolImageRowProps {
 }
 const PoolImageRow = (props: PoolImageRowProps) => {
     return (
-        <div className={`cardBackground mb-4 flex w-full flex-col space-y-4 rounded-3xl md:space-y-10 md:p-10`}>
+        <div className={`mb-4 flex w-full flex-col space-y-4 rounded-3xl md:space-y-10 md:p-10`}>
             <div className='relative size-full overflow-hidden rounded-3xl bg-black'>
                 <div className='relative size-full object-contain object-center'>
                     <Image src={props?.poolImage ?? frog.src} alt='Pool Image' width={500} height={400} />

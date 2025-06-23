@@ -1,7 +1,7 @@
 'use client'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
-import { formatNumberToMetric } from '@/app/_lib/utils/numbers'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatNumberToMetric } from '@/lib/utils/numbers'
 import { cn } from '@/lib/utils/tailwind'
 import { blo } from 'blo'
 import type { Address } from 'viem'

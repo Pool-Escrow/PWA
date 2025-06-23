@@ -1,14 +1,14 @@
-import { useState, useCallback, useEffect } from 'react'
+import useTransactions from '@/hooks/use-transactions'
+import { getConfig } from '@/providers/configs/wagmi.config'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
+import { usePayoutStore } from '@/stores/payout-store'
+import { poolAbi } from '@/types/contracts'
 import { useQueryClient } from '@tanstack/react-query'
-import type { Hash } from 'viem';
+import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import type { Hash } from 'viem'
 import { getAbiItem } from 'viem'
 import { useWaitForTransactionReceipt } from 'wagmi'
-import { toast } from 'sonner'
-import { poolAbi } from '@/types/contracts'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
-import { getConfig } from '@/app/_client/providers/configs/wagmi.config'
 
 export function useSetWinners(poolId: string) {
     const { executeTransactions, result } = useTransactions()
@@ -60,8 +60,8 @@ export function useSetWinners(poolId: string) {
         if (isConfirmed && result.hash && result.hash !== lastConfirmedHash) {
             toast.success('Successfully set payouts')
             clearPoolPayouts(poolId)
-            queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
-            queryClient.invalidateQueries({ queryKey: ['poolDetails', poolId, getConfig().state.chainId] })
+            void queryClient.invalidateQueries({ queryKey: ['participants', poolId] })
+            void queryClient.invalidateQueries({ queryKey: ['poolDetails', poolId, getConfig().state.chainId] })
             setLastConfirmedHash(result.hash)
         }
 

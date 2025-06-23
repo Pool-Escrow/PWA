@@ -1,10 +1,15 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
-import ParticipantCard from './participantCard'
 import type { useParticipants } from '@/hooks/use-participants'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import { usePayoutStore } from '@/stores/payout-store'
+import { useEffect, useMemo, useState } from 'react'
+import ParticipantCard from './participantCard'
 import { TabValue } from './participants'
+
+type Payout = {
+    participantAddress: string
+    amount: string
+}
 
 const ParticipantList = ({
     participants,
@@ -19,7 +24,7 @@ const ParticipantList = ({
     tabValue: TabValue
     tokenDecimals: number
 }) => {
-    const [savedPayouts, setSavedPayouts] = useState<Record<string, any>>({})
+    const [savedPayouts, setSavedPayouts] = useState<Record<string, Payout>>({})
 
     useEffect(() => {
         const storePayouts = usePayoutStore.getState().payouts[poolId] || []
@@ -29,7 +34,7 @@ const ParticipantList = ({
                     acc[payout.participantAddress] = payout
                     return acc
                 },
-                {} as Record<string, any>,
+                {} as Record<string, Payout>,
             ),
         )
     }, [poolId])
@@ -91,9 +96,7 @@ const ParticipantList = ({
                     />
                 ))
             ) : (
-                <p className={`${tabValue !== TabValue.Winners ? 'pt-4' : ''}`}>
-                    No participants found.
-                </p>
+                <p className={`${tabValue !== TabValue.Winners ? 'pt-4' : ''}`}>No participants found.</p>
             )}
         </>
     )

@@ -1,4 +1,4 @@
-import { formatCountdownTime } from '@/app/_lib/utils/date-time'
+import { formatCountdownTime } from '@/lib/utils/date-time'
 import { useEffect, useState } from 'react'
 
 interface CountdownProps {

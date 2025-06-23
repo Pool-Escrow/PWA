@@ -1,13 +1,12 @@
 'use client'
 
-import { usePoolCreationStore } from '@/app/_client/stores/pool-creation-store'
-import { Avatar, AvatarImage } from '@/app/_components/ui/avatar'
-import { Button } from '@/app/_components/ui/button'
-import { formatAddress } from '@/app/_lib/utils/addresses'
 import PageWrapper from '@/components/page-wrapper'
 import ScannerPageLayout from '@/components/scanner-page-layout'
-import circleErrorIcon from '@/public/app/icons/svg/circle-error-icon.svg'
-import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { formatAddress } from '@/lib/utils/addresses'
+import * as circleErrorIcon from '@/public/app/icons/svg/circle-error-icon.svg'
+import * as circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
 import type { QrCodeCheckInData } from '@/types/qr'
 import { blo } from 'blo'
 import Image from 'next/image'
@@ -30,8 +29,8 @@ enum CheckInState {
 }
 
 export default function PayoutScanPage() {
-    const [result, setResult] = useState<string | null>(null)
-    const [error, setError] = useState<string | null>(null)
+    const [_result, setResult] = useState<string | null>(null)
+    const [_error, setError] = useState<string | null>(null)
     const [isScanning, setIsScanning] = useState(true)
     const [showDialog, setShowDialog] = useState(false)
     const [scannedAddress, setScannedAddress] = useState<Address | null>(null)
@@ -46,10 +45,6 @@ export default function PayoutScanPage() {
     // Fetch user details using the hook
     const { data: userDetails } = useUserDetails(scannedAddress as Address)
 
-    const { showToast } = usePoolCreationStore(state => ({
-        showToast: state.showToast,
-    }))
-
     const resetQrDialog = () => {
         setShowDialog(false)
         setCheckInState(CheckInState.PROCESSING_CHECK_IN)
@@ -60,7 +55,7 @@ export default function PayoutScanPage() {
 
         try {
             isProcessing.current = true
-            const parsedQrData: QrCodeCheckInData = JSON.parse(decodedResult)
+            const parsedQrData: QrCodeCheckInData = JSON.parse(decodedResult) as QrCodeCheckInData
             if (parsedQrData.poolId !== params?.['pool-id']) {
                 setCheckInStatus({ success: false, message: 'This QR code is for a different pool' })
                 setCheckInState(CheckInState.ERROR)
@@ -77,7 +72,7 @@ export default function PayoutScanPage() {
 
             // Check participant status first
             const statusResponse = await checkParticipantStatusAction(
-                params['pool-id'] as string,
+                params['pool-id'],
                 parsedQrData.address as Address,
             )
 
@@ -159,7 +154,7 @@ export default function PayoutScanPage() {
         }
     }
 
-    const handlePayout = async () => {
+    const handlePayout = () => {
         if (!qrData || !params?.['pool-id']) return
 
         setCheckInState(CheckInState.PROCESSING_PAYOUT)
@@ -177,7 +172,7 @@ export default function PayoutScanPage() {
                     <DialogContent
                         avatar={
                             <div className='relative size-16 rounded-full border-2 border-white bg-white md:size-24'>
-                                <Image src={circleErrorIcon} alt='Error Image' fill />
+                                <Image src={circleErrorIcon} alt='Error Image' fill sizes='100%' />
                             </div>
                         }
                         title='Check in failed'
@@ -220,7 +215,7 @@ export default function PayoutScanPage() {
                                 </Button>
                                 <Button
                                     className='h-full w-1/2 rounded-full bg-[#6993FF] text-[16px] font-semibold text-white hover:bg-[#6993FF] active:bg-[#6993FF] md:text-[24px]'
-                                    onClick={handleCheckIn}>
+                                    onClick={() => void handleCheckIn()}>
                                     Check In
                                 </Button>
                             </>
@@ -333,7 +328,7 @@ export default function PayoutScanPage() {
         <PageWrapper fullScreen>
             <ScannerPageLayout title='Manage Participants'>
                 <PoolQrScanner
-                    onDecode={handleDecode}
+                    onDecode={decodedResult => void handleDecode(decodedResult)}
                     onError={handleError}
                     enableCallback={!showDialog}
                     startButtonText={isScanning ? 'Scanning...' : 'Start Scanning'}

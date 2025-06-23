@@ -1,15 +1,15 @@
 'use client'
 
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
+import { useConfetti } from '@/hooks/use-confetti'
+import useTransactions from '@/hooks/use-transactions'
+import { currentPoolAddress } from '@/server/blockchain/server-config'
+import { poolAbi } from '@/types/contracts'
 import { CheckCircleIcon } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Address} from 'viem';
+import type { Address } from 'viem'
 import { getAbiItem } from 'viem'
 import { useAccount } from 'wagmi'
-import { useConfetti } from '@/hooks/use-confetti'
-import { currentPoolAddress } from '@/app/_server/blockchain/server-config'
-import { poolAbi } from '@/types/contracts'
 
 interface PoolDetailsClaimableWinningsProps {
     claimableAmount: number

@@ -1,10 +1,10 @@
 'use server'
 
-import { UnauthorizedError } from '@/app/_lib/entities/errors/auth'
-import { verifyToken } from '@/app/_server/auth/privy'
-import { db } from '@/app/_server/database/db'
-import { isAdminUseCase } from '@/app/_server/use-cases/users/is-admin'
-import { isParticipantUseCase } from '@/app/_server/use-cases/users/is-participant'
+import { UnauthorizedError } from '@/lib/entities/errors/auth'
+import { verifyToken } from '@/server/auth/privy'
+import { getDb } from '@/server/database/db'
+import { isAdminUseCase } from '@/server/use-cases/users/is-admin'
+import { isParticipantUseCase } from '@/server/use-cases/users/is-participant'
 import type { Address } from 'viem'
 
 export async function checkInAction(poolId: string, address: Address) {
@@ -34,6 +34,7 @@ export async function checkInAction(poolId: string, address: Address) {
 
         console.log('user is participant')
 
+        const db = getDb()
         // Ensure the user is not already checked in
         const { data: userData, error: userError } = await db
             .from('users')
@@ -114,6 +115,7 @@ export async function checkParticipantStatusAction(poolId: string, address: Addr
             }
         }
 
+        const db = getDb()
         // Get user's check-in status
         const { data: userData, error: userError } = await db
             .from('users')

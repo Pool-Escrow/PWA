@@ -1,4 +1,4 @@
-import { getStatusString } from '@/app/_lib/utils/get-relative-date'
+import { getStatusString } from '@/lib/utils/get-relative-date'
 import type { POOLSTATUS } from '../_lib/definitions'
 
 interface PoolDetailsHeadingProps {

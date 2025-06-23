@@ -1,6 +1,6 @@
 'use client'
 
-import { Input } from '@/app/_components/ui/input'
+import { Input } from '@/components/ui/input'
 import { QrCodeIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 

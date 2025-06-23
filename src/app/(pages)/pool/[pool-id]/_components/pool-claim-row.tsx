@@ -1,7 +1,7 @@
 // src/components/pool-detail/pool-detail.tsx
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
 import { CircleCheckIcon } from 'lucide-react'
 
 // import { useWinnerDetail } from '@/app/_client/hooks/use-winner-detail'
@@ -19,7 +19,7 @@ import { CircleCheckIcon } from 'lucide-react'
 interface PoolDetailsProps {
     poolId: string
 }
-const PoolClaimRow = (props: PoolDetailsProps) => {
+const PoolClaimRow = (_props: PoolDetailsProps) => {
     // const { wallets } = useWallets()
     // const { winnerDetail /* isLoading, */ /* error */ } = useWinnerDetail(BigInt(props.poolId), wallets[0]?.address)
     // // const queryClient = useQueryClient()

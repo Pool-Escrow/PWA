@@ -1,13 +1,17 @@
+import { createSupabaseBrowserClient } from '@/lib/supabase'
 import type { Database } from '@/types/db'
-import { createBrowserClient } from '@supabase/ssr'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+// We create the Supabase client once and reuse it across hook/component calls.
+// This avoids spawning multiple websocket connections and excessive HTTP requests
+// that can indirectly contribute to RPC rate-limit issues due to overall network
+// saturation.
+let browserClientSingleton: SupabaseClient<Database> | null = null
 
 export function getSupabaseBrowserClient() {
-    if (!supabaseUrl || !supabaseAnonKey) {
-        throw new Error('Missing Supabase URL or anon key')
+    if (!browserClientSingleton) {
+        browserClientSingleton = createSupabaseBrowserClient()
     }
 
-    return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
+    return browserClientSingleton
 }

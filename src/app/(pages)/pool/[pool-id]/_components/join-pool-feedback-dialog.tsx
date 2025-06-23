@@ -1,6 +1,5 @@
-import useMediaQuery from '@/app/_client/hooks/use-media-query'
-import { Button } from '@/app/_components/ui/button'
-import { Dialog } from '@/app/_components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Dialog } from '@/components/ui/dialog'
 import {
     Drawer,
     DrawerContent,
@@ -8,8 +7,9 @@ import {
     DrawerFooter,
     DrawerHeader,
     DrawerTitle,
-} from '@/app/_components/ui/drawer'
+} from '@/components/ui/drawer'
 import { useConfetti } from '@/hooks/use-confetti'
+import useMediaQuery from '@/hooks/use-media-query'
 import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 import { CheckCircle, PartyPopper } from 'lucide-react'

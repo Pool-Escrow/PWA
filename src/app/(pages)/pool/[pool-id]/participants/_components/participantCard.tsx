@@ -1,13 +1,13 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/app/_components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatAddress } from '@/lib/utils/addresses'
 import { cn } from '@/lib/utils/tailwind'
-import Link from 'next/link'
-import { formatUnits, type Address } from 'viem'
+import * as circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
+import { usePayoutStore } from '@/stores/payout-store'
 import Image from 'next/image'
-import circleTickIcon from '@/public/app/icons/svg/circle-tick-icon.svg'
-import { formatAddress } from '@/app/_lib/utils/addresses'
-import { TabValue } from './participants'
-import { usePayoutStore } from '@/app/_client/stores/payout-store'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { formatUnits, type Address } from 'viem'
+import { TabValue } from './participants'
 
 interface ParticipantCardProps {
     address: Address
@@ -30,7 +30,7 @@ export default function ParticipantCard({
     avatar,
     displayName,
     poolId,
-    status = 'Registered',
+    // status = 'Registered',
     isLoading,
     error,
     isAdmin,

@@ -1,4 +1,4 @@
-import { AlertDialog } from '@/app/_components/ui/alert-dialog'
+import { AlertDialog } from '@/components/ui/alert-dialog'
 import type { Dispatch, SetStateAction } from 'react'
 import LoadingAnimation from './loading-animation'
 
