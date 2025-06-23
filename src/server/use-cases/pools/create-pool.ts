@@ -1,7 +1,7 @@
 import 'server-only'
 
+import { createPoolInDb } from '@/server/persistence/pools/db/create-db-pool'
 import type { Address } from 'viem'
-import { createPoolInDb } from '../../persistence/pools/db/create-db-pool'
 
 interface PoolItem {
     name: string
