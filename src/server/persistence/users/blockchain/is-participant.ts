@@ -1,4 +1,4 @@
-import { currentPoolAddress, serverConfig } from '@/app/_server/blockchain/server-config'
+import { currentPoolAddress, serverConfig } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'

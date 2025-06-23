@@ -1,7 +1,6 @@
 import 'server-only'
 
-import { db } from '@/app/_server/database/db'
-import { processImage } from '@/app/_server/lib/utils/process-image'
+import { getDb } from '@/server/database/db'
 import type { Address } from 'viem'
 import { uploadBannerImageToStorage } from '../storage/upload-banner-image'
 
@@ -21,6 +20,7 @@ interface PoolItem {
 export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
     console.log('Creating pool in database...')
 
+    const db = getDb()
     const { data: createdPool, error } = await db
         .from('pools')
         .insert({
@@ -50,7 +50,7 @@ export async function createPoolInDb(creatorAddress: Address, data: PoolItem) {
     let bannerImageUrl: string | undefined
 
     if (data.bannerImage) {
-        const processedBuffer = await processImage(data.bannerImage, 1024, 512)
+        // const processedBuffer = await processImage(data.bannerImage, 1024, 512)
         bannerImageUrl = await uploadBannerImageToStorage(poolId, data.bannerImage)
     }
 

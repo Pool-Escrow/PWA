@@ -1,11 +1,11 @@
 // import 'server-only'
 
+import { adminRole } from '@/lib/blockchain/constants'
+import { HasRoleFunction } from '@/lib/blockchain/functions/pool/has-role'
+import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'
 import { currentPoolAddress, serverClient, serverConfig } from '../../../blockchain/server-config'
-import { adminRole } from '@/app/_lib/blockchain/constants'
-import { HasRoleFunction } from '@/app/_lib/blockchain/functions/pool/has-role'
-import { poolAbi } from '@/types/contracts'
 
 export const fetchClaimablePools = async ({ queryKey }: { queryKey: [string, string, number] }) => {
     const [_, address] = queryKey
