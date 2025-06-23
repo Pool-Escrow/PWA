@@ -1,20 +1,18 @@
 'use client'
 
-import { Avatar, AvatarImage } from '@/app/_components/ui/avatar'
-import { ExternalLinkIcon, History } from 'lucide-react'
-import Link from 'next/link'
-import { Skeleton } from '@/app/_components/ui/skeleton'
-import { blo } from 'blo'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useUserInfo } from '@/hooks/use-user-info'
-import { explorerUrl } from '@/app/_server/blockchain/server-config'
+import { explorerUrl } from '@/server/blockchain/server-config'
+import { blo } from 'blo'
+import { ExternalLinkIcon, History } from 'lucide-react'
 
 interface UserInfoProps {
     variant?: 'cross-swap'
     onHistoryClick?: () => void
-    hasTransactions?: boolean
 }
 
-export default function UserInfo({ variant, onHistoryClick, hasTransactions }: UserInfoProps) {
+export default function UserInfo({ variant, onHistoryClick }: UserInfoProps) {
     const { data: userInfo, isLoading } = useUserInfo()
     const address = userInfo?.address
     const truncatedAddress = address?.slice(0, 6) + '...' + address?.slice(-4)

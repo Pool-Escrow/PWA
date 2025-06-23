@@ -1,6 +1,6 @@
 'use client'
 
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
 import { useWallets } from '@privy-io/react-auth'
 import type { Address } from 'viem'
 import { useBalance } from 'wagmi'

@@ -1,15 +1,9 @@
-'use client'
-
-import { Button } from '@/app/_components/ui/button'
-import { Drawer } from '@/app/_components/ui/drawer'
-import Divider from '@/app/_components/divider'
-import OnRampCoinbaseButton from '@/app/(pages)/profile/_components/onramps/onramp-coinbase'
-import OnRampForm from './onramp.form'
-import ReceiveDialog from '@/app/(pages)/profile/_components/receive/receive.dialog'
-import Unlimit from '@/app/(pages)/profile/_components/onramps/unlimit'
-// import { OnrampWithStripe } from '@/app/(pages)/profile/_components/onramps/onramp-stripe'
-import type { MoonpayCurrencyCode, MoonpayPaymentMethod} from '@privy-io/react-auth';
-import { currentTokenAddress } from '@/app/_server/blockchain/server-config'
+import Divider from '@/components/divider'
+import { Button } from '@/components/ui/button'
+import { Drawer } from '@/components/ui/drawer'
+import { currentTokenAddress } from '@/server/blockchain/server-config'
+import type { MoonpayCurrencyCode, MoonpayPaymentMethod } from '@privy-io/react-auth'
+import { useFundWallet, useWallets } from '@privy-io/react-auth'
 import { useAccount, useBalance } from 'wagmi'
 
 interface OnRampDialogProps {
@@ -30,23 +24,6 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
     })
 
     const formattedBalance = Number(balance?.value) / Math.pow(10, Number(balance?.decimals))
-    // const [open, setOpen] = useState(false)
-    // const isDesktop = useMediaQuery('(min-width: 768px)')
-
-    // if (isDesktop) {
-    //     return (
-    //         <Dialog open={open} onOpenChange={setOpen}>
-    //             <Dialog.Trigger asChild></Dialog.Trigger>
-    //             <Dialog.Content className='bg-white sm:max-w-[425px]'>
-    //                 <Dialog.Header>
-    //                     <Dialog.Title>You need to add USDC in order to register for this event.</Dialog.Title>
-    //                     <div></div>
-    //                 </Dialog.Header>
-    //                 <OnRampForm />
-    //             </Dialog.Content>
-    //         </Dialog>
-    //     )
-    // }
 
     const { wallets } = useWallets()
     const { fundWallet } = useFundWallet()
@@ -62,7 +39,7 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <Drawer.Trigger asChild></Drawer.Trigger>
+            <Drawer.Trigger asChild />
             <Drawer.Content className='bg-white'>
                 <Drawer.Header className='text-left'>
                     <Drawer.Title className='mb-6 text-xl'>
@@ -127,7 +104,7 @@ const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
                             </div>
 
                             <Button
-                                onClick={fundWithMoonpay}
+                                onClick={() => void fundWithMoonpay()}
                                 className='h-10 w-20 rounded-[2rem] bg-cta text-center text-xs font-semibold leading-normal text-white shadow-button active:shadow-button-push'>
                                 On Ramp
                             </Button>

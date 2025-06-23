@@ -1,8 +1,8 @@
 'use client'
 
-import Divider from '@/app/_components/divider'
-import { Button } from '@/app/_components/ui/button'
-import { Input } from '@/app/_components/ui/input'
+import Divider from '@/components/divider'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils/tailwind'
 import { useEffect, useState } from 'react'
 import QRCode from 'react-qr-code'

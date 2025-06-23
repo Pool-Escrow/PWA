@@ -1,4 +1,4 @@
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
 import { GateFiDisplayModeEnum, GateFiSDK } from '@gatefi/js-sdk'
 import { useEffect, useRef, useState } from 'react'
 import { useAccount } from 'wagmi'
@@ -36,7 +36,7 @@ export default function Unlimit(props: UnlimitProps) {
         if (overlayInstance.current) {
             overlayInstance.current?.destroy()
             if (!isOverlayVisible) {
-                setOpen && setOpen(false)
+                setOpen?.(false)
                 overlayInstance.current?.show()
                 setIsOverlayVisible(true)
             }
@@ -56,7 +56,9 @@ export default function Unlimit(props: UnlimitProps) {
                     amount: amount || '0',
                 },
             })
-            setOpen && setOpen(false)
+            if (setOpen) {
+                setOpen(false)
+            }
             overlayInstance.current?.show()
             setIsOverlayVisible(true)
         }

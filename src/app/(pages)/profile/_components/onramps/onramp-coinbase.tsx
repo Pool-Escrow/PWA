@@ -1,4 +1,4 @@
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
 import { baseSepolia } from 'viem/chains'
 import { useAccount } from 'wagmi'

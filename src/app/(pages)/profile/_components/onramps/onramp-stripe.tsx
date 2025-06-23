@@ -1,10 +1,10 @@
 // 'use client'
 
-// import { Button } from '@/app/_components/ui/button'
+// import { Button } from '@/components/ui/button'
 // // import { loadStripeOnramp } from '@stripe/crypto'
 // import { useEffect, useRef, useState } from 'react'
 // // import { getSession } from './get-session'
-// import { Dialog } from '@/app/_components/ui/dialog'
+// import { Dialog } from '@/components/ui/dialog'
 
 // interface StripeOnrampAppearance {
 //     theme: 'light' | 'dark'
