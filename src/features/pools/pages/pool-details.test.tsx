@@ -1,7 +1,7 @@
-import { render } from '@testing-library/react'
-import { Providers } from '@/app/_client/providers'
+import MainWrapper from '@/components/main-wrapper'
+import { Providers } from '@/providers'
 import '@testing-library/jest-dom'
-import MainWrapper from '@/app/_components/main-wrapper'
+import { render } from '@testing-library/react'
 
 import BottomBar from '@/app/@bottombar/default'
 import PoolDetails from './pool-details'

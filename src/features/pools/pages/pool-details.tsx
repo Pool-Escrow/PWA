@@ -5,7 +5,7 @@ import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/b
 import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
 import { getPoolDetailsById } from '@/features/pools/server/db/pools'
-import { getUserAdminStatusActionWithCookie } from '@/features/users/actions'
+import { useIsAdmin } from '@/hooks/use-is-admin'
 import { useQuery } from '@tanstack/react-query'
 
 // import PoolDetailsLoader from '@/app/(pages)/pool/[pool-id]/loading'
@@ -16,8 +16,8 @@ import PoolDetailsHeading from '@/app/(pages)/pool/[pool-id]/_components/pool-de
 import PoolDetailsInfo from '@/app/(pages)/pool/[pool-id]/_components/pool-details-info'
 import PoolDetailsParticipants from '@/app/(pages)/pool/[pool-id]/_components/pool-details-participants'
 import PoolDetailsProgress from '@/app/(pages)/pool/[pool-id]/_components/pool-details-progress'
-import PullToRefresh from '@/app/_components/pull-to-refresh'
-import { Skeleton } from '@/app/_components/ui/skeleton'
+import PullToRefresh from '@/components/pull-to-refresh'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useEffect } from 'react'
 
 export default function PoolDetails({ poolId }: { poolId: string }) {
@@ -30,14 +30,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
         queryFn: getPoolDetailsById,
     })
 
-    const {
-        data: isAdmin,
-        isPending: isUserInfoPending,
-        isError: isUserInfoError,
-    } = useQuery({
-        queryKey: ['userAdminStatus'],
-        queryFn: () => getUserAdminStatusActionWithCookie(),
-    })
+    const { isAdmin, isLoading: isUserInfoPending, error: isUserInfoError } = useIsAdmin()
 
     console.log('🔄 [PoolDetails] Rendering with poolId:', poolId)
 
@@ -84,7 +77,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
     }))
 
     return (
-        <PullToRefresh keysToRefetch={['pool-details', 'userAdminStatus']}>
+        <PullToRefresh keysToRefetch={['pool-details', 'is-admin']}>
             <div
                 className='h-full space-y-3 overflow-y-auto overscroll-y-contain bg-white p-2 overflow-scrolling-touch'
                 style={{
@@ -142,7 +135,7 @@ export default function PoolDetails({ poolId }: { poolId: string }) {
                 </PoolDetailsCard>
 
                 <BottomBarHandler
-                    keysToRefetch={['pool-details', 'userAdminStatus']}
+                    keysToRefetch={['pool-details', 'is-admin']}
                     poolId={pool.contractId}
                     isAdmin={isAdmin || false}
                     poolStatus={pool.status}

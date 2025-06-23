@@ -1,11 +1,11 @@
 'use client'
 
-import { QrCode, EditIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { motion } from 'framer-motion'
+import { EditIcon, QrCode } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
 import ShareDialog from '../dialogs/share'
-import { Button } from '@/app/_components/ui/button'
-import { motion } from 'framer-motion'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type BannerButtonProps = {
     onClick?: () => void

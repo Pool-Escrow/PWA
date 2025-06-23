@@ -3,10 +3,10 @@ import { getSupabaseBrowserClient } from '@/app/(pages)/pool/[pool-id]/participa
 import { getUserAddressAction } from '@/app/(pages)/pools/actions'
 import { getPoolInfo, getWinnerDetail } from '@/lib/contract/pool'
 import { getTokenDecimals, getTokenSymbol } from '@/lib/contract/token'
+import { getPoolDateOverride } from '@/lib/utils/get-pool-date-override'
 import { fromUnixTime } from 'date-fns'
-import type { Address} from 'viem';
+import type { Address } from 'viem'
 import { formatUnits } from 'viem'
-import { getPoolDateOverride } from '@/app/_lib/utils/get-pool-date-override'
 import { z } from 'zod'
 
 const PoolDetailsSchema = z.object({
@@ -38,10 +38,23 @@ const PoolDetailsSchema = z.object({
     poolBalance: z.number(),
 })
 
-type PoolDetails = z.infer<typeof PoolDetailsSchema>
+// type PoolDetails = z.infer<typeof PoolDetailsSchema>
 
 export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: string[] }) {
-    const address = await getUserAddressAction()
+    // -------------------------------------------------------------------------------------
+    // Avoid invoking a Server Action from the browser. When this function is executed on
+    // the client (e.g. React-Query prefetch on hover) calling a `use server` action would
+    // issue an extra POST request to `/` which is both wasteful and noisy in the logs.
+    // We therefore only call `getUserAddressAction` when the code is running on the
+    // server. On the client we fall back to `undefined` (claimableAmount will be "0").
+    // -------------------------------------------------------------------------------------
+
+    let address: Address | undefined
+
+    if (typeof window === 'undefined') {
+        address = await getUserAddressAction()
+    }
+
     const contractInfo = await getContractPoolInfo(poolId)
 
     if (!contractInfo) {
@@ -75,9 +88,8 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
     }
 
     let claimableAmount = '0'
-
     if (address && contractInfo.participants.includes(address)) {
-        if (contractInfo.status === POOLSTATUS.ENDED) {
+        if ((contractInfo.status as POOLSTATUS) === POOLSTATUS.ENDED) {
             const winnerDetail = (await getWinnerDetail(poolId, address)) || {
                 amountWon: BigInt(0),
                 amountClaimed: BigInt(0),
@@ -115,9 +127,9 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
         price,
         tokenSymbol: contractInfo.tokenSymbol,
         tokenDecimals: contractInfo.tokenDecimals,
-        status: contractInfo.status,
+        status: contractInfo.status as POOLSTATUS,
         imageUrl: poolInfo.bannerImage,
-        winnerTitle: contractInfo.status === POOLSTATUS.ENDED ? 'Winner' : undefined,
+        winnerTitle: (contractInfo.status as POOLSTATUS) === POOLSTATUS.ENDED ? 'Winner' : undefined,
         softCap: poolInfo.softCap,
         description: poolInfo.description,
         termsUrl: poolInfo.termsURL || undefined,
@@ -141,7 +153,7 @@ export async function getContractPoolInfo(poolId: string) {
     }
 
     // TODO: fetch host name from poolAdmin address instead of pool_participants
-    const [poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
+    const [_poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
 
     const tokenDecimals = await getTokenDecimals(poolToken)
     const tokenSymbol = await getTokenSymbol(poolToken)
