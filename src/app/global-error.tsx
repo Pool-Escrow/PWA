@@ -7,6 +7,8 @@ export default function GlobalError({ error, reset }: { error: Error & { digest?
         console.error('Global error:', error)
     }, [error])
 
+    // TODO: Add a nicer error page with recovery options
+
     return (
         <html>
             <body>

@@ -1,11 +1,10 @@
 'use client'
 
-import * as React from 'react'
-import { useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { ArrowLeft, Clipboard, Home, RefreshCw, Send } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { Button } from './_components/ui/button'
-import { Clipboard, Home, ArrowLeft, RefreshCw, Send } from 'lucide-react'
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
     const router = useRouter()
@@ -29,7 +28,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
     }
 
     const copyErrorToClipboard = () => {
-        navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2))
+        void navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2))
         toast.success('Error details copied to clipboard')
     }
 

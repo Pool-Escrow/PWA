@@ -1,12 +1,11 @@
 'use client'
 
-import * as React from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { usePathname } from 'next/navigation'
-import { motion, useMotionValue, useTransform } from 'framer-motion'
-import { useEffect, useState } from 'react'
 import frog from '@/public/app/images/frog.png'
+import { motion, useMotionValue, useTransform } from 'framer-motion'
+import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const GRID_SIZE = 10
 
@@ -99,7 +98,9 @@ export default function NotFound() {
                         fill
                     />
                 </div>
-                <p className='mb-4 text-center text-xl md:text-2xl'>Oops! The page you're looking for doesn't exist.</p>
+                <p className='mb-4 text-center text-xl md:text-2xl'>
+                    Oops! The page you&apos;re looking for doesn&apos;t exist.
+                </p>
                 <p className='mb-8 text-center text-base text-gray-400 md:text-lg'>
                     You tried to access: <span className='rounded bg-gray-700 px-2 py-1 font-mono'>{pathname}</span>
                 </p>
