@@ -1,5 +1,5 @@
-import useTransactions from '@/app/_client/hooks/use-transactions'
-import type { ContractCall } from '@/app/_lib/entities/models/contract-call'
+import useTransactions from '@/hooks/use-transactions'
+import type { ContractCall } from '@/lib/entities/models/contract-call'
 import { useWallets } from '@privy-io/react-auth'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
