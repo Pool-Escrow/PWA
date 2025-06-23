@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
-import useMediaQuery from '@/app/_client/hooks/use-media-query'
-import { Dialog } from '@/app/_components/ui/dialog'
-import { Drawer } from '@/app/_components/ui/drawer'
 import InstallPrompt from '@/components/install-prompt'
+import { Dialog } from '@/components/ui/dialog'
+import { Drawer } from '@/components/ui/drawer'
+import useMediaQuery from '@/hooks/use-media-query'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 export default function DefaultModal() {
     const [open, setOpen] = useState(false)
