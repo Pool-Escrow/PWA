@@ -1,8 +1,8 @@
 import 'server-only'
 
+import { AuthenticationError } from '@/lib/entities/errors/auth'
 import { createServerActionProcedure } from 'zsa'
 import { verifyToken } from '../auth/privy'
-import { AuthenticationError } from '../../_lib/entities/errors/auth'
 import { rateLimitByKey } from '../lib/limiter'
 
 export const authenticatedProcedure = createServerActionProcedure().handler(async () => {
