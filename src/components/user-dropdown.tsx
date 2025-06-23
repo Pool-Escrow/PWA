@@ -5,7 +5,7 @@ import {
     DropdownMenuContent,
     DropdownMenuPortal,
     DropdownMenuTrigger,
-} from '@/app/_components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import { EllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
 import UserDropdownList from './user-dropdown.list'

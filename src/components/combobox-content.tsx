@@ -1,15 +1,8 @@
-import React, { useRef, useEffect, useState } from 'react'
-import {
-    Command,
-    CommandInput,
-    CommandList,
-    CommandEmpty,
-    CommandGroup,
-    CommandItem,
-} from '@/app/_components/ui/command'
-import { Check, Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils/tailwind'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import type { City } from '@/lib/utils/cities'
+import { cn } from '@/lib/utils/tailwind'
+import { Check, Loader2 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 type ComboboxContentProps = {
     searchTerm: string

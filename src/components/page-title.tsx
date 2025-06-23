@@ -1,4 +1,4 @@
-import PoolTopLogo from '@/app/_components/icons/pool-top-logo'
+import PoolTopLogo from '@/components/icons/pool-top-logo'
 import Link from 'next/link'
 
 export default function PageTitle({ title }: { title?: string }) {

@@ -1,11 +1,11 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
-import { Skeleton } from '@/app/_components/ui/skeleton'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useAuth } from '@/hooks/use-auth'
 import { usePrivy } from '@privy-io/react-auth'
-import UserAvatar from './user-avatar'
-import { useAuth } from '@/app/_client/hooks/use-auth'
 import { usePathname } from 'next/navigation'
+import UserAvatar from './user-avatar'
 
 export default function UserMenu() {
     const { login } = useAuth()

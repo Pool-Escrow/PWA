@@ -1,8 +1,8 @@
 'use client'
 
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/hooks/use-auth'
 import { usePrivy } from '@privy-io/react-auth'
-import { useAuth } from '@/app/_client/hooks/use-auth'
 
 export default function MainPageLoginButton() {
     const { login } = useAuth()

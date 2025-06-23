@@ -1,10 +1,10 @@
 'use client'
 
-import { Avatar, AvatarImage } from '@/app/_components/ui/avatar'
+import { Avatar, AvatarImage } from '@/components/ui/avatar'
 import { useUserInfo } from '@/hooks/use-user-info'
-import { User, Loader2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Loader2, User } from 'lucide-react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
 
 export default function UserAvatar() {
     const { data: userInfo, isLoading } = useUserInfo()

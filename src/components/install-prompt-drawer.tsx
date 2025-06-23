@@ -1,23 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Drawer } from '@/app/_components/ui/drawer'
-import { Button } from '@/app/_components/ui/button'
+import { Button } from '@/components/ui/button'
+import { Drawer } from '@/components/ui/drawer'
+import { useEffect, useState } from 'react'
+
+interface BeforeInstallPromptEvent extends Event {
+    prompt(): Promise<void>
+    userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
 
 export default function InstallPromptDrawer() {
     const [isOpen, setIsOpen] = useState(false)
     const [isIOS, setIsIOS] = useState(false)
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
     const [isStandalone, setIsStandalone] = useState(false)
 
     useEffect(() => {
         const handleBeforeInstallPrompt = (e: Event) => {
             e.preventDefault()
-            setDeferredPrompt(e)
+            setDeferredPrompt(e as BeforeInstallPromptEvent)
             setIsOpen(true)
         }
 
-        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream)
+        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window))
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -34,8 +39,8 @@ export default function InstallPromptDrawer() {
 
     const handleInstall = () => {
         if (deferredPrompt) {
-            deferredPrompt.prompt()
-            deferredPrompt.userChoice.then((choiceResult: { outcome: string }) => {
+            void deferredPrompt.prompt()
+            void deferredPrompt.userChoice.then(choiceResult => {
                 if (choiceResult.outcome === 'accepted') {
                     console.log('User accepted the install prompt')
                 }
@@ -62,7 +67,7 @@ export default function InstallPromptDrawer() {
                                 {' '}
                                 ⎋{' '}
                             </span>
-                            and then "Add to Home Screen"
+                            and then &quot;Add to Home Screen&quot;
                             <span role='img' aria-label='plus icon'>
                                 {' '}
                                 ➕{' '}

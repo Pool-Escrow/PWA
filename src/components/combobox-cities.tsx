@@ -1,13 +1,14 @@
-import React, { useState, useCallback, useEffect } from 'react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/app/_components/ui/popover'
-import { Drawer, DrawerContent, DrawerTitle, DrawerDescription, DrawerTrigger } from '@/app/_components/ui/drawer'
-import { Button } from '@/app/_components/ui/button'
-import useMediaQuery from '@/app/_client/hooks/use-media-query'
-import { allCities } from '@/lib/utils/cities'
-import { ComboboxContent } from './combobox-content'
+import { Button } from '@/components/ui/button'
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useCitySearch } from '@/hooks/use-city-search'
+import useMediaQuery from '@/hooks/use-media-query'
+import { allCities } from '@/lib/utils/cities'
+import type { Location } from '@/lib/utils/location-timezone'
+import locationTimezone from '@/lib/utils/location-timezone'
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
-import locationTimezone from 'node-location-timezone'
+import React, { useCallback, useEffect, useState } from 'react'
+import { ComboboxContent } from './combobox-content'
 
 type ComboboxCitiesProps = {
     value: string
@@ -30,38 +31,20 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
         setKeyboardHeight(height)
     }, [])
 
-    useEffect(() => {
-        if (!selectedValue) {
-            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-            const [continent, cityName] = userTimezone.split('/')
-            const locations = locationTimezone.findLocationsByCountryName(cityName, true)
-            const defaultCityLocation = locations.find(loc => loc.timezone === userTimezone)
-
-            if (defaultCityLocation) {
-                const defaultCityValue = `${defaultCityLocation.city}-${defaultCityLocation.country.iso2}`
-                setSelectedValue(defaultCityValue)
-                handleChange(defaultCityLocation.city, defaultCityLocation.country.iso2)
-
-                // Set the selectedCityObject based on the default location
-                const cityObject = allCities.find(
-                    city =>
-                        city.value.toLowerCase() === defaultCityLocation.city.toLowerCase() &&
-                        city.countryCode === defaultCityLocation.country.iso2,
-                )
-                setSelectedCityObject(cityObject || null)
-            }
-        } else {
-            // If there's an initial value, set the selectedCityObject
-            const cityObject = allCities.find(city => `${city.value}-${city.countryCode}` === selectedValue)
-            setSelectedCityObject(cityObject || null)
-        }
-    }, [])
-
     const handleChange = useCallback(
         (newValue: string, countryCode: string) => {
             if (typeof window !== 'undefined') {
                 const locations = locationTimezone.findLocationsByCountryIso(countryCode)
-                const cityLocation = locations.find(loc => loc.city.toLowerCase() === newValue.toLowerCase())
+                let cityLocation = locations.find((loc: Location) => loc.city.toLowerCase() === newValue.toLowerCase())
+
+                // Fallback: if exact city not found, use the first available timezone for the country
+                if (!cityLocation && locations.length > 0) {
+                    console.warn(
+                        `Location not found for city: ${newValue} in country: ${countryCode}. Falling back to ${locations[0].city}`,
+                    )
+                    cityLocation = locations[0]
+                }
+
                 if (cityLocation) {
                     const timezone = cityLocation.timezone
                     console.log(`Selected city: ${newValue} (${countryCode}), Timezone: ${timezone}`)
@@ -81,12 +64,42 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
             setSelectedValue(newSelectedValue)
 
             const newCityObject = allCities.find(
-                city => city.value.toLowerCase() === newValue.toLowerCase() && city.countryCode === countryCode,
+                (city: (typeof allCities)[0]) =>
+                    city.value.toLowerCase() === newValue.toLowerCase() && city.countryCode === countryCode,
             )
             setSelectedCityObject(newCityObject || null)
         },
         [onChangeId, onCityChange],
     )
+
+    useEffect(() => {
+        if (!selectedValue) {
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+            const [_continent, cityName] = userTimezone.split('/')
+            const locations = locationTimezone.findLocationsByCountryName(cityName, true)
+            const defaultCityLocation = locations.find((loc: Location) => loc.timezone === userTimezone)
+
+            if (defaultCityLocation) {
+                const defaultCityValue = `${defaultCityLocation.city}-${defaultCityLocation.country.iso2}`
+                setSelectedValue(defaultCityValue)
+                handleChange(defaultCityLocation.city, defaultCityLocation.country.iso2)
+
+                // Set the selectedCityObject based on the default location
+                const cityObject = allCities.find(
+                    (city: (typeof allCities)[0]) =>
+                        city.value.toLowerCase() === defaultCityLocation.city.toLowerCase() &&
+                        city.countryCode === defaultCityLocation.country.iso2,
+                )
+                setSelectedCityObject(cityObject || null)
+            }
+        } else {
+            // If there's an initial value, set the selectedCityObject
+            const cityObject = allCities.find(
+                (city: (typeof allCities)[0]) => `${city.value}-${city.countryCode}` === selectedValue,
+            )
+            setSelectedCityObject(cityObject || null)
+        }
+    }, [handleChange, selectedValue])
 
     const buttonContent = selectedCityObject
         ? `${selectedCityObject.label} (${selectedCityObject.countryCode})`
@@ -104,7 +117,7 @@ export function ComboboxCities({ value, onChangeId, onCityChange }: ComboboxCiti
                 className='relative h-[38px] w-full justify-between rounded-[70px] border border-[#ebebeb] pr-6 text-sm font-normal leading-tight text-black'
                 {...props}>
                 {buttonContent}
-                <span className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                <span className='ml-2 size-4 shrink-0 opacity-50' />
             </Button>
         ),
     )

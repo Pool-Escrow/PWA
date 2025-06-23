@@ -1,5 +1,7 @@
 'use client'
 
+import { useAuth } from '@/hooks/use-auth'
+import { useOnRamp } from '@/hooks/use-onramp'
 import type { Variants } from 'framer-motion'
 import { motion } from 'framer-motion'
 import { useRef, useState } from 'react'
@@ -7,8 +9,6 @@ import { toast } from 'sonner'
 import UserDropdownItem from './user-dropdown.item'
 import type { DropdownItemConfig } from './user-dropdown.list.config'
 import { dropdownItemsConfig } from './user-dropdown.list.config'
-import { useAuth } from '@/app/_client/hooks/use-auth'
-import { useOnRamp } from '@/app/_client/hooks/use-onramp'
 
 /**
  * Variants for the dropdown menu animation using framer-motion.
