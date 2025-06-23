@@ -9,34 +9,37 @@ import { Button } from '../ui/button'
 
 export interface ImageUploaderProps {
     name: string
+    value?: File | null
     onChange?: (file: File | null) => void
+    errors?: string[]
 }
 
-export default function ImageUploader({ name, onChange }: ImageUploaderProps) {
+export default function ImageUploader({ name, onChange, value, errors }: ImageUploaderProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null)
 
-    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
+    useEffect(() => {
+        if (value) {
             const reader = new FileReader()
             reader.onloadend = () => {
                 setImagePreview(reader.result as string)
             }
-            reader.readAsDataURL(file)
-            onChange?.(file)
+            reader.readAsDataURL(value)
         } else {
             setImagePreview(null)
-            onChange?.(null)
         }
+    }, [value])
+
+    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0]
+        onChange?.(file || null)
     }
 
     const handleRemove = () => {
-        setImagePreview(null)
         onChange?.(null)
     }
 
     return (
-        <>
+        <div>
             <input
                 placeholder='Choose an image'
                 title='Choose an image'
@@ -56,7 +59,7 @@ export default function ImageUploader({ name, onChange }: ImageUploaderProps) {
                         fill
                     />
                     <div className='absolute inset-0 flex items-center justify-center opacity-0 transition-opacity hover:opacity-100'>
-                        <div className='absolute inset-0 rounded-xl bg-black opacity-50'></div>
+                        <div className='absolute inset-0 rounded-xl bg-black opacity-50' />
                         <Button
                             size='icon'
                             variant='outline'
@@ -77,6 +80,7 @@ export default function ImageUploader({ name, onChange }: ImageUploaderProps) {
                     <p className='text-center text-xs font-normal text-[#B2B2B2]'>Select an Image</p>
                 </label>
             )}
-        </>
+            {errors && errors.length > 0 && <p className='mt-1 text-xs text-red-500'>{errors.join(', ')}</p>}
+        </div>
     )
 }
