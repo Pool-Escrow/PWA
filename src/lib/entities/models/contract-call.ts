@@ -5,4 +5,6 @@ export type ContractCall = {
     abi: Abi
     functionName: string
     args: unknown[] // ContractFunctionArgs[]
+    data?: Hex // Encoded function data
+    value?: bigint // ETH value to send
 }

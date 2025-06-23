@@ -1,7 +1,7 @@
-import { currentPoolAddress, serverConfig } from '@/app/_server/blockchain/server-config'
+import { currentPoolAddress, serverConfig } from '@/server/blockchain/server-config'
 import { poolAbi } from '@/types/contracts'
 import { getPublicClient } from '@wagmi/core'
-import type { Address} from 'viem';
+import type { Address } from 'viem'
 import { getAbiItem } from 'viem'
 import type { Role } from './constants'
 import { getTokenDecimals, getTokenSymbol } from './token'
@@ -43,7 +43,7 @@ export async function getContractPoolInfo(poolId: string) {
     }
 
     // TODO: fetch host name from poolAdmin address instead of pool_participants
-    const [poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
+    const [_poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
 
     const tokenDecimals = await getTokenDecimals(poolToken)
     const tokenSymbol = await getTokenSymbol(poolToken)
