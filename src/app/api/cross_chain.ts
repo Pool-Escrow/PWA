@@ -1,8 +1,8 @@
 import 'server-only'
 
+import { HttpClient } from '@/app/(pages)/profile/cross-swap/_components/api/http-client'
+import { CONFIG } from '@/app/(pages)/profile/cross-swap/_components/config'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { HttpClient } from '../profile/cross-swap/_components/api/http-client'
-import { CONFIG } from '../profile/cross-swap/_components/config'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'GET') {
