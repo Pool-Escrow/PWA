@@ -12,14 +12,10 @@ interface EncryptTextProps {
     }
     symbol?: string
     color?: string
+    size?: 'default' | 'small'
+    showCurrencySymbol?: boolean
+    icon?: React.ReactNode
 }
-
-const formatNumber = (num: number, padLength: number) =>
-    num
-        .toString()
-        .padStart(padLength, '0')
-        // replace with commas to add thousand separators
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
 const MotionSpan = motion.span
 
@@ -33,12 +29,14 @@ const charVariants = {
     }),
 }
 
-const EncryptText: React.FC<EncryptTextProps> = ({ children, balance, symbol = '', color = 'black' }) => {
+const EncryptText: React.FC<EncryptTextProps> = ({
+    children,
+    color = 'black',
+    size = 'default',
+    showCurrencySymbol = true,
+    icon: Icon,
+}) => {
     const { isEncoded } = useEncryptStore()
-    const childrenVisible = !isEncoded
-
-    const formattedInteger = useMemo(() => formatNumber(balance.integerPart, 1), [balance.integerPart])
-    const formattedFractional = useMemo(() => formatNumber(balance.fractionalPart, 2), [balance.fractionalPart])
 
     const encodedText = useMemo(
         () =>
@@ -66,37 +64,28 @@ const EncryptText: React.FC<EncryptTextProps> = ({ children, balance, symbol = '
             </MotionSpan>
         ))
 
-    return (
-        <div className='relative mb-6 inline-flex w-full whitespace-nowrap align-middle'>
-            <div className={cn('relative inline-flex items-baseline gap-2 text-4xl font-bold', `text-[${color}]`)}>
-                {!isEncoded && (
-                    <div className={cn('absolute', childrenVisible ? 'opacity-100' : 'opacity-0')}>{children}</div>
-                )}
-                <div className={childrenVisible ? 'opacity-0' : 'opacity-100'}>
-                    <AnimatePresence mode='popLayout' initial={false}>
-                        {!isEncoded && (
-                            <motion.div key='visible' className='absolute'>
-                                {renderText('$')}
-                                {renderText(formattedInteger, 'inline-block text-4xl tabular-nums')}
-                                {renderText('.')}
-                                {renderText(formattedFractional, 'inline-block text-2xl tabular-nums')}
-                                <span className='ml-2'>{renderText(symbol || '', 'text-sm')}</span>
-                            </motion.div>
-                        )}
+    const containerSize = size === 'default' ? 'text-4xl' : 'text-sm'
+    const integerSize = size === 'default' ? 'text-4xl' : 'text-sm'
+    const fractionalSize = size === 'default' ? 'text-2xl' : 'text-xs'
+    const symbolSize = size === 'default' ? 'text-sm' : 'text-xs'
 
-                        {isEncoded && (
-                            <motion.div key='encoded' className='absolute blur-sm'>
-                                {renderText('$')}
-                                {renderText(encodedText?.integer || '', 'inline-block text-4xl tabular-nums')}
-                                {renderText('.')}
-                                {renderText(encodedText?.fractional || '', 'inline-block text-2xl tabular-nums')}
-                                <span className='ml-2'>{renderText(encodedText?.symbol || '', 'text-sm')}</span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-        </div>
+    return (
+        <span className={cn('relative inline-flex items-baseline font-bold', containerSize, `text-[${color}]`)}>
+            <AnimatePresence mode='popLayout' initial={false}>
+                {isEncoded ? (
+                    <motion.span key='encoded' className='inline-flex items-center blur-sm'>
+                        {Icon && <span className='mr-2'>{Icon}</span>}
+                        {showCurrencySymbol && renderText('$')}
+                        {renderText(encodedText?.integer || '', `inline-block ${integerSize} tabular-nums`)}
+                        {renderText('.')}
+                        {renderText(encodedText?.fractional || '', `inline-block ${fractionalSize} tabular-nums`)}
+                        <span className='ml-2'>{renderText(encodedText?.symbol || '', symbolSize)}</span>
+                    </motion.span>
+                ) : (
+                    <motion.span key='decoded'>{children}</motion.span>
+                )}
+            </AnimatePresence>
+        </span>
     )
 }
 
