@@ -2,18 +2,20 @@ import MainPageLoginButton from '@/components/main-page-login-button'
 import PageWrapper from '@/components/page-wrapper'
 import PullToRefresh from '@/components/pull-to-refresh'
 import TopSection from '@/components/top-section'
-import NextUserPoolV2 from './_components/next-user-pool-v2'
+import UpcomingPools from '@/features/pools/components/upcoming-pools'
+import { getUpcomingPools } from '@/features/pools/server/get-upcoming-pools'
+import { POOLS_UPCOMING_KEY } from '@/hooks/query-keys'
 import RenderBottomBar from './_components/render-bottom-bar'
-import UpcomingPoolsV2 from './_components/upcoming-pools-v2'
 
-export default function PoolsPage() {
+export default async function PoolsPage() {
+    const upcomingPools = await getUpcomingPools()
+
     return (
         <PageWrapper>
             <div className='flex h-full flex-1 flex-col'>
                 <TopSection topBarProps={{ backButton: false }} />
                 <div className='relative flex-1 overflow-hidden'>
-                    <PullToRefresh
-                        keysToRefetch={['pools', 'next-user-pool', 'upcoming-pools-v2', 'user-next-pools-v2']}>
+                    <PullToRefresh keysToRefetch={[POOLS_UPCOMING_KEY]}>
                         <div
                             className='absolute inset-0 overflow-y-auto overscroll-y-contain [&::-webkit-scrollbar]:hidden'
                             style={{
@@ -22,9 +24,8 @@ export default function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
-                                <NextUserPoolV2 />
-                                <UpcomingPoolsV2 />
-                                <div className='h-20' />
+                                {/* <NextUserPoolV2 /> */}
+                                <UpcomingPools initialData={upcomingPools} />
                             </div>
                         </div>
                     </PullToRefresh>
