@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
-export default function PoolSkeleton({ length }: { length: number }) {
+export default function UpcomingPoolsSkeleton({ length }: { length: number }) {
     return (
         <div className='mt-3 flex w-full flex-col space-y-4'>
             {Array.from({ length }, (_, index) => (

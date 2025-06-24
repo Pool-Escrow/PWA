@@ -4,7 +4,7 @@ import PoolList from '@/features/pools/components/pool-list'
 import { useUpcomingPools } from '@/features/pools/hooks/use-upcoming-pools'
 import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { ErrorBoundary } from 'react-error-boundary'
-import PoolsSkeleton from './pools-skeleton'
+import UpcomingPoolsSkeleton from './upcoming-pools-skeleton'
 
 function UpcomingPoolsError({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
     console.error('[UpcomingPools] Error boundary caught:', error)
@@ -51,7 +51,7 @@ function UpcomingPoolsContent({ initialData }: { initialData: PoolsQueryResult }
             <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
                 <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
                 <div className='mt-4'>
-                    <PoolsSkeleton length={8} />
+                    <UpcomingPoolsSkeleton length={8} />
                 </div>
             </div>
         )
