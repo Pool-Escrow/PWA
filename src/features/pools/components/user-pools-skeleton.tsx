@@ -2,7 +2,7 @@
 
 import { Skeleton } from '@/components/ui/skeleton'
 
-export function NextUserPoolSkeleton() {
+export function UserPoolsSkeleton() {
     return (
         <div className='flex h-24 items-center gap-[14px] rounded-3xl bg-white p-3 pr-4'>
             <Skeleton className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px]' />

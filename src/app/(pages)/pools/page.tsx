@@ -3,6 +3,7 @@ import PageWrapper from '@/components/page-wrapper'
 import PullToRefresh from '@/components/pull-to-refresh'
 import TopSection from '@/components/top-section'
 import UpcomingPools from '@/features/pools/components/upcoming-pools'
+import UserPools from '@/features/pools/components/user-pools'
 import { getUpcomingPools } from '@/features/pools/server/get-upcoming-pools'
 import { POOLS_UPCOMING_KEY } from '@/hooks/query-keys'
 import RenderBottomBar from './_components/render-bottom-bar'
@@ -24,7 +25,7 @@ export default async function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
-                                {/* <NextUserPoolV2 /> */}
+                                <UserPools />
                                 <UpcomingPools initialData={upcomingPools} />
                             </div>
                         </div>

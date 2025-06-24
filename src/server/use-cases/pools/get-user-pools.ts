@@ -5,8 +5,13 @@ import type { Address } from 'viem'
 import { getUserPools } from '../../persistence/pools/blockchain/get-contract-user-pools'
 import { getDbPools } from '../../persistence/pools/db/get-db-pools'
 
-async function getUserPoolsUseCase(userAddress: Address): Promise<PoolItem[]> {
-    const [userPools, dbPools] = await Promise.all([getUserPools(userAddress), getDbPools()])
+async function getUserPoolsUseCase(userAddress: Address, chainId?: number): Promise<PoolItem[]> {
+    // If no chainId is provided, return an empty array
+    if (!chainId) {
+        return []
+    }
+
+    const [userPools, dbPools] = await Promise.all([getUserPools(userAddress, chainId), getDbPools()])
 
     return userPools
         .filter((pool): pool is NonNullable<typeof pool> => pool !== null && pool !== undefined)
@@ -25,15 +30,15 @@ async function getUserPoolsUseCase(userAddress: Address): Promise<PoolItem[]> {
         })
 }
 
-export const getUserUpcomingPoolsUseCase = async (userAddress: Address): Promise<PoolItem[]> => {
-    const pools = await getUserPoolsUseCase(userAddress)
+export const getUserUpcomingPoolsUseCase = async (userAddress: Address, chainId?: number): Promise<PoolItem[]> => {
+    const pools = await getUserPoolsUseCase(userAddress, chainId)
     return pools
         .filter(pool => pool.status !== POOLSTATUS.ENDED && pool.status !== POOLSTATUS.DELETED)
         .sort((a, b) => b.startDate.getTime() - a.startDate.getTime())
 }
 
-export const getUserPastPoolsUseCase = async (userAddress: Address): Promise<PoolItem[]> => {
-    const pools = await getUserPoolsUseCase(userAddress)
+export const getUserPastPoolsUseCase = async (userAddress: Address, chainId?: number): Promise<PoolItem[]> => {
+    const pools = await getUserPoolsUseCase(userAddress, chainId)
     return pools
         .filter(pool => pool.status === POOLSTATUS.ENDED)
         .sort((a, b) => b.endDate.getTime() - a.endDate.getTime())

@@ -39,6 +39,10 @@ declare global {
     var __wagmiConfigLogged: boolean | undefined
     // eslint-disable-next-line no-var
     var __lastTransactionStatus: string | undefined
+    // eslint-disable-next-line no-var
+    var __lastUserPoolsLogKey: string | undefined
+    // eslint-disable-next-line no-var
+    var __lastUserPoolComponentLogKey: string | undefined
 }
 
 export {}
