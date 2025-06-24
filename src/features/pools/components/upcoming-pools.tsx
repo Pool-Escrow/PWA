@@ -1,12 +1,13 @@
 'use client'
 
-import { useUpcomingPoolsWithDebug } from '@/hooks/use-upcoming-pools-v2'
+import PoolList from '@/features/pools/components/pool-list'
+import { useUpcomingPools } from '@/features/pools/hooks/use-upcoming-pools'
+import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { ErrorBoundary } from 'react-error-boundary'
-import PoolList from './pool-list'
 import PoolsSkeleton from './pools-skeleton'
 
 function UpcomingPoolsError({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) {
-    console.error('[UpcomingPoolsV2] Error boundary caught:', error)
+    console.error('[UpcomingPools] Error boundary caught:', error)
 
     return (
         <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
@@ -26,11 +27,11 @@ function UpcomingPoolsError({ error, resetErrorBoundary }: { error: Error; reset
     )
 }
 
-function UpcomingPoolsContent() {
-    const { data, isLoading, isFetching, isError, error } = useUpcomingPoolsWithDebug()
+function UpcomingPoolsContent({ initialData }: { initialData: PoolsQueryResult }) {
+    const { data, isLoading, isFetching, isError, error } = useUpcomingPools(initialData)
 
     if (isError) {
-        console.error('[UpcomingPoolsV2] Query error:', error)
+        console.error('[UpcomingPools] Query error:', error)
         return (
             <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
                 <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
@@ -44,8 +45,8 @@ function UpcomingPoolsContent() {
         )
     }
 
-    if (isLoading) {
-        console.log('[UpcomingPoolsV2] ⏳ Loading state')
+    if (isLoading && !data?.pools) {
+        console.log('[UpcomingPools] ⏳ Loading state')
         return (
             <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
                 <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
@@ -60,19 +61,18 @@ function UpcomingPoolsContent() {
     const metadata = data?.metadata
 
     // Log successful render
-    if (process.env.NODE_ENV === 'development') {
-        console.log('[UpcomingPoolsV2] ✅ Rendering with data:', {
-            poolsCount: pools.length,
-            metadata,
-            isFetching,
-            sampleData: pools.slice(0, 2),
-        })
-    }
+    console.log('[UpcomingPools] ✅ Rendering with data:', {
+        poolsCount: pools.length,
+        metadata,
+        isFetching,
+        sampleData: pools.slice(0, 2),
+    })
 
     return (
         <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>
             <div className='flex items-center justify-between'>
                 <h1 className='pl-[6px] text-lg font-semibold'>Upcoming Pools</h1>
+                {/* // TODO: control toggle with dev mode in settings page */}
                 {process.env.NODE_ENV === 'development' && metadata && (
                     <div className='text-xs text-gray-500'>
                         {metadata.visiblePools}/{metadata.totalContractPools}
@@ -86,18 +86,28 @@ function UpcomingPoolsContent() {
     )
 }
 
-export default function UpcomingPoolsV2() {
+export default function UpcomingPools({ initialData }: { initialData: PoolsQueryResult }) {
     return (
         <ErrorBoundary
             FallbackComponent={UpcomingPoolsError}
             onError={(error, errorInfo) => {
-                console.error('[UpcomingPoolsV2] Error boundary:', error, errorInfo)
+                console.error('[UpcomingPools] Error boundary:', error, errorInfo)
             }}
             onReset={() => {
                 // Optionally trigger a refetch or page reload
-                console.log('[UpcomingPoolsV2] Error boundary reset')
+                console.log('[UpcomingPools] Error boundary reset')
             }}>
-            <UpcomingPoolsContent />
+            <UpcomingPoolsContent initialData={initialData} />
         </ErrorBoundary>
     )
+}
+
+interface PoolsQueryResult {
+    pools: PoolItem[]
+    metadata: {
+        totalContractPools: number
+        totalDbPools: number
+        visiblePools: number
+        syncedPools: number
+    }
 }
