@@ -1,8 +1,7 @@
 import 'server-only'
 
 import type { PoolItem } from '@/lib/entities/models/pool-item'
-import { getPoolAddressForChain } from '@/server/blockchain/server-config'
-import { db } from '@/server/database/db'
+import { getDb } from '@/server/database/db'
 import type { Address } from 'viem'
 
 /**
@@ -23,7 +22,7 @@ export async function getUserPools(
     chainId?: number,
 ): Promise<PoolItem[]> {
     // 1. Find all pool IDs the user has participated in.
-    const { data: userParticipations, error: userPoolsError } = await db
+    const { data: userParticipations, error: userPoolsError } = await getDb()
         .from('pool_participants')
         .select('pool_id, users!inner(walletAddress)')
         .eq('users.walletAddress', userAddress)
@@ -45,24 +44,25 @@ export async function getUserPools(
 
     // 2. Fetch pools based on the IDs and status
     const now = new Date().toISOString()
-    const contractAddress = getPoolAddressForChain(chainId)
 
-    const query = db
+    const query = getDb()
         .from('pools')
         .select('*')
-        .in('contract_id', poolIds) // Filter by the pools the user is part of
+        .in('id', poolIds) // Filter by the pools the user is part of
         .order('startDate', { ascending: status === 'upcoming' })
 
-    // Filter by chain if chainId is provided
-    if (contractAddress) {
-        query.eq('tokenAddress', contractAddress)
-    }
+    // // Filter by chain if chainId is provided
+    // if (contractAddress) {
+    //     query.eq('tokenAddress', contractAddress)
+    // }
 
     if (status === 'upcoming') {
         query.gte('endDate', now)
     } else {
         query.lt('endDate', now)
     }
+
+    console.log('query', query)
 
     const { data: pools, error: poolsError } = await query
 
