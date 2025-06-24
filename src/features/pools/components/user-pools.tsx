@@ -2,6 +2,7 @@
 
 import { useUserPools } from '@/features/pools/hooks/use-user-pools'
 import { useAuth } from '@/hooks/use-auth'
+import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { motion } from 'framer-motion'
 import { ChevronRightIcon } from 'lucide-react'
 import Image from 'next/image'
@@ -17,9 +18,11 @@ import { UserPoolsSkeleton } from './user-pools-skeleton'
  * - Reduced re-renders
  * - Improved error handling
  */
-export default function UserPools() {
+export default function UserPools({ initialData }: { initialData?: PoolItem[] }) {
     const { login } = useAuth()
-    const { pools, isError, isEmpty, hasData, showSkeleton, ready, authenticated, refetch } = useUserPools('upcoming')
+    const { pools, isError, isEmpty, hasData, showSkeleton, ready, authenticated, refetch } = useUserPools('upcoming', {
+        initialData,
+    })
 
     const handleRetry = useCallback(() => {
         void refetch().catch(console.error)

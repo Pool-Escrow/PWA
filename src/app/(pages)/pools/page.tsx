@@ -5,11 +5,18 @@ import TopSection from '@/components/top-section'
 import UpcomingPools from '@/features/pools/components/upcoming-pools'
 import UserPools from '@/features/pools/components/user-pools'
 import { getUpcomingPools } from '@/features/pools/server/get-upcoming-pools'
+import { getUserPools } from '@/features/pools/server/get-user-pools'
 import { POOLS_UPCOMING_KEY } from '@/hooks/query-keys'
+import { verifyToken } from '@/server/auth/privy'
+import type { Address } from 'viem'
 import RenderBottomBar from './_components/render-bottom-bar'
 
 export default async function PoolsPage() {
     const upcomingPools = await getUpcomingPools()
+    const user = await verifyToken().catch(() => null)
+    const userAddress = user?.wallet?.address as Address | undefined
+
+    const userPools = userAddress ? await getUserPools(userAddress, 'upcoming') : []
 
     return (
         <PageWrapper>
@@ -25,7 +32,7 @@ export default async function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
-                                <UserPools />
+                                <UserPools initialData={userPools} />
                                 <UpcomingPools initialData={upcomingPools} />
                             </div>
                         </div>
