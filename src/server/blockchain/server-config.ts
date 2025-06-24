@@ -180,6 +180,16 @@ if (env.NODE_ENV === 'development' && env.NEXT_PUBLIC_VERBOSE_LOGS === 'true' &&
 }
 
 /**
+ * Get the pool contract address for a specific chain, or the default if not provided
+ * @param chainId The ID of the chain to get the address for
+ * @returns The contract address
+ */
+export const getPoolAddressForChain = (chainId?: number): Address | undefined => {
+    const targetChainId = chainId || defaultChain.id
+    return poolAddress[targetChainId as keyof typeof poolAddress] as Address | undefined
+}
+
+/**
  * Get a public client for the default chain
  */
 export const getDefaultPublicClient = () => {

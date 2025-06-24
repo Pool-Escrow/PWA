@@ -4,18 +4,22 @@ import { getPublicClient } from '@wagmi/core'
 import type { Address } from 'viem'
 import { getAbiItem } from 'viem'
 
-const publicClient = getPublicClient(serverConfig)
+export function getTokenSymbol(tokenAddress: Address, chainId?: number) {
+    const client = getPublicClient(serverConfig, { chainId })
+    if (!client) return undefined
 
-export function getTokenSymbol(tokenAddress: Address) {
-    return publicClient?.readContract({
+    return client.readContract({
         address: tokenAddress,
         abi: [getAbiItem({ abi: tokenAbi, name: 'symbol' })],
         functionName: 'symbol',
     })
 }
 
-export function getTokenDecimals(tokenAddress: Address) {
-    return publicClient?.readContract({
+export function getTokenDecimals(tokenAddress: Address, chainId?: number) {
+    const client = getPublicClient(serverConfig, { chainId })
+    if (!client) return undefined
+
+    return client.readContract({
         address: tokenAddress,
         abi: [getAbiItem({ abi: tokenAbi, name: 'decimals' })],
         functionName: 'decimals',

@@ -40,7 +40,7 @@ const PoolDetailsSchema = z.object({
 
 // type PoolDetails = z.infer<typeof PoolDetailsSchema>
 
-export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: string[] }) {
+export async function getPoolDetailsById({ queryKey: [, poolId], chainId }: { queryKey: string[]; chainId?: number }) {
     // -------------------------------------------------------------------------------------
     // Avoid invoking a Server Action from the browser. When this function is executed on
     // the client (e.g. React-Query prefetch on hover) calling a `use server` action would
@@ -55,7 +55,7 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
         address = await getUserAddressAction()
     }
 
-    const contractInfo = await getContractPoolInfo(poolId)
+    const contractInfo = await getContractPoolInfo(poolId, chainId)
 
     if (!contractInfo) {
         // TODO: handle when the pool does not exist in the contract
@@ -90,7 +90,7 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
     let claimableAmount = '0'
     if (address && contractInfo.participants.includes(address)) {
         if ((contractInfo.status as POOLSTATUS) === POOLSTATUS.ENDED) {
-            const winnerDetail = (await getWinnerDetail(poolId, address)) || {
+            const winnerDetail = (await getWinnerDetail(poolId, address, chainId)) || {
                 amountWon: BigInt(0),
                 amountClaimed: BigInt(0),
                 forfeited: false,
@@ -145,8 +145,8 @@ export async function getPoolDetailsById({ queryKey: [, poolId] }: { queryKey: s
     }
 }
 
-export async function getContractPoolInfo(poolId: string) {
-    const poolInfo = await getPoolInfo(poolId)
+export async function getContractPoolInfo(poolId: string, chainId?: number) {
+    const poolInfo = await getPoolInfo(poolId, chainId)
 
     if (poolInfo === undefined) {
         return null
@@ -155,8 +155,8 @@ export async function getContractPoolInfo(poolId: string) {
     // TODO: fetch host name from poolAdmin address instead of pool_participants
     const [_poolAdmin, poolDetail, poolBalance, poolStatus, poolToken, participants] = poolInfo
 
-    const tokenDecimals = await getTokenDecimals(poolToken)
-    const tokenSymbol = await getTokenSymbol(poolToken)
+    const tokenDecimals = await getTokenDecimals(poolToken, chainId)
+    const tokenSymbol = await getTokenSymbol(poolToken, chainId)
 
     if (tokenDecimals === undefined || tokenSymbol === undefined) {
         return null

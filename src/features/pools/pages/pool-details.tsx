@@ -4,9 +4,10 @@ import PoolDetailsBanner from '@/features/pools/components/pool-details/banner'
 import PoolDetailsBannerButtons from '@/features/pools/components/pool-details/banner-buttons'
 import PoolDetailsBannerStatus from '@/features/pools/components/pool-details/banner-status'
 import PoolDetailsCard from '@/features/pools/components/pool-details/card'
-import { getPoolDetailsById } from '@/features/pools/server/db/pools'
 import { useIsAdmin } from '@/hooks/use-is-admin'
 import { useQuery } from '@tanstack/react-query'
+import { useChainId } from 'wagmi'
+import { z } from 'zod'
 
 // import PoolDetailsLoader from '@/app/(pages)/pool/[pool-id]/loading'
 import { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
@@ -20,14 +21,56 @@ import PullToRefresh from '@/components/pull-to-refresh'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEffect } from 'react'
 
+const _PoolDetailsSchema = z.object({
+    hostName: z.string().nullable(),
+    contractId: z.string(),
+    claimableAmount: z.string(),
+    participants: z.array(
+        z.object({
+            name: z.string(),
+            avatarUrl: z.string(),
+            address: z.string(),
+        }),
+    ),
+    goal: z.number(),
+    name: z.string(),
+    startDate: z.coerce.date(),
+    endDate: z.coerce.date(),
+    numParticipants: z.number(),
+    price: z.number(),
+    tokenSymbol: z.string(),
+    tokenDecimals: z.number(),
+    status: z.number(),
+    imageUrl: z.string().nullable(),
+    winnerTitle: z.string().optional(),
+    softCap: z.number().nullable(),
+    description: z.string().nullable(),
+    termsUrl: z.string().optional(),
+    requiredAcceptance: z.boolean().nullable(),
+    poolBalance: z.number(),
+})
+
+type PoolWithRelations = z.infer<typeof _PoolDetailsSchema>
+
+const fetchPoolDetails = async (poolId: string, chainId: number): Promise<PoolWithRelations> => {
+    const response = await fetch(`/api/pools/${poolId}?chainId=${chainId}`)
+    if (!response.ok) {
+        const errorData = (await response.json()) as { message?: string }
+        throw new Error(errorData.message || 'Failed to fetch pool details')
+    }
+    return response.json() as Promise<PoolWithRelations>
+}
+
 export default function PoolDetails({ poolId }: { poolId: string }) {
+    const chainId = useChainId()
     const {
         data: pool,
         isPending: isPoolPending,
         isError: isPoolError,
     } = useQuery({
-        queryKey: ['pool-details', poolId],
-        queryFn: getPoolDetailsById,
+        queryKey: ['pool-details', poolId, chainId],
+        queryFn: () => fetchPoolDetails(poolId, chainId),
+        enabled: !!chainId,
     })
 
     const { isAdmin, isLoading: isUserInfoPending, error: isUserInfoError } = useIsAdmin()
