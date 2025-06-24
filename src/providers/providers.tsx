@@ -47,6 +47,12 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         'Failed to fetch',
         'POST https://sepolia.base.org/ 403',
         'POST https://sepolia.base.org/ 429',
+        'POST https://base-sepolia.infura.io',
+        'POST https://base-sepolia-rpc.publicnode.com',
+        'POST https://base-sepolia.gateway.tenderly.co',
+        'RPC endpoint returned error',
+        'Rate limit detected',
+        'Transport created for',
     ] as const
 
     console.warn = (...args: unknown[]): void => {
@@ -56,14 +62,35 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         nativeWarn(...(args as Parameters<typeof console.warn>))
     }
 
+    // Enhanced console.log suppression for development noise
+    const nativeLog = console.log
+    const NOISY_LOGS = [
+        '[server-config] Transport created for',
+        '[wagmi-config]',
+        '[privy-config]',
+        '[env.mjs]',
+        'Transport created for',
+        'Environment detection',
+        'Configuration complete',
+    ] as const
+
+    console.log = (...args: unknown[]): void => {
+        // Only suppress if NEXT_PUBLIC_VERBOSE_LOGS is not set to 'true'
+        if (process.env.NEXT_PUBLIC_VERBOSE_LOGS !== 'true') {
+            if (typeof args[0] === 'string' && NOISY_LOGS.some(msg => (args[0] as string).includes(msg))) {
+                return
+            }
+        }
+        nativeLog(...(args as Parameters<typeof console.log>))
+    }
+
     // 3 ▸ Silence Lit's dev-mode banner
     window.litIssuedWarnings ??= new Set()
     window.litIssuedWarnings.add(
         'Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information.',
     )
 
-    // 4 ▸ Silence wallet extension conflicts and RPC errors
-    // Multiple wallet extensions often try to redefine window.ethereum, causing errors
+    // 4 ▸ Enhanced error suppression for wallet conflicts and RPC issues
     const nativeError = console.error
     console.error = (...args: unknown[]): void => {
         if (typeof args[0] === 'string') {
@@ -80,8 +107,13 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
                 errorMessage.includes('POST https://sepolia.base.org/ 429') ||
                 errorMessage.includes('POST https://mainnet.base.org/ 403') ||
                 errorMessage.includes('POST https://mainnet.base.org/ 429') ||
+                errorMessage.includes('POST https://base-sepolia.infura.io') ||
+                errorMessage.includes('POST https://base-sepolia-rpc.publicnode.com') ||
+                errorMessage.includes('POST https://base-sepolia.gateway.tenderly.co') ||
                 (errorMessage.includes('Failed to fetch') && errorMessage.includes('sepolia.base.org')) ||
-                (errorMessage.includes('Failed to fetch') && errorMessage.includes('mainnet.base.org'))
+                (errorMessage.includes('Failed to fetch') && errorMessage.includes('mainnet.base.org')) ||
+                (errorMessage.includes('Failed to fetch') && errorMessage.includes('base-sepolia')) ||
+                (errorMessage.includes('Fetch failed loading') && errorMessage.includes('base-sepolia'))
             ) {
                 return
             }
@@ -94,7 +126,11 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
                     'response.errorInstance._errors_request_js__WEBPACK_IMPORTED_MODULE_3__.TimeoutError',
                 ) ||
                 (errorMessage.includes('POST') && errorMessage.includes('403 (Forbidden)')) ||
-                (errorMessage.includes('POST') && errorMessage.includes('429'))
+                (errorMessage.includes('POST') && errorMessage.includes('429')) ||
+                errorMessage.includes('withTimeout.js') ||
+                errorMessage.includes('withRetry.js') ||
+                errorMessage.includes('fallback.js') ||
+                errorMessage.includes('rankTransports')
             ) {
                 return
             }
@@ -110,7 +146,17 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
             // Suppress Coinbase Wallet connection check errors
             if (
                 errorMessage.includes('checkCrossOriginOpenerPolicy') ||
-                errorMessage.includes('Failed to add embedded wallet connector')
+                errorMessage.includes('Failed to add embedded wallet connector') ||
+                errorMessage.includes('createCoinbaseWalletSDK')
+            ) {
+                return
+            }
+
+            // Suppress Next.js navigation errors during auth flow
+            if (
+                errorMessage.includes('fetchServerResponse') ||
+                errorMessage.includes('refreshReducer') ||
+                errorMessage.includes('_rsc=')
             ) {
                 return
             }
