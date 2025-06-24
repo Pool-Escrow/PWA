@@ -32,7 +32,7 @@ export default async function PoolsPage() {
                                 WebkitOverflowScrolling: 'touch',
                             }}>
                             <div className='mt-4 space-y-4 px-1 pb-safe'>
-                                <UserPools initialData={userPools} />
+                                <UserPools initialData={userPools?.length > 0 ? userPools : undefined} />
                                 <UpcomingPools initialData={upcomingPools} />
                             </div>
                         </div>
