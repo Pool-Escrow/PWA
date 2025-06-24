@@ -107,7 +107,9 @@ export function SwitchChainDrawer({
             { chainId: targetChain.id },
             {
                 onSuccess: () => {
-                    console.log(`[SwitchChainDrawer] Successfully switched to chain ${targetChain.id}`)
+                    console.log(
+                        `[SwitchChainDrawer] Successfully switched to chain ${targetChain.name} ${targetChain.id}`,
+                    )
                     onSwitched?.()
                     onOpenChange(false)
                     setIsLoading(false)

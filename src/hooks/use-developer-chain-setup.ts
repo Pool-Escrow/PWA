@@ -1,5 +1,5 @@
 import { useDeveloperFeaturesVisible, useDeveloperStore } from '@/stores/developer.store'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useChainId, useSwitchChain } from 'wagmi'
 
 /**
@@ -10,10 +10,11 @@ export function useDeveloperChainSetup() {
     const isDeveloperFeaturesVisible = useDeveloperFeaturesVisible()
     const currentChainId = useChainId()
     const { switchChain } = useSwitchChain()
+    const [hasSwitched, setHasSwitched] = useState(false)
 
     useEffect(() => {
-        // Only run once after hydration and if developer features are visible
-        if (!isHydrated || !isDeveloperFeaturesVisible) {
+        // Only run once after hydration, if developer features are visible, and if we haven't switched yet
+        if (!isHydrated || !isDeveloperFeaturesVisible || hasSwitched) {
             return
         }
 
@@ -29,14 +30,19 @@ export function useDeveloperChainSetup() {
                 {
                     onSuccess: () => {
                         console.log(`[DeveloperChainSetup] Successfully switched to chain ${settings.defaultChainId}`)
+                        setHasSwitched(true) // Mark that we've switched
                     },
                     onError: error => {
                         console.warn('[DeveloperChainSetup] Failed to switch to default chain:', error)
+                        setHasSwitched(true) // Also mark on error to avoid loops
                     },
                 },
             )
+        } else {
+            // Already on the correct chain, so we mark it as "switched" to prevent future runs
+            setHasSwitched(true)
         }
-    }, [isHydrated, isDeveloperFeaturesVisible, currentChainId, settings.defaultChainId, switchChain])
+    }, [isHydrated, isDeveloperFeaturesVisible, currentChainId, settings.defaultChainId, switchChain, hasSwitched])
 
     return {
         isSetupReady: isHydrated && isDeveloperFeaturesVisible,

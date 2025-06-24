@@ -14,7 +14,7 @@ export interface NetworkValidation {
 }
 
 /**
- * Hook para validar la red actual contra la configuración esperada
+ * Hook to validate the current network against the expected configuration
  */
 export function useNetworkValidation(): NetworkValidation {
     const chainId = useChainId()

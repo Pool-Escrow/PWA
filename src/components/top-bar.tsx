@@ -72,12 +72,9 @@ export default function TopBar(props: TopBarProps) {
     }
 
     const shouldShowNetworkBadge = () => {
-        // Always show in production for non-developer users
-        if (!isDeveloperFeaturesVisible) {
-            return true
-        }
-        // In developer mode, respect the setting
-        return settings.showNetworkIndicator
+        // The network badge is displayed only when developer mode is active
+        // and the 'showNetworkIndicator' setting is enabled.
+        return isDeveloperFeaturesVisible && settings.showNetworkIndicator
     }
 
     return (
@@ -86,7 +83,11 @@ export default function TopBar(props: TopBarProps) {
                 {/* Network status badge - ONLY this is conditional based on developer settings */}
                 {shouldShowNetworkBadge() && (
                     <div className='absolute left-2 top-1 z-40'>
-                        <NetworkStatusBadge variant='compact' showSwitchButton={true} />
+                        <NetworkStatusBadge
+                            variant='compact'
+                            showSwitchButton={true}
+                            onClick={() => setShowChainDrawer(true)}
+                        />
                     </div>
                 )}
                 {/* Original TopBarContent - UNCHANGED */}

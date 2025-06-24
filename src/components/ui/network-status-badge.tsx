@@ -12,12 +12,13 @@ interface NetworkStatusBadgeProps {
     className?: string
     showSwitchButton?: boolean
     variant?: 'compact' | 'full' | 'minimal'
+    onClick?: () => void
 }
 
 const getChainDisplayName = (chainId: number): string => {
     switch (chainId) {
         case 8453:
-            return 'Base'
+            return 'Base Mainnet'
         case 84532:
             return 'Base Sepolia'
         default:
@@ -25,7 +26,12 @@ const getChainDisplayName = (chainId: number): string => {
     }
 }
 
-export function NetworkStatusBadge({ className, showSwitchButton = true, variant = 'full' }: NetworkStatusBadgeProps) {
+export function NetworkStatusBadge({
+    className,
+    showSwitchButton = true,
+    variant = 'full',
+    onClick,
+}: NetworkStatusBadgeProps) {
     const { currentChainId, expectedChain, networkStatus, shouldShowWarning } = useNetworkValidation()
     const { switchChain, isPending } = useSwitchChain()
 
@@ -64,28 +70,28 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
                     icon: <CheckCircle className='size-4' />,
                     color: 'text-green-600',
                     bgColor: 'bg-green-50 border-green-200',
-                    label: 'Correcto',
+                    label: 'Correct',
                 }
             case 'wrong':
                 return {
                     icon: <AlertTriangle className='size-4' />,
                     color: 'text-amber-600',
                     bgColor: 'bg-amber-50 border-amber-200',
-                    label: 'Red incorrecta',
+                    label: 'Wrong Network',
                 }
             case 'unsupported':
                 return {
                     icon: <WifiOff className='size-4' />,
                     color: 'text-red-600',
                     bgColor: 'bg-red-50 border-red-200',
-                    label: 'No soportada',
+                    label: 'Unsupported',
                 }
             default:
                 return {
                     icon: <HelpCircle className='size-4' />,
                     color: 'text-gray-600',
                     bgColor: 'bg-gray-50 border-gray-200',
-                    label: 'Desconocida',
+                    label: 'Unknown',
                 }
         }
     }
@@ -99,7 +105,7 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
 
     if (!currentChainId && variant === 'minimal') return null
 
-    // Variant: minimal - solo un icono pequeño
+    // Variant: minimal - just a small icon
     if (variant === 'minimal') {
         return (
             <div className={cn('flex items-center', className)}>
@@ -112,7 +118,7 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
         )
     }
 
-    // Variant: compact - expandible
+    // Variant: compact - expandable
     if (variant === 'compact') {
         if (!isExpanded) {
             return (
@@ -138,7 +144,9 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
                     className,
                 )}>
                 {statusConfig.icon}
-                <span>{currentChainId ? getChainDisplayName(currentChainId) : 'Sin conexión'}</span>
+                <button onClick={onClick} className='hover:opacity-70'>
+                    <span>{currentChainId ? getChainDisplayName(currentChainId) : 'Offline'}</span>
+                </button>
                 {shouldShowWarning && showSwitchButton && (
                     <Button
                         size='sm'
@@ -146,7 +154,7 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
                         onClick={handleSwitchNetwork}
                         disabled={isPending}
                         className='ml-1 h-5 px-1 text-xs'>
-                        {isPending ? <Loader2 className='size-3 animate-spin' /> : 'Cambiar'}
+                        {isPending ? <Loader2 className='size-3 animate-spin' /> : 'Switch'}
                     </Button>
                 )}
                 <button onClick={() => setIsExpanded(false)} className='ml-1 hover:opacity-70'>
@@ -156,7 +164,7 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
         )
     }
 
-    // Variant: full - completo
+    // Variant: full - complete
     return (
         <div className={cn('flex items-center gap-2 rounded-lg border px-3 py-2', statusConfig.bgColor, className)}>
             <div className={statusConfig.color}>
@@ -165,10 +173,10 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
 
             <div className='min-w-0 flex-1'>
                 <div className={cn('text-sm font-medium', statusConfig.color)}>
-                    {currentChainId ? getChainDisplayName(currentChainId) : 'Sin conexión'}
+                    {currentChainId ? getChainDisplayName(currentChainId) : 'Offline'}
                 </div>
                 {shouldShowWarning && (
-                    <div className='text-xs text-gray-600'>Se requiere: {getChainDisplayName(expectedChain.id)}</div>
+                    <div className='text-xs text-gray-600'>Required: {getChainDisplayName(expectedChain.id)}</div>
                 )}
             </div>
 
@@ -182,10 +190,10 @@ export function NetworkStatusBadge({ className, showSwitchButton = true, variant
                     {isPending ? (
                         <>
                             <Loader2 className='mr-1 size-3 animate-spin' />
-                            Cambiando...
+                            Switching...
                         </>
                     ) : (
-                        'Cambiar red'
+                        'Switch Network'
                     )}
                 </Button>
             )}
