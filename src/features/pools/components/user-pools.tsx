@@ -19,31 +19,20 @@ import { UserPoolsSkeleton } from './user-pools-skeleton'
  */
 export default function UserPools() {
     const { login } = useAuth()
-    const { pools, metadata, isError, isEmpty, hasData, showSkeleton, ready, authenticated, refetch } = useUserPools()
+    const { pools, isError, isEmpty, hasData, showSkeleton, ready, authenticated, refetch } = useUserPools('upcoming')
 
-    // Memoize callbacks to prevent unnecessary re-renders
     const handleRetry = useCallback(() => {
         void refetch().catch(console.error)
     }, [refetch])
 
-    // Enhanced development logging (only when verbose logging is enabled)
     if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
-        // Only log significant state changes, not every render
-        const componentLogKey = `${showSkeleton}-${hasData}-${isEmpty}-${isError}`
-        if (!globalThis.__lastUserPoolComponentLogKey || globalThis.__lastUserPoolComponentLogKey !== componentLogKey) {
-            if (showSkeleton) {
-                console.log('[NextUserPoolV2] ⏳ Loading state')
-            } else if (hasData) {
-                console.log('[NextUserPoolV2] ✅ Data loaded:', {
-                    poolsCount: pools.length,
-                    metadata,
-                })
-            } else if (isEmpty) {
-                console.log('[NextUserPoolV2] 📭 No pools found')
-            } else if (isError) {
-                console.error('[NextUserPoolV2] ❌ Error state')
-            }
-            globalThis.__lastUserPoolComponentLogKey = componentLogKey
+        const logKey = `${showSkeleton}-${hasData}-${isEmpty}-${isError}`
+        if (!globalThis.__lastUserPoolComponentLogKey || globalThis.__lastUserPoolComponentLogKey !== logKey) {
+            if (showSkeleton) console.log('[UserPools] ⏳ Loading state')
+            else if (hasData) console.log(`[UserPools] ✅ Data loaded with ${pools.length} pools.`)
+            else if (isEmpty) console.log('[UserPools] 📭 No pools found')
+            else if (isError) console.error('[UserPools] ❌ Error state')
+            globalThis.__lastUserPoolComponentLogKey = logKey
         }
     }
 
