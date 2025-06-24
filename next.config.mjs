@@ -1,12 +1,12 @@
 // @ts-check
 
-import bundleAnalyzer from '@next/bundle-analyzer'
+// import bundleAnalyzer from '@next/bundle-analyzer'
 import config from './config/index.mjs'
 // import { execSync } from 'node:child_process'
 
-const withBundleAnalyzer = bundleAnalyzer({
-    enabled: process.env.ANALYZE === 'true',
-})
+// const withBundleAnalyzer = bundleAnalyzer({
+//     enabled: process.env.ANALYZE === 'true',
+// })
 
 /** @type {import('next').NextConfig} */
 const baseConfig = {
@@ -31,6 +31,9 @@ const baseConfig = {
     rewrites: config.rewrites,
     // webpack: config.webpack,
     // generateBuildId: () => execSync('git rev-parse HEAD').toString().trim(),
+    compiler: {
+        removeConsole: process.env.NODE_ENV === 'production',
+    },
 }
 
 export default baseConfig
