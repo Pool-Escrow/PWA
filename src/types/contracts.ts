@@ -1534,7 +1534,12 @@ export const tokenAbi = [
  * - [__View Contract on Base Sepolia Basescan__](https://sepolia.basescan.org/address/0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b)
  */
 export const tokenAddress = {
+    // USDC Base Mainnet
     8453: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    // USDC Base Sepolia
+    // TODO: replace to actual USDC Base Sepolia address: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+
+    // Currently using Drop Token address for Sepolia
     84532: '0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b',
 } as const
 
