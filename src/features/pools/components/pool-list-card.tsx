@@ -72,7 +72,11 @@ export default function PoolListCard({
     if (!id) return <PoolCardSkeleton />
 
     return (
-        <Link href={`/pool/${id}`} onMouseEnter={prefetch} onFocus={prefetch}>
+        <Link
+            href={`/pool/${id}`}
+            onMouseEnter={prefetch}
+            onFocus={prefetch}
+            legacyBehavior>
             <motion.div
                 className='flex h-24 items-center gap-[14px] rounded-3xl bg-white p-3 pr-4'
                 whileHover={{ scale: 1.05 }}
@@ -111,5 +115,5 @@ export default function PoolListCard({
                 </div>
             </motion.div>
         </Link>
-    )
+    );
 }

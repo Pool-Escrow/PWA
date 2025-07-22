@@ -20,7 +20,10 @@ const SearchBar = ({
             <SearchIcon size={14} />
         </div>
         {isAdmin && (
-            <Link href={`/pool/${poolId}/check-in`} className='absolute right-[10px] z-10 flex h-10 w-6 items-center'>
+            <Link
+                href={`/pool/${poolId}/check-in`}
+                className='absolute right-[10px] z-10 flex h-10 w-6 items-center'
+                legacyBehavior>
                 <QrCodeIcon size={18} />
             </Link>
         )}

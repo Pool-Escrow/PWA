@@ -102,10 +102,11 @@ export default function ParticipantCard({
         return (
             <Link
                 className={'bottom-2 flex flex-row space-x-4 border-b border-[#E9F1F5] py-4'}
-                href={`/pool/${poolId}/participants/${address}`}>
+                href={`/pool/${poolId}/participants/${address}`}
+                legacyBehavior>
                 {Content}
             </Link>
-        )
+        );
     }
 
     return <div className={'bottom-2 flex flex-row space-x-4 border-b border-[#E9F1F5] py-4'}>{Content}</div>

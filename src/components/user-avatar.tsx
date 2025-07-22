@@ -11,7 +11,7 @@ export default function UserAvatar() {
 
     return (
         <Avatar className='relative size-8 cursor-pointer overflow-hidden' aria-label='Go to Profile' asChild>
-            <Link href={'/profile'}>
+            <Link href={'/profile'} legacyBehavior>
                 <AnimatePresence mode='wait'>
                     {isLoading ? (
                         <motion.div
@@ -52,5 +52,5 @@ export default function UserAvatar() {
                 </AnimatePresence>
             </Link>
         </Avatar>
-    )
+    );
 }

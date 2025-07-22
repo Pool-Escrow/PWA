@@ -180,9 +180,6 @@ const AdminPoolPage = () => {
     //     return <></>
     // }
     return (
-        <PageWrapper topBarProps={{ title: 'Admin', backButton: true }}>
-            <div>Admin Page</div>
-        </PageWrapper>
         // <Page>
         //     <Section>
         //         <div className='flex w-full flex-col items-center justify-center'>
@@ -219,7 +216,6 @@ const AdminPoolPage = () => {
         //                                 />
         //                             </Link>
         //                             <ShareDialog />
-
         //                             <button
         //                                 title='Edit Pool'
         //                                 type='button'
@@ -264,7 +260,6 @@ const AdminPoolPage = () => {
         //                         <Progress value={participantPercent} />
         //                     </div>
         //                 </div>
-
         //                 <div
         //                     className={`cardBackground mt-2 flex w-full flex-col rounded-3xl p-4 md:mt-4 md:px-10 md:py-8`}>
         //                     <h3 className='text-sm font-semibold md:text-2xl'>Description</h3>
@@ -323,7 +318,10 @@ const AdminPoolPage = () => {
         //         </div>
         //     </Section>
         // </Page>
-    )
+        <PageWrapper topBarProps={{ title: 'Admin', backButton: true }}>
+            <div>Admin Page</div>
+        </PageWrapper>
+    );
 }
 
 export default AdminPoolPage

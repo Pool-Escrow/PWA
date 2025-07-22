@@ -24,7 +24,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
           }
 
     const parseErrorDetails = (details: typeof errorDetails) => {
-        return JSON.stringify(details, null, 2).replace(/\\n/g, '\n').replace(/\\"/g, '"')
+        return JSON.stringify(details, null, 2).replace(/\\n/g, '\n').replace(/\\"/g, '"');
     }
 
     const copyErrorToClipboard = () => {

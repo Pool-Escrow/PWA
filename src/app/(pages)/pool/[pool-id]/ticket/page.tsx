@@ -23,7 +23,7 @@ const TicketPage = ({ params: { 'pool-id': poolId } }: { params: { 'pool-id': st
                 <div className='flex w-full flex-1 flex-col items-center justify-center'>
                     {hasJoined ? (
                         // eslint-disable-next-line tailwindcss/no-custom-classname
-                        <div className='cardBackground flex w-full max-w-lg rounded-3xl bg-[#F6F6F6] p-12'>
+                        (<div className='cardBackground flex w-full max-w-lg rounded-3xl bg-[#F6F6F6] p-12'>
                             <QRCode
                                 size={256}
                                 style={{
@@ -34,14 +34,14 @@ const TicketPage = ({ params: { 'pool-id': poolId } }: { params: { 'pool-id': st
                                 value={JSON.stringify({ address, poolId })}
                                 viewBox={`0 0 256 256`}
                             />
-                        </div>
+                        </div>)
                     ) : (
                         <div>You have not joined the pool</div>
                     )}
                 </div>
             </div>
         </PageWrapper>
-    )
+    );
 }
 
 export default TicketPage

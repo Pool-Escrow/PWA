@@ -19,7 +19,7 @@ export default function PoolDetailsParticipants({
         <div className='space-y-2'>
             {numParticipants > 0 ? (
                 <>
-                    <Link href={`/pool/${poolId}/participants`}>
+                    <Link href={`/pool/${poolId}/participants`} legacyBehavior>
                         <div className='pb-2 text-xs'>Participants</div>
                         <div className='inline-flex w-full items-center justify-between'>
                             <Avatars avatarUrls={avatarUrls} numPeople={numParticipants} />
@@ -36,5 +36,5 @@ export default function PoolDetailsParticipants({
                 </>
             )}
         </div>
-    )
+    );
 }

@@ -9,10 +9,10 @@ interface EncryptState {
 export const useEncryptStore = create<EncryptState>()(
     persist(
         set =>
-            ({
+            (({
                 isEncoded: false,
-                toggleEncryption: () => set(state => ({ isEncoded: !state.isEncoded })),
-            }) as EncryptState,
+                toggleEncryption: () => set(state => ({ isEncoded: !state.isEncoded }))
+            }) as EncryptState),
         {
             name: 'encrypt-storage',
         },

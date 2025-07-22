@@ -59,14 +59,13 @@ export default function UserDropdownItem({
     return (
         <>
             {href ? (
-                <Link href={href} passHref>
+                <Link href={href} passHref legacyBehavior>
                     {menuItem}
                 </Link>
             ) : (
                 <div>{menuItem}</div>
             )}
-
             {showSeparator && <DropdownMenuSeparator />}
         </>
-    )
+    );
 }

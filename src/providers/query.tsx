@@ -55,7 +55,7 @@ function makeQueryClient() {
                 retryDelay: 2000, // Fixed 2s delay for mutation retries
             },
         },
-    })
+    });
 }
 
 let browserQueryClient: QueryClient | undefined = undefined

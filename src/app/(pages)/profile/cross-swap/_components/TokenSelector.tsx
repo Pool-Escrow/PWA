@@ -42,7 +42,6 @@ export const TokenSelector = ({
                     <X className='size-6' />
                 </button>
             </div>
-
             {/* Search input */}
             <div className='mt-4'>
                 <div className='relative flex h-[42px] items-center'>
@@ -55,7 +54,6 @@ export const TokenSelector = ({
                     />
                 </div>
             </div>
-
             <div className='mt-6'>
                 <div className='mb-4 text-[12px] font-bold text-black'>
                     Select network: {selectedNetwork !== 'all' ? networkName : 'All'}
@@ -134,7 +132,6 @@ export const TokenSelector = ({
                     </div>
                 </div>
             </div>
-
             {/* Token list */}
             <div className='scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mt-6 space-y-2 overflow-y-scroll'>
                 {isLoading ? (
@@ -182,5 +179,5 @@ export const TokenSelector = ({
                 )}
             </div>
         </>
-    )
+    );
 }

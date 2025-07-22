@@ -100,7 +100,10 @@ export default function UserPools({ initialData }: { initialData?: PoolItem[] })
             <div className='flex shrink justify-between'>
                 <h1 className='pl-[6px] text-lg font-semibold'>Your Pools</h1>
                 {ready && authenticated && hasData && (
-                    <Link href='/my-pools' className='inline-flex h-[30px] items-center gap-1 pr-[6px]'>
+                    <Link
+                        href='/my-pools'
+                        className='inline-flex h-[30px] items-center gap-1 pr-[6px]'
+                        legacyBehavior>
                         <motion.div
                             className='text-[11px] font-semibold text-[#4078FA]'
                             whileHover={{ scale: 1.05 }}
@@ -118,5 +121,5 @@ export default function UserPools({ initialData }: { initialData?: PoolItem[] })
             </div>
             <div className='mt-4'>{renderContent}</div>
         </div>
-    )
+    );
 }

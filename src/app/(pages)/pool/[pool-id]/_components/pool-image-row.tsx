@@ -36,7 +36,8 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                             href={`/pool/${props.poolId}/check-in`}
                             type='button'
                             title='Scan QR'
-                            className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'>
+                            className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'
+                            legacyBehavior>
                             <Image className='flex size-6' src={qrIcon as StaticImport} alt='Share with Friends' />
                         </Link>
                     )}
@@ -46,7 +47,8 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                             href={`/pool/${props.poolId}/edit`}
                             type='button'
                             title='Edit Pool'
-                            className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'>
+                            className='flex size-8 items-center justify-center rounded-full bg-black/40 p-2 md:size-10 md:p-3'
+                            legacyBehavior>
                             <Image className='flex size-6' src={editIcon as StaticImport} alt='Share with Friends' />
                         </Link>
                     )}
@@ -54,7 +56,7 @@ const PoolImageRow = (props: PoolImageRowProps) => {
                 <PoolStatus status={props.poolStatus} />
             </div>
         </div>
-    )
+    );
 }
 
 export default PoolImageRow

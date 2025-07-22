@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export default function PageTitle({ title }: { title?: string }) {
     return (
-        <Link href='/'>
+        <Link href='/' legacyBehavior>
             <h1 className='text-[0.875rem] font-semibold'>
                 {title ?? (
                     <div className='h-8 w-24'>
@@ -12,5 +12,5 @@ export default function PageTitle({ title }: { title?: string }) {
                 )}
             </h1>
         </Link>
-    )
+    );
 }
