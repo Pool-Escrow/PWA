@@ -1,7 +1,9 @@
 'use client'
 
+import type { POOLSTATUS } from '@/app/(pages)/pool/[pool-id]/_lib/definitions'
 import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { motion } from 'framer-motion'
+import { LoaderIcon } from 'lucide-react'
 import PoolListCard from './pool-list-card'
 
 const poolMessages = {
@@ -28,6 +30,53 @@ const poolMessages = {
     },
 }
 
+/* 
+bannerImage
+: 
+"https://gyalvpenhktgsmrrjmxv.supabase.co/storage/v1/object/public/images/389/bannerImage.png"
+contract_id
+: 
+172
+createdAt
+: 
+"2025-06-20T06:13:41.347+00:00"
+description
+: 
+"Test pool description"
+endDate
+: 
+"2025-06-20T16:11:48+00:00"
+internal_id
+: 
+389
+name
+: 
+"Test pool 03"
+price
+: 
+0
+required_acceptance
+: 
+false
+softCap
+: 
+1
+startDate
+: 
+"2025-06-20T15:20:48+00:00"
+status
+: 
+"unconfirmed"
+termsURL
+: 
+""
+tokenAddress
+: 
+"0xfD2Ec58cE4c87b253567Ff98ce2778de6AF0101b"
+updatedAt
+: 
+"2025-06-20T06:13:41.347+00:00"*/
+
 export default function PoolList({
     pools,
     name = 'feed',
@@ -38,7 +87,11 @@ export default function PoolList({
     isLoading?: boolean
 }) {
     if (isLoading) {
-        return null
+        return (
+            <div className='flex h-24 items-center justify-center rounded-3xl bg-white p-4'>
+                <LoaderIcon className='size-4 animate-spin' />
+            </div>
+        )
     }
 
     if (!pools || pools.length === 0) {
@@ -75,8 +128,22 @@ export default function PoolList({
     }
 
     return (
-        <section className='flex flex-col gap-2 pb-32'>
-            {pools?.length ? pools.map(pool => <PoolListCard key={pool.id} {...pool} />) : null}
+        <section className='flex flex-col gap-2'>
+            {pools?.length
+                ? pools.map(pool => (
+                      <PoolListCard
+                          key={pool.id}
+                          endDate={pool.endDate}
+                          id={pool.id}
+                          image={pool.image}
+                          name={pool.name}
+                          numParticipants={pool.numParticipants}
+                          softCap={pool.softCap}
+                          startDate={pool.startDate}
+                          status={pool.status as POOLSTATUS}
+                      />
+                  ))
+                : null}
         </section>
     )
 }

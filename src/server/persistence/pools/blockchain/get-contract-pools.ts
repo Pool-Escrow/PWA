@@ -122,8 +122,17 @@ export async function getContractPools(chainId?: number): Promise<ContractPool[]
     const idChunks = chunkArray(poolIds, MULTICALL_BATCH_SIZE)
 
     const chunkResults = await Promise.all(
-        idChunks.map(chunk =>
-            multicall(serverConfig, {
+        idChunks.map(chunk => {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[DEBUG][getContractPools] multicall (chunk)', {
+                    chainId: actualChainId,
+                    chunkSize: chunk.length,
+                    contracts: chunk.map(id => ({ address: targetPoolAddress, fn: GetAllPoolInfo.name, poolId: id })),
+                    stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+                    timestamp: new Date().toISOString(),
+                })
+            }
+            return multicall(serverConfig, {
                 // Specify the chainId to ensure we use the correct RPC endpoint
                 chainId: actualChainId,
                 contracts: chunk.map(id => ({
@@ -132,8 +141,8 @@ export async function getContractPools(chainId?: number): Promise<ContractPool[]
                     functionName: GetAllPoolInfo.name,
                     args: [id],
                 })),
-            }),
-        ),
+            })
+        }),
     )
 
     const flatResults = chunkResults.flat()

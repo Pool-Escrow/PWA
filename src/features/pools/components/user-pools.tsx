@@ -5,9 +5,9 @@ import { useAuth } from '@/hooks/use-auth'
 import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { motion } from 'framer-motion'
 import { ChevronRightIcon } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
+import PoolList from './pool-list'
 import { UserPoolsSkeleton } from './user-pools-skeleton'
 
 /**
@@ -20,56 +20,14 @@ import { UserPoolsSkeleton } from './user-pools-skeleton'
  */
 export default function UserPools({ initialData }: { initialData?: PoolItem[] }) {
     const { login } = useAuth()
-    const { pools, isError, isEmpty, hasData, showSkeleton, ready, authenticated, refetch } = useUserPools('upcoming', {
-        initialData,
-    })
+    const { pools, isError, isLoading, isFetching, hasData, showSkeleton, ready, authenticated, refetch } =
+        useUserPools('upcoming', {
+            initialData,
+        })
 
     const handleRetry = useCallback(() => {
         void refetch().catch(console.error)
     }, [refetch])
-
-    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_VERBOSE_LOGS === 'true') {
-        const logKey = `${showSkeleton}-${hasData}-${isEmpty}-${isError}`
-        if (!globalThis.__lastUserPoolComponentLogKey || globalThis.__lastUserPoolComponentLogKey !== logKey) {
-            if (showSkeleton) console.log('[UserPools] ⏳ Loading state')
-            else if (hasData) console.log(`[UserPools] ✅ Data loaded with ${pools.length} pools.`)
-            else if (isEmpty) console.log('[UserPools] 📭 No pools found')
-            else if (isError) console.error('[UserPools] ❌ Error state')
-            globalThis.__lastUserPoolComponentLogKey = logKey
-        }
-    }
-
-    const renderPoolCard = useCallback(
-        (pool: (typeof pools)[0]) => (
-            <Link key={pool.id} href={`/pool/${pool.id}`}>
-                <motion.div
-                    className='flex h-24 items-center gap-[14px] rounded-3xl bg-white p-3 pr-4'
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}>
-                    <div className='relative size-[76px] shrink-0 overflow-hidden rounded-[16px] bg-neutral-200'>
-                        <Image
-                            src={pool.image || '/app/images/frog.png'}
-                            alt='Pool Image'
-                            fill
-                            priority
-                            sizes='72px'
-                            className='object-cover'
-                        />
-                    </div>
-                    <div className='flex flex-col gap-[5px] truncate'>
-                        <h1 className='truncate text-sm font-semibold'>{pool.name}</h1>
-                        <span className='truncate text-xs font-medium tracking-tight'>
-                            {`${pool.numParticipants}/${pool.softCap} Registered`}
-                        </span>
-                        <span className='truncate text-xs font-medium tracking-tight'>
-                            Starts {new Date(pool.startDate).toLocaleDateString()}
-                        </span>
-                    </div>
-                </motion.div>
-            </Link>
-        ),
-        [],
-    )
 
     const renderContent = useMemo(() => {
         // Privy not ready or loading state
@@ -115,7 +73,11 @@ export default function UserPools({ initialData }: { initialData?: PoolItem[] })
 
         // Authenticated user with pools
         if (hasData) {
-            return <div className='flex flex-col space-y-2'>{pools.map(renderPoolCard)}</div>
+            return (
+                <div key='user-pools-list' className='flex flex-col space-y-2'>
+                    <PoolList pools={pools} name='user-pools' isLoading={isLoading || isFetching} />
+                </div>
+            )
         }
 
         // Authenticated user with no pools
@@ -131,7 +93,7 @@ export default function UserPools({ initialData }: { initialData?: PoolItem[] })
                 </div>
             </motion.div>
         )
-    }, [showSkeleton, authenticated, isError, hasData, pools, renderPoolCard, login, handleRetry])
+    }, [showSkeleton, authenticated, isError, hasData, login, handleRetry, pools, isLoading, isFetching])
 
     return (
         <div className='detail_card_bg rounded-[2rem] p-3 pt-[18px]'>

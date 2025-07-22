@@ -8,24 +8,61 @@ The Pools system is the core feature of the application, responsible for fetchin
 
 ```mermaid
 graph TD
-    A[User Interface] --> B[UpcomingPoolsV2 Component]
-    B --> C[useUpcomingPoolsV2 Hook]
-    C --> D[getUpcomingPoolsAction Server Action]
-    D --> E[getContractPools - Smart Contract]
-    D --> F[Supabase Database]
-    E --> G[Data Combination & Filtering]
-    F --> G
-    G --> H[Status Filtering & Validation]
-    H --> I[Pool Transformation]
-    I --> J[Metadata Generation]
-    J --> K[UI Rendering]
+    A[User Navigation] --> B[PoolsPage SSR]
+    B --> C{Parallel Data Fetch}
 
-    L[Error Boundary] --> B
-    M[Diagnostics Component] --> N[Debug Info]
+    C --> D[getUpcomingPools]
+    C --> E[verifyToken]
+    C --> F[getUserPools]
 
-    style D fill:#e1f5fe
-    style G fill:#f3e5f5
-    style K fill:#e8f5e8
+    D --> G[Contract Pools API]
+    D --> H[Supabase DB Cache]
+
+    G --> I[Blockchain RPC]
+    H --> J[Optimized Query]
+
+    I --> K[Smart Contract]
+    J --> L[Pool Status Filter]
+
+    K --> M[Pool Transformation]
+    L --> M
+
+    M --> N[Metadata Generation]
+    N --> O[SSR Response]
+
+    E --> P[User Authentication]
+    F --> Q[User Pool Data]
+
+    P --> O
+    Q --> O
+
+    O --> R[Client Hydration]
+    R --> S[React Query Cache]
+
+    S --> T[useUpcomingPools Hook]
+    S --> U[useUserPools Hook]
+
+    T --> V[UpcomingPools Component]
+    U --> W[UserPools Component]
+
+    V --> X[Pool List Rendering]
+    W --> X
+
+    X --> Y[Error Boundaries]
+    Y --> Z[User Interface]
+
+    style B fill:#e1f5fe
+    style D fill:#f3e5f5
+    style S fill:#e8f5e8
+    style Y fill:#fff3e0
+
+    classDef performance fill:#e8f5e8,stroke:#4caf50
+    classDef caching fill:#e3f2fd,stroke:#2196f3
+    classDef error fill:#fff3e0,stroke:#ff9800
+
+    class D,M,N performance
+    class H,S,T,U caching
+    class Y,Z error
 ```
 
 ## 🔄 Data Flow Sequence

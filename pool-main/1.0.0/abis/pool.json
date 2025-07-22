@@ -1,0 +1,1026 @@
+[
+    { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+    { "inputs": [], "name": "AccessControlBadConfirmation", "type": "error" },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "account", "type": "address" },
+            { "internalType": "bytes32", "name": "neededRole", "type": "bytes32" }
+        ],
+        "name": "AccessControlUnauthorizedAccount",
+        "type": "error"
+    },
+    { "inputs": [], "name": "EnforcedPause", "type": "error" },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "timeNow", "type": "uint256" },
+            { "internalType": "uint256", "name": "timeStart", "type": "uint256" },
+            { "internalType": "address", "name": "caller", "type": "address" }
+        ],
+        "name": "EventStarted",
+        "type": "error"
+    },
+    { "inputs": [], "name": "ExpectedPause", "type": "error" },
+    {
+        "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "caller", "type": "address" }],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "Deposit",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "ExtraDeposit",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "fees", "type": "uint256" }
+        ],
+        "name": "FeesCharged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "host", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "fees", "type": "uint256" }
+        ],
+        "name": "FeesCollected",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" }
+        ],
+        "name": "JoinedPoolsRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+        ],
+        "name": "OwnershipTransferStarted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" }
+        ],
+        "name": "ParticipantRejoined",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" }
+        ],
+        "name": "ParticipantRemoved",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+        "name": "Paused",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "balanceBefore", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "balanceAfter", "type": "uint256" }
+        ],
+        "name": "PoolBalanceUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "host", "type": "address" },
+            { "indexed": false, "internalType": "string", "name": "poolName", "type": "string" },
+            { "indexed": false, "internalType": "uint256", "name": "depositAmountPerPerson", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "penaltyFeeRate", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "token", "type": "address" }
+        ],
+        "name": "PoolCreated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "endTime", "type": "uint256" }
+        ],
+        "name": "PoolEndTimeChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": false, "internalType": "string", "name": "poolName", "type": "string" }
+        ],
+        "name": "PoolNameChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": false, "internalType": "uint256", "name": "startTime", "type": "uint256" }
+        ],
+        "name": "PoolStartTimeChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": false, "internalType": "enum IPool.POOLSTATUS", "name": "status", "type": "uint8" }
+        ],
+        "name": "PoolStatusChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "participant", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "Refund",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "host", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "RemainingBalanceCollected",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "indexed": true, "internalType": "bytes32", "name": "previousAdminRole", "type": "bytes32" },
+            { "indexed": true, "internalType": "bytes32", "name": "newAdminRole", "type": "bytes32" }
+        ],
+        "name": "RoleAdminChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+        ],
+        "name": "RoleGranted",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+            { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+        ],
+        "name": "RoleRevoked",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "sponsor", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "SponsorshipAdded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [{ "indexed": false, "internalType": "address", "name": "account", "type": "address" }],
+        "name": "Unpaused",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "WinnerSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "WinningForfeited",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            { "indexed": false, "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "indexed": true, "internalType": "address", "name": "winner", "type": "address" },
+            { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "WinningsClaimed",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "DEFAULT_ADMIN_ROLE",
+        "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "WHITELISTED_HOST",
+        "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "WHITELISTED_SPONSOR",
+        "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    { "inputs": [], "name": "acceptOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "uint40", "name": "timeEnd", "type": "uint40" }
+        ],
+        "name": "changeEndTime",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "string", "name": "poolName", "type": "string" }
+        ],
+        "name": "changePoolName",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "uint40", "name": "timeStart", "type": "uint40" }
+        ],
+        "name": "changeStartTime",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "winner", "type": "address" }
+        ],
+        "name": "claimWinning",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256[]", "name": "poolIds", "type": "uint256[]" },
+            { "internalType": "address[]", "name": "_winners", "type": "address[]" }
+        ],
+        "name": "claimWinnings",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "claimablePools",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "collectFees",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "collectRemainingBalance",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint40", "name": "timeStart", "type": "uint40" },
+            { "internalType": "uint40", "name": "timeEnd", "type": "uint40" },
+            { "internalType": "string", "name": "poolName", "type": "string" },
+            { "internalType": "uint256", "name": "depositAmountPerPerson", "type": "uint256" },
+            { "internalType": "uint16", "name": "penaltyFeeRate", "type": "uint16" },
+            { "internalType": "address", "name": "token", "type": "address" }
+        ],
+        "name": "createPool",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "createdPools",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "deletePool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "deposit",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "contract IERC20", "name": "token", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "emergencyWithdraw",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "enableDeposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "endPool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "winner", "type": "address" }
+        ],
+        "name": "forfeitWinnings",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getAllPoolInfo",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "address", "name": "host", "type": "address" },
+                    { "internalType": "uint16", "name": "penaltyFeeRate", "type": "uint16" }
+                ],
+                "internalType": "struct IPool.PoolAdmin",
+                "name": "_poolAdmin",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    { "internalType": "uint40", "name": "timeStart", "type": "uint40" },
+                    { "internalType": "uint40", "name": "timeEnd", "type": "uint40" },
+                    { "internalType": "string", "name": "poolName", "type": "string" },
+                    { "internalType": "uint256", "name": "depositAmountPerPerson", "type": "uint256" }
+                ],
+                "internalType": "struct IPool.PoolDetail",
+                "name": "_poolDetail",
+                "type": "tuple"
+            },
+            {
+                "components": [
+                    { "internalType": "uint256", "name": "totalDeposits", "type": "uint256" },
+                    { "internalType": "uint256", "name": "feesAccumulated", "type": "uint256" },
+                    { "internalType": "uint256", "name": "feesCollected", "type": "uint256" },
+                    { "internalType": "uint256", "name": "balance", "type": "uint256" },
+                    { "internalType": "uint256", "name": "sponsored", "type": "uint256" }
+                ],
+                "internalType": "struct IPool.PoolBalance",
+                "name": "_poolBalance",
+                "type": "tuple"
+            },
+            { "internalType": "enum IPool.POOLSTATUS", "name": "_poolStatus", "type": "uint8" },
+            { "internalType": "address", "name": "_poolToken", "type": "address" },
+            { "internalType": "address[]", "name": "_participants", "type": "address[]" },
+            { "internalType": "address[]", "name": "_winners", "type": "address[]" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "winner", "type": "address" }],
+        "name": "getClaimablePools",
+        "outputs": [
+            { "internalType": "uint256[]", "name": "", "type": "uint256[]" },
+            { "internalType": "bool[]", "name": "", "type": "bool[]" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getFeesAccumulated",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getFeesCollected",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getHost",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "participant", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "getParticipantDeposit",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "participant", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "getParticipantDetail",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "uint256", "name": "deposit", "type": "uint256" },
+                    { "internalType": "uint256", "name": "feesCharged", "type": "uint256" },
+                    { "internalType": "uint120", "name": "participantIndex", "type": "uint120" },
+                    { "internalType": "uint120", "name": "joinedPoolsIndex", "type": "uint120" },
+                    { "internalType": "bool", "name": "refunded", "type": "bool" }
+                ],
+                "internalType": "struct IPool.ParticipantDetail",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getParticipants",
+        "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getPoolBalance",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getPoolDetail",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "uint40", "name": "timeStart", "type": "uint40" },
+                    { "internalType": "uint40", "name": "timeEnd", "type": "uint40" },
+                    { "internalType": "string", "name": "poolName", "type": "string" },
+                    { "internalType": "uint256", "name": "depositAmountPerPerson", "type": "uint256" }
+                ],
+                "internalType": "struct IPool.PoolDetail",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getPoolFeeRate",
+        "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "host", "type": "address" }],
+        "name": "getPoolsCreatedBy",
+        "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "participant", "type": "address" }],
+        "name": "getPoolsJoinedBy",
+        "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+        "name": "getRoleAdmin",
+        "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "_sponsor", "type": "address" }
+        ],
+        "name": "getSponsorDetail",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "string", "name": "name", "type": "string" },
+                    { "internalType": "uint256", "name": "amount", "type": "uint256" }
+                ],
+                "internalType": "struct IPool.SponsorDetail",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getSponsors",
+        "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getSponsorshipAmount",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "winner", "type": "address" }
+        ],
+        "name": "getWinnerDetail",
+        "outputs": [
+            {
+                "components": [
+                    { "internalType": "uint256", "name": "amountWon", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amountClaimed", "type": "uint256" },
+                    { "internalType": "uint40", "name": "timeWon", "type": "uint40" },
+                    { "internalType": "bool", "name": "claimed", "type": "bool" },
+                    { "internalType": "bool", "name": "forfeited", "type": "bool" },
+                    { "internalType": "bool", "name": "alreadyInList", "type": "bool" }
+                ],
+                "internalType": "struct IPool.WinnerDetail",
+                "name": "",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getWinners",
+        "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "getWinnersDetails",
+        "outputs": [
+            { "internalType": "address[]", "name": "", "type": "address[]" },
+            {
+                "components": [
+                    { "internalType": "uint256", "name": "amountWon", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amountClaimed", "type": "uint256" },
+                    { "internalType": "uint40", "name": "timeWon", "type": "uint40" },
+                    { "internalType": "bool", "name": "claimed", "type": "bool" },
+                    { "internalType": "bool", "name": "forfeited", "type": "bool" },
+                    { "internalType": "bool", "name": "alreadyInList", "type": "bool" }
+                ],
+                "internalType": "struct IPool.WinnerDetail[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "winner", "type": "address" }
+        ],
+        "name": "getWinningAmount",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "internalType": "address", "name": "account", "type": "address" }
+        ],
+        "name": "grantRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "internalType": "address", "name": "account", "type": "address" }
+        ],
+        "name": "hasRole",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "isHost",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "isParticipant",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "joinedPools",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestPoolId",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "participantDetail",
+        "outputs": [
+            { "internalType": "uint256", "name": "deposit", "type": "uint256" },
+            { "internalType": "uint256", "name": "feesCharged", "type": "uint256" },
+            { "internalType": "uint120", "name": "participantIndex", "type": "uint120" },
+            { "internalType": "uint120", "name": "joinedPoolsIndex", "type": "uint120" },
+            { "internalType": "bool", "name": "refunded", "type": "bool" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "participants",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    { "inputs": [], "name": "pause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [],
+        "name": "paused",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "pendingOwner",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "name": "poolAdmin",
+        "outputs": [
+            { "internalType": "address", "name": "host", "type": "address" },
+            { "internalType": "uint16", "name": "penaltyFeeRate", "type": "uint16" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "name": "poolBalance",
+        "outputs": [
+            { "internalType": "uint256", "name": "totalDeposits", "type": "uint256" },
+            { "internalType": "uint256", "name": "feesAccumulated", "type": "uint256" },
+            { "internalType": "uint256", "name": "feesCollected", "type": "uint256" },
+            { "internalType": "uint256", "name": "balance", "type": "uint256" },
+            { "internalType": "uint256", "name": "sponsored", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "name": "poolDetail",
+        "outputs": [
+            { "internalType": "uint40", "name": "timeStart", "type": "uint40" },
+            { "internalType": "uint40", "name": "timeEnd", "type": "uint40" },
+            { "internalType": "string", "name": "poolName", "type": "string" },
+            { "internalType": "uint256", "name": "depositAmountPerPerson", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "name": "poolStatus",
+        "outputs": [{ "internalType": "enum IPool.POOLSTATUS", "name": "", "type": "uint8" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "name": "poolToken",
+        "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "reenableDeposit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "participant", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "refundParticipant",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "internalType": "address", "name": "callerConfirmation", "type": "address" }
+        ],
+        "name": "renounceRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+            { "internalType": "address", "name": "account", "type": "address" }
+        ],
+        "name": "revokeRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "selfRefund",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address", "name": "winner", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "setWinner",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "address[]", "name": "_winners", "type": "address[]" },
+            { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+        ],
+        "name": "setWinners",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "string", "name": "name", "type": "string" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "sponsor",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "sponsorDetail",
+        "outputs": [
+            { "internalType": "string", "name": "name", "type": "string" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "sponsors",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "uint256", "name": "poolId", "type": "uint256" }],
+        "name": "startPool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }],
+        "name": "supportsInterface",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    { "inputs": [], "name": "unpause", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
+    {
+        "inputs": [
+            { "internalType": "address", "name": "", "type": "address" },
+            { "internalType": "uint256", "name": "poolId", "type": "uint256" }
+        ],
+        "name": "winnerDetail",
+        "outputs": [
+            { "internalType": "uint256", "name": "amountWon", "type": "uint256" },
+            { "internalType": "uint256", "name": "amountClaimed", "type": "uint256" },
+            { "internalType": "uint40", "name": "timeWon", "type": "uint40" },
+            { "internalType": "bool", "name": "claimed", "type": "bool" },
+            { "internalType": "bool", "name": "forfeited", "type": "bool" },
+            { "internalType": "bool", "name": "alreadyInList", "type": "bool" }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            { "internalType": "uint256", "name": "", "type": "uint256" },
+            { "internalType": "uint256", "name": "", "type": "uint256" }
+        ],
+        "name": "winners",
+        "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]

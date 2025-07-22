@@ -1,0 +1,72 @@
+specVersion: 0.0.4
+schema:
+    file: ./schema.graphql
+dataSources:
+    - kind: ethereum
+      name: Pool
+      network: base-sepolia
+      source:
+          address: '0x5C22662210E48D0f5614cACA6f7a6a938716Ea26'
+          abi: Pool
+          startBlock: 12000000 # Update with actual deployment block
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.6
+          language: wasm/assemblyscript
+          entities:
+              - Pool
+              - Participant
+              - Winner
+              - Sponsor
+              - PoolAdmin
+              - PoolDetail
+              - PoolBalance
+          eventHandlers:
+              # Core pool lifecycle events
+              - event: PoolCreated(uint256,indexed address,string,uint256,uint256,indexed address)
+                handler: handlePoolCreated
+              - event: PoolStatusChanged(uint256,uint8)
+                handler: handlePoolStatusChanged
+
+              # Participant events
+              - event: Deposit(uint256,indexed address,uint256)
+                handler: handleDeposit
+              - event: ExtraDeposit(uint256,indexed address,uint256)
+                handler: handleExtraDeposit
+              - event: Refund(uint256,indexed address,uint256)
+                handler: handleRefund
+              - event: ParticipantRemoved(uint256,indexed address)
+                handler: handleParticipantRemoved
+              - event: ParticipantRejoined(uint256,indexed address)
+                handler: handleParticipantRejoined
+
+              # Winner events
+              - event: WinnerSet(uint256,indexed address,uint256)
+                handler: handleWinnerSet
+              - event: WinningsClaimed(uint256,indexed address,uint256)
+                handler: handleWinningsClaimed
+              - event: WinningForfeited(uint256,indexed address,uint256)
+                handler: handleWinningForfeited
+
+              # Sponsor events
+              - event: SponsorshipAdded(uint256,indexed address,uint256)
+                handler: handleSponsorshipAdded
+
+              # Pool management events
+              - event: PoolNameChanged(uint256,string)
+                handler: handlePoolNameChanged
+              - event: PoolStartTimeChanged(uint256,uint256)
+                handler: handlePoolStartTimeChanged
+              - event: PoolEndTimeChanged(uint256,uint256)
+                handler: handlePoolEndTimeChanged
+              - event: PoolBalanceUpdated(uint256,uint256,uint256)
+                handler: handlePoolBalanceUpdated
+
+              # Fee events
+              - event: FeesCollected(uint256,indexed address,uint256)
+                handler: handleFeesCollected
+              - event: FeesCharged(uint256,indexed address,uint256)
+                handler: handleFeesCharged
+              - event: RemainingBalanceCollected(uint256,indexed address,uint256)
+                handler: handleRemainingBalanceCollected
+          file: ./src/pool.ts

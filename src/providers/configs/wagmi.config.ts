@@ -108,15 +108,10 @@ const getChainConfiguration = (): { chains: readonly [Chain, ...Chain[]]; defaul
     const network = env.NEXT_PUBLIC_NETWORK
 
     switch (network) {
-        case 'mainnet':
+        case 'production':
             return {
                 chains: [base] as const,
                 defaultChain: base,
-            }
-        case 'testnet':
-            return {
-                chains: [base, baseSepolia] as const,
-                defaultChain: baseSepolia,
             }
         case 'development':
             return {
@@ -190,6 +185,5 @@ export { defaultChain, chains as supportedChains }
 export const networkInfo = {
     current: env.NEXT_PUBLIC_NETWORK,
     isDevelopment: env.NODE_ENV === 'development',
-    isMainnet: env.NEXT_PUBLIC_NETWORK === 'mainnet',
-    isTestnet: env.NEXT_PUBLIC_NETWORK === 'testnet',
+    isProduction: env.NEXT_PUBLIC_NETWORK === 'production',
 }

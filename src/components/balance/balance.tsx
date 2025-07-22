@@ -1,6 +1,7 @@
 'use client'
 
 import { useNetworkValidation } from '@/hooks/use-network-validation'
+import { useSharedBalance } from '@/hooks/use-shared-balance'
 import { formatBalance } from '@/lib/utils/balance'
 import { cn } from '@/lib/utils/tailwind'
 import { tokenAddress } from '@/types/contracts'
@@ -62,28 +63,53 @@ export default function Balance({ color }: Props) {
         )
     }
 
-    const { data: balanceData, isLoading } = useBalance({
+    // Try to use shared balance first, fallback to individual useBalance if needed
+    const { usdc: sharedUsdc, canFetch: sharedCanFetch } = useSharedBalance('Balance')
+
+    // Only proceed with individual balance query if shared balance can't fetch
+    const canFetchBalance = Boolean(address && currentTokenAddress && isCorrectNetwork)
+    const shouldUseIndividualQuery = canFetchBalance && !sharedCanFetch
+
+    // Fallback individual balance query
+    const { data: individualBalanceData, isLoading: individualLoading } = useBalance({
         token: currentTokenAddress,
         address,
         query: {
-            staleTime: 60_000, // Consider data fresh for 1 minute
-            gcTime: 300_000, // Keep in cache for 5 minutes
+            staleTime: 60_000,
+            gcTime: 300_000,
             refetchOnWindowFocus: false,
             refetchOnMount: false,
-            refetchInterval: 30_000, // DISABLE automatic polling
-            // Only fetch balance if user is on the correct network
-            enabled: Boolean(address && currentTokenAddress && isCorrectNetwork),
+            refetchInterval: false,
+            enabled: shouldUseIndividualQuery,
         },
     })
 
+    // Use shared balance if available, otherwise use individual balance
+    const balanceData = sharedCanFetch ? sharedUsdc : individualBalanceData
+    const isLoading = sharedCanFetch ? sharedUsdc.isLoading : individualLoading
+
+    // Debug log only when actually making requests
+    if (process.env.NODE_ENV === 'development' && shouldUseIndividualQuery) {
+        console.log('[DEBUG][Balance] useBalance USDC (individual fallback)', {
+            address,
+            token: currentTokenAddress,
+            chainId: currentChainId,
+            isCorrectNetwork,
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
+
     // Format balance
-    const balance = balanceData
-        ? {
-              ...balanceData,
-              symbol: 'USDC',
-              ...formatBalance(balanceData.value, balanceData.decimals),
-          }
-        : zeroBalance
+    const balance =
+        balanceData && balanceData.value > 0
+            ? {
+                  value: balanceData.value,
+                  decimals: balanceData.decimals,
+                  symbol: 'USDC',
+                  ...formatBalance(balanceData.value, balanceData.decimals),
+              }
+            : zeroBalance
 
     // Auto-switch to correct network if user is on Base mainnet
     if (shouldShowWarning && currentChainId === 8453) {
@@ -95,8 +121,8 @@ export default function Balance({ color }: Props) {
     return (
         <div
             className={cn('flex items-baseline gap-2 text-[2.5rem] font-bold', color ? `text-${color}` : 'text-white')}>
-            {isLoading && <BalanceSkeleton />}
-            {!isLoading && (
+            {(!canFetchBalance || isLoading) && <BalanceSkeleton />}
+            {canFetchBalance && !isLoading && (
                 <EncryptText balance={balance} color={color} symbol={balance.symbol}>
                     <FormattedBalance
                         integerPart={balance.integerPart}

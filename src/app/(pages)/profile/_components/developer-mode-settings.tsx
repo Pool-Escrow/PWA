@@ -126,6 +126,17 @@ export function DeveloperModeSettings() {
                                 />
                             </div>
 
+                            <div className='flex items-center justify-between'>
+                                <Label htmlFor='show-debug-overlay' className='text-xs'>
+                                    Show debug overlay (request monitor)
+                                </Label>
+                                <Switch
+                                    id='show-debug-overlay'
+                                    checked={settings.showDebugOverlay}
+                                    onCheckedChange={() => handleToggleSetting('showDebugOverlay')}
+                                />
+                            </div>
+
                             {/* Pool visibility toggles */}
                             <div className='flex items-center justify-between'>
                                 <Label htmlFor='only-contract-pools' className='text-xs'>

@@ -4,22 +4,41 @@ import { Drawer } from '@/components/ui/drawer'
 import { currentTokenAddress } from '@/server/blockchain/server-config'
 import type { MoonpayCurrencyCode, MoonpayPaymentMethod } from '@privy-io/react-auth'
 import { useFundWallet, useWallets } from '@privy-io/react-auth'
+import type { Dispatch, SetStateAction } from 'react'
 import { useAccount, useBalance } from 'wagmi'
 
 interface OnRampDialogProps {
     open: boolean
-    setOpen: (open: boolean) => void
+    setOpen: Dispatch<SetStateAction<boolean>>
     amount?: string
 }
 
 const OnRampDialog = ({ open, setOpen, amount }: OnRampDialogProps) => {
     const { address } = useAccount()
+
+    // Only proceed with balance query if we have valid prerequisites
+    const canFetchBalance = Boolean(address && currentTokenAddress)
+
+    // Debug log for USDC balance request - only when we actually make the request
+    if (process.env.NODE_ENV === 'development' && canFetchBalance) {
+        console.log('[DEBUG][OnRampDialog] useBalance USDC', {
+            address,
+            token: currentTokenAddress,
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
+
     const { data: balance } = useBalance({
         token: currentTokenAddress,
         address,
         query: {
-            enabled: Boolean(address),
-            refetchInterval: 10_000, // 10 seconds
+            staleTime: 60_000, // Consider data fresh for 1 minute
+            gcTime: 300_000, // Keep in cache for 5 minutes
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchInterval: false, // ✅ DISABLED automatic polling to prevent excessive requests
+            enabled: canFetchBalance,
         },
     })
 

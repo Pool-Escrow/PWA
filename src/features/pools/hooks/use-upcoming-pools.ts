@@ -3,7 +3,8 @@
 import { POOLS_UPCOMING_KEY } from '@/hooks/query-keys'
 import type { PoolItem } from '@/lib/entities/models/pool-item'
 import { useDeveloperStore } from '@/stores/developer.store'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useChainId } from 'wagmi'
 
 interface PoolsQueryResult {
@@ -13,6 +14,8 @@ interface PoolsQueryResult {
         totalDbPools: number
         visiblePools: number
         syncedPools: number
+        fetchTime: number
+        cacheStatus: string
     }
 }
 
@@ -29,26 +32,126 @@ const fetchUpcomingPools = async (chainId?: number): Promise<PoolsQueryResult> =
     return (await response.json()) as PoolsQueryResult
 }
 
-export function useUpcomingPools(initialData: PoolsQueryResult) {
+export function useUpcomingPools(initialData?: PoolsQueryResult) {
     const chainId = useChainId()
     const { settings } = useDeveloperStore()
+    const queryClient = useQueryClient()
 
-    return useQuery<PoolsQueryResult, Error>({
-        queryKey: [POOLS_UPCOMING_KEY, chainId, settings.poolFilterMode],
+    // Memoized query key for stable references
+    const queryKey = useMemo(
+        () => [POOLS_UPCOMING_KEY, chainId, settings.poolFilterMode] as const,
+        [chainId, settings.poolFilterMode],
+    )
+
+    // Prefetch next likely queries for smoother UX
+    const prefetchRelatedQueries = useMemo(() => {
+        const prefetch = () => {
+            if (typeof window !== 'undefined' && chainId) {
+                // Only prefetch on client-side after initial load and with a valid chainId
+                setTimeout(() => {
+                    queryClient
+                        .prefetchQuery({
+                            queryKey: ['user-pools', chainId, 'upcoming'],
+                            queryFn: () =>
+                                fetch(`/api/pools/user-pools?status=upcoming&chainId=${chainId}`).then(res =>
+                                    res.json(),
+                                ),
+                            staleTime: 60_000, // 1 minute for user-specific data
+                        })
+                        .catch(() => {
+                            // Silent fail for prefetch
+                        })
+                }, 1000)
+            }
+        }
+        return prefetch
+    }, [queryClient, chainId])
+
+    const query = useQuery<PoolsQueryResult, Error>({
+        queryKey: [POOLS_UPCOMING_KEY, chainId, settings.poolFilterMode] as const,
         queryFn: () => fetchUpcomingPools(chainId),
         initialData: initialData,
+
+        // Performance optimizations
         staleTime: 30_000, // 30 seconds - pools don't change frequently
-        gcTime: 5 * 60 * 1000, // 5 minutes cache
-        refetchOnWindowFocus: true,
-        refetchOnMount: true,
-        refetchInterval: false, // No polling by default
+        gcTime: 5 * 60 * 1000, // 5 minutes cache retention
+        refetchOnWindowFocus: true, // Fresh data on tab focus
+        refetchOnMount: 'always', // Always get fresh data on mount
+        refetchInterval: false, // No automatic polling (user-triggered only)
+
+        // Smart retry logic based on error type
         retry: (failureCount, error) => {
-            if (failureCount >= 2) return false
-            if (error.message.includes('Failed to fetch')) return true
-            return false
+            // Don't retry on client errors (4xx)
+            if (error.message.includes('Rate limit') || error.message.includes('(4')) {
+                return false
+            }
+
+            // Retry network errors and server errors up to 2 times
+            if (error.message.includes('Network error') || error.message.includes('Server error')) {
+                return failureCount < 2
+            }
+
+            // Default: retry once for other errors
+            return failureCount < 1
         },
-        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+
+        // Exponential backoff with jitter for retries
+        retryDelay: attemptIndex => {
+            const baseDelay = Math.min(1000 * 2 ** attemptIndex, 30000)
+            const jitter = Math.random() * 0.1 * baseDelay
+            return baseDelay + jitter
+        },
+
+        // Enable background updates for better UX
+        refetchOnReconnect: true,
+
+        // Optimize for React 18 concurrent features
+        notifyOnChangeProps: ['data', 'error', 'isLoading'],
     })
+
+    // Trigger prefetch after successful data load
+    if (query.isSuccess && !query.isFetching) {
+        prefetchRelatedQueries()
+    }
+
+    // Enhanced debugging in development
+    if (process.env.NODE_ENV === 'development' && query.data?.metadata) {
+        const { metadata } = query.data
+
+        // Log performance metrics
+        if (metadata.fetchTime > 1000) {
+            console.warn('[useUpcomingPools] ⚠️ Slow query detected:', {
+                fetchTime: `${metadata.fetchTime}ms`,
+                chainId,
+                cacheStatus: metadata.cacheStatus,
+            })
+        }
+
+        // Log sync issues
+        if (metadata.totalContractPools > 0 && metadata.visiblePools === 0) {
+            console.warn('[useUpcomingPools] ⚠️ No visible pools detected:', {
+                contractPools: metadata.totalContractPools,
+                syncedPools: metadata.syncedPools,
+                visiblePools: metadata.visiblePools,
+            })
+        }
+    }
+
+    return {
+        ...query,
+        // Additional convenience properties
+        hasData: Boolean(query.data?.pools?.length),
+        isEmpty: query.isSuccess && (!query.data?.pools || query.data.pools.length === 0),
+        metadata: query.data?.metadata,
+
+        // Performance metrics for debugging
+        isStale: query.isStale,
+        isFetchedAfterMount: query.isFetchedAfterMount,
+
+        // Helper methods
+        invalidate: () => queryClient.invalidateQueries({ queryKey }),
+        refresh: () => queryClient.refetchQueries({ queryKey }),
+    }
 }
 
 // TODO: only load in developer mode or combine both hooks

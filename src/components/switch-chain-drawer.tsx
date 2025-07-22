@@ -9,7 +9,7 @@ import {
     DrawerTitle,
 } from '@/components/ui/drawer'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { Chain } from 'viem'
 import { base, baseSepolia } from 'viem/chains'
 import { useConfig, useSwitchChain } from 'wagmi'
@@ -60,15 +60,15 @@ export function SwitchChainDrawer({
     const [isLoading, setIsLoading] = useState(false)
 
     // Debug: Log the actual configured chains on mount (development only)
-    useEffect(() => {
-        if (process.env.NODE_ENV === 'development') {
-            console.log('[SwitchChainDrawer] Component mounted with config:', {
-                chains: config.chains.map(c => ({ id: c.id, name: c.name })),
-                targetChainId: targetChain.id,
-                isTargetInConfig: config.chains.some(c => c.id === targetChain.id),
-            })
-        }
-    }, [config, targetChain.id])
+    // useEffect(() => {
+    //     if (process.env.NODE_ENV === 'development') {
+    //         console.log('[SwitchChainDrawer] Component mounted with config:', {
+    //             chains: config.chains.map(c => ({ id: c.id, name: c.name })),
+    //             targetChainId: targetChain.id,
+    //             isTargetInConfig: config.chains.some(c => c.id === targetChain.id),
+    //         })
+    //     }
+    // }, [config, targetChain.id])
 
     const handleSwitchChain = () => {
         if (!targetChain) return
@@ -82,15 +82,15 @@ export function SwitchChainDrawer({
         // Pre-check: Ensure the target chain is available in the config
         const isChainAvailable = config.chains.some(c => c.id === targetChain.id)
 
-        console.log(`[SwitchChainDrawer] Attempting to switch to chain:`, {
-            chainId: targetChain.id,
-            chainName: getChainName(targetChain),
-            targetChain,
-            availableChainsInConfig: config.chains.map(c => ({ id: c.id, name: c.name })),
-            isChainAvailable,
-            configLoaded: !!config,
-            chainsLength: config.chains.length,
-        })
+        // console.log(`[SwitchChainDrawer] Attempting to switch to chain:`, {
+        //     chainId: targetChain.id,
+        //     chainName: getChainName(targetChain),
+        //     targetChain,
+        //     availableChainsInConfig: config.chains.map(c => ({ id: c.id, name: c.name })),
+        //     isChainAvailable,
+        //     configLoaded: !!config,
+        //     chainsLength: config.chains.length,
+        // })
 
         if (!isChainAvailable) {
             console.error(

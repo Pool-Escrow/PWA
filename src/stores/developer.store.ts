@@ -17,6 +17,7 @@ export interface DeveloperSettings {
     showDebugOptions: boolean
     showChainSelector: boolean
     showNetworkIndicator: boolean
+    showDebugOverlay: boolean
 
     // Pool visibility filters
     poolFilterMode: PoolFilterMode
@@ -48,6 +49,7 @@ const defaultSettings: DeveloperSettings = {
     showDebugOptions: true,
     showChainSelector: true,
     showNetworkIndicator: true,
+    showDebugOverlay: false, // Debug overlay off by default
     poolFilterMode: 'intersection',
     showContractPoolsOnly: false,
     showDatabasePoolsOnly: false,

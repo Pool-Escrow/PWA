@@ -41,7 +41,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             return NextResponse.json({ message: 'Invalid chainId' }, { status: 400 })
         }
 
-        const data = await getUserPools(userAddress, status, chainId)
+        const data = await getUserPools(userAddress, status)
 
         return NextResponse.json(data)
     } catch (error) {

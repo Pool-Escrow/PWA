@@ -33,14 +33,47 @@ export function usePoolActions({
     const { executeTransactions, isReady, resetConfirmation, result } = useTransactions()
     const { wallets } = useWallets()
     const { isStable: isWalletStable } = useWalletConnectionStatus()
+
+    // Get wallet address safely
+    const walletAddress = wallets[0]?.address as Address
+
+    // Only proceed with balance query if we have valid prerequisites
+    const canFetchBalance = Boolean(walletAddress && walletAddress !== '0x')
+
+    // Debug log for balance check - only when we actually make the request
+    if (process.env.NODE_ENV === 'development' && canFetchBalance) {
+        console.log('[DEBUG][usePoolActions] useReadContract balanceOf', {
+            address: walletAddress,
+            tokenAddress: currentTokenAddress,
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
+
     const { data: userBalance, error: balanceError } = useReadContract({
         address: currentTokenAddress,
         abi: tokenAbi,
         functionName: 'balanceOf',
-        args: [(wallets[0]?.address as Address) || '0x'],
+        args: [walletAddress || '0x'],
         query: {
-            enabled: Boolean(wallets[0]?.address),
-            refetchInterval: 5_000,
+            enabled: canFetchBalance,
+            staleTime: 60_000, // Consider data fresh for 1 minute
+            gcTime: 300_000, // Keep in cache for 5 minutes
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchInterval: false, // ✅ DISABLED automatic polling to prevent excessive requests
+            retry: (failureCount, error) => {
+                // Don't retry on 403 Forbidden errors or rate limit errors
+                if (
+                    error?.message?.includes('403') ||
+                    error?.message?.includes('Forbidden') ||
+                    error?.message?.includes('429') ||
+                    error?.message?.includes('rate limit')
+                ) {
+                    return false
+                }
+                return failureCount < 1
+            },
         },
     })
 

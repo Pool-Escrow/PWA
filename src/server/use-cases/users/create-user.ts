@@ -6,6 +6,8 @@ import { createUserInDb } from '../../persistence/users/db/create-db-user'
 interface UserInfo {
     walletAddress: Address
     role: 'admin' | 'user'
+    displayName?: string
+    avatar?: string
 }
 
 interface UserItem {

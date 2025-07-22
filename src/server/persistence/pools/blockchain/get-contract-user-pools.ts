@@ -45,6 +45,19 @@ export async function getUserPools(userAddress: Address, chainId?: number): Prom
         console.log(`[getUserPools] Using chain ${actualChainId}, user: ${userAddress}`)
     }
 
+    // Debug log for multicall (created/joined pools)
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[DEBUG][getUserPools] multicall (created/joined)', {
+            userAddress,
+            chainId: actualChainId,
+            contracts: [
+                { address: currentPoolAddress, fn: GetPoolsCreatedBy.name },
+                { address: currentPoolAddress, fn: GetPoolsJoinedBy.name },
+            ],
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
     const [createdPoolsResult, joinedPoolsResult] = await multicall(serverConfig, {
         // Specify the chainId to ensure we use the correct RPC endpoint
         chainId: actualChainId,
@@ -78,6 +91,17 @@ export async function getUserPools(userAddress: Address, chainId?: number): Prom
         return []
     }
 
+    // Debug log for multicall (pool details)
+    if (process.env.NODE_ENV === 'development') {
+        console.log('[DEBUG][getUserPools] multicall (pool details)', {
+            userAddress,
+            chainId: actualChainId,
+            numPools: allUserPools.length,
+            contracts: allUserPools.map(poolId => ({ address: currentPoolAddress, fn: GetAllPoolInfo.name, poolId })),
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
     const poolDetailsResults = await multicall(serverConfig, {
         // Specify the chainId to ensure we use the correct RPC endpoint
         chainId: actualChainId,

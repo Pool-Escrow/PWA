@@ -18,10 +18,11 @@ export default function RootLayout({ children, bottombar, modal, transactionprog
             <body className='flex min-h-dvh flex-col antialiased'>
                 <Providers cookie={wagmiCookie}>
                     <MainWrapper>{children}</MainWrapper>
-                    {modal}
-                    {bottombar}
-                    {transactionprogressmodal}
+                    {/* {modal} */}
+                    {/* {bottombar} */}
+                    {/* {transactionprogressmodal} */}
                     {/* <InstallPromptDrawer /> */}
+                    {/* <DebugOverlay /> */}
                 </Providers>
             </body>
         </html>

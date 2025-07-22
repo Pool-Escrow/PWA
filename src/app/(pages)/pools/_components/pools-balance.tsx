@@ -3,12 +3,8 @@
 import BalanceSkeleton from '@/components/balance/balance-skeleton'
 import EncryptText from '@/components/balance/encrypt-text'
 import FormattedBalance from '@/components/balance/formatted-balance'
-import { useNetworkValidation } from '@/hooks/use-network-validation'
+import { useSharedBalance } from '@/hooks/use-shared-balance'
 import { formatBalance } from '@/lib/utils/balance'
-import { dropTokenAddress, tokenAddress } from '@/types/contracts'
-import { usePrivy } from '@privy-io/react-auth'
-import type { Address } from 'viem'
-import { useBalance } from 'wagmi'
 
 // Default/fallback balances for each token
 const zeroUsdcbalance = {
@@ -37,97 +33,56 @@ const DropIcon = () => (
 )
 
 export default function PoolsBalance() {
-    const { user } = usePrivy()
-    const address = user?.wallet?.address as Address
-    const { currentChainId } = useNetworkValidation()
+    // Use shared balance hook to prevent duplicate requests
+    const { usdc, drop, isAnyLoading } = useSharedBalance('PoolsBalance')
 
-    // Get chain-specific token addresses
-    const currentTokenAddress = currentChainId
-        ? (tokenAddress[currentChainId as keyof typeof tokenAddress] as Address)
-        : undefined
-    const currentDropTokenAddress = currentChainId
-        ? (dropTokenAddress[currentChainId as keyof typeof dropTokenAddress] as Address)
-        : undefined
+    // Format balances using the existing formatBalance utility
+    const balance =
+        usdc.value > 0
+            ? {
+                  ...usdc,
+                  symbol: 'USDC',
+                  ...formatBalance(usdc.value, usdc.decimals),
+              }
+            : zeroUsdcbalance
 
-    const { data: balanceData, isLoading } = useBalance({
-        token: currentTokenAddress,
-        address,
-        query: {
-            staleTime: 60_000, // Consider data fresh for 1 minute
-            gcTime: 300_000, // Keep in cache for 5 minutes
-            refetchOnWindowFocus: false,
-            refetchOnMount: false,
-            refetchInterval: 30_000, // DISABLE automatic polling
-            // Only fetch if user is connected and the token address is valid
-            enabled: Boolean(address && currentTokenAddress),
-        },
-    })
-
-    const { data: dropBalanceData } = useBalance({
-        token: currentDropTokenAddress,
-        address,
-        query: {
-            staleTime: 60_000, // Consider data fresh for 1 minute
-            gcTime: 300_000, // Keep in cache for 5 minutes
-            refetchOnWindowFocus: false,
-            refetchOnMount: false,
-            refetchInterval: false, // DISABLE automatic polling
-            // Only fetch balance if user is on the correct network
-            enabled: Boolean(address && currentDropTokenAddress),
-        },
-    })
-
-    // Format balances
-    const balance = balanceData
-        ? {
-              ...balanceData,
-              symbol: 'USDC',
-              ...formatBalance(balanceData.value, balanceData.decimals),
-          }
-        : zeroUsdcbalance
-
-    const dropBalance = dropBalanceData
-        ? {
-              ...dropBalanceData,
-              symbol: 'DROP',
-              ...formatBalance(dropBalanceData.value, dropBalanceData.decimals),
-          }
-        : zeroDropBalance
+    const dropBalance =
+        drop.value > 0
+            ? {
+                  ...drop,
+                  symbol: 'DROP',
+                  ...formatBalance(drop.value, drop.decimals),
+              }
+            : zeroDropBalance
 
     return (
         <section className='flex flex-col gap-2'>
             <h1 className='text-sm font-medium text-white/80'>Total balance</h1>
             <div className='flex gap-2 text-[2.5rem] font-bold text-white'>
-                {isLoading && <BalanceSkeleton />}
-                {!isLoading && (
-                    <EncryptText balance={balance} color='white' symbol={balance.symbol}>
-                        <FormattedBalance
-                            integerPart={balance.integerPart}
-                            fractionalPart={balance.fractionalPart}
-                            symbol={balance.symbol}
-                        />
-                    </EncryptText>
-                )}
-            </div>
-            <div className='inline-flex w-fit items-center gap-2 rounded-full text-white'>
-                {isLoading && <BalanceSkeleton size='small' />}
-                {!isLoading && (
-                    <EncryptText
-                        balance={dropBalance}
-                        color='white'
-                        symbol={dropBalance.symbol}
-                        size='small'
-                        showCurrencySymbol={false}
-                        icon={<DropIcon />}>
-                        <FormattedBalance
-                            integerPart={dropBalance.integerPart}
-                            fractionalPart={dropBalance.fractionalPart}
-                            symbol={dropBalance.symbol}
-                            size='small'
-                            showCurrencySymbol={false}
-                            icon={<DropIcon />}
-                        />
-                    </EncryptText>
+                {/* Show loading skeleton if balances are not ready */}
+                {isAnyLoading ? (
+                    <BalanceSkeleton />
+                ) : (
+                    <>
+                        <EncryptText balance={balance} color='white' symbol={balance.symbol}>
+                            <FormattedBalance
+                                integerPart={balance.integerPart}
+                                fractionalPart={balance.fractionalPart}
+                                symbol={balance.symbol}
+                            />
+                        </EncryptText>
+                        <div className='text-xs text-white/60'>+</div>
+                        <div className='flex items-center gap-1'>
+                            <EncryptText balance={dropBalance} color='white' symbol={dropBalance.symbol}>
+                                <FormattedBalance
+                                    integerPart={dropBalance.integerPart}
+                                    fractionalPart={dropBalance.fractionalPart}
+                                    symbol={dropBalance.symbol}
+                                />
+                            </EncryptText>
+                            <DropIcon />
+                        </div>
+                    </>
                 )}
             </div>
         </section>

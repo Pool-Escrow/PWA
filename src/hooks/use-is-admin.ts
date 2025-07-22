@@ -1,7 +1,6 @@
 import { ROLES } from '@/server/persistence/users/blockchain/has-role'
 import { poolAbi } from '@/types/contracts'
 import { usePrivy } from '@privy-io/react-auth'
-import { useEffect, useState } from 'react'
 import type { Address } from 'viem'
 import { getAbiItem } from 'viem'
 import { useAccount, useReadContract } from 'wagmi'
@@ -16,31 +15,10 @@ export const useIsAdmin = () => {
     const { isConnected } = useAccount()
     const address = user?.wallet?.address as Address | undefined
     const { poolAddress, chainId } = useChainAwareContracts()
-    const [hasInitialized, setHasInitialized] = useState(false)
-
-    // Wait for everything to be properly initialized
-    useEffect(() => {
-        if (ready && authenticated && address && poolAddress && chainId) {
-            // Add a small delay to ensure wagmi is fully initialized
-            const timer = setTimeout(() => {
-                setHasInitialized(true)
-            }, 1000)
-            return () => clearTimeout(timer)
-        } else {
-            setHasInitialized(false)
-        }
-    }, [ready, authenticated, address, poolAddress, chainId])
 
     // Only make the contract call if we have all required data and are properly initialized
     const shouldQuery = Boolean(
-        hasInitialized &&
-            ready &&
-            authenticated &&
-            address &&
-            poolAddress &&
-            address !== '0x' &&
-            chainId &&
-            isConnected,
+        ready && authenticated && isConnected && address && poolAddress && address !== '0x' && chainId,
     )
 
     const {
@@ -60,7 +38,6 @@ export const useIsAdmin = () => {
             gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
             refetchInterval: false, // DISABLE automatic polling to prevent excessive RPC calls
             refetchOnWindowFocus: false, // Don't refetch on window focus
-            refetchOnMount: false, // Don't refetch if we have fresh data
             refetchOnReconnect: false, // Don't refetch on reconnect
             retry: (failureCount, error) => {
                 // Don't retry on 403 Forbidden errors or rate limit errors
@@ -88,7 +65,7 @@ export const useIsAdmin = () => {
             poolAddress,
             address,
             shouldQuery,
-            hasInitialized,
+            hasInitialized: true, // Deprecated, but keeping for now
             isConnected,
         })
     }
@@ -98,7 +75,7 @@ export const useIsAdmin = () => {
 
     return {
         isAdmin: finalIsAdmin,
-        isLoading: (isLoading && shouldQuery) || (!hasInitialized && authenticated),
+        isLoading: isLoading && shouldQuery,
         error: isError ? error : null,
         chainId,
         // Additional debug info
@@ -108,7 +85,7 @@ export const useIsAdmin = () => {
             hasPoolAddress: Boolean(poolAddress),
             isAuthenticated: authenticated,
             isReady: ready,
-            hasInitialized,
+            hasInitialized: true, // Deprecated, but keeping for now
             isConnected,
         },
     }

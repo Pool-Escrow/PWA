@@ -62,11 +62,36 @@ export default function useTransactions() {
 
     const paymasterRequestId = paymasterRequest?.id
 
+    // Debug log for calls status polling - only when we actually make the request
+    if (process.env.NODE_ENV === 'development' && paymasterRequestId) {
+        console.log('[DEBUG][useTransactions] useCallsStatus polling', {
+            paymasterRequestId,
+            stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+            timestamp: new Date().toISOString(),
+        })
+    }
+
     const { data: callsStatus } = useCallsStatus({
         id: paymasterRequestId ?? '',
         query: {
             enabled: Boolean(paymasterRequestId),
-            refetchInterval: data => ((data.state.data?.status as string) === 'CONFIRMED' ? false : 1000),
+            // Optimized polling: start with 2s intervals, stop when confirmed
+            refetchInterval: data => {
+                const status = data?.state.data?.status as string
+                if (status === 'CONFIRMED' || status === 'FAILED') {
+                    return false // Stop polling when transaction is final
+                }
+                return 2000 // Poll every 2 seconds instead of 1 second to reduce load
+            },
+            // Add retry logic for better reliability
+            retry: (failureCount, error) => {
+                if (error?.message?.includes('429') || error?.message?.includes('rate limit')) {
+                    return false
+                }
+                return failureCount < 2
+            },
+            staleTime: 0, // Always get fresh data for transaction status
+            gcTime: 60_000, // Keep in cache for 1 minute only
         },
     })
 

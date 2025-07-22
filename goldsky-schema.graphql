@@ -1,0 +1,201 @@
+type Pool @entity {
+    id: ID! # Pool ID from contract
+    host: Bytes! # Address of the pool host
+    name: String!
+    depositAmountPerPerson: BigInt!
+    penaltyFeeRate: BigInt!
+    token: Bytes! # Token contract address
+    # Pool details
+    timeStart: BigInt!
+    timeEnd: BigInt!
+    status: PoolStatus!
+
+    # Pool balance tracking
+    totalDeposits: BigInt!
+    feesAccumulated: BigInt!
+    feesCollected: BigInt!
+    balance: BigInt!
+    sponsored: BigInt!
+
+    # Relationships
+    participants: [Participant!]! @derivedFrom(field: "pool")
+    winners: [Winner!]! @derivedFrom(field: "pool")
+    sponsors: [Sponsor!]! @derivedFrom(field: "pool")
+
+    # Metadata
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+
+    # Update tracking
+    createdAt: BigInt!
+    updatedAt: BigInt!
+}
+
+enum PoolStatus {
+    INACTIVE
+    DEPOSIT_ENABLED
+    STARTED
+    ENDED
+    DELETED
+}
+
+type Participant @entity {
+    id: ID! # poolId-participantAddress
+    pool: Pool!
+    participant: Bytes! # Address
+    deposit: BigInt!
+    feesCharged: BigInt!
+    refunded: Boolean!
+    active: Boolean! # Whether still in pool
+    # Event tracking
+    joinedAt: BigInt!
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type Winner @entity {
+    id: ID! # poolId-winnerAddress
+    pool: Pool!
+    winner: Bytes! # Address
+    amountWon: BigInt!
+    amountClaimed: BigInt!
+    claimed: Boolean!
+    forfeited: Boolean!
+    timeWon: BigInt!
+
+    # Event tracking
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type Sponsor @entity {
+    id: ID! # poolId-sponsorAddress
+    pool: Pool!
+    sponsor: Bytes! # Address
+    name: String
+    amount: BigInt!
+
+    # Event tracking
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type PoolAdmin @entity {
+    id: ID! # Pool ID
+    pool: Pool!
+    host: Bytes!
+    penaltyFeeRate: BigInt!
+
+    # Update tracking
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type PoolDetail @entity {
+    id: ID! # Pool ID
+    pool: Pool!
+    timeStart: BigInt!
+    timeEnd: BigInt!
+    poolName: String!
+    depositAmountPerPerson: BigInt!
+
+    # Update tracking
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+type PoolBalance @entity {
+    id: ID! # Pool ID
+    pool: Pool!
+    totalDeposits: BigInt!
+    feesAccumulated: BigInt!
+    feesCollected: BigInt!
+    balance: BigInt!
+    sponsored: BigInt!
+
+    # Update tracking
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+}
+
+# Event entities for detailed tracking
+type PoolCreatedEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    host: Bytes!
+    poolName: String!
+    depositAmountPerPerson: BigInt!
+    penaltyFeeRate: BigInt!
+    token: Bytes!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}
+
+type DepositEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    participant: Bytes!
+    amount: BigInt!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}
+
+type RefundEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    participant: Bytes!
+    amount: BigInt!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}
+
+type WinnerSetEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    winner: Bytes!
+    amount: BigInt!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}
+
+type SponsorshipAddedEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    sponsor: Bytes!
+    amount: BigInt!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}
+
+type PoolStatusChangedEvent @entity {
+    id: ID! # Transaction hash + log index
+    poolId: BigInt!
+    status: PoolStatus!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+    transactionHash: Bytes!
+    logIndex: BigInt!
+}

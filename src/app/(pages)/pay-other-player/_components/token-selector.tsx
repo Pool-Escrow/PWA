@@ -8,7 +8,7 @@ import { useWallets } from '@privy-io/react-auth'
 import { getBalance } from '@wagmi/core'
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { Address } from 'viem'
 
 interface Token {
@@ -45,34 +45,67 @@ export default function TokenSelector({ onTokenSelect, onMaxClick }: TokenSelect
     const currentToken = tokens.find(t => t.address === selectedAddress) || tokens[0]
     const { wallets } = useWallets()
 
-    useEffect(() => {
-        const fetchBalance = async () => {
+    // Get wallet address safely
+    const walletAddress = wallets[0]?.address
+
+    const fetchBalances = useCallback(async () => {
+        // Guard: Only fetch if we have a valid wallet address
+        if (!walletAddress) {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[DEBUG][TokenSelector] Skipping balance fetch - no wallet address')
+            }
+            return
+        }
+
+        try {
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[DEBUG][TokenSelector] getBalance DROP', {
+                    address: walletAddress,
+                    token: dropTokenAddress[8453],
+                    chainId: 8453,
+                    stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+                    timestamp: new Date().toISOString(),
+                })
+            }
             const dropBalance = await getBalance(serverConfig, {
-                address: wallets[0].address as `0x${string}`,
+                address: walletAddress as `0x${string}`,
                 token: dropTokenAddress[8453],
             })
+
+            if (process.env.NODE_ENV === 'development') {
+                console.log('[DEBUG][TokenSelector] getBalance USDC', {
+                    address: walletAddress,
+                    token: currentTokenAddress,
+                    chainId: 8453,
+                    stack: new Error().stack?.split('\n').slice(1, 3).join(' | '),
+                    timestamp: new Date().toISOString(),
+                })
+            }
             const usdcBalance = await getBalance(serverConfig, {
-                address: wallets[0].address as `0x${string}`,
+                address: walletAddress as `0x${string}`,
                 token: currentTokenAddress,
             })
+
             console.log(dropBalance, usdcBalance)
-            return { dropBalance, usdcBalance }
+
+            const newTokens = initialTokens.map(token => ({
+                ...token,
+                balance: token.symbol === 'USDC' ? usdcBalance.formatted : dropBalance.formatted,
+            }))
+
+            setTokens(newTokens)
+            console.log(newTokens)
+        } catch (err) {
+            console.error('[TokenSelector] Error fetching balances:', err)
         }
-        fetchBalance()
-            .then(balances => {
-                console.log(balances)
-                const newTokens = tokens.map(token => {
-                    return {
-                        ...token,
-                        balance:
-                            token.symbol === 'USDC' ? balances.usdcBalance.formatted : balances.dropBalance.formatted,
-                    }
-                })
-                setTokens(newTokens)
-                console.log(newTokens)
-            })
-            .catch(err => console.log(err))
-    }, [selectedAddress, tokens, wallets])
+    }, [walletAddress])
+
+    // Only fetch balances when wallet address is available and changes
+    useEffect(() => {
+        if (walletAddress) {
+            void fetchBalances()
+        }
+    }, [walletAddress, fetchBalances])
 
     const handleTokenSelect = (address: Address) => {
         const token = tokens.find(t => t.address === address)
@@ -100,55 +133,55 @@ export default function TokenSelector({ onTokenSelect, onMaxClick }: TokenSelect
                                         alt={`${token.symbol} icon`}
                                         width={36}
                                         height={36}
-                                        className='size-9'
+                                        className='rounded-full'
                                     />
                                 </div>
-                                <div className='flex w-28 flex-col items-start'>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='text-[14px] font-semibold'>{token.symbol}</span>
+                                <div className='flex flex-1 items-center justify-between'>
+                                    <div className='flex flex-col'>
+                                        <span className='text-[16px] font-medium'>{token.symbol}</span>
                                     </div>
-                                    <span className='text-[12px] font-medium text-gray-500'>
-                                        {token.balance} available
-                                    </span>
+                                    <span className='text-[14px] text-gray-600'>{token.balance}</span>
                                 </div>
                             </Button>
                         ))}
                     </div>
                 )}
-                <div
+
+                <Button
                     onClick={() => setIsOpen(!isOpen)}
-                    className='flex h-16 w-full cursor-pointer items-center justify-between rounded-full border border-[#E5E7EB] bg-white px-[14px]'>
-                    <div className='flex items-center gap-3'>
+                    className='flex h-16 w-full items-center justify-between rounded-[32px] border border-[#E5E7EB] bg-white px-6 text-black hover:bg-gray-50 focus:bg-gray-50'>
+                    <div className='flex items-center space-x-3'>
                         <div className='flex size-9 items-center justify-center'>
                             <Image
                                 src={currentToken.icon}
                                 alt={`${currentToken.symbol} icon`}
                                 width={36}
                                 height={36}
-                                className='size-9'
+                                className='rounded-full'
                             />
                         </div>
-                        <div className='flex flex-col items-start'>
-                            <div className='flex items-center gap-2'>
-                                <span className='text-[14px] font-semibold'>{currentToken.symbol}</span>
-                                <ChevronDown
-                                    className={cn('h-4 w-4 transition-transform', isOpen ? 'rotate-180' : '')}
-                                />
-                            </div>
-                            <span className='text-[12px] font-medium text-gray-500'>
-                                {currentToken.balance} available
-                            </span>
+                        <div className='flex flex-col'>
+                            <span className='text-[16px] font-medium'>{currentToken.symbol}</span>
                         </div>
                     </div>
-                    <Button
-                        onClick={e => {
-                            e.stopPropagation()
-                            onMaxClick?.(currentToken.balance)
-                        }}
-                        className='rounded-full bg-[#F3F4F6] px-4 py-2 text-sm font-medium text-[#6993FF] hover:bg-[#F3F4F6] focus:bg-[#F3F4F6]'>
-                        Max
-                    </Button>
-                </div>
+                    <div className='flex items-center space-x-3'>
+                        <span className='text-[14px] text-gray-600'>{currentToken.balance}</span>
+                        <div className='flex items-center space-x-1'>
+                            <button
+                                type='button'
+                                onClick={e => {
+                                    e.stopPropagation()
+                                    onMaxClick?.(currentToken.balance)
+                                }}
+                                className='rounded-md bg-blue-100 px-2 py-1 text-xs text-blue-600 hover:bg-blue-200'>
+                                MAX
+                            </button>
+                            <ChevronDown
+                                className={cn('size-4 text-gray-400 transition-transform', isOpen && 'rotate-180')}
+                            />
+                        </div>
+                    </div>
+                </Button>
             </div>
         </div>
     )

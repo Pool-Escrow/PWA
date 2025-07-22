@@ -1,0 +1,151 @@
+version: 1
+
+sources:
+    - name: pool-subgraph
+      type: subgraph
+      subgraph_id: '${GOLDSKY_SUBGRAPH_ID}'
+
+sinks:
+    - name: neon-pools
+      type: postgres
+      connection_string: '${NEON_DATABASE_URL}'
+
+      # Enable automatic schema creation
+      auto_create_schema: true
+
+      # Configure conflict resolution
+      on_conflict:
+          - table: pools
+            constraint: pools_contract_id_key
+            action: update
+          - table: pool_participants
+            constraint: pool_participants_pkey
+            action: update
+          - table: pool_winners
+            constraint: pool_winners_pkey
+            action: update
+          - table: pool_sponsors
+            constraint: pool_sponsors_pkey
+            action: update
+
+transforms:
+    # Transform Pool entities to pools table
+    - name: pools-transform
+      sql: |
+          SELECT 
+            id::integer as contract_id,
+            name,
+            'Pool created from contract' as description,
+            depositAmountPerPerson::numeric / 1e18 as price,
+            1 as soft_cap, -- Default soft cap, will be updated via metadata
+            to_timestamp(timeStart) as start_date,
+            to_timestamp(timeEnd) as end_date,
+            token as token_address,
+            CASE 
+              WHEN status = 'INACTIVE' THEN 'inactive'
+              WHEN status = 'DEPOSIT_ENABLED' THEN 'depositsEnabled'
+              WHEN status = 'STARTED' THEN 'started'
+              WHEN status = 'ENDED' THEN 'ended'
+              WHEN status = 'DELETED' THEN 'deleted'
+              ELSE 'inactive'
+            END as status,
+            blockNumber as block_number,
+            transactionHash as transaction_hash,
+            0 as log_index,
+            NOW() as synced_at,
+            to_timestamp(createdAt) as created_at,
+            to_timestamp(updatedAt) as updated_at,
+            false as required_acceptance,
+            '' as banner_image,
+            '' as terms_url,
+            '' as code_of_conduct_url
+          FROM pool
+
+    # Transform Participant entities to pool_participants table
+    - name: participants-transform
+      sql: |
+          SELECT 
+            p.participant as user_address,
+            p.pool as pool_id,
+            'participant' as pool_role,
+            'joined' as status,
+            to_timestamp(p.joinedAt) as joined_at,
+            p.blockNumber as block_number,
+            p.transactionHash as transaction_hash,
+            0 as log_index
+          FROM participant p
+          WHERE p.active = true
+
+    # Transform Winner entities to pool_winners table
+    - name: winners-transform
+      sql: |
+          SELECT
+            w.pool as pool_id,
+            w.winner as winner_address,
+            w.amountWon::numeric / 1e18 as amount_won,
+            w.amountClaimed::numeric / 1e18 as amount_claimed,
+            w.claimed,
+            w.forfeited,
+            w.blockNumber as block_number,
+            w.transactionHash as transaction_hash,
+            0 as log_index
+          FROM winner w
+
+    # Transform Sponsor entities to pool_sponsors table
+    - name: sponsors-transform
+      sql: |
+          SELECT
+            s.pool as pool_id,
+            s.sponsor as sponsor_address,
+            s.name as sponsor_name,
+            s.amount::numeric / 1e18 as amount_sponsored,
+            s.blockNumber as block_number,
+            s.transactionHash as transaction_hash,
+            0 as log_index
+          FROM sponsor s
+
+# Webhook configuration for real-time updates
+webhook:
+    url: '${WEBHOOK_URL}/api/webhooks/goldsky'
+    secret: '${GOLDSKY_WEBHOOK_SECRET}'
+    events:
+        - table_changes
+        - sync_status
+
+    # Batch configuration for better performance
+    batch_size: 100
+    batch_timeout: 5s
+
+    # Retry configuration
+    retry:
+        max_attempts: 3
+        backoff: exponential
+        initial_delay: 1s
+        max_delay: 30s
+
+# Monitoring and alerting
+monitoring:
+    metrics:
+        enabled: true
+        port: 9090
+
+    alerts:
+        - name: sync_lag
+          condition: 'sync_lag > 30s'
+          severity: warning
+        - name: error_rate
+          condition: 'error_rate > 0.01'
+          severity: critical
+
+# Performance tuning
+performance:
+    # Buffer size for batch processing
+    buffer_size: 1000
+
+    # Connection pool settings
+    pool_size: 10
+    pool_timeout: 30s
+
+    # Sync settings
+    sync_interval: 1s
+    backfill_batch_size: 10000

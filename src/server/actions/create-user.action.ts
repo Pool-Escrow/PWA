@@ -10,11 +10,23 @@ export const createUserAction = authenticatedProcedure.createServerAction().hand
     if (!walletAddress) {
         throw new Error('User does not have a wallet address')
     }
+
+    const displayName =
+        user.google?.name ||
+        user.twitter?.name ||
+        user.discord?.username ||
+        user.github?.name ||
+        user.email?.address.split('@')[0]
+
+    const avatar = user.twitter?.profilePictureUrl
+
     await createProfileUseCase({
         privyId: user.id,
         info: {
             walletAddress,
             role: (await isAdminUseCase(walletAddress)) ? 'admin' : 'user',
+            displayName,
+            avatar: avatar || undefined,
         },
     })
 })
