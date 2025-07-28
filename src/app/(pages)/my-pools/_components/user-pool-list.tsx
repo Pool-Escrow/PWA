@@ -1,7 +1,7 @@
 'use client'
 
+import PoolListCard from '@/features/pools/components/pool-list-card'
 import type { PoolItem } from '@/lib/entities/models/pool-item'
-import PoolListCard from '../../pools/_components/pool-list-card'
 
 const poolMessages = {
     upcoming: {

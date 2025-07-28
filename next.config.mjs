@@ -13,18 +13,13 @@ const baseConfig = {
     // compiler: config.compiler,
     // eslint: { ignoreDuringBuilds: true },
     // optimizeCss: true,
-    experimental: {
-        // ...config.experimental,
-        // Exclude native modules from bundling to prevent "Failed to load bindings" warnings
-        // See: https://bgenc.net/2023.08.13.nextjs-bindings-cannot-read-property-indexof-undefined-getfilename/
-        serverComponentsExternalPackages: [
-            'bigint-buffer',
-            //     'keccak',
-            //     'secp256k1',
-            //     '@solana/buffer-layout-utils',
-            //     '@coinbase/wallet-sdk',
-        ],
-    },
+    serverExternalPackages: [
+        'bigint-buffer',
+        //     'keccak',
+        //     'secp256k1',
+        //     '@solana/buffer-layout-utils',
+        //     '@coinbase/wallet-sdk',
+    ],
     // headers: config.security,
     images: config.images,
     // reactStrictMode: true,
