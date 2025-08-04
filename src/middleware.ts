@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { verifyToken } from '@/app/_server/auth/privy'
+import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
 export async function middleware(request: NextRequest) {
     // Check if the route is /my-pools
@@ -11,7 +12,14 @@ export async function middleware(request: NextRequest) {
             if (!user) {
                 return NextResponse.redirect(new URL('/', request.url))
             }
-        } catch (error) {
+        } catch (error: unknown) {
+            console.error(
+                '\x1b[35m[middleware]\x1b[0m',
+                '🦩\t',
+                '\x1b[36m' + request.nextUrl.pathname + '\x1b[0m',
+                'Error verifying token:',
+                error,
+            )
             // If there's an error verifying the token, redirect to the main page
             return NextResponse.redirect(new URL('/', request.url))
         }
