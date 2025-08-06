@@ -1,0 +1,3 @@
+- typescript needs to be 5.8.3, because some eslint rules are not compatible with 5.9.x yet (better tailwind or antfu eslint config)
+- antfu eslint config es only patched for 5.1.0, because 5.2.0 is not compatible with 5.8.3
+- node and node types, fixed to 22.17.0 currently
