@@ -1,41 +1,116 @@
-import { verifyToken } from '@/app/_server/auth/privy'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-    // Check if the route is /my-pools
-    if (request.nextUrl.pathname === '/my-pools') {
-        try {
-            const user = await verifyToken()
+export function middleware(request: NextRequest) {
+  // Handle Privy's cross-origin policy checks
+  if (request.nextUrl.pathname.includes('checkCrossOriginOpenerPolicy')) {
+    return new NextResponse('// Cross-origin policy check handled', {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/javascript',
+        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+        'Cross-Origin-Embedder-Policy': 'unsafe-none',
+      },
+    })
+  }
 
-            // If no user is found, redirect to the main page
-            if (!user) {
-                return NextResponse.redirect(new URL('/', request.url))
-            }
-        } catch (error: unknown) {
-            console.error(
-                '\x1b[35m[middleware]\x1b[0m',
-                '🦩\t',
-                '\x1b[36m' + request.nextUrl.pathname + '\x1b[0m',
-                'Error verifying token:',
-                error,
-            )
-            // If there's an error verifying the token, redirect to the main page
-            return NextResponse.redirect(new URL('/', request.url))
-        }
-    }
+  // Skip CSP for proxy routes
+  if (request.nextUrl.pathname.startsWith('/api/proxy/')) {
+    return NextResponse.next()
+  }
 
-    const response = NextResponse.next()
+  const isDev = process.env.NODE_ENV === 'development'
+  const isTest = process.env.NEXT_DISABLE_CSP === 'true'
 
-    console.info('\x1b[35m[middleware]\x1b[0m', '🦩\t', '\x1b[36m' + request.nextUrl.pathname + '\x1b[0m')
+  // Define external domains
+  const privyDomains = 'https://auth.privy.io'
+  const walletConnectDomains
+        = 'https://pulse.walletconnect.org https://rpc.walletconnect.org https://relay.walletconnect.org https://registry.walletconnect.org https://explorer.walletconnect.org https://explorer-api.walletconnect.com'
+  const web3ModalDomains = 'https://api.web3modal.org https://cloud.web3modal.org'
+  const googleFonts = 'https://fonts.googleapis.com https://fonts.gstatic.com'
+  const goldSkyDomains = 'https://api.goldsky.com'
 
-    response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload')
-    response.headers.set('X-XSS-Protection', '1; mode=block')
+  // Common CSS hashes for Next.js inline styles
+  // const commonStyleHashes = Object.values(COMMON_NEXTJS_STYLE_HASHES).join(' ')
 
-    return response
+  // Very permissive CSP for tests, more permissive for development, strict for production
+  const cspHeader = isTest
+    ? `
+    default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *;
+    style-src 'self' 'unsafe-inline' 'unsafe-hashes' data: blob: *;
+    img-src 'self' 'unsafe-inline' data: blob: *;
+    font-src 'self' 'unsafe-inline' data: blob: *;
+    connect-src 'self' 'unsafe-inline' data: blob: *;
+    frame-src 'self' 'unsafe-inline' data: blob: *;
+    worker-src 'self' 'unsafe-inline' data: blob: *;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+`
+    : isDev
+      ? `
+    default-src 'self';
+    script-src 'self' 'unsafe-eval' 'unsafe-inline' ${privyDomains} ${walletConnectDomains} ${web3ModalDomains};
+    style-src 'self' 'unsafe-inline' ${privyDomains} data: 'unsafe-hashes' ${googleFonts};
+    img-src 'self' blob: data: https: http: ${privyDomains};
+    font-src 'self' data: ${privyDomains} ${googleFonts};
+    connect-src 'self' ${privyDomains} ${walletConnectDomains} ${web3ModalDomains} ${goldSkyDomains} wss: ws: localhost:* 127.0.0.1:*;
+    frame-src 'self' ${privyDomains};
+    worker-src 'self' blob:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+`
+      : `
+    default-src 'self';
+    script-src 'self' 'strict-dynamic' ${privyDomains};
+    style-src 'self' ${privyDomains} 'unsafe-hashes' ${googleFonts};
+    img-src 'self' blob: data: ${privyDomains};
+    font-src 'self' ${privyDomains} ${googleFonts};
+    connect-src 'self' ${privyDomains} ${walletConnectDomains} ${web3ModalDomains} ${goldSkyDomains};
+    frame-src 'self' ${privyDomains};
+    worker-src 'self' blob:;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+`
+
+  // Replace newline characters and spaces
+  const contentSecurityPolicyHeaderValue = cspHeader.replace(/\s{2,}/g, ' ').trim()
+
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('Content-Security-Policy', contentSecurityPolicyHeaderValue)
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+  response.headers.set('Content-Security-Policy', contentSecurityPolicyHeaderValue)
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups')
+  response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none')
+
+  return response
 }
 
 export const config = {
-    // matcher: '/disabled',
-    matcher: ['/((?!api|_next|static|public|favicon.ico|app/assets).*)', '/my-pools'],
+  matcher: [
+    /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next/static (static files)
+         * - _next/image (image optimization files)
+         * - favicon.ico (favicon file)
+         */
+    {
+      source: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+      missing: [{ type: 'header', key: 'next-router-prefetch' }, { type: 'header', key: 'purpose', value: 'prefetch' }],
+    },
+  ],
 }
