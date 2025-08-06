@@ -1,29 +1,6 @@
-# Generated via Next.js
-.next
-
-# Generated via Node.js
-node_modules
-
-# Generated via next-pwa
-**/public/workbox**
-**/public/sw**
-
-# System
 .DS_Store
-
-# Environment
-.env.*
-env.*
-!.env.example
-info.md
-
-# Vercel
-.vercel
-certificates
-
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
 .env
+.next
+node_modules
+tsconfig.tsbuildinfo
+old
