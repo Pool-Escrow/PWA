@@ -1,79 +1,79 @@
 name: 🐞 Bug Report
 description: File a bug report
 title: 'bug: '
-labels: ['bug', 'triage']
+labels: [bug, triage]
 body:
-    - type: markdown
-      attributes:
-          value: |
-              Thanks for taking the time to fill out this bug report! Let's make our app better together! 🚀
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Let's make our app better together! 🚀
 
-              Before submitting, please ensure you've searched for existing issues to avoid duplication.
+        Before submitting, please ensure you've searched for existing issues to avoid duplication.
 
-    - type: input
-      id: user-story
-      attributes:
-          label: 👤 User Story
-          description: Describe the issue from a user's perspective.
-          placeholder: As a [type of user], I want [goal] so that [reason].
+  - type: input
+    id: user-story
+    attributes:
+      label: 👤 User Story
+      description: Describe the issue from a user's perspective.
+      placeholder: As a [type of user], I want [goal] so that [reason].
 
-    - type: textarea
-      id: description
-      attributes:
-          label: 📝 Bug Description
-          description: Provide a clear, objective description of the bug. Avoid speculation about the cause.
-          placeholder: When I do X, Y happens instead of Z...
-      validations:
-          required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Bug Description
+      description: Provide a clear, objective description of the bug. Avoid speculation about the cause.
+      placeholder: When I do X, Y happens instead of Z...
+    validations:
+      required: true
 
-    - type: textarea
-      id: reproduction-steps
-      attributes:
-          label: 🔄 Steps to Reproduce
-          description: Provide detailed, minimal steps to reproduce the issue. Be as specific as possible.
-          placeholder: |
-              1. Go to '...'
-              2. Enter 'specific text' in '...'
-              3. Click on '....'
-              4. Observe the error
-      validations:
-          required: true
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: 🔄 Steps to Reproduce
+      description: Provide detailed, minimal steps to reproduce the issue. Be as specific as possible.
+      placeholder: |
+        1. Go to '...'
+        2. Enter 'specific text' in '...'
+        3. Click on '....'
+        4. Observe the error
+    validations:
+      required: true
 
-    - type: textarea
-      id: expected-behavior
-      attributes:
-          label: 🎯 Expected Behavior
-          description: Clearly describe what you expected to happen.
-      validations:
-          required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 🎯 Expected Behavior
+      description: Clearly describe what you expected to happen.
+    validations:
+      required: true
 
-    - type: textarea
-      id: screenshots
-      attributes:
-          label: 📸 Screenshots or GIFs
-          description: If applicable, add screenshots or GIFs to help explain your problem. You can drag and drop images here.
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots or GIFs
+      description: If applicable, add screenshots or GIFs to help explain your problem. You can drag and drop images here.
 
-    - type: textarea
-      id: additional-context
-      attributes:
-          label: 📘 Additional Context
-          description: Add any other context about the problem here, including any investigation you've done (e.g., console errors, network traffic issues).
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: 📘 Additional Context
+      description: Add any other context about the problem here, including any investigation you've done (e.g., console errors, network traffic issues).
 
-    - type: input
-      id: related-issues
-      attributes:
-          label: 🔗 Related Issues
-          description: Link any related issues here.
-          placeholder: '#123, #456'
+  - type: input
+    id: related-issues
+    attributes:
+      label: 🔗 Related Issues
+      description: Link any related issues here.
+      placeholder: '#123, #456'
 
-    - type: input
-      id: mention
-      attributes:
-          label: 👥 Mention
-          description: Tag anyone who should be alerted about this issue.
-          placeholder: '@username1, @username2'
+  - type: input
+    id: mention
+    attributes:
+      label: 👥 Mention
+      description: Tag anyone who should be alerted about this issue.
+      placeholder: '@username1, @username2'
 
-    - type: markdown
-      attributes:
-          value: |
-              Thanks for completing this bug report! We'll investigate and get back to you as soon as possible. 🙏
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for completing this bug report! We'll investigate and get back to you as soon as possible. 🙏
