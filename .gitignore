@@ -1,6 +1,7 @@
 .DS_Store
 .env
 .next
+.turbo
 node_modules
-tsconfig.tsbuildinfo
 old
+tsconfig.tsbuildinfo
