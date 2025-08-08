@@ -17,7 +17,7 @@ export default function OnboardingScreen() {
 
   const handleNext = () => {
     if (isLastStep) {
-      void setCompleted().then(() => router.push('/app'))
+      void setCompleted().then(() => router.refresh())
     }
     else {
       setCurrentStep(currentStep + 1)
