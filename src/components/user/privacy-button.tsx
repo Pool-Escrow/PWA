@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Icons } from '@/components/ui/icons'
+import Icon from '@/components/ui/icon'
 import usePrivacy from '@/hooks/use-privacy'
 
 export default function PrivacyButton() {
@@ -16,13 +16,7 @@ export default function PrivacyButton() {
         void toggle()
       }}
     >
-      {hidden
-        ? (
-            <Icons.eyeOff className="size-6" />
-          )
-        : (
-            <Icons.eye className="size-6" />
-          )}
+      {hidden ? <Icon.eyeOff /> : <Icon.eye />}
     </Button>
   )
 }
