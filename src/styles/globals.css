@@ -159,7 +159,12 @@
   }
 
   number-flow-react::part(suffix) {
-    font-size: 1.125rem;
+    font-size: 0.875rem;
+    font-weight: bold;
     margin-left: 0.25rem;
+  }
+
+  number-flow-react::part(fraction-digit) {
+    font-size: 1rem;
   }
 }

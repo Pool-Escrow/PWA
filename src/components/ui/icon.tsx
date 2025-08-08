@@ -3,26 +3,25 @@ import { cn } from '@/lib/utils/tailwind'
 
 // get the colection/icon names to alias from https://icones.js.org/
 const ICON_MAP = {
+
   arrowLeft: 'lucide:arrow-left',
   chevronLeft: 'lucide:chevron-left',
   chevronRight: 'lucide:chevron-right',
   close: 'lucide:x',
   delete: 'lucide:trash-2',
+  drop: 'ic:sharp-water-drop',
   edit: 'lucide:pencil',
-  eyeOff: 'lucide:eye-off',
+  eye: 'mdi:eye',
+  eyeOff: 'mdi:eye-off',
   loading: 'lucide:loader-circle',
   minus: 'lucide:minus',
   plus: 'lucide:plus',
+  qr: 'fluent:qr-code-24-filled',
   search: 'lucide:search',
   spinner: 'lucide:loader',
-
-  eye: 'lucide:eye',
-  drop: 'ic:sharp-water-drop',
-  qr: 'fluent:qr-code-24-filled',
+  swap: 'jam:refresh',
   wallet: 'fluent:wallet-24-filled',
-  swap: 'jam:refresh', // 'iconamoon:synchronize-fill',
   withdraw: 'fluent:share-24-filled',
-  usdc: 'token:usdc',
 } satisfies Record<string, string>
 
 export interface StaticIconProps {

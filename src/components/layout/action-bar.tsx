@@ -2,12 +2,11 @@
 
 import type { MoonpayCurrencyCode, MoonpayPaymentMethod } from '@privy-io/react-auth'
 import type { StaticIconProps } from '@/components/ui/icon'
-import { useFundWallet, useWallets } from '@privy-io/react-auth'
+import { useFundWallet, usePrivy, useWallets } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import Icon from '@/components/ui/icon'
-import { useAuth } from '@/hooks/use-auth'
 
 interface ActionItem {
   id: string
@@ -19,7 +18,7 @@ interface ActionItem {
 
 export default function ActionBar() {
   const router = useRouter()
-  const { login, authenticated } = useAuth()
+  const { login, authenticated } = usePrivy()
   const { fundWallet } = useFundWallet()
   const { wallets } = useWallets()
 
@@ -36,7 +35,6 @@ export default function ActionBar() {
       currencyCode: 'USDC_BASE' as MoonpayCurrencyCode,
       quoteCurrencyAmount: 10,
       paymentMethod: 'credit_debit_card' as MoonpayPaymentMethod,
-      uiConfig: { accentColor: '#f00' },
     }
     if (!authenticated) {
       login()
@@ -96,7 +94,7 @@ export default function ActionBar() {
     <div className="short-dividers my-7 flex w-full">
       {actions.map(action => (
         <Button
-          variant="link"
+          variant="ghost"
           key={action.id}
           onClick={action.onClick}
           className={`

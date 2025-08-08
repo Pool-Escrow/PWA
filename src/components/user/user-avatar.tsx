@@ -13,7 +13,7 @@ export default function UserAvatar() {
   }
 
   if (user?.address == null) {
-    return <div className="size-8 animate-pulse rounded-full bg-gray-200" />
+    return null
   }
 
   const address = user.address
