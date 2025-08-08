@@ -8,7 +8,7 @@ export default antfu(
     typescript: { tsconfigPath: './config/tsconfig.eslint.json' },
     react: true,
     nextjs: true,
-    ignores: ['contracts/*', 'old/*', 'src/lib/icons/bundle.json'],
+    ignores: ['contracts/*', 'old/*'],
     formatters: {
       css: true,
       html: true,
@@ -17,6 +17,7 @@ export default antfu(
     },
     rules: {
       'n/prefer-global/process': ['error', 'always'],
+      'unicorn/prefer-node-protocol': 'off',
     },
   },
 
@@ -37,6 +38,14 @@ export default antfu(
       'better-tailwindcss': {
         entryPoint: 'src/styles/globals.css',
       },
+    },
+  },
+
+  // 🟢 Disable rules for Markdown
+  {
+    files: ['**/*.md'],
+    rules: {
+      'import/first': 'off',
     },
   },
 )

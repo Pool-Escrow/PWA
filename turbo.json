@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["generate:icons"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "dev:next": {
+      "dependsOn": ["generate:icons"],
+      "cache": false,
+      "persistent": true
+    },
+    "generate:icons": {
+      "inputs": ["scripts/generate-icon-assets.ts", "src/components/ui/icon.tsx"],
+      "outputs": ["public/icons/sprite.svg", ".next/icons-hash.txt"]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "typecheck": {
+      "outputs": []
+    }
+  }
+}

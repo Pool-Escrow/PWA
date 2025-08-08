@@ -1,48 +1,58 @@
-import iconBundle from '@/lib/icons/bundle.json'
+import React from 'react'
 import { cn } from '@/lib/utils/tailwind'
 
-interface IconProps {
-  name: string
-  size?: string | number
+// get the colection/icon names to alias from https://icones.js.org/
+const ICON_MAP = {
+  arrowLeft: 'lucide:arrow-left',
+  chevronLeft: 'lucide:chevron-left',
+  chevronRight: 'lucide:chevron-right',
+  close: 'lucide:x',
+  delete: 'lucide:trash-2',
+  edit: 'lucide:pencil',
+  eyeOff: 'lucide:eye-off',
+  loading: 'lucide:loader-circle',
+  minus: 'lucide:minus',
+  plus: 'lucide:plus',
+  search: 'lucide:search',
+  spinner: 'lucide:loader',
+
+  eye: 'lucide:eye',
+  drop: 'ic:sharp-water-drop',
+  qr: 'fluent:qr-code-24-filled',
+  wallet: 'fluent:wallet-24-filled',
+  swap: 'jam:refresh', // 'iconamoon:synchronize-fill',
+  withdraw: 'fluent:share-24-filled',
+  usdc: 'token:usdc',
+} satisfies Record<string, string>
+
+export interface StaticIconProps {
   className?: string
-  color?: string
-  [key: string]: unknown
 }
 
-interface IconData {
-  body: string
-  viewBox: string
+// Base Icon component for rendering sprites
+function BaseIcon({ name, className }: { name: keyof typeof ICON_MAP, className?: string }) {
+  const iconName = ICON_MAP[name]
+
+  return (
+    <svg
+      className={cn('inline-block size-[1em] text-white', className)}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <use href={`/icons/sprite.svg#${iconName}`} />
+    </svg>
+  )
 }
 
-function Icon({ ref, name, size = 24, className, color = 'white', ...props }: IconProps & { ref?: React.RefObject<SVGSVGElement | null> }) {
-  // Always use local bundle for consistency and to avoid CSP issues
-  try {
-    const iconData = iconBundle[name as keyof typeof iconBundle] as IconData
-    if (iconData == null) {
-      console.warn(`Icon not found: ${name}`)
-      return <div className={cn('inline-block', className as string)} style={{ width: size, height: size }} />
-    }
-
-    return (
-      <svg
-        ref={ref}
-        width={size}
-        height={size}
-        viewBox={iconData.viewBox}
-        className={cn('inline-block', className as string)}
-        style={{ color }}
-        {...props}
-        // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml
-        dangerouslySetInnerHTML={{ __html: iconData.body }}
-      />
-    )
-  }
-  catch (error) {
-    console.warn(`Failed to load icon: ${name}`, error)
-    return <div className={cn('inline-block', className as string)} style={{ width: size, height: size }} />
-  }
+// Main Icon component with static properties
+const Icon = {} as {
+  [K in keyof typeof ICON_MAP]: (props?: StaticIconProps) => React.JSX.Element
 }
 
-Icon.displayName = 'Icon'
+// Add static properties for each icon
+Object.keys(ICON_MAP).forEach((iconKey) => {
+  const key = iconKey as keyof typeof ICON_MAP
+  Icon[key] = (props?: StaticIconProps) => <BaseIcon name={key} {...props} />
+})
 
-export { Icon }
+export default Icon

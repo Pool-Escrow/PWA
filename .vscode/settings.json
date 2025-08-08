@@ -103,5 +103,8 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
+  },
+
+  // iconify
+  "iconify.inplace": false
 }

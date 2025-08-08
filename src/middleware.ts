@@ -14,6 +14,22 @@ export function middleware(request: NextRequest) {
     })
   }
 
+  // Handle SVG sprite with cache-busting headers
+  if (request.nextUrl.pathname === '/icons/sprite.svg') {
+    const response = NextResponse.next()
+
+    // Force cache invalidation for SVG sprites
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+
+    // Add ETag based on file modification time for better cache control
+    const etag = `"sprite-${Date.now()}"`
+    response.headers.set('ETag', etag)
+
+    return response
+  }
+
   // Skip CSP for proxy routes
   if (request.nextUrl.pathname.startsWith('/api/proxy/')) {
     return NextResponse.next()

@@ -9,19 +9,27 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
   },
-  // currently only development
-  turbopack: {
-    resolveAlias: {
-      '@/lib/icons/bundle.json': './src/lib/icons/bundle.json',
-    },
-  },
-  // for production builds
-  webpack: (config: { resolve: { alias: Record<string, string> } }) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@/lib/icons/bundle.json': './src/lib/icons/bundle.json',
-    }
-    return config
+
+  async headers() {
+    return [
+      {
+        source: '/icons/sprite.svg',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+        ],
+      },
+    ]
   },
 }
 
