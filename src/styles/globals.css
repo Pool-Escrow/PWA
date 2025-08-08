@@ -49,6 +49,9 @@
   /* custom colors */
   --color-pool-blue: oklch(60.309% 0.19571 263.415);
   --color-pool-blue-active: oklch(54.794% 0.18878 263.918);
+
+  /* custom font sizes */
+  --text-2xs: 0.625rem;
 }
 
 :root {
@@ -149,5 +152,14 @@
 
   .dropdown-backdrop {
     @apply fixed left-0 top-0 z-50 h-full w-full bg-white/30 backdrop-blur-sm;
+  }
+
+  .short-dividers {
+    @apply [&>*:not(:last-child)]:after:content-[''] [&>*:not(:last-child)]:after:absolute [&>*:not(:last-child)]:after:top-[20%] [&>*:not(:last-child)]:after:right-0 [&>*:not(:last-child)]:after:h-[50%] [&>*:not(:last-child)]:after:w-px [&>*:not(:last-child)]:after:bg-white/50;
+  }
+
+  number-flow-react::part(suffix) {
+    font-size: 1.125rem;
+    margin-left: 0.25rem;
   }
 }
