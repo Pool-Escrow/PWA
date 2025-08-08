@@ -14,14 +14,13 @@ export default function UserBalances() {
         <NumberFlow
           className="text-2xl font-medium"
           value={usdc.balance}
-          // trend={0}
           format={{
             currency: 'USD',
             useGrouping: false,
             style: 'currency',
           }}
           suffix="USDC"
-          isolate
+          isolate={false}
         />
       </span>
 
@@ -30,7 +29,7 @@ export default function UserBalances() {
         <span>Drop Tokens:</span>
         <NumberFlow
           className="text-sm"
-          isolate
+          isolate={false}
           value={drop.balance}
           format={{
             useGrouping: false,
