@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '../ui/button'
-import UserBalance from './user-balance'
+import UserBalances from './user-balances'
 
 type UserProfileData = App.User & {
   joinedDate: string
@@ -100,7 +100,7 @@ export default function UserProfile({ address }: UserProfileProps) {
       <div className="rounded-lg bg-blue-50 p-4">
         <h2 className="text-lg font-semibold text-gray-900">Total Balance</h2>
         <div className="mt-2">
-          <UserBalance address={address} />
+          <UserBalances />
         </div>
       </div>
 
