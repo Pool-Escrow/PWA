@@ -1,6 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback, HeaderSkeleton, HeroSkeleton, PageSkeleton } from '../ui/skeletons'
@@ -24,13 +25,16 @@ export function AppShell({ children, header, hero, bottom, loading, error }: App
   const renderHeader = () => {
     if (!header)
       return null
+
+    const { className: headerClassName, ...headerProps } = header
+
     return (
       <Suspense fallback={<HeaderSkeleton />}>
         <Header
-          {...header}
+          {...headerProps}
           className={`
             ${hero != null && 'shadow-none'}
-            ${header.className}
+            ${headerClassName}
           `}
         />
       </Suspense>
@@ -62,10 +66,33 @@ export function AppShell({ children, header, hero, bottom, loading, error }: App
           <Suspense fallback={loading != null ? loading : <PageSkeleton />}>{children}</Suspense>
         </main>
 
-        {bottom != null && (
+        {/* {bottom != null && (
           <div className="fixed right-0 bottom-0 left-0 z-50 mb-safe-or-4 border-t border-gray-200 bg-white p-4">
             {bottom}
           </div>
+        )} */}
+
+        {bottom != null && (
+          <AnimatePresence presenceAffectsLayout>
+            <motion.footer
+              initial={{ opacity: 0.7, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0.7, y: 100 }}
+              transition={{
+                duration: 0.2,
+                ease: 'easeInOut',
+              }}
+              className="fixed bottom-0 left-0 z-30 w-full"
+            >
+              <nav className={`
+                mx-auto flex h-24 max-w-screen-md items-center rounded-t-3xl bg-neutral-100/50 px-safe-or-4 pb-3 shadow
+                shadow-black/60 backdrop-blur-2xl
+              `}
+              >
+                {bottom}
+              </nav>
+            </motion.footer>
+          </AnimatePresence>
         )}
       </div>
     </ErrorBoundary>
