@@ -158,6 +158,8 @@
     @apply [&>*:not(:last-child)]:after:content-[''] [&>*:not(:last-child)]:after:absolute [&>*:not(:last-child)]:after:top-[20%] [&>*:not(:last-child)]:after:right-0 [&>*:not(:last-child)]:after:h-[50%] [&>*:not(:last-child)]:after:w-px [&>*:not(:last-child)]:after:bg-white/50;
   }
 
+  /* .px-safe-or-6 */
+
   number-flow-react::part(suffix) {
     font-size: 0.875rem;
     font-weight: bold;
