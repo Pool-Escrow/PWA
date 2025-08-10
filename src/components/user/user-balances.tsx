@@ -12,7 +12,7 @@ export default function UserBalances() {
       <h1 className="text-sm font-semibold">Total balance</h1>
       <span>
         <NumberFlow
-          className="text-2xl font-medium"
+          className="text-4xl font-bold"
           value={usdc.balance}
           format={{
             currency: 'USD',
