@@ -30,11 +30,7 @@ export function HeroSkeleton() {
 
       {/* Action Bar Skeleton */}
       <div className="mt-4">
-        <div className={`
-          mx-auto h-[55px] w-full max-w-[340px] animate-pulse rounded-[12px]
-          bg-white/20
-        `}
-        />
+        <div className="mx-auto h-[55px] w-full max-w-[340px] animate-pulse rounded-[12px] bg-white/20" />
       </div>
       <div className="h-6" />
     </div>
