@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useTransitionRouter } from 'next-view-transitions'
 import { Button } from '@/components/ui/button'
 
 interface BackButtonProps {
@@ -8,7 +8,7 @@ interface BackButtonProps {
 }
 
 export default function BackButton({ rounded = false }: BackButtonProps = {}) {
-  const router = useRouter()
+  const router = useTransitionRouter()
   return (
     <Button
       onClick={() => router.back()}
