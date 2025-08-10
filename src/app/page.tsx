@@ -27,10 +27,10 @@ export default async function Page() {
         ),
       }}
       hero={(
-        <div className="mb-6 flex flex-col gap-4">
+        <>
           <UserBalances />
           <ActionBar />
-        </div>
+        </>
       )}
       // bottomCTA={
       // <Button className="w-full">Create Pool</Button>

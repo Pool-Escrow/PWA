@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorFallback, HeaderSkeleton, HeroSkeleton, PageSkeleton } from '../ui/skeletons'
-import { DynamicHeader } from './dynamic-header'
+import Header from './header'
 
 interface AppShellProps {
   children: ReactNode
@@ -26,7 +26,7 @@ export function AppShell({ children, header, hero, bottomCTA, loading, error }: 
       return null
     return (
       <Suspense fallback={<HeaderSkeleton />}>
-        <DynamicHeader
+        <Header
           {...header}
           className={`
             ${hero != null && 'shadow-none'}
@@ -43,7 +43,7 @@ export function AppShell({ children, header, hero, bottomCTA, loading, error }: 
     return (
       <div
         className={`
-          rounded-b-4xl bg-pool-blue px-safe-or-4
+          mb-4 flex flex-col rounded-b-4xl bg-pool-blue px-safe-or-4
           ${header && 'pt-15'}
         `}
       >
