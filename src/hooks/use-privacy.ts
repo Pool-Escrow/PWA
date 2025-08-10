@@ -64,7 +64,8 @@ export default function usePrivacy() {
         if (!isMounted)
           return
         const { hide, show } = usePrivacyStore.getState()
-        if (cookieHidden) hide()
+        if (cookieHidden)
+          hide()
         else show()
       }
       catch {
