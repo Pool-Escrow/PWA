@@ -29,10 +29,10 @@ interface HeaderProps {
 
 export default function Header({ backButton, title, rightContent, className }: HeaderProps) {
   return (
-    <header className={cn('grid h-12 grid-cols-[auto_1fr_auto] items-center px-3', className)}>
-      <div className="justify-self-start">{backButton != null && <BackButton rounded={backButton === 'rounded'} />}</div>
-      <div className="justify-self-center truncate text-center text-2xl font-semibold text-black">{title}</div>
-      <div className="flex items-center gap-2 justify-self-end">{rightContent}</div>
+    <header className={cn('relative flex h-12 items-center bg-amber-400 px-3', className)}>
+      <div className="min-w-0 bg-lime-200">{backButton != null && <BackButton rounded={backButton === 'rounded'} />}</div>
+      <div className="absolute left-1/2 max-w-[70%] -translate-x-1/2 truncate bg-red-300 text-center text-black">{title}</div>
+      <div className="ml-auto flex items-center gap-2 bg-blue-400">{rightContent}</div>
     </header>
   )
 }
