@@ -3,6 +3,7 @@ import ActionBar from '@/components/layout/action-bar'
 import { AppShell } from '@/components/layout/app-shell'
 import Onboarding from '@/components/onboarding'
 import PoolsList from '@/components/pools/pools-list'
+import { Button } from '@/components/ui/button'
 // import { Button } from '@/components/ui/button'
 import PrivacyButton from '@/components/user/privacy-button'
 import UserAvatar from '@/components/user/user-avatar'
@@ -32,9 +33,9 @@ export default async function Page() {
           <ActionBar />
         </>
       )}
-      // bottomCTA={
-      // <Button className="w-full">Create Pool</Button>
-      // }
+      bottom={
+        <Button className="w-full">Create Pool</Button>
+      }
     >
       <PoolsList />
     </AppShell>

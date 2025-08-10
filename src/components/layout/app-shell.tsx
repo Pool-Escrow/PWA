@@ -15,12 +15,12 @@ interface AppShellProps {
     className?: string
   }
   hero?: ReactNode // For the blue section with balance
-  bottomCTA?: ReactNode // For fixed buttons at the bottom
+  bottom?: ReactNode // For fixed buttons at the bottom
   loading?: ReactNode
   error?: ReactNode
 }
 
-export function AppShell({ children, header, hero, bottomCTA, loading, error }: AppShellProps) {
+export function AppShell({ children, header, hero, bottom, loading, error }: AppShellProps) {
   const renderHeader = () => {
     if (!header)
       return null
@@ -62,9 +62,9 @@ export function AppShell({ children, header, hero, bottomCTA, loading, error }: 
           <Suspense fallback={loading != null ? loading : <PageSkeleton />}>{children}</Suspense>
         </main>
 
-        {bottomCTA != null && (
-          <div className="fixed right-0 bottom-0 left-0 z-50 border-t border-gray-200 bg-white p-4 pb-safe">
-            {bottomCTA}
+        {bottom != null && (
+          <div className="fixed right-0 bottom-0 left-0 z-50 mb-safe-or-4 border-t border-gray-200 bg-white p-4">
+            {bottom}
           </div>
         )}
       </div>
