@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useUser } from '@/hooks/use-user'
 import { API_ROUTES, QUERY_KEYS } from '@/lib/constants'
 
@@ -22,6 +22,8 @@ export function useUserBalances() {
     queryFn: async () => fetchBalances(address as App.Address),
     refetchInterval: process.env.NODE_ENV === 'development' ? false : 20000,
     staleTime: process.env.NODE_ENV === 'development' ? 0 : 10000,
+    // Keep showing the previous data while the new address is fetching
+    placeholderData: keepPreviousData,
     enabled: Boolean(address),
   })
 
