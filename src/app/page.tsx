@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers'
-import ActionBar from '@/components/layout/action-bar'
+import ActionsBar from '@/components/layout/actions-bar'
 import { AppShell } from '@/components/layout/app-shell'
+import PageContent from '@/components/layout/page-content'
 import Onboarding from '@/components/onboarding'
-import PoolsList from '@/components/pools/pools-list'
 import PrivacyButton from '@/components/user/privacy-button'
 import UserAvatar from '@/components/user/user-avatar'
 import UserBalances from '@/components/user/user-balances'
@@ -27,11 +27,11 @@ export default async function Page() {
       hero={(
         <>
           <UserBalances />
-          <ActionBar />
+          <ActionsBar />
         </>
       )}
     >
-      <PoolsList />
+      <PageContent />
     </AppShell>
   )
 }
