@@ -2,8 +2,10 @@
 
 import type { Variants } from 'motion/react'
 import type { LinkProps } from 'next/link'
+import { useQueryClient } from '@tanstack/react-query'
 import { motion } from 'motion/react'
 import { Link } from 'next-view-transitions'
+import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -68,15 +70,27 @@ const itemVariants: Variants = {
 
 const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setOpen }): React.ReactNode => {
   const { logout } = useAuth()
+  const router = useRouter()
+  const queryClient = useQueryClient()
   const [hoveredItemIndex, setHoveredItemIndex] = useState<number | null>(null)
   const dropdownListRef = useRef<HTMLDivElement | null>(null)
   //   const { handleOnRamp } = useOnRamp()
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = async () => {
     try {
       console.warn('[user-dropdown] logging out')
       setOpen(false)
-      void logout()
+
+      // Invalidate all user-related queries
+      void queryClient.invalidateQueries({ queryKey: ['user'] })
+      void queryClient.invalidateQueries({ queryKey: ['user-balances'] })
+      void queryClient.removeQueries({ queryKey: ['user-balances'] })
+
+      // Wait for logout to complete
+      await logout()
+
+      // Navigate after logout is complete
+      router.push('/')
       //   toast.success('Disconnected successfully')
     }
     catch (error) {
@@ -106,15 +120,15 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
   const dropdownItemsConfig: DropdownItemConfig[] = [
     { label: 'Profile', icon: <Icon.eye size={16} />, href: '/profile' },
     { label: 'Deposit', icon: <Icon.swap size={16} />, onClick: handleDepositClick },
-    { label: 'Disconnect', icon: <Icon.wallet size={16} />, onClick: handleLogoutClick },
+    { label: 'Disconnect', icon: <Icon.wallet size={16} />, onClick: () => void handleLogoutClick() },
   ]
 
   const updatedDropdownItemsConfig: DropdownItemConfig[] = dropdownItemsConfig.map((item) => {
     switch (item.label) {
       case 'Disconnect':
-        return { ...item, onClick: handleLogoutClick }
+        return { ...item, onClick: () => void handleLogoutClick() }
       case 'Deposit':
-        return { ...item, onClick: handleDepositClick }
+        return { ...item, onClick: () => void handleDepositClick() }
       default:
         return item
     }
