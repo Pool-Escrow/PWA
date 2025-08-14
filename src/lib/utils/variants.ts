@@ -41,6 +41,11 @@ export const buttonVariants = cva(
                   text-primary underline-offset-4
                   hover:underline
                 `,
+        pool: `
+                  bg-pool-blue text-white shadow-[0px_4px_8px_0px_rgba(0,0,0,0.15)]
+                  hover:bg-pool-blue-active hover:cursor-pointer
+                  active:bg-pool-blue-active active:shadow-[0px_2px_4px_0px_rgba(0,0,0,0.2)]
+                `,
       },
       size: {
         default: `

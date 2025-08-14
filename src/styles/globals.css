@@ -129,6 +129,13 @@
   }
   body {
     @apply bg-background text-foreground overflow-hidden max-w-screen antialiased;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
 
   @view-transition {
@@ -146,16 +153,34 @@
 }
 
 @layer components {
-  .pool-button {
-    @apply bg-pool-blue text-white hover:bg-pool-blue/90 active:bg-pool-blue-active;
-  }
-
   .dropdown-backdrop {
     @apply fixed left-0 top-0 z-50 h-full w-full bg-white/30 backdrop-blur-sm;
   }
 
   .short-dividers {
     @apply [&>*:not(:last-child)]:after:content-[''] [&>*:not(:last-child)]:after:absolute [&>*:not(:last-child)]:after:top-[20%] [&>*:not(:last-child)]:after:right-0 [&>*:not(:last-child)]:after:h-[50%] [&>*:not(:last-child)]:after:w-px [&>*:not(:last-child)]:after:bg-white/50;
+  }
+
+  .detail_card_bg {
+    border: 0.5px solid rgba(190, 212, 235, 0.16);
+    background: #f6f6f6;
+    box-shadow: 0px 0px 5.5px 0px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(13.149999618530273px);
+  }
+
+  .mobile-scroll-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .main-home-login-button {
+    border: 0.5px solid rgba(190, 212, 235, 0.16);
+    background: #fff;
+    box-shadow: 0px 0px 5.5px 0px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(13.149999618530273px);
   }
 
   /* .px-safe-or-6 */
