@@ -1,7 +1,7 @@
 import { use } from 'react'
 import { AppShell } from '@/components/layout/app-shell'
 import PrivacyButton from '@/components/user/privacy-button'
-import UserAvatar from '@/components/user/user-avatar'
+import UserDropdown from '@/components/user/user-dropdown'
 import UserProfile from '@/components/user/user-profile'
 
 interface ProfilePageProps {
@@ -18,7 +18,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
         rightContent: (
           <>
             <PrivacyButton />
-            <UserAvatar />
+            <UserDropdown />
           </>
         ),
       }}
