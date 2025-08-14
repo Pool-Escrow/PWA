@@ -16,7 +16,7 @@ interface ActionItem {
   onClick: () => void
 }
 
-export default function ActionBar() {
+export default function ActionsBar() {
   const router = useRouter()
   const { login, authenticated } = usePrivy()
   const { fundWallet } = useFundWallet()
