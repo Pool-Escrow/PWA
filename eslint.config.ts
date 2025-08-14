@@ -8,11 +8,11 @@ export default antfu(
     typescript: { tsconfigPath: './config/tsconfig.eslint.json' },
     react: true,
     nextjs: true,
-    ignores: ['contracts/*', 'old/*'],
+    ignores: ['contracts/*', 'old/*', '**/*.md', '**/*.mdx'],
     formatters: {
       css: true,
       html: true,
-      markdown: true,
+      markdown: 'prettier',
       svg: true,
     },
     rules: {
@@ -41,11 +41,5 @@ export default antfu(
     },
   },
 
-  // 🟢 Disable rules for Markdown
-  {
-    files: ['**/*.md'],
-    rules: {
-      'import/first': 'off',
-    },
-  },
+
 )
