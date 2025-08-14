@@ -12,7 +12,7 @@ const cspDev = `
   default-src 'self';
   script-src 'self' 'unsafe-inline' 'unsafe-eval' https://auth.privy.io https://challenges.cloudflare.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://explorer-api.walletconnect.com;
   font-src 'self' https://fonts.gstatic.com data:;
   object-src 'none';
   base-uri 'self';
@@ -29,7 +29,7 @@ const cspProd = `
   default-src 'self';
   script-src 'self' https://auth.privy.io https://challenges.cloudflare.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' data: blob:;
+  img-src 'self' data: blob: https://explorer-api.walletconnect.com;
   font-src 'self' https://fonts.gstatic.com data:;
   object-src 'none';
   base-uri 'self';
