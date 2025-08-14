@@ -24,7 +24,7 @@ interface AppShellProps {
   onLogin?: () => void
 }
 export function AppShell({ children, header, hero, loading, error, onLogin }: AppShellProps) {
-  const { authenticated, login } = useAuth()
+  const { authenticated, login, ready } = useAuth()
   const hasHero = hero != null
   const contextValue = useMemo(() => ({ hasHero }), [hasHero])
 
@@ -67,7 +67,7 @@ export function AppShell({ children, header, hero, loading, error, onLogin }: Ap
               {children}
             </Suspense>
           </main>
-          {!authenticated && (
+          {ready && !authenticated && (
             <AnimatePresence presenceAffectsLayout>
               <motion.footer
                 initial={{ opacity: 0.7, y: 100 }}

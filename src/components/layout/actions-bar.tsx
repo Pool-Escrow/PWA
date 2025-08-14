@@ -18,11 +18,13 @@ interface ActionItem {
 
 export default function ActionsBar() {
   const router = useRouter()
-  const { login, authenticated } = usePrivy()
+  const { login, authenticated, ready } = usePrivy()
   const { fundWallet } = useFundWallet()
   const { wallets } = useWallets()
 
   const handleWithdraw = () => {
+    if (!ready)
+      return
     if (!authenticated) {
       login()
       return
@@ -31,6 +33,8 @@ export default function ActionsBar() {
   }
 
   const handleDeposit = () => {
+    if (!ready)
+      return
     const fundWalletConfig = {
       currencyCode: 'USDC_BASE' as MoonpayCurrencyCode,
       quoteCurrencyAmount: 10,
@@ -44,6 +48,8 @@ export default function ActionsBar() {
   }
 
   const handlePayRequest = () => {
+    if (!ready)
+      return
     if (!authenticated) {
       login()
       return
@@ -52,6 +58,8 @@ export default function ActionsBar() {
   }
 
   const handleBridge = () => {
+    if (!ready)
+      return
     if (!authenticated) {
       login()
       return
