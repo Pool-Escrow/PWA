@@ -1,133 +1,70 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { Link } from 'next-view-transitions'
-import { Skeleton } from '@/components/ui/skeletons'
-import { Button } from '../ui/button'
+import type { PoolItem } from '@/types/pools'
+import PoolListCard from './pools-list-item'
+import { motion } from 'framer-motion'
 
-interface Pool {
-  id: string
-  name: string
-  description: string
-  participants: number
-  maxParticipants: number
-  startDate: string
-  status: 'upcoming' | 'live' | 'ended'
-}
-
-// Placeholder data for now
-const mockPools: Pool[] = [
-  {
-    id: '1',
-    name: 'The Original Pool Poker Party',
-    description: 'Join us for an unforgettable night filled with laughter, drinks and poker!',
-    participants: 140,
-    maxParticipants: 200,
-    startDate: '2h 14m',
-    status: 'upcoming',
-  },
-  {
-    id: '2',
-    name: 'Women\'s Lunch w/ Base',
-    description: 'Networking lunch for women in tech',
-    participants: 168,
-    maxParticipants: 300,
-    startDate: 'Mar 28, 2025',
-    status: 'upcoming',
-  },
-  {
-    id: '3',
-    name: 'Arcade Corner w/ Tezza',
-    description: 'Retro gaming tournament',
-    participants: 77,
-    maxParticipants: 150,
-    startDate: 'Apr 12, 2025',
-    status: 'upcoming',
-  },
-]
-
-function PoolCard({ pool }: { pool: Pool }) {
-  return (
-    <Link href={`/pool/${pool.id}`}>
-      <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="size-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600" />
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">{pool.name}</h3>
-          <p className="text-sm text-gray-600">{pool.description}</p>
-          <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-            <span>
-              {pool.participants}
-              /
-              {pool.maxParticipants}
-              {' '}
-              Registered
-            </span>
-            <span>
-              Starts
-              {pool.startDate}
-            </span>
-          </div>
-        </div>
-      </div>
-    </Link>
-  )
-}
-
-function PoolsListSkeleton() {
-  return (
-    <div className="space-y-4">
-      {[1, 2, 3].map(id => (
-        <div
-          key={`skeleton-${id}`}
-          className="rounded-lg border border-gray-200 bg-white p-4"
-        >
-          <div className="flex items-start gap-3">
-            <Skeleton className="size-12 rounded-lg" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-5 w-3/4" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export default function PoolsList() {
-  const { data: pools, isLoading } = useQuery({
-    queryKey: ['pools'],
-    queryFn: async (): Promise<Pool[]> => {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      return mockPools
+const poolMessages = {
+    upcoming: {
+        title: 'No Pools on Your Horizon',
+        message: 'Time to dive in! Ready to make some waves?',
+        cta: 'Explore and join a pool to get started.',
+        link: null,
+        linkText: null,
     },
-    staleTime: 30000, // 30 seconds
-  })
+    past: {
+        title: 'Your Pool History Awaits',
+        message: 'Waiting for your first splash!',
+        cta: 'Your past pools will be here. What will be your first?',
+        link: null,
+        linkText: null,
+    },
+    feed: {
+        title: 'No Upcoming Pools Yet',
+        message: "We're working on bringing exciting pools to you!",
+        cta: null,
+        link: 'mailto:info@poolparty.cc',
+        linkText: 'Contact us',
+    },
+}
 
-  if (isLoading) {
-    return <PoolsListSkeleton />
-  }
+export default function PoolList({ pools, name = 'feed' }: { pools?: PoolItem[] | null; name?: string }) {
+    if (pools?.length === 0) {
+        const defaultMessage = {
+            title: 'No Pools Available',
+            message: 'There are currently no pools to display.',
+            cta: 'Check back later for new pools.',
+            link: null,
+            linkText: null,
+        }
+        const { title, message, cta, link, linkText } =
+            poolMessages[name as keyof typeof poolMessages] || defaultMessage
+        return (
+            <motion.div
+                className='flex h-24 items-center justify-center rounded-3xl bg-white p-4'
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}>
+                <div className='flex flex-col items-center gap-1'>
+                    <h2 className='text-sm font-semibold'>{title}</h2>
+                    <p className='text-xs text-gray-600'>{message}</p>
+                    <p className='text-xs text-gray-500'>{cta}</p>
+                    {link && linkText && (
+                        <a
+                            href={link}
+                            className=' text-xs text-blue-500 hover:underline'
+                            target='_blank'
+                            rel='noopener noreferrer'>
+                            {linkText}
+                        </a>
+                    )}
+                </div>
+            </motion.div>
+        )
+    }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">Upcoming Pools</h2>
-        <Button
-          className={`
-            text-sm text-blue-600
-            hover:text-blue-700
-          `}
-        >
-          View All
-        </Button>
-      </div>
-      <div className="flex flex-col gap-3">
-        {pools?.map(pool => (
-          <PoolCard key={pool.id} pool={pool} />
-        ))}
-      </div>
-    </div>
-  )
+    return (
+        <section className='flex flex-col gap-2 pb-4 select-none'>
+            {pools?.length ? pools.map(pool => <PoolListCard key={pool.id} {...pool} />) : null}
+        </section>
+    )
 }
