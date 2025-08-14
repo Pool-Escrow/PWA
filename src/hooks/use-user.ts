@@ -14,6 +14,7 @@ export function useUser() {
       ready,
     }),
     enabled: ready && !!address,
-    staleTime: Infinity, // User data doesn't change often
+    staleTime: 0, // Always refetch when dependencies change
+    gcTime: 0, // Immediately garbage collect when disabled
   })
 }

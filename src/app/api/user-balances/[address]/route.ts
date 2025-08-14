@@ -21,25 +21,19 @@ export async function GET(
 
     const address = addressResult.data
 
-    // Mock data - replace with actual API calls
-    const mockBalances: App.BalancesResponse = {
-      address,
-      balances: {
-        usdc: {
-          symbol: 'USDC',
-          balance: 1234.56,
-          rawBalance: '1234560000', // 6 decimals
-        },
-        drop: {
-          symbol: 'DROP',
-          balance: 18600,
-          rawBalance: '18600000000000000000000', // 18 decimals
-        },
-      },
+    // Fetch real balances from the blockchain using the existing balances endpoint
+    const baseUrl = request.nextUrl.origin
+    const balancesResponse = await fetch(`${baseUrl}/api/balances/${address}`)
+
+    if (!balancesResponse.ok) {
+      console.error('[API] Failed to fetch balances from blockchain:', balancesResponse.statusText)
+      return NextResponse.json({ error: 'Failed to fetch balances from blockchain' }, { status: 500 })
     }
 
+    const balancesData = await balancesResponse.json() as App.BalancesResponse
+
     // Validate response with Zod schema before sending
-    const validationResult = safeParseWithError(BalancesResponseSchema, mockBalances)
+    const validationResult = safeParseWithError(BalancesResponseSchema, balancesData)
     if (!validationResult.success) {
       console.error('[API] Response validation failed:', validationResult.error)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

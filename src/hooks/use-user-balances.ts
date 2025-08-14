@@ -1,6 +1,8 @@
 'use client'
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
 import { API_ROUTES, QUERY_KEYS } from '@/lib/constants'
 
@@ -15,22 +17,42 @@ async function fetchBalances(address: App.Address): Promise<App.BalancesResponse
 
 export function useUserBalances() {
   const { data: user } = useUser()
-  const address = user?.address ?? (process.env.NODE_ENV === 'development' ? '0x0000000000000000000000000000000000000001' : undefined)
+  const { authenticated } = useAuth()
+  const queryClient = useQueryClient()
+  const address = user?.address
+
+  // Clear balance queries when user logs out
+  useEffect(() => {
+    if (!authenticated) {
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.USER_BALANCES(address) })
+    }
+  }, [authenticated, address, queryClient])
 
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.USER_BALANCES(address),
     queryFn: async () => fetchBalances(address as App.Address),
-    refetchInterval: process.env.NODE_ENV === 'development' ? false : 20000,
-    staleTime: process.env.NODE_ENV === 'development' ? 0 : 10000,
-    // Keep showing the previous data while the new address is fetching
-    placeholderData: keepPreviousData,
-    enabled: Boolean(address),
+    refetchInterval: 20000, // 20 seconds
+    staleTime: 0, // Always refetch when address changes
+    // Don't keep previous data when user logs out
+    placeholderData: undefined,
+    enabled: Boolean(address) && authenticated, // Only fetch when user is authenticated
+    // Clear cache when user changes
+    gcTime: 0, // Immediately garbage collect when query is disabled
   })
 
-  // Always return consistent structure
+  // Return zero balances when user is not authenticated
+  if (address == null || !authenticated) {
+    return {
+      usdc: { balance: 0, symbol: 'USDC', rawBalance: '0' },
+      drop: { balance: 0, symbol: 'DROP', rawBalance: '0' },
+      isLoading: false,
+    }
+  }
+
+  // Return fetched balances or zero balances while loading
   return {
-    usdc: data?.balances?.usdc ?? { balance: 0, symbol: 'USDC' },
-    drop: data?.balances?.drop ?? { balance: 0, symbol: 'DROP' },
-    isLoading: isLoading && Boolean(address),
+    usdc: data?.balances?.usdc ?? { balance: 0, symbol: 'USDC', rawBalance: '0' },
+    drop: data?.balances?.drop ?? { balance: 0, symbol: 'DROP', rawBalance: '0' },
+    isLoading,
   }
 }
