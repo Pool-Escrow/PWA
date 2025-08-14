@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Suspense, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useAuth } from '@/hooks/use-auth'
+import { cn } from '@/lib/utils/tailwind'
 import { Button } from '../ui/button'
 import { ErrorFallback, HeaderSkeleton, HeroSkeleton, PageSkeleton } from '../ui/skeletons'
 import Header from './header'
@@ -26,6 +27,7 @@ export function AppShell({ children, header, hero, loading, error, onLogin }: Ap
   const { authenticated, login } = useAuth()
   const hasHero = hero != null
   const contextValue = useMemo(() => ({ hasHero }), [hasHero])
+
   const renderHeader = () => {
     if (!header)
       return null
@@ -47,7 +49,7 @@ export function AppShell({ children, header, hero, loading, error, onLogin }: Ap
       return null
     return (
       <div
-        className="mb-4 flex flex-col rounded-b-4xl bg-pool-blue px-safe-or-4"
+        className="flex flex-col rounded-b-4xl bg-pool-blue px-safe-or-4"
         style={{ '--icon-color': 'white' } as React.CSSProperties}
       >
         <Suspense fallback={<HeroSkeleton />}>{hero}</Suspense>
@@ -57,11 +59,13 @@ export function AppShell({ children, header, hero, loading, error, onLogin }: Ap
   return (
     <ErrorBoundary fallback={error != null ? error : <ErrorFallback />}>
       <HeaderContext value={contextValue}>
-        <div>
+        <div className="fixed inset-0 flex flex-col">
           {renderHeader()}
-          {renderHero()}
-          <main className="flex flex-col gap-4 px-safe-or-2">
-            <Suspense fallback={loading != null ? loading : <PageSkeleton />}>{children}</Suspense>
+          <main className={cn('flex flex-1 flex-col overflow-hidden')}>
+            <Suspense fallback={loading != null ? loading : <PageSkeleton />}>
+              {renderHero()}
+              {children}
+            </Suspense>
           </main>
           {!authenticated && (
             <AnimatePresence presenceAffectsLayout>
@@ -73,23 +77,22 @@ export function AppShell({ children, header, hero, loading, error, onLogin }: Ap
                   duration: 0.2,
                   ease: 'easeInOut',
                 }}
-                className="fixed bottom-0 left-0 z-30 w-full"
+                className="fixed inset-x-0 bottom-0 z-50"
               >
-                <nav className={`
-                  mx-auto flex h-24 max-w-screen-md items-center rounded-t-3xl bg-neutral-100/50 px-safe-or-4 pb-3
-                  shadow shadow-black/60 backdrop-blur-2xl
-                `}
-                >
-                  <Button
-                    className={`
-                      pool-button mb-3 h-[46px] w-full rounded-[2rem] px-4 py-[11px] text-center text-base
-                      leading-normal font-semibold text-white
-                    `}
-                    onClick={onLogin ?? login}
-                  >
-                    Login
-                  </Button>
-                </nav>
+                <div className="main-home-login-button rounded-t-[2rem] pb-safe-or-6">
+                  <div className="mx-auto max-w-screen-md pt-[15px] px-safe-or-6">
+                    <Button
+                      variant="pool"
+                      className={`
+                        mb-3 h-[46px] w-full rounded-[2rem] px-4 py-[11px] text-center text-base leading-normal
+                        font-semibold
+                      `}
+                      onClick={onLogin ?? login}
+                    >
+                      Login
+                    </Button>
+                  </div>
+                </div>
               </motion.footer>
             </AnimatePresence>
           )}
