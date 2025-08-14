@@ -1,7 +1,9 @@
+import type { PoolItem } from '@/types/pools'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 import { createPublicClient, http, parseAbi } from 'viem'
 import { baseSepolia } from 'viem/chains'
+import { POOLSTATUS } from '@/types/pools'
 
 export const runtime = 'edge'
 
@@ -126,6 +128,130 @@ app.get('/user-info/:privyId', async (c) => {
   catch (error) {
     console.error('Error fetching user info:', error)
     return c.json({ error: 'Error fetching user info' }, 500)
+  }
+})
+
+// Mock pools data - using ISO strings for consistent JSON serialization
+const mockPools: PoolItem[] = [
+  {
+    id: '1',
+    name: 'Weekly Challenge Pool',
+    image: '/app/images/frog.png',
+    startDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
+    endDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(), // 9 days from now
+    status: POOLSTATUS.DEPOSIT_ENABLED,
+    numParticipants: 15,
+    softCap: 50,
+    hostAddress: '0x1234567890123456789012345678901234567890',
+    depositAmountPerPerson: 10,
+    description: 'Weekly fitness challenge pool',
+  },
+  {
+    id: '2',
+    name: 'Morning Workout Pool',
+    image: '/app/images/frog.png',
+    startDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day from now
+    endDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(), // 8 days from now
+    status: POOLSTATUS.DEPOSIT_ENABLED,
+    numParticipants: 8,
+    softCap: 20,
+    hostAddress: '0x2345678901234567890123456789012345678901',
+    depositAmountPerPerson: 5,
+    description: 'Early morning workout commitment pool',
+  },
+  {
+    id: '3',
+    name: 'Study Group Challenge',
+    image: '/app/images/frog.png',
+    startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
+    endDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
+    status: POOLSTATUS.STARTED,
+    numParticipants: 12,
+    softCap: 15,
+    hostAddress: '0x3456789012345678901234567890123456789012',
+    depositAmountPerPerson: 15,
+    description: 'Daily study commitment pool',
+  },
+  {
+    id: '4',
+    name: 'Reading Challenge',
+    image: '/app/images/frog.png',
+    startDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
+    endDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    status: POOLSTATUS.ENDED,
+    numParticipants: 25,
+    softCap: 30,
+    hostAddress: '0x4567890123456789012345678901234567890123',
+    depositAmountPerPerson: 20,
+    description: 'Monthly reading challenge pool',
+  },
+]
+
+// Pools endpoints
+app.get('/pools', (c) => {
+  try {
+    return c.json({
+      pools: mockPools,
+      total: mockPools.length,
+    })
+  }
+  catch (error) {
+    console.error('Error fetching pools:', error)
+    return c.json({ error: 'Error fetching pools' }, 500)
+  }
+})
+
+app.get('/pools/upcoming', (c) => {
+  try {
+    const upcomingPools = mockPools.filter(pool =>
+      pool.status === POOLSTATUS.DEPOSIT_ENABLED
+      || pool.status === POOLSTATUS.STARTED,
+    )
+
+    return c.json({
+      pools: upcomingPools,
+      total: upcomingPools.length,
+    })
+  }
+  catch (error) {
+    console.error('Error fetching upcoming pools:', error)
+    return c.json({ error: 'Error fetching upcoming pools' }, 500)
+  }
+})
+
+app.get('/pools/user/:address', async (c) => {
+  try {
+    const address = c.req.param('address')
+
+    // Mock user pools - in real implementation, filter by user participation
+    const userPools = mockPools.filter((_, index) => index < 2) // Mock: first 2 pools for any user
+
+    return c.json({
+      pools: userPools,
+      total: userPools.length,
+      address,
+    })
+  }
+  catch (error) {
+    console.error('Error fetching user pools:', error)
+    return c.json({ error: 'Error fetching user pools' }, 500)
+  }
+})
+
+app.get('/pools/:id', (c) => {
+  try {
+    const id = c.req.param('id')
+    const pool = mockPools.find(p => p.id === id)
+
+    if (!pool) {
+      return c.json({ error: 'Pool not found' }, 404)
+    }
+
+    return c.json({ pool })
+  }
+  catch (error) {
+    console.error('Error fetching pool details:', error)
+    return c.json({ error: 'Error fetching pool details' }, 500)
   }
 })
 
