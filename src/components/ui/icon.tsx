@@ -11,6 +11,7 @@ const ICON_MAP = {
   delete: 'lucide:trash-2',
   drop: 'ic:sharp-water-drop',
   edit: 'lucide:pencil',
+  ellipsis: 'lucide:ellipsis',
   eye: 'mdi:eye',
   eyeOff: 'mdi:eye-off',
   loading: 'lucide:loader-circle',
@@ -26,15 +27,21 @@ const ICON_MAP = {
 
 export interface StaticIconProps {
   className?: string
+  size?: number
 }
 
 // Base Icon component for rendering sprites
-function BaseIcon({ name, className }: { name: keyof typeof ICON_MAP, className?: string }) {
+function BaseIcon({ name, className, size }: { name: keyof typeof ICON_MAP, className?: string, size?: number }) {
   const iconName = ICON_MAP[name]
 
   return (
     <svg
-      className={cn('inline-block size-[1em] text-white', className)}
+      className={cn('inline-block', className)}
+      style={{
+        width: size,
+        height: size,
+        color: 'var(--icon-color, currentColor)',
+      }}
       aria-hidden="true"
       focusable="false"
     >

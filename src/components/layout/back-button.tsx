@@ -2,6 +2,7 @@
 
 import { useTransitionRouter } from 'next-view-transitions'
 import { Button } from '@/components/ui/button'
+import Icon from '@/components/ui/icon'
 
 interface BackButtonProps {
   rounded?: boolean
@@ -20,12 +21,7 @@ export default function BackButton({ rounded = false }: BackButtonProps = {}) {
       `}
       size="icon"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" className="size-7" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M14.0002 18L15.4102 16.59L10.8302 12L15.4102 7.41L14.0002 6L8.00016 12L14.0002 18Z"
-          fill="#5472E9"
-        />
-      </svg>
+      <Icon.chevronLeft className="size-7" />
     </Button>
   )
 }

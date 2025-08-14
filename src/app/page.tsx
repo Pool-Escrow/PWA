@@ -3,8 +3,6 @@ import ActionBar from '@/components/layout/action-bar'
 import { AppShell } from '@/components/layout/app-shell'
 import Onboarding from '@/components/onboarding'
 import PoolsList from '@/components/pools/pools-list'
-import { Button } from '@/components/ui/button'
-// import { Button } from '@/components/ui/button'
 import PrivacyButton from '@/components/user/privacy-button'
 import UserAvatar from '@/components/user/user-avatar'
 import UserBalances from '@/components/user/user-balances'
@@ -19,7 +17,6 @@ export default async function Page() {
   return (
     <AppShell
       header={{
-        className: 'bg-transparent',
         rightContent: (
           <>
             <PrivacyButton />
@@ -33,9 +30,6 @@ export default async function Page() {
           <ActionBar />
         </>
       )}
-      bottom={
-        <Button className="w-full">Create Pool</Button>
-      }
     >
       <PoolsList />
     </AppShell>

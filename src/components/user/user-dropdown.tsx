@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import { Link } from 'next-view-transitions'
 import { useRef, useState } from 'react'
 import { useAuth } from '@/hooks/use-auth'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuPortal, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import Icon from '../ui/icon'
 
 interface UserDropdownItemProps {
@@ -14,7 +14,6 @@ interface UserDropdownItemProps {
   icon?: React.ReactNode
   label: string
   onClick?: () => void
-  showSeparator?: boolean
 }
 
 function UserDropdownItem({
@@ -22,7 +21,6 @@ function UserDropdownItem({
   icon,
   label,
   onClick,
-  showSeparator = true,
 }: UserDropdownItemProps): React.ReactNode {
   const menuItem = (
     <DropdownMenuLabel
@@ -48,8 +46,6 @@ function UserDropdownItem({
         : (
             <div>{menuItem}</div>
           )}
-
-      {showSeparator && <DropdownMenuSeparator />}
     </>
   )
 }
@@ -80,7 +76,7 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
     try {
       console.warn('[user-dropdown] logging out')
       setOpen(false)
-      logout()
+      void logout()
       //   toast.success('Disconnected successfully')
     }
     catch (error) {
@@ -130,7 +126,7 @@ const UserDropdownList: React.FC<{ setOpen: (open: boolean) => void }> = ({ setO
       animate="open"
       exit="closed"
       variants={menuVariants}
-      className="pointer-events-none relative w-[213px] cursor-pointer"
+      className="pointer-events-none relative w-[213px] cursor-pointer divide-y divide-gray-200"
       ref={dropdownListRef}
       style={{ pointerEvents: 'none' }}
     >
