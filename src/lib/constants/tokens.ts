@@ -5,12 +5,12 @@ export const TOKEN_ADDRESSES = {
   // Base Sepolia Testnet (84532)
   84532: {
     USDC: '0x036CbD53842c5426634e7929541eC2318f3dCF7e' as const,
-    DROP: '0x0000000000000000000000000000000000000000' as const, // TODO: Deploy DROP token
+    DROP: '0xc9e3a0b2d65cbb151fa149608f99791543290d6d' as const, // Deployed DROP token
   },
   // Base Mainnet (8453)
   8453: {
     USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as const,
-    DROP: '0x0000000000000000000000000000000000000000' as const, // TODO: Deploy DROP token
+    DROP: '0xd8a698486782d0d3fa336c0f8dd7856196c97616' as const, // Deployed DROP token
   },
   // Ethereum Mainnet (1)
   1: {
