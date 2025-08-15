@@ -1,7 +1,9 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import AdminBadge from '@/components/ui/admin-badge'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useUserRoles } from '@/hooks/use-user-roles'
 import { Button } from '../ui/button'
 import UserBalances from './user-balances'
 
@@ -46,6 +48,7 @@ function UserProfileSkeleton() {
 }
 
 export default function UserProfile({ address }: UserProfileProps) {
+  const { isAdmin, isHost, isSponsor } = useUserRoles()
   const { data: profile, isLoading } = useQuery({
     queryKey: ['user-profile', address],
     queryFn: async (): Promise<UserProfileData> => {
@@ -82,11 +85,37 @@ export default function UserProfile({ address }: UserProfileProps) {
     <div className="space-y-6 p-4">
       {/* Profile Header */}
       <div className="flex items-center gap-4">
-        <div className="size-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+        <div className="relative">
+          <div className="size-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+          {/* Show admin badge if user has admin role */}
+          {isAdmin && (
+            <div className="absolute -top-1 -right-1">
+              <AdminBadge variant="admin" size="md" />
+            </div>
+          )}
+          {/* Show host badge if user has host role but not admin */}
+          {!isAdmin && isHost && (
+            <div className="absolute -top-1 -right-1">
+              <AdminBadge variant="host" size="md" />
+            </div>
+          )}
+          {/* Show sponsor badge if user has sponsor role but not admin or host */}
+          {!isAdmin && !isHost && isSponsor && (
+            <div className="absolute -top-1 -right-1">
+              <AdminBadge variant="sponsor" size="md" />
+            </div>
+          )}
+        </div>
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">
-            {displayName}
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-semibold text-gray-900">
+              {displayName}
+            </h1>
+            {/* Show role badges next to name */}
+            {isAdmin && <AdminBadge variant="admin" size="sm" />}
+            {!isAdmin && isHost && <AdminBadge variant="host" size="sm" />}
+            {!isAdmin && !isHost && isSponsor && <AdminBadge variant="sponsor" size="sm" />}
+          </div>
           <p className="text-sm text-gray-500">
             {address.slice(0, 6)}
             ...

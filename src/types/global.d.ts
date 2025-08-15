@@ -62,6 +62,18 @@ declare global {
     }
 
     /**
+     * User roles response from API
+     */
+    interface UserRolesResponse {
+      address: Address
+      roles: {
+        isAdmin: boolean
+        isHost: boolean
+        isSponsor: boolean
+      }
+    }
+
+    /**
      * Component prop helpers
      */
     type WithAddress<T = object> = T & {

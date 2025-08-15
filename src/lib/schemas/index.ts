@@ -48,6 +48,18 @@ export const BalancesResponseSchema = z.object({
 }) satisfies z.ZodType<App.BalancesResponse>
 
 /**
+ * User roles schema
+ */
+export const UserRolesSchema = z.object({
+  address: AddressSchema,
+  roles: z.object({
+    isAdmin: z.boolean(),
+    isHost: z.boolean(),
+    isSponsor: z.boolean(),
+  }),
+}) satisfies z.ZodType<App.UserRolesResponse>
+
+/**
  * Pool schema
  * TODO: Will be used for pool creation and validation
  */

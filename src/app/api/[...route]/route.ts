@@ -40,6 +40,9 @@ app.get('/balances/:address', async (c) => {
       return c.json({ error: 'Invalid address' }, 400)
     }
 
+    // Set simple caching headers for balance data
+    c.header('Cache-Control', 'public, s-maxage=300, max-age=300') // 5 minutes
+
     // Read balances in parallel
     const [usdcBalance, dropBalance, usdcDecimals, dropDecimals, usdcSymbol, dropSymbol] = await Promise.all([
       client.readContract({
@@ -190,6 +193,9 @@ const mockPools: PoolItem[] = [
 // Pools endpoints
 app.get('/pools', (c) => {
   try {
+    // Set simple caching headers for pool data
+    c.header('Cache-Control', 'public, s-maxage=1800, max-age=1800') // 30 minutes
+
     return c.json({
       pools: mockPools,
       total: mockPools.length,
@@ -203,6 +209,9 @@ app.get('/pools', (c) => {
 
 app.get('/pools/upcoming', (c) => {
   try {
+    // Set simple caching headers for pool data
+    c.header('Cache-Control', 'public, s-maxage=1800, max-age=1800') // 30 minutes
+
     const upcomingPools = mockPools.filter(pool =>
       pool.status === POOLSTATUS.DEPOSIT_ENABLED
       || pool.status === POOLSTATUS.STARTED,
@@ -223,6 +232,9 @@ app.get('/pools/user/:address', async (c) => {
   try {
     const address = c.req.param('address')
 
+    // Set simple caching headers for user-specific pool data
+    c.header('Cache-Control', 'public, s-maxage=900, max-age=900') // 15 minutes
+
     // Mock user pools - in real implementation, filter by user participation
     const userPools = mockPools.filter((_, index) => index < 2) // Mock: first 2 pools for any user
 
@@ -241,6 +253,10 @@ app.get('/pools/user/:address', async (c) => {
 app.get('/pools/:id', (c) => {
   try {
     const id = c.req.param('id')
+
+    // Set simple caching headers for pool data (30 minutes)
+    c.header('Cache-Control', 'public, s-maxage=1800, max-age=1800')
+
     const pool = mockPools.find(p => p.id === id)
 
     if (!pool) {

@@ -31,13 +31,9 @@ export function useUserBalances() {
   const { data, isLoading } = useQuery({
     queryKey: QUERY_KEYS.USER_BALANCES(address),
     queryFn: async () => fetchBalances(address as App.Address),
-    refetchInterval: 20000, // 20 seconds
-    staleTime: 0, // Always refetch when address changes
-    // Don't keep previous data when user logs out
-    placeholderData: undefined,
-    enabled: Boolean(address) && authenticated, // Only fetch when user is authenticated
-    // Clear cache when user changes
-    gcTime: 0, // Immediately garbage collect when query is disabled
+    refetchInterval: 30000, // 30 seconds
+    staleTime: 20000, // 20 seconds - consider data fresh for 20 seconds
+    enabled: Boolean(address) && authenticated,
   })
 
   // Return zero balances when user is not authenticated
