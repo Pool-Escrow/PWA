@@ -1,3 +1,6 @@
-[submodule "contracts"]
-	path = contracts
+[submodule "contracts/pool"]
+	path = contracts/pool
 	url = https://github.com/ottodevs/pool-smart-contracts.git
+[submodule "contracts/droplet"]
+	path = contracts/droplet
+	url = https://github.com/ottodevs/droplet-smart-contracts.git
