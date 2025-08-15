@@ -25,27 +25,58 @@ export interface PoolItem {
   description?: string
 }
 
+// Smart contract structures
+export interface PoolAdmin {
+  host: `0x${string}`
+  penaltyFeeRate: number
+}
+
 export interface PoolDetail {
   timeStart: number
   timeEnd: number
   poolName: string
-  depositAmountPerPerson: number
+  depositAmountPerPerson: bigint
 }
 
 export interface PoolBalance {
-  totalDeposits: number
-  feesAccumulated: number
-  feesCollected: number
-  balance: number
-  sponsored: number
+  totalDeposits: bigint
+  feesAccumulated: bigint
+  feesCollected: bigint
+  balance: bigint
+  sponsored: bigint
 }
 
 export interface ParticipantDetail {
-  deposit: number
-  feesCharged: number
+  deposit: bigint
+  feesCharged: bigint
   participantIndex: number
   joinedPoolsIndex: number
   refunded: boolean
+}
+
+export interface WinnerDetail {
+  amountWon: bigint
+  amountClaimed: bigint
+  timeWon: number
+  claimed: boolean
+  forfeited: boolean
+  alreadyInList: boolean
+}
+
+export interface SponsorDetail {
+  name: string
+  amount: bigint
+}
+
+// Complete pool data from smart contract
+export interface PoolData {
+  poolAdmin: PoolAdmin
+  poolDetail: PoolDetail
+  poolBalance: PoolBalance
+  poolStatus: POOLSTATUS
+  poolToken: `0x${string}`
+  participants: `0x${string}`[]
+  winners: `0x${string}`[]
 }
 
 export type PoolsListType = 'upcoming' | 'user' | 'feed'

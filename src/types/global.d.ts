@@ -73,6 +73,63 @@ declare global {
       }
     }
 
+    // Smart contract types
+    interface PoolAdmin {
+      host: Address
+      penaltyFeeRate: number
+    }
+
+    interface PoolDetail {
+      timeStart: number
+      timeEnd: number
+      poolName: string
+      depositAmountPerPerson: bigint
+    }
+
+    interface PoolBalance {
+      totalDeposits: bigint
+      feesAccumulated: bigint
+      feesCollected: bigint
+      balance: bigint
+      sponsored: bigint
+    }
+
+    interface ParticipantDetail {
+      deposit: bigint
+      feesCharged: bigint
+      participantIndex: number
+      joinedPoolsIndex: number
+      refunded: boolean
+    }
+
+    interface WinnerDetail {
+      amountWon: bigint
+      amountClaimed: bigint
+      timeWon: number
+      claimed: boolean
+      forfeited: boolean
+      alreadyInList: boolean
+    }
+
+    interface SponsorDetail {
+      name: string
+      amount: bigint
+    }
+
+    interface PoolData {
+      poolAdmin: PoolAdmin
+      poolDetail: PoolDetail
+      poolBalance: PoolBalance
+      poolStatus: import('@/types/pools').POOLSTATUS
+      poolToken: Address
+      participants: Address[]
+      winners: Address[]
+    }
+
+    // Re-export POOLSTATUS for easier access
+    type POOLSTATUS = import('@/types/pools').POOLSTATUS
+    type PoolItem = import('@/types/pools').PoolItem
+
     /**
      * Component prop helpers
      */

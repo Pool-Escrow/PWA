@@ -4,18 +4,20 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
-import { API_ROUTES, QUERY_KEYS } from '@/lib/constants'
+import { QUERY_KEYS } from '@/lib/constants'
+import { safeQueryData, UserRolesSchema } from '@/lib/schemas'
+import { fetchUserRoles } from './use-pool-contract'
 
-async function fetchUserRoles(address: App.Address): Promise<App.UserRolesResponse> {
-  const response = await fetch(`${API_ROUTES.USER_ROLES}/${address}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch user roles')
-  }
-  const data = (await response.json()) as App.UserRolesResponse
-  return data
+const defaultRoles: App.UserRolesResponse = {
+  address: '0x0000000000000000000000000000000000000000' as App.Address,
+  roles: {
+    isAdmin: false,
+    isHost: false,
+    isSponsor: false,
+  },
 }
 
-export function useUserRoles() {
+export function useUserRoles(chainId: number = 84532) {
   const { data: user } = useUser()
   const { authenticated } = useAuth()
   const queryClient = useQueryClient()
@@ -28,11 +30,18 @@ export function useUserRoles() {
     }
   }, [authenticated, address, queryClient])
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.USER_ROLES(address),
-    queryFn: async () => fetchUserRoles(address as App.Address),
-    staleTime: 60 * 60 * 1000, // 1 hour - consider data fresh for 1 hour
+    queryFn: async () => fetchUserRoles(address as App.Address, chainId),
+    staleTime: 60 * 60 * 1000, // 1 hour - roles don't change often
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours - keep roles in cache for a full day
     enabled: Boolean(address) && authenticated,
+    retry: 1,
+    retryDelay: 3000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false, // Don't refetch on network reconnect
+    refetchInterval: false, // Never auto-refetch roles
   })
 
   // Return default roles when user is not authenticated
@@ -42,14 +51,29 @@ export function useUserRoles() {
       isHost: false,
       isSponsor: false,
       isLoading: false,
+      isError: false,
     }
   }
 
-  // Return fetched roles or default roles while loading
+  // Handle error state gracefully - return default values instead of error
+  if (isError || data === null || data === undefined) {
+    return {
+      isAdmin: defaultRoles.roles.isAdmin,
+      isHost: defaultRoles.roles.isHost,
+      isSponsor: defaultRoles.roles.isSponsor,
+      isLoading: false, // Don't show loading state on error
+      isError: false, // Don't expose error to UI
+    }
+  }
+
+  // Use Zod schema to safely extract data
+  const safeData = safeQueryData(data, UserRolesSchema, defaultRoles)
+
   return {
-    isAdmin: data?.roles?.isAdmin ?? false,
-    isHost: data?.roles?.isHost ?? false,
-    isSponsor: data?.roles?.isSponsor ?? false,
+    isAdmin: safeData.roles.isAdmin,
+    isHost: safeData.roles.isHost,
+    isSponsor: safeData.roles.isSponsor,
     isLoading,
+    isError: false, // Never expose errors to UI
   }
 }

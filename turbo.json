@@ -3,17 +3,26 @@
   "globalDependencies": [".env"],
   "tasks": {
     "build": {
-      "dependsOn": ["generate:icons"],
+      "dependsOn": ["generate:icons", "generate:contracts"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "dev:next": {
-      "dependsOn": ["generate:icons"],
+      "dependsOn": ["generate:icons", "generate:contracts"],
       "cache": false,
       "persistent": true
     },
     "generate:icons": {
       "inputs": ["scripts/generate-icon-assets.ts", "src/components/ui/icon.tsx"],
       "outputs": ["public/icons/sprite.svg", ".next/icons-hash.txt"]
+    },
+    "generate:contracts": {
+      "inputs": [
+        "contracts/broadcast/**/run-*.json",
+        "contracts/src/**/*.sol",
+        "wagmi.config.ts",
+        "scripts/extract-deployments.ts"
+      ],
+      "outputs": ["src/lib/contracts/generated.ts"]
     },
     "lint": {
       "outputs": []

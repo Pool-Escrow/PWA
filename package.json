@@ -1,15 +1,11 @@
 {
   "name": "pool-pwa",
-  "type": "module",
   "version": "0.0.0",
   "private": true,
-  "packageManager": "bun@1.2.19",
-  "engines": {
-    "node": "22.17.0"
-  },
+  "type": "module",
   "scripts": {
     "analyze": "ANALYZE=true bun run build:next",
-    "build": "bun run generate:icons && next build",
+    "build": "bun run generate:icons && bun run generate:contracts && next build",
     "build:next": "bun run generate:icons && next build",
     "clean": "rm -rf .next .turbo node_modules",
     "clean:reinstall": "rm -rf node_modules .next bun.lock && bun install",
@@ -19,15 +15,20 @@
     "fmt:check": "eslint",
     "fmt:code": "eslint --fix",
     "fmt:pkg": "bunx sort-package-json",
+    "generate:contracts": "bun scripts/extract-deployments.ts",
     "generate:icons": "bun scripts/generate-icon-assets.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "unused": "knip"
+    "unused": "knip",
+    "wagmi:generate": "wagmi generate"
   },
+  "overrides": {},
   "dependencies": {
     "@number-flow/react": "0.5.10",
+    "@orpc/client": "1.8.1",
+    "@orpc/server": "1.8.1",
     "@privy-io/react-auth": "2.21.1",
     "@radix-ui/react-avatar": "1.1.10",
     "@radix-ui/react-dropdown-menu": "2.1.16",
@@ -49,6 +50,8 @@
     "tailwind-merge": "3.3.1",
     "tailwindcss-safe-area": "1.1.0",
     "viem": "2.33.2",
+    "winston": "3.17.0",
+    "winston-daily-rotate-file": "5.0.0",
     "zod": "4.0.15",
     "zustand": "5.0.7"
   },
@@ -65,6 +68,7 @@
     "@types/node": "22.17.0",
     "@types/react": "19.1.9",
     "@types/react-dom": "19.1.7",
+    "@wagmi/cli": "2.4.0",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "eslint": "9.32.0",
     "eslint-config-next": "15.4.5",
@@ -79,7 +83,10 @@
     "tw-animate-css": "1.3.6",
     "typescript": "5.8.3"
   },
-  "overrides": {},
+  "packageManager": "bun@1.2.19",
+  "engines": {
+    "node": "22.17.0"
+  },
   "patchedDependencies": {
     "@antfu/eslint-config@5.1.0": "config/patches/@antfu%2Feslint-config@5.1.0.patch"
   },

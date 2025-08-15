@@ -10,7 +10,7 @@ import PoolListCard from './pools-list-item'
 
 export default function UserPoolsList() {
   const { ready, authenticated, login } = usePrivy()
-  const { data, isLoading } = useUserPools()
+  const { data, isLoading, isError } = useUserPools()
   const hasNextPool = data?.pools && data.pools.length > 0
 
   return (
@@ -87,25 +87,38 @@ export default function UserPoolsList() {
                             </div>
                           </motion.div>
                         )
-                      : hasNextPool
+                      : isError
                         ? (
-                            data?.pools.map(pool => (
-                              <PoolListCard key={pool.id} {...pool} />
-                            ))
-                          )
-                        : (
                             <motion.div
                               className="flex h-24 items-center justify-center rounded-3xl bg-white p-4"
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                             >
                               <div className="flex flex-col items-center gap-1">
-                                <h2 className="text-sm font-semibold">Welcome to Pool</h2>
-                                <p className="text-xs text-gray-600">You&apos;re ready to dive in!</p>
-                                <p className="text-xs text-gray-500">Register to an upcoming pool below.</p>
+                                <h2 className="text-sm font-semibold">Unable to load pools</h2>
+                                <p className="text-xs text-gray-600">Please try again later</p>
                               </div>
                             </motion.div>
-                          )}
+                          )
+                        : hasNextPool
+                          ? (
+                              data?.pools.map(pool => (
+                                <PoolListCard key={pool.id} {...pool} />
+                              ))
+                            )
+                          : (
+                              <motion.div
+                                className="flex h-24 items-center justify-center rounded-3xl bg-white p-4"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                              >
+                                <div className="flex flex-col items-center gap-1">
+                                  <h2 className="text-sm font-semibold">Welcome to Pool</h2>
+                                  <p className="text-xs text-gray-600">You&apos;re ready to dive in!</p>
+                                  <p className="text-xs text-gray-500">Register to an upcoming pool below.</p>
+                                </div>
+                              </motion.div>
+                            )}
                   </div>
                 )}
       </div>

@@ -16,7 +16,7 @@ export default function PageContent() {
       }}
     >
       <div className={`
-        space-y-4 px-safe-or-2
+        space-y-4 pt-4 px-safe-or-2
         ${!authenticated ? 'pb-32' : 'pb-safe'}
       `}
       >

@@ -1,0 +1,18 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+]
+
+[rpc_endpoints]
+base = "${BASE_URL}"
+base_testnet = "${BASE_SEPOLIA_URL}"
+
+[etherscan]
+base = {key = "${BASESCAN_API_KEY}", url = "https://api.basescan.org/api", chain = "8453"}
+base_testnet = {key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api", chain = "84532"}
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

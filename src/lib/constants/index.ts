@@ -7,12 +7,18 @@ export const API_ROUTES = {
   USER_COOKIES: '/api/user-cookies',
 } as const
 
+// Re-export token constants
+export * from './tokens'
+
 // Query Keys for TanStack Query
 export const QUERY_KEYS = {
   USER_BALANCES: (address?: App.Address) => ['user-balances', address] as const,
   USER_ROLES: (address?: App.Address) => ['user-roles', address] as const,
   USER_PROFILE: (address?: App.Address) => ['user-profile', address] as const,
   POOLS: ['pools'] as const,
+  POOL: (id: string) => ['pool', id] as const,
+  POOLS_UPCOMING: ['pools', 'upcoming'] as const,
+  POOLS_USER: (address?: App.Address) => ['pools', 'user', address] as const,
   USER: (address?: App.Address, ready?: boolean) => ['user', address, ready] as const,
 } as const
 

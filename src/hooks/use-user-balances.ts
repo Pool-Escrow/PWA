@@ -4,18 +4,19 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { useAuth } from '@/hooks/use-auth'
 import { useUser } from '@/hooks/use-user'
-import { API_ROUTES, QUERY_KEYS } from '@/lib/constants'
+import { QUERY_KEYS } from '@/lib/constants'
+import { BalancesResponseSchema, safeQueryData } from '@/lib/schemas'
+import { fetchUserBalances } from './use-pool-contract'
 
-async function fetchBalances(address: App.Address): Promise<App.BalancesResponse> {
-  const response = await fetch(`${API_ROUTES.USER_BALANCES}/${address}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch balances')
-  }
-  const data = (await response.json()) as App.BalancesResponse
-  return data
+const defaultBalances: App.BalancesResponse = {
+  address: '0x0000000000000000000000000000000000000000' as App.Address,
+  balances: {
+    usdc: { balance: 0, symbol: 'USDC', rawBalance: '0' },
+    drop: { balance: 0, symbol: 'DROP', rawBalance: '0' },
+  },
 }
 
-export function useUserBalances() {
+export function useUserBalances(chainId: number = 84532) {
   const { data: user } = useUser()
   const { authenticated } = useAuth()
   const queryClient = useQueryClient()
@@ -28,27 +29,47 @@ export function useUserBalances() {
     }
   }, [authenticated, address, queryClient])
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: QUERY_KEYS.USER_BALANCES(address),
-    queryFn: async () => fetchBalances(address as App.Address),
-    refetchInterval: 30000, // 30 seconds
-    staleTime: 20000, // 20 seconds - consider data fresh for 20 seconds
+    queryFn: async () => fetchUserBalances(address as App.Address, chainId),
+    refetchInterval: 120000, // 2 minutes - even less frequent
+    staleTime: 90000, // 1.5 minutes - consider data fresh for longer
+    gcTime: 600000, // 10 minutes - keep in cache much longer
     enabled: Boolean(address) && authenticated,
+    retry: 1,
+    retryDelay: 3000,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false, // Don't refetch on network reconnect
   })
 
   // Return zero balances when user is not authenticated
   if (address == null || !authenticated) {
     return {
-      usdc: { balance: 0, symbol: 'USDC', rawBalance: '0' },
-      drop: { balance: 0, symbol: 'DROP', rawBalance: '0' },
+      usdc: defaultBalances.balances.usdc,
+      drop: defaultBalances.balances.drop,
       isLoading: false,
+      isError: false,
     }
   }
 
-  // Return fetched balances or zero balances while loading
+  // Handle error state gracefully - return default values instead of error
+  if (isError || data === null || data === undefined) {
+    return {
+      usdc: defaultBalances.balances.usdc,
+      drop: defaultBalances.balances.drop,
+      isLoading: false, // Don't show loading state on error
+      isError: false, // Don't expose error to UI
+    }
+  }
+
+  // Use Zod schema to safely extract data
+  const safeData = safeQueryData(data, BalancesResponseSchema, defaultBalances)
+
   return {
-    usdc: data?.balances?.usdc ?? { balance: 0, symbol: 'USDC', rawBalance: '0' },
-    drop: data?.balances?.drop ?? { balance: 0, symbol: 'DROP', rawBalance: '0' },
+    usdc: safeData.balances.usdc,
+    drop: safeData.balances.drop,
     isLoading,
+    isError: false, // Never expose errors to UI
   }
 }
