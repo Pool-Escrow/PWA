@@ -1,3 +1,3 @@
 [submodule "contracts"]
 	path = contracts
-	url = git@github.com:Pool-Escrow/Smart-Contracts-New.git
+	url = https://github.com/ottodevs/pool-smart-contracts.git
